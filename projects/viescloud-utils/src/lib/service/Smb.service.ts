@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ViesRestService } from './Rest.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { environment } from 'src/environments/environment.prod';
+import { environment } from 'projects/environments/environment.prod';
 import { Observable, first } from 'rxjs';
 import { Metadata } from '../model/Smb.model';
 import { VFile } from './Utils.service';

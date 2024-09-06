@@ -2,7 +2,7 @@ import { Observable, first, firstValueFrom } from "rxjs";
 import HttpClientUtils from "../model/HttpClientUtils.model";
 import { HttpClient } from "@angular/common/http";
 import { UtilsService } from "./Utils.service";
-import { environment } from "src/environments/environment.prod";
+import { environment } from "projects/environments/environment.prod";
 import { PropertyMatcherEnum } from "../model/Mat.model";
 import { MatDialog } from "@angular/material/dialog";
 import { ObjectDialog, ObjectDialogData } from "../dialog/object-dialog/object-dialog.component";

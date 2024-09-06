@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
 import { MatFormFieldAppearance } from '@angular/material/form-field';
-import { defaultTextColor } from 'src/app/app.module';
 import { FixChangeDetection } from '../../directive/FixChangeDetection';
 
 @Component({
@@ -74,7 +73,6 @@ export class MatFormFieldComponent extends FixChangeDetection implements OnInit,
   }
 
   ngOnInit() {
-    this.defaultTextColor = defaultTextColor;
     if((this.value === undefined || this.value === null) && this.blankObject) {
       this.value = structuredClone(this.blankObject);
       this.valueCopy = structuredClone(this.blankObject);
