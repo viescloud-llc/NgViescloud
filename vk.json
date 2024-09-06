@@ -1,5 +1,32 @@
 [
     {
+        "configId": 8,
+        "configName": "angular_workspace with git hook",
+        "path": "/vincent-services/v-eco",
+        "jobName": "wrap-dev",
+        "replaceMap": {
+            "projectUrl": "https://github.com/vincent-inc/NgViescloud",
+            "cicdUrl": "https://github.com/vincent-inc/CICD-config",
+            "displayName": "wrap dev",
+            "projectName": "wrap",
+            "environment": "dev",
+            "envFileId": "fef2ee70-534a-4613-b53d-65a43ea1a4a0"
+        }
+    },
+    {
+		"configId": 2,
+		"configName": "k8s",
+		"path": "/vincent-services/v-eco",
+		"jobName": "wrap-dev-k8s",
+		"replaceMap": {
+			"projectUrl": "https://github.com/vincent-inc/CICD-config",
+			"displayName": "wrap Dev k8s",
+			"triggerAfterJobName": "wrap-dev",
+			"k8sServiceFolderName": "wrap",
+			"environment": "dev"
+		}
+	},
+    {
         "configId": 9,
         "configName": "angular_workspace",
         "path": "/vincent-services/v-eco",
@@ -12,5 +39,45 @@
             "environment": "stage",
             "envFileId": "9e4f7dc1-440b-4f56-b743-952a6e72b4e6"
         }
-    }
+    },
+    {
+		"configId": 2,
+		"configName": "k8s",
+		"path": "/vincent-services/v-eco",
+		"jobName": "wrap-stage-k8s",
+		"replaceMap": {
+			"projectUrl": "https://github.com/vincent-inc/CICD-config",
+			"displayName": "wrap Dev k8s",
+			"triggerAfterJobName": "wrap-stage",
+			"k8sServiceFolderName": "wrap",
+			"environment": "stage"
+		}
+	},
+    {
+        "configId": 9,
+        "configName": "angular_workspace",
+        "path": "/vincent-services/v-eco",
+        "jobName": "wrap-prod",
+        "replaceMap": {
+            "projectUrl": "https://github.com/vincent-inc/NgViescloud",
+            "cicdUrl": "https://github.com/vincent-inc/CICD-config",
+            "displayName": "wrap dev",
+            "projectName": "wrap",
+            "environment": "prod",
+            "envFileId": "d038916e-099b-459d-9d50-1ef7de67b944"
+        }
+    },
+    {
+		"configId": 2,
+		"configName": "k8s",
+		"path": "/vincent-services/v-eco",
+		"jobName": "wrap-prod-k8s",
+		"replaceMap": {
+			"projectUrl": "https://github.com/vincent-inc/CICD-config",
+			"displayName": "wrap Dev k8s",
+			"triggerAfterJobName": "wrap-prod",
+			"k8sServiceFolderName": "wrap",
+			"environment": "prod"
+		}
+	}
 ]
