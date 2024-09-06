@@ -1,0 +1,31 @@
+<h1 mat-dialog-title>{{getTitle()}}</h1>
+<div mat-dialog-content appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
+  <ul *ngIf="value && productCategoriesOptions">
+    <li *ngIf="error">
+      <h1 class="text-center" style="color: red">{{error}}</h1>
+    </li>
+    <li>
+      <app-mat-form-field-input-option
+      label="Product Category"
+      [value]="value.category" (valueChange)="value.category = $event"
+      [options]="productCategoriesOptions"
+      noneLabel="please select a category"
+      [required]="true"
+      ></app-mat-form-field-input-option>
+    </li>
+    <li>
+      <app-mat-form-field-input-dynamic
+      label="Product"
+      objectLabel="Product"
+      [value]="value" (valueChange)="value = $event"
+      [blankObject]="data.blankObject"
+      styleWidth="100%"
+      ></app-mat-form-field-input-dynamic>
+    </li>
+  </ul>
+</div>
+<div mat-dialog-actions>
+  <button mat-raised-button color="primary" [disabled]="!validForm || !isValueChange()" (click)="triggerItemEvent()">{{getModifyLabel()}}</button>
+  <button mat-raised-button color="accent" [disabled]="!isValueChange()" (click)="revert()">Revert</button>
+  <button mat-raised-button color="warn" mat-dialog-close>Close</button>
+</div>

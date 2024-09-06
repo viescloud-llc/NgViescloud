@@ -1,0 +1,56 @@
+<mat-expansion-panel [ngStyle]="{width: styleWidth}" appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
+  <mat-expansion-panel-header>
+    <mat-panel-title>
+      List of {{label}}
+    </mat-panel-title>
+    <mat-panel-description>
+      Size: {{value.length}}
+    </mat-panel-description>
+  </mat-expansion-panel-header>
+  <ul>
+    <li *ngIf="showSizeInput">
+      <app-mat-form-field-input
+      [label]="'Number of ' + label"
+      [value]="value.length"
+      (valueChange)="listLength = $event"
+      (onValueChange)="updateListLength()"
+      defaultType="number"
+      [showMinMaxHint]="true"
+      min="0"
+      [max]="maxSize.toString()"
+      [required]="true"
+      [styleWidth]="styleWidth"
+      [manuallyEmitValue]="true"
+      [showClearIcon]="false"
+      [focusoutEmit]="false"
+      ></app-mat-form-field-input>
+    </li>
+    <ng-container *ngIf="blankObjectType !=='object' && blankObjectType !=='array'">
+      <li *ngFor="let item of value; let i = index; trackBy: trackByIndex;">
+        <app-mat-form-field-input
+        [label]="label + ' ' + (i + 1)"
+        [value]="item" (valueChange)="value[i] = $event"
+        styleWidth="100%"
+        [required]="required"
+        customIconLabel="remove_circle"
+        (onCustomIconClick)="remove(i)"
+        ></app-mat-form-field-input>
+      </li>
+    </ng-container>
+    <ng-container *ngIf="blankObjectType =='object'">
+      <ng-container *ngFor="let item of value; let i = index; trackBy: trackByIndex;">
+        <app-mat-form-field-input-dynamic
+        [label]="label"
+        [value]="item" (valueChange)="value[i] = $event"
+        [blankObject]="blankObject"
+        styleWidth="100%"
+        ></app-mat-form-field-input-dynamic>
+        <button *ngIf="showRemoveItemButton" (click)="removeWithWarning(i)" mat-raised-button color="warn">Remove this {{label}}</button>
+        <hr>
+      </ng-container>
+    </ng-container>
+    <li *ngIf="showAddItemButton">
+      <button mat-raised-button color="primary" style="width: 100%;" (click)="addNewItem()" [disabled]="reachMaxSize()">Add new {{label}}</button>
+    </li>
+  </ul>
+</mat-expansion-panel>

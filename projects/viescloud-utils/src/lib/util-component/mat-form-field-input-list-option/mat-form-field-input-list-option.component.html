@@ -1,0 +1,47 @@
+<mat-expansion-panel appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
+  <mat-expansion-panel-header>
+    <mat-panel-title>
+      List of {{label}}
+    </mat-panel-title>
+    <mat-panel-description>
+      Size: {{value.length}}
+    </mat-panel-description>
+  </mat-expansion-panel-header>
+  <br>
+  <ul>
+    <li *ngIf="showSizeInput">
+      <app-mat-form-field-input
+      [label]="'Number of ' + label"
+      [value]="value.length"
+      (valueChange)="listLength = $event"
+      (onValueChange)="updateListLength()"
+      defaultType="number"
+      [showMinMaxHint]="true"
+      min="0"
+      [max]="maxSize.toString()"
+      [required]="true"
+      [styleWidth]="styleWidth"
+      [manuallyEmitValue]="true"
+      [showClearIcon]="false"
+      [focusoutEmit]="false"
+      ></app-mat-form-field-input>
+    </li>
+    <ng-container>
+      <ng-container *ngFor="let item of value; let i = index; trackBy: trackByIndex;">
+        <app-mat-form-field-input-option
+        [label]="label"
+        [value]="value[i]" (valueChange)="value[i] = $event"
+        [options]="options"
+        styleWidth="95%"
+        noneLabel=""
+        [required]="required"
+        ></app-mat-form-field-input-option>
+        <button mat-icon-button color="primary" (click)="remove(i)" style="width: 5%;">
+          <mat-icon>delete</mat-icon>
+        </button>
+        <hr>
+      </ng-container>
+    </ng-container>
+    <li><button mat-raised-button color="primary" style="width: 100%;" (click)="addNewItem()" [disabled]="reachMaxSize()">Add new {{label}}</button></li>
+  </ul>
+</mat-expansion-panel>

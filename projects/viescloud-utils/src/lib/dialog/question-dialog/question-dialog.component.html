@@ -1,0 +1,67 @@
+<h1 mat-dialog-title>User ID: {{data.questionId}}</h1>
+<div mat-dialog-content>
+  <ul>
+    <li>
+      <app-mat-form-field-input
+      [value]="question.question!" (valueChange)="question.question = $event.toString()"
+      label="Question"
+      ></app-mat-form-field-input>
+    </li>
+    <li>
+      <app-mat-form-field-input
+      [value]="question.category!" (valueChange)="question.category = $event.toString()"
+      label="category"
+      ></app-mat-form-field-input>
+    </li>
+    <li>
+      <app-mat-form-field-input
+      [value]="question.orderBy!" (valueChange)="question.orderBy = +$event"
+      label="orderBy"
+      min="0"
+      defaultType="number"
+      ></app-mat-form-field-input>
+    </li>
+    <hr>
+    <li>
+      <h1>Possible Answer</h1>
+    </li>
+    <li *ngFor="let answer of question.possibleAnswer; let i = index">
+      <app-mat-form-field-input
+      [value]="answer" (valueChange)="this.question.possibleAnswer!.splice(i, 1, $event.toString())"
+      [manuallyEmitValue]="true"
+      label="Possible answer"
+      ></app-mat-form-field-input>
+    </li>
+    <li><button mat-raised-button color="primary" style="width: 100%;" (click)="addNewPossibleAnswer()">Add new possible answer</button></li>
+    <hr>
+    <li>
+      <h1>Answer</h1>
+    </li>
+    <li *ngFor="let answer of question.answer!.correctAnswer; let i = index" >
+      <mat-form-field style="width: 100%;" appearance="fill">
+        <mat-label>Correct Answer</mat-label>
+        <mat-select [(ngModel)]="question.answer!.correctAnswer![i]" required>
+          <div *ngFor="let q of question.possibleAnswer">
+            <mat-option [value]="q">{{q}}</mat-option>
+          </div>
+          <mat-option (click)="removeCorrectAnswer(i)">Remove</mat-option>
+        </mat-select>
+      </mat-form-field>
+  </li>
+    <li><button mat-raised-button color="primary" style="width: 100%;" (click)="addNewCorrectAnswer()">Add new Correct answer</button></li>
+    <li>
+      <app-mat-form-field-input
+      [value]="question.answer!.pointPerCorrectAnswer!" (valueChange)="question.answer!.pointPerCorrectAnswer = +$event"
+      label="Number of point per correct answer"
+      min="0"
+      defaultType="number"
+      ></app-mat-form-field-input>
+    </li>
+  </ul>
+</div>
+
+<div mat-dialog-actions>
+  <button mat-raised-button color="primary" [disabled]="!isValueChange()" (click)="save()">Save</button>
+  <button mat-raised-button color="accent" [disabled]="!isValueChange()" (click)="revert()">Revert</button>
+  <button mat-raised-button color="warn" mat-dialog-close>Close</button>
+</div>

@@ -1,0 +1,58 @@
+<h1 mat-dialog-title>User ID: {{data.lobbyId}}</h1>
+<div mat-dialog-content>
+  <ul *ngIf="user && lobby" appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
+    <li>
+      <app-mat-form-field-input
+      label="Host username"
+      [value]="user.username!"
+      [disable]="true"
+      [required]="true"
+      ></app-mat-form-field-input>
+    </li>
+    <li>
+      <app-mat-form-field-input
+      label="Lobby name"
+      [value]="lobby.name!" (valueChange)="lobby.name = $event.toString()"
+      [required]="true"
+      ></app-mat-form-field-input>
+    </li>
+    <li>
+      <app-mat-form-field-input
+      label="Lobby Description"
+      [value]="lobby.description!" (valueChange)="lobby.description = $event.toString()"
+      ></app-mat-form-field-input>
+    </li>
+    <li>
+      <mat-form-field style="width: 100%;" appearance="fill">
+        <mat-label>Lobby</mat-label>
+        <mat-select [(ngModel)]="lobby.currentGame" required>
+          <mat-option value="CHATTING">Just chatting</mat-option>
+          <mat-option value="BATTLESHIP">Battleship</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </li>
+    <li>
+      <app-mat-form-field-input
+      label="Lobby password"
+      [value]="lobby.password!" (valueChange)="lobby.password = $event.toString()"
+      [showVisibleSwitch]="true"
+      [switchVisibility]="false"
+      ></app-mat-form-field-input>
+    </li>
+    <li>
+      <app-mat-form-field-input
+      label="Max Player"
+      [value]="lobby.maxPlayer!" (valueChange)="lobby.maxPlayer = +$event"
+      min="1"
+      defaultType="number"
+      [required]="true"
+      ></app-mat-form-field-input>
+    </li>
+  </ul>
+</div>
+
+<div mat-dialog-actions>
+  <button mat-raised-button color="primary" [disabled]="!validForm || isValueNotChange()" (click)="save()">Save</button>
+  <button mat-raised-button color="accent" [disabled]="isValueNotChange()" (click)="revert()">Revert</button>
+  <button mat-raised-button color="warn" mat-dialog-close>Close</button>
+</div>
