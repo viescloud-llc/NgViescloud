@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
+    "start_wrap": "ng serve --project wrap",
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
