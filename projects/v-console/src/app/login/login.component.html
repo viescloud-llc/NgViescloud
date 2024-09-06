@@ -1,0 +1,17 @@
+<div class="margin-center">
+  <form [formGroup]="loginForm" class="d-flex flex-column">
+      <div *ngIf="error"><h1 class="text-center" style="color: red;">{{error}}</h1></div>
+      <mat-form-field appearance="fill">
+          <mat-label>Username</mat-label>
+          <input matInput placeholder="Username" formControlName="username" required>
+          <mat-error *ngIf="loginForm.get('username')?.getError('required')">Username can't be empty</mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+          <mat-label>Password</mat-label>
+          <input matInput type="password" placeholder="Password" formControlName="password" required>
+          <mat-error *ngIf="loginForm.get('password')?.getError('required')">Username can't be empty</mat-error>
+      </mat-form-field>
+      <button mat-raised-button color="primary" [disabled]="loginForm.invalid" (click)="login()">Login</button>
+  </form>
+  <h3>Need to <a routerLink="/register">register</a> ?</h3>
+</div>

@@ -1,0 +1,41 @@
+<div class="margin-center">
+  <h1 class="text-center">Auto Routing</h1>
+  <ul>
+    <li>
+      <button mat-raised-button color="primary" [disabled]="!isRouteChange()" (click)="save()">Apply all Setting</button>
+      <button mat-raised-button color="primary" [disabled]="!isRouteChange()" (click)="revert()">Revert Change</button>
+      <button mat-raised-button color="primary" (click)="importRoutes()">Import Setting</button>
+      <button mat-raised-button color="primary" (click)="exportRoute()">Export Current Setting</button>
+    </li>
+    <li>
+      <app-mat-form-field-input
+      label="Search any service name"
+      placeholder="e.g authenticator-service"
+      styleWidth="100%"
+      [(value)]="searchText"
+      ></app-mat-form-field-input>
+    </li>
+    <ng-container *ngFor="let swagger of swaggers">
+      <li *ngIf="containIgnoreCase(swagger.serviceName, searchText)">
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              {{swagger.serviceName}}
+            </mat-panel-title>
+            <mat-panel-description>
+              prefix: {{swagger.prefix}}
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+          <button mat-raised-button color="primary" style="width: fit-content;" (click)="editGlobalRule(swagger.prefix)">Change {{swagger.prefix}} global rule</button>
+          <app-mat-table
+          [matRows]="processPath(swagger.paths)"
+          [displayFilter]="true"
+          [blankObject]="blankPath"
+          (onEditRow)="editRuleFromSwaggerPath($event)"
+          ></app-mat-table>
+        </mat-expansion-panel>
+        <br>
+      </li>
+    </ng-container>
+  </ul>
+</div>

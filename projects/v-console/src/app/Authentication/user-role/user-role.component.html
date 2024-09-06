@@ -1,0 +1,25 @@
+<div class="margin-center">
+  <ul>
+    <li *ngFor="let role of userRoles">
+      <hr>
+        <h2>ID: {{role.id}}</h2>
+        <app-mat-form-field-input
+        label="Name"
+        placeholder="Some name"
+        [value]="role.name!.toString()" (valueOutput)="role.name = $event.toString()"
+        [alwayUppercase]="true"
+        ></app-mat-form-field-input>
+        <br>
+        <app-mat-form-field-input
+        label="Level"
+        placeholder="Some level"
+        defaultType="number"
+        [value]="role.level!" (valueOutput)="role.level = +$event"
+        ></app-mat-form-field-input>
+    </li>
+    <hr>
+    <button mat-raised-button color="primary" (click)="addNewRole()">Add new role</button>
+    <button mat-raised-button color="primary" [disabled]="!isValueChange()" (click)="save()">Save change</button>
+    <button mat-raised-button color="primary" [disabled]="!isValueChange()" (click)="reverseChange()">Reverse change</button>
+  </ul>
+</div>

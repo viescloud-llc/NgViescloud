@@ -5,6 +5,8 @@
     "ng": "ng",
     "start_wrap": "ng serve --project wrap",
     "build_wrap": "ng build --project wrap",
+    "start_v_console": "ng serve --project v-console",
+    "build_v_console": "ng build --project v-console",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
