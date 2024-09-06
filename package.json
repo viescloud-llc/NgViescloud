@@ -4,8 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start_wrap": "ng serve --project wrap",
-    "start": "ng serve",
-    "build": "ng build",
+    "build_wrap": "ng build --project wrap",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
