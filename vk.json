@@ -1,0 +1,16 @@
+[
+    {
+        "configId": 9,
+        "configName": "angular_workspace",
+        "path": "/vincent-services/v-eco",
+        "jobName": "wrap-stage",
+        "replaceMap": {
+            "projectUrl": "https://github.com/vincent-inc/NgViescloud",
+            "cicdUrl": "https://github.com/vincent-inc/CICD-config",
+            "displayName": "wrap dev",
+            "projectName": "wrap",
+            "environment": "stage",
+            "envFileId": "9e4f7dc1-440b-4f56-b743-952a6e72b4e6"
+        }
+    }
+]
