@@ -1,1 +1,114 @@
 /* You can add global styles to this file, and also import other style files */
+@import '@angular/material/prebuilt-themes/pink-bluegrey.css';
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+textarea
+{
+    resize: both;
+}
+
+*
+{
+    font-size: large;
+}
+
+@media screen and (max-width: 1000px)
+{
+    *
+    {
+        font-size: medium;
+    }
+}
+
+@media screen and (max-width: 650px)
+{
+    *
+    {
+        font-size: medium;
+    }
+}
+
+@media screen and (max-width: 520px)
+{
+    *
+    {
+        font-size: small;
+    }
+}
+
+@media screen and (max-width: 350px)
+{
+    *
+    {
+        font-size: small;
+        width: fit-content;
+    }
+}
+
+ul
+{
+    list-style: none;
+    // margin-right: 2rem;
+    padding-right: 2rem;
+}
+
+a
+{
+    text-decoration: none;
+}
+
+.box
+{
+    border: 3px solid black;
+    // width: fit-content;
+    background-color: white;
+    border-radius: 10px;
+    color: black;
+    img
+    {
+        border-radius: 10px;
+    }
+
+    ul
+    {
+        list-style: none;
+        margin-right: 30px;
+        // margin-top: 20px;
+        li
+        {
+            margin-top: 10px;
+            font-size: large;
+        }
+    }
+
+    a
+    {
+        text-decoration: none;
+        font-size: large;
+    }
+}
+
+.middle
+{
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.margin-center
+{
+    width: 98%; 
+    margin: auto; 
+    margin-top: 2%;
+    margin-bottom: 2%;
+}
+
+.greenHightLight
+{
+    background-color: green;
+}
+
+.blueGreenHightLight
+{
+    background-color: rgb(0, 255, 251);
+}
