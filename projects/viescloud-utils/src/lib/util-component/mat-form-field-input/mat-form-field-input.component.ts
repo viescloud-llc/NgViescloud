@@ -184,10 +184,13 @@ export class MatFormFieldInputComponent extends MatFormFieldComponent {
     if (this.isValueNumber() && this.max && +value > +this.max)
       value = +this.max;
 
-    if(this.defaultType === 'number' && !value) {
+    if(this.defaultType === 'number' && !value)
       this.valueChange.emit(0);
-      this.onValueChange.emit();
-    }
+    else
+      this.valueChange.emit(value);
+
+    this.onValueChange.emit();
+
   }
 
   focusoutEmitValue() {
