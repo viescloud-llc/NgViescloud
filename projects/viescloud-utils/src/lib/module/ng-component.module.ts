@@ -16,8 +16,11 @@ import { MatFormFieldInputOptionComponent } from '../util-component/mat-form-fie
 import { MatFormFieldInputListComponent } from '../util-component/mat-form-field-input-list/mat-form-field-input-list.component';
 import { MatFormFieldInputDynamicComponent } from '../util-component/mat-form-field-input-dynamic/mat-form-field-input-dynamic.component';
 import { MatFormFieldInputListOptionComponent } from '../util-component/mat-form-field-input-list-option/mat-form-field-input-list-option.component';
+import { HeaderComponent } from '../share-component/header/header.component';
+import { LoginComponent } from '../share-component/login/login.component';
+import { OpenIdComponent } from '../share-component/openId/openId.component';
 
-const list = [
+const UTILS = [
   CopyToClipboardUtilComponent,
   InputTypeSwitchComponent,
   MatFormFieldInputComponent,
@@ -35,12 +38,24 @@ const list = [
   MatFormFieldInputListOptionComponent
 ]
 
+const COMPONENTS = [
+  HeaderComponent,
+  LoginComponent,
+  OpenIdComponent
+]
+
 @NgModule({
-  declarations: list,
+  declarations: [
+    ...UTILS,
+    ...COMPONENTS
+  ],
   imports: [
     NgMaterialModule,
     NgEssentialModule
   ],
-  exports: list
+  exports: [
+    ...UTILS,
+    ...COMPONENTS
+  ]
 })
 export class NgComponentModule { }

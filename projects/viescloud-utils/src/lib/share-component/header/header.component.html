@@ -1,0 +1,18 @@
+<mat-toolbar color="primary" *ngIf="getDisplayHeader()">
+  <button mat-icon-button aria-label="Example icon-button with menu icon" (click)="drawer?.toggle()">
+    <mat-icon>menu</mat-icon>
+  </button>
+
+  <span *ngIf="getAlias()">Hello: {{getAlias()}}</span>
+
+  <span class="spacer"></span>
+  <button mat-icon-button aria-label="Example icon-button with heart icon">
+    <mat-icon>favorite</mat-icon>
+  </button>
+  <app-copy-to-clipboard-util
+  [copyValue]="getURL()"
+  matIcon="share"
+  ></app-copy-to-clipboard-util>
+  <span *ngIf="!authenticatorService.isLoginB" style="cursor: pointer;" (click)="openIdService.authorizeFlow()">Login</span>
+  <span *ngIf="authenticatorService.isLoginB" style="cursor: pointer;" (click)="logout()">Logout</span>
+</mat-toolbar>
