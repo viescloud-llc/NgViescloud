@@ -79,5 +79,89 @@
 			"k8sServiceFolderName": "wrap",
 			"environment": "prod"
 		}
+	},
+
+
+    
+    {
+        "configId": 8,
+        "configName": "angular_workspace with git hook",
+        "path": "/vincent-services/v-eco",
+        "jobName": "v-console-dev",
+        "replaceMap": {
+            "projectUrl": "https://github.com/vincent-inc/v-console",
+            "cicdUrl": "https://github.com/vincent-inc/CICD-config",
+            "displayName": "v-console dev",
+            "projectName": "v-console",
+            "environment": "dev",
+            "envFileId": "fef2ee70-534a-4613-b53d-65a43ea1a4a0"
+        }
+    },
+    {
+		"configId": 2,
+		"configName": "k8s",
+		"path": "/vincent-services/v-eco",
+		"jobName": "v-console-dev-k8s",
+		"replaceMap": {
+			"projectUrl": "https://github.com/vincent-inc/CICD-config",
+			"displayName": "v-console Dev k8s",
+			"triggerAfterJobName": "v-console-dev",
+			"k8sServiceFolderName": "v-console",
+			"environment": "dev"
+		}
+	},
+    {
+        "configId": 9,
+        "configName": "angular_workspace",
+        "path": "/vincent-services/v-eco",
+        "jobName": "v-console-stage",
+        "replaceMap": {
+            "projectUrl": "https://github.com/vincent-inc/v-console",
+            "cicdUrl": "https://github.com/vincent-inc/CICD-config",
+            "displayName": "v-console dev",
+            "projectName": "v-console",
+            "environment": "stage",
+            "envFileId": "9e4f7dc1-440b-4f56-b743-952a6e72b4e6"
+        }
+    },
+    {
+		"configId": 2,
+		"configName": "k8s",
+		"path": "/vincent-services/v-eco",
+		"jobName": "v-console-stage-k8s",
+		"replaceMap": {
+			"projectUrl": "https://github.com/vincent-inc/CICD-config",
+			"displayName": "v-console Dev k8s",
+			"triggerAfterJobName": "v-console-stage",
+			"k8sServiceFolderName": "v-console",
+			"environment": "stage"
+		}
+	},
+    {
+        "configId": 9,
+        "configName": "angular_workspace",
+        "path": "/vincent-services/v-eco",
+        "jobName": "v-console-prod",
+        "replaceMap": {
+            "projectUrl": "https://github.com/vincent-inc/v-console",
+            "cicdUrl": "https://github.com/vincent-inc/CICD-config",
+            "displayName": "v-console dev",
+            "projectName": "v-console",
+            "environment": "prod",
+            "envFileId": "d038916e-099b-459d-9d50-1ef7de67b944"
+        }
+    },
+    {
+		"configId": 2,
+		"configName": "k8s",
+		"path": "/vincent-services/v-eco",
+		"jobName": "v-console-prod-k8s",
+		"replaceMap": {
+			"projectUrl": "https://github.com/vincent-inc/CICD-config",
+			"displayName": "v-console Dev k8s",
+			"triggerAfterJobName": "v-console-prod",
+			"k8sServiceFolderName": "v-console",
+			"environment": "prod"
+		}
 	}
 ]
