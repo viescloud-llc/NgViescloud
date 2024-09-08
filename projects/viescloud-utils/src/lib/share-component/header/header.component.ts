@@ -7,7 +7,7 @@ import { AuthenticatorService } from '../../service/Authenticator.service';
 import { SettingService } from '../../service/Setting.service';
 
 @Component({
-  selector: 'app-header',
+  selector: 'viescloud-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss']
 })

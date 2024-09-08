@@ -19,6 +19,8 @@ import { MatFormFieldInputListOptionComponent } from '../util-component/mat-form
 import { HeaderComponent } from '../share-component/header/header.component';
 import { LoginComponent } from '../share-component/login/login.component';
 import { OpenIdComponent } from '../share-component/openId/openId.component';
+import { SideDrawerMenuComponent } from '../share-component/side-drawer-menu/side-drawer-menu.component';
+import { QuickSideDrawerMenuComponent } from '../share-component/quick-side-drawer-menu/quick-side-drawer-menu.component';
 
 const UTILS = [
   CopyToClipboardUtilComponent,
@@ -41,7 +43,9 @@ const UTILS = [
 const COMPONENTS = [
   HeaderComponent,
   LoginComponent,
-  OpenIdComponent
+  OpenIdComponent,
+  SideDrawerMenuComponent,
+  QuickSideDrawerMenuComponent
 ]
 
 @NgModule({
@@ -51,7 +55,7 @@ const COMPONENTS = [
   ],
   imports: [
     NgMaterialModule,
-    NgEssentialModule
+    NgEssentialModule,
   ],
   exports: [
     ...UTILS,

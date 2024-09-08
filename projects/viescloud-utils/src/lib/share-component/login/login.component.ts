@@ -6,7 +6,7 @@ import { AuthenticatorService } from '../../service/Authenticator.service';
 import { OpenIdService } from '../../service/OpenId.service';
 
 @Component({
-  selector: 'app-login',
+  selector: 'viescloud-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })

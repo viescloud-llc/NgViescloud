@@ -1,4 +1,7 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+import { AuthenticatorService } from 'projects/viescloud-utils/src/lib/service/Authenticator.service';
+import { QuickSideDrawerMenu } from 'projects/viescloud-utils/src/lib/share-component/quick-side-drawer-menu/quick-side-drawer-menu.component';
 
 @Component({
   selector: 'app-root',
@@ -7,4 +10,41 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'wrap';
+
+  menu: QuickSideDrawerMenu[] = [
+    {
+      title: 'Viescloud',
+      children: [
+        {
+          title: 'Home',
+          routerLink: '/home'
+        },
+        {
+          title: 'Login',
+          routerLink: '/login',
+          hideConditional: !this.authenticatorService.isLogout()
+        },
+        {
+          title: 'logout',
+          routerLink: '/logout',
+          hideConditional: this.authenticatorService.isLogout()
+        }
+      ]
+    },
+    {
+      title: 'About',
+      children: [
+        {
+          title: 'Legal',
+          routerLink: '/legal'
+        },
+        {
+          title: 'Privacy',
+          routerLink: '/privacy'
+        }
+      ]
+    }
+  ]
+
+  constructor(public router: Router, private authenticatorService: AuthenticatorService) { }
 }

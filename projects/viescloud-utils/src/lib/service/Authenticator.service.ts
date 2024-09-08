@@ -13,7 +13,7 @@ import { DateTime } from '../model/Mat.model';
 export class AuthenticatorService {
 
   jwt?: string | null;
-  currentUser: User | undefined | null;
+  currentUser?: User | null;
   isLoginB: boolean = false;
 
   private prefix = "authenticator"
@@ -83,18 +83,22 @@ export class AuthenticatorService {
   logoutWithoutReroute(): void {
     localStorage.removeItem("jwt");
     this.isLoginB = false;
+    this.jwt = null;
+    this.currentUser = null;
     this.httpClient.get<void>(`${this.settingService.getGatewayUrl()}/logout`).pipe(first()).subscribe(
       res => {},
       error => {},
-      () => {
-        this.jwt = null;
-      }
+      () => {}
     );
   }
   
   logout(): void {
     this.logoutWithoutReroute();
     this.router.navigate(["/login"]);
+  }
+
+  isLogout(): boolean {
+    return !(this.jwt && this.currentUser);
   }
 
   getJwt(): string | null | undefined {

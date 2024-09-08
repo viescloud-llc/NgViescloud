@@ -1,5 +1,13 @@
-<app-mat-form-field-input
-label="Title"
-[placeholder]="'title'"
-[(value)]="title"
-></app-mat-form-field-input>
+<router-outlet></router-outlet>
+
+<mat-drawer-container style="height: 100%; width: 100%;" autosize>
+    <mat-drawer #drawer  mode="side">
+      <viescloud-quick-side-drawer-menu
+      [router]="router"
+      [menu]="menu"
+      ></viescloud-quick-side-drawer-menu>
+    </mat-drawer>
+    
+    <viescloud-header [drawer]="drawer"></viescloud-header>
+    <router-outlet></router-outlet>
+</mat-drawer-container>
