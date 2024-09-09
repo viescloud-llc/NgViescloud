@@ -1,0 +1,18 @@
+<ul *ngIf="isThereAreData()">
+  <li>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>Pinterest</mat-panel-title>
+        <mat-panel-description>
+          Pin data
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <app-mat-form-field-input-dynamic
+      [value]="product.pinterestPinData?.pinResponse"
+      [blankObject]="blankPinResponse"
+      ></app-mat-form-field-input-dynamic>
+    </mat-expansion-panel>
+  </li>
+</ul>
+
+<h1 *ngIf="!isThereAreData()" class="text-center">No marketing data for this product yet</h1>

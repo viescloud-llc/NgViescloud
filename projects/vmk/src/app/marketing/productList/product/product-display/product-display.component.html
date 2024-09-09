@@ -1,0 +1,63 @@
+<div class="container">
+  <div *ngIf="files.length; else uploadPrompt">
+    <mat-tab-group headerPosition="below" [(selectedIndex)]="selectedIndex">
+      <mat-tab  *ngFor="let file of files; let i = index" [label]="'File ' + (i + 1)">
+        <ng-container *ngIf="file.type.startsWith('image/')" >
+          <img [src]="file.value" [alt]="file.name" *ngIf="data.selectedResolution === 'original'; else elseImage">
+          <ng-template #elseImage>
+            <img [src]="file.value" [alt]="file.name" [width]="getWidthResolution()" [height]="getHeightResolution()">
+          </ng-template>
+        </ng-container>
+        <ng-container *ngIf="file.type.startsWith('video/')" >
+          <video [src]="file.value" controls *ngIf="data.selectedResolution === 'original'; else elseVideo"></video>
+          <ng-template #elseVideo>
+            <video [src]="file.value" controls [width]="getWidthResolution()" [height]="getHeightResolution()" ></video>
+          </ng-template>
+        </ng-container>
+        <ng-container *ngIf="!file.type.startsWith('image/') && !file.type.startsWith('video/')">
+          <div style="color: red;" class="text-center">File type not supported or not an image or video</div>
+        </ng-container>
+      </mat-tab>
+    </mat-tab-group>
+    <app-mat-form-field-input-option
+    label="View Image and video as (Original Resolution is unchanged)"
+    [(value)]="data.selectedResolution"
+    [options]="resolutionOptions"
+    styleWidth="100%"
+    noneLabel=""
+    (onValueChange)="data.populateAllFile(data.selectedResolution)"
+    ></app-mat-form-field-input-option>
+    <hr>
+    <button mat-raised-button color="primary" style="width: 50%;" (click)="uploadFile()">Upload More</button>
+    <button mat-raised-button color="warn" style="width: 50%;" (click)="removeFile(selectedIndex)">Remove File {{selectedIndex + 1}}</button>
+  </div>
+
+  <ng-template #uploadPrompt>
+    <div class="upload-prompt">
+      <button mat-raised-button color="primary" style="width: 100%;" (click)="uploadFile()">Click here to upload videos or pictures</button>
+    </div>
+  </ng-template>
+
+  <app-mat-form-field-input
+  label="Import from URI"
+  placeholder="Ex. https://example.com"
+  [(value)]="data.inputUri"
+  styleWidth="100%"
+  (onEnter)="fetchFile()"
+  (onCustomIconClick)="fetchFile()"
+  [customIconLabel]="'cloud_upload'"
+  (onValueChange)="data.uploadError = ''"
+  ></app-mat-form-field-input>
+  <ng-container *ngIf="data.uploadError">
+    <h2 style="color: red">{{data.uploadError}}</h2>
+  </ng-container>
+  <div *ngIf="fileOptions && fileOptions.length > 0">
+    <app-mat-form-field-input-option
+    label="Import File from Product information"
+    [options]="fileOptions"
+    (selectionChange)="onSelectFileOption.emit($event);"
+    styleWidth="100%"
+    noneLabel=""
+    ></app-mat-form-field-input-option>
+  </div>
+</div>

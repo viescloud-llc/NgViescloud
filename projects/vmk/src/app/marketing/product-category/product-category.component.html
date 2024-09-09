@@ -1,0 +1,13 @@
+<ul class="margin-center">
+  <li><h1 class="text-center">Categories</h1></li>
+  <li>
+    <app-mat-table
+    [matRows]="categories"
+    [blankObject]="categorySample"
+    [displayFilter]="true"
+    [displayPagination]="true"
+    (onEditRow)="editCategory($event)"
+    ></app-mat-table>
+  </li>
+  <li><button mat-raised-button color="primary" style="width: 100%;" (click)="addCategory()">Add category</button></li>
+</ul>

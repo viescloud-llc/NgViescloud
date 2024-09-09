@@ -1,0 +1,19 @@
+ul {
+    display: flex;
+    flex-direction: row; // Arrange items horizontally
+    flex-wrap: wrap; // Allow items to wrap to the next line if necessary
+    justify-content: flex-start; // Align items to the start of the main axis
+    align-items: center; // Align items to the center of the cross axis
+    padding: 0; // Remove default padding
+    margin: 0; // Remove default margin
+    list-style: none; // Remove default list styling
+  
+    li {
+      margin: 0 10px; // Add some spacing between items
+    }
+  
+    li {
+      padding: 10px;
+      border-radius: 5px;
+    }
+  }

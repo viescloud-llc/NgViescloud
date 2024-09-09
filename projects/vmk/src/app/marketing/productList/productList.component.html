@@ -1,0 +1,13 @@
+<ul class="margin-center">
+  <li><h1 class="text-center">Product List</h1></li>
+  <li>
+    <app-mat-table
+    [matRows]="products"
+    [blankObject]="productSample"
+    [displayFilter]="true"
+    [displayPagination]="true"
+    (onEditRow)="editProduct($event)"
+    ></app-mat-table>
+  </li>
+  <li><button mat-raised-button color="primary" style="width: 100%;" [routerLink]="['0']">Add product</button></li>
+</ul>

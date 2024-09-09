@@ -1,0 +1,47 @@
+<ul class="margin-center" appMatFormFieldGroup (onAllInputCheck)="validInput = $event">
+  <li>
+    <app-product-display
+    [files]="data.files"
+    [(selectedIndex)]="selectedFileIndex"
+    (onRemoveFile)="afterRemoveFile($event)"
+    ></app-product-display>
+  </li>
+  <ng-container *ngIf="product.fileLinks">
+    <hr>
+    <li *ngFor="let link of product.fileLinks; let i = index">
+      <b>
+        File {{i + 1}}: 
+      </b>
+      {{link.link}}, <b>external:</b> {{link.external}}
+    </li>
+  </ng-container>
+  <hr>
+  <li>
+    <button mat-raised-button color="primary" (click)="data.addNewCategory()">Add new categories</button>
+  </li>
+  <li>
+    <app-mat-form-field-input-option
+    label="Product Category"
+    [(value)]="product.category"
+    [options]="data.productCategoriesOptions"
+    noneLabel=""
+    [required]="true"
+    styleWidth="100%"
+    ></app-mat-form-field-input-option>
+  </li>
+  <hr>
+  <li>
+    <app-mat-form-field-input-dynamic
+    label="Product"
+    objectLabel="Product"
+    [(value)]="product"
+    [blankObject]="blankProduct"
+    styleWidth="100%"
+    objectLabel=""
+    ></app-mat-form-field-input-dynamic>
+  </li>
+  <li>
+    <button mat-raised-button color="primary" style="width: 50%;" [disabled]="!isProductChange() || !validInput" (click)="save()">{{product.id ? 'Modify' : 'Add'}}</button>
+    <button mat-raised-button color="warn" style="width: 50%;" [disabled]="!isProductChange()" (click)="reverse()">Undo Change</button>
+  </li>
+</ul>
