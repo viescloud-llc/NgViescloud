@@ -1,7 +1,7 @@
 <ul>
   <ng-container *ngFor="let item of menu">
     <ng-container *ngIf="item.routerLink && !isHide(item)">
-      <li><button mat-flat-button (click)="click(item)" routerLinkActive="router-link-active" >{{item.title}}</button></li>
+      <li [class]="routerLinkActive(item)"><button mat-flat-button (click)="click(item)">{{item.title}}</button></li>
     </ng-container>
 
     <ng-container *ngIf="!item.routerLink">

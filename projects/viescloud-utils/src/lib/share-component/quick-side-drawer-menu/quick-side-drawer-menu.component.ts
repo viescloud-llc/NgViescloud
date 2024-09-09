@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 export class QuickSideDrawerMenu {
   title: string = '';
   routerLink?: string;
+  routerLinkActive?: string;
   hideConditional?: () => boolean;
   hideChildren?: boolean;
   click?: () => void;
@@ -47,6 +48,17 @@ export class QuickSideDrawerMenuComponent implements OnInit {
       return item.hideConditional();
     }
     return false;
+  }
+
+  routerLinkActive(item: QuickSideDrawerMenu) {
+    if(this.router.isActive(item.routerLink!, {paths: 'exact', queryParams: 'exact', fragment: 'ignored', matrixParams: 'ignored'})) {
+      if(item.routerLinkActive)
+        return item.routerLinkActive;
+      else
+        return 'custom-router-link-active';
+    }
+    else
+      return '';
   }
 
 }
