@@ -247,5 +247,89 @@
 			"k8sServiceFolderName": "vmk",
 			"environment": "prod"
 		}
+	},
+
+    
+
+    {
+        "configId": 8,
+        "configName": "angular_workspace with git hook",
+        "path": "/vincent-services/v-eco",
+        "jobName": "v-service-dev",
+        "replaceMap": {
+            "projectUrl": "https://github.com/vincent-inc/NgViescloud",
+            "cicdUrl": "https://github.com/vincent-inc/CICD-config",
+            "displayName": "v-service dev",
+            "projectName": "v-service",
+            "environment": "dev",
+            "envFileId": "fef2ee70-534a-4613-b53d-65a43ea1a4a0"
+        }
+    },
+    {
+		"configId": 2,
+		"configName": "k8s",
+		"path": "/vincent-services/v-eco",
+		"jobName": "v-service-dev-k8s",
+		"replaceMap": {
+			"projectUrl": "https://github.com/vincent-inc/CICD-config",
+			"displayName": "v-service Dev k8s",
+			"triggerAfterJobName": "v-service-dev",
+			"k8sServiceFolderName": "v-service",
+			"environment": "dev"
+		}
+	},
+    {
+        "configId": 9,
+        "configName": "angular_workspace",
+        "path": "/vincent-services/v-eco",
+        "jobName": "v-service-stage",
+        "replaceMap": {
+            "projectUrl": "https://github.com/vincent-inc/NgViescloud",
+            "cicdUrl": "https://github.com/vincent-inc/CICD-config",
+            "displayName": "v-service dev",
+            "projectName": "v-service",
+            "environment": "stage",
+            "envFileId": "9e4f7dc1-440b-4f56-b743-952a6e72b4e6"
+        }
+    },
+    {
+		"configId": 2,
+		"configName": "k8s",
+		"path": "/vincent-services/v-eco",
+		"jobName": "v-service-stage-k8s",
+		"replaceMap": {
+			"projectUrl": "https://github.com/vincent-inc/CICD-config",
+			"displayName": "v-service Dev k8s",
+			"triggerAfterJobName": "v-service-stage",
+			"k8sServiceFolderName": "v-service",
+			"environment": "stage"
+		}
+	},
+    {
+        "configId": 9,
+        "configName": "angular_workspace",
+        "path": "/vincent-services/v-eco",
+        "jobName": "v-service-prod",
+        "replaceMap": {
+            "projectUrl": "https://github.com/vincent-inc/NgViescloud",
+            "cicdUrl": "https://github.com/vincent-inc/CICD-config",
+            "displayName": "v-service dev",
+            "projectName": "v-service",
+            "environment": "prod",
+            "envFileId": "d038916e-099b-459d-9d50-1ef7de67b944"
+        }
+    },
+    {
+		"configId": 2,
+		"configName": "k8s",
+		"path": "/vincent-services/v-eco",
+		"jobName": "v-service-prod-k8s",
+		"replaceMap": {
+			"projectUrl": "https://github.com/vincent-inc/CICD-config",
+			"displayName": "v-service Dev k8s",
+			"triggerAfterJobName": "v-service-prod",
+			"k8sServiceFolderName": "v-service",
+			"environment": "prod"
+		}
 	}
 ]

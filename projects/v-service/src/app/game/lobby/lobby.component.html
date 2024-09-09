@@ -1,0 +1,20 @@
+<div class="margin-center">
+  <ul>
+    <li><h1 class="text-center">Welcome to game lobby</h1></li>
+    <li *ngIf="LobbyRows.length === 0">
+      <h2 class="text-center">There are no available lobby at the moment, please create one</h2>
+    </li>
+    <li *ngIf="LobbyRows.length > 0">
+      <app-mat-table
+      [matRows]="LobbyRows"
+      [displayFilter]="true"
+      [displayPagination]="true"
+      (onEditRow)="enterLobby($event)"
+    ></app-mat-table>
+    </li>
+    <hr>
+    <li><button mat-raised-button color="primary" style="width: 100%;" (click)="createNewLobby()">Create new Lobby</button></li>
+  </ul>
+</div>
+
+<router-outlet></router-outlet>

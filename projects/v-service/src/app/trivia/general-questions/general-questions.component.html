@@ -1,0 +1,51 @@
+<div class="margin-center" >
+  <ul>
+    <li>
+      <app-mat-form-field-input
+      label="Question category"
+      [value]="category" (valueOutput)="category = $event.toString()"
+      (onValueChange)="init()"
+      styleWidth="100%"
+      [required]="true"
+      maxlength="100"
+      ></app-mat-form-field-input>
+    </li>
+    <div *ngIf="category === 'GF'">
+      <li><h1 class="text-center">Welcome to girlfriend test</h1></li>
+      <li><h2 class="text-center">Well how well do you know Vincent 😉</h2></li>
+    </div>
+    <li *ngIf="questions.length > 0">
+      <mat-stepper orientation="vertical" #stepper>
+        <mat-step *ngFor="let question of questions">
+          <ng-template matStepLabel>{{question.question}}</ng-template>
+          <form>
+            <ul>
+              <li *ngFor="let answer of question.possibleAnswer; let i = index">
+                <input [disabled]="lock" style="cursor: pointer;" type="checkbox" [id]="'Q:' + question.id! + i" [value]="answer" #input (change)="selectAnswer(question, i, input)">
+                <label style="cursor: pointer;" [for]="'Q:' + question.id! + i"><p>{{answer}}</p></label><br>
+              </li>
+              <hr>
+              <li><button mat-button matStepperNext>Next</button></li>
+            </ul>
+          </form>
+        </mat-step>
+        <mat-step>
+          <ng-template matStepLabel>Finish</ng-template>
+          <p>Congratulation on finish the Quiz</p>
+          <div>
+            <button mat-button (click)="reset(); stepper.reset();">Do it again?</button>
+          </div>
+          <div>
+            <button mat-button (click)="seeResult()">See result</button>
+          </div>
+          <hr>
+          <div *ngIf="lock">
+            <h2>Your score: {{score}}%/100%</h2>
+            <h2>Your point: {{point}}/{{maxPoint}}</h2>
+            <h2>{{message}}</h2>
+          </div>
+        </mat-step>
+      </mat-stepper>
+    </li>
+  </ul>
+</div>

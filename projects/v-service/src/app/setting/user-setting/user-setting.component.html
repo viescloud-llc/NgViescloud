@@ -1,0 +1,143 @@
+<div class="margin-center" *ngIf="user">
+  <h1 class="text-center">User Setting</h1>
+  <hr>
+  <ul appMatFormFieldGroup (onAllInputCheck)="validInfoForm = $event" (onFormSummit)="saveInfo()">
+    <li><h2>Basic information</h2></li>
+    <li>
+      <app-mat-form-field-input
+      #matInput
+      label="Alias"
+      placeholder="Ex. WOW111"
+      [value]="user.userProfile!.alias?.toString() ?? ''" (valueOutput)="user.userProfile!.alias = $event.toString()"
+      styleWidth="100%"
+      ></app-mat-form-field-input>
+    </li>
+    <li>
+      <app-mat-form-field-input
+      label="Username"
+      placeholder="Ex. SomethingCool123"
+      [value]="user.username!.toString()" (valueOutput)="user.username = $event.toString()"
+      [required]="true"
+      (onValueChange)="validateUsername()"
+      [error]="usernameError"
+      styleWidth="100%"
+      ></app-mat-form-field-input>
+    </li>
+    
+    <li>
+      <app-mat-form-field-input
+      label="First name"
+      placeholder="Ex. firstName"
+      [value]="user.userProfile!.firstName?.toString() ?? ''" (valueOutput)="user.userProfile!.firstName = $event.toString()"
+      styleWidth="100%"
+      ></app-mat-form-field-input>
+    </li>
+    <li>
+      <app-mat-form-field-input
+      label="Last name"
+      placeholder="Ex. lastName"
+      [value]="user.userProfile!.lastName?.toString() ?? ''" (valueOutput)="user.userProfile!.lastName = $event.toString()"
+      styleWidth="100%"
+      ></app-mat-form-field-input>
+    </li>
+    <li>
+      <app-mat-form-field-input
+      label="Phone number"
+      placeholder="Ex. phoneNumber"
+      [value]="user.userProfile!.phoneNumber?.toString() ?? 0" (valueOutput)="user.userProfile!.phoneNumber = $event.toString()"
+      defaultType="number"
+      min="0"
+      max="9999999999"
+      styleWidth="100%"
+      ></app-mat-form-field-input>
+    </li>
+    <li>
+      <app-mat-form-field-input
+      label="Email"
+      placeholder="Ex. email"
+      [value]="user.email?.toString() ?? ''"
+      styleWidth="100%"
+      [disable]="true"
+      ></app-mat-form-field-input>
+    </li>
+    <li>
+      <app-mat-form-field-input
+      label="Home address"
+      placeholder="Ex. address"
+      [value]="user.userProfile!.address?.toString() ?? ''" (valueOutput)="user.userProfile!.address = $event.toString()"
+      styleWidth="100%"
+      ></app-mat-form-field-input>
+    </li>
+    <li>
+      <app-mat-form-field-input
+      label="City"
+      placeholder="Ex. city"
+      [value]="user.userProfile!.city?.toString() ?? ''" (valueOutput)="user.userProfile!.city = $event.toString()"
+      styleWidth="100%"
+      ></app-mat-form-field-input>
+    </li>
+    <li>
+      <app-mat-form-field-input
+      label="State"
+      placeholder="Ex. state"
+      [value]="user.userProfile!.state?.toString() ?? ''" (valueOutput)="user.userProfile!.state = $event.toString()"
+      styleWidth="100%"
+      ></app-mat-form-field-input>
+    </li>
+    <li>
+      <app-mat-form-field-input
+      label="Zip code"
+      placeholder="Ex. zip"
+      [value]="user.userProfile!.zip?.toString() ?? 0" (valueOutput)="user.userProfile!.zip = $event.toString()"
+      defaultType="number"
+      min="0"
+      max="99999"
+      styleWidth="100%"
+      ></app-mat-form-field-input>
+    </li>
+    <li>
+      <button mat-raised-button color="primary" [disabled]="!validInfoForm || !isValueChange()" (click)="saveInfo()">Save</button>
+      <button mat-raised-button color="accent" [disabled]="!isValueChange()" (click)="revert()">Revert</button>
+    </li>
+  </ul>
+
+
+
+  <hr>
+  <ul>
+    <h2>Password change</h2>
+    <li>
+      <app-mat-form-field-input
+      label="Current Password"
+      placeholder="Ex. SomethingBetter@123!"
+      [(value)]="currentPassword"
+      [required]="true"
+      [showVisibleSwitch]="true"
+      [switchVisibility]="false"
+      styleWidth="100%"
+      ></app-mat-form-field-input>
+    </li>
+    <li>
+      <app-mat-form-field-input
+      label="New Password"
+      placeholder="Ex. SomethingBetter@123!"
+      [(value)]="newPassword"
+      [required]="true"
+      [showVisibleSwitch]="true"
+      [switchVisibility]="false"
+      styleWidth="100%"
+      ></app-mat-form-field-input>
+    </li>
+    <li>
+      <app-mat-form-field-input
+      label="Re-enter new Password"
+      placeholder="Ex. SomethingBetter@123!"
+      [(value)]="reNewPassword"
+      [required]="true"
+      [showVisibleSwitch]="true"
+      [switchVisibility]="false"
+      styleWidth="100%"
+      ></app-mat-form-field-input>
+    </li>
+  </ul>
+</div>
