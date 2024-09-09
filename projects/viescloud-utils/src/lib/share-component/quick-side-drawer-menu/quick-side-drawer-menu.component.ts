@@ -4,8 +4,9 @@ import { Router } from '@angular/router';
 export class QuickSideDrawerMenu {
   title: string = '';
   routerLink?: string;
-  hideConditional?: boolean;
+  hideConditional?: () => boolean;
   hideChildren?: boolean;
+  click?: () => void;
   children?: QuickSideDrawerMenu[];
 }
 
@@ -30,6 +31,22 @@ export class QuickSideDrawerMenuComponent implements OnInit {
 
   navigateUrl(url: string) {
     this.router.navigate([url]);
+  }
+
+  click(item: QuickSideDrawerMenu) {
+    if (item.click) {
+      item.click();
+    }
+    else if (item.routerLink) {
+      this.navigateUrl(item.routerLink);
+    }
+  }
+
+  isHide(item: QuickSideDrawerMenu) {
+    if (item.hideConditional) {
+      return item.hideConditional();
+    }
+    return false;
   }
 
 }

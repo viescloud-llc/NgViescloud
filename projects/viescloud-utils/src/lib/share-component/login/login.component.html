@@ -1,0 +1,40 @@
+<ul class="margin-center; text-center" appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
+    <li><h1>Login</h1></li>
+    <li><h3 style="color: red;">{{error}}</h3></li>
+    <li>
+        <app-mat-form-field-input
+        label="Username"
+        placeholder="Ex. some username"
+        [(value)]="username"
+        [required]="true"
+        styleWidth="500px"
+        ></app-mat-form-field-input>
+    </li>
+    <li>
+        <app-mat-form-field-input
+        label="Password"
+        placeholder="Ex. some password"
+        [(value)]="password"
+        [required]="true"
+        styleWidth="500px"
+        ></app-mat-form-field-input>
+    </li>
+    <li>
+        <button
+        mat-raised-button
+        color="primary"
+        (click)="login()"
+        class="min-fit-500px"
+        [disabled]="!validForm"
+        >Login</button>
+    </li>
+    <br>
+    <li>
+        <button
+        mat-raised-button
+        color="primary"
+        (click)="openIdService.authorizeFlow()"
+        class="min-fit-500px"
+        >Login With Authentik</button>
+    </li>
+</ul>

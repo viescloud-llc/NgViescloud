@@ -12,18 +12,32 @@ import { OpenIdService } from '../../service/OpenId.service';
 })
 export class LoginComponent implements OnInit {
 
-  loginForm!: FormGroup;
+  username: string = '';
+  password: string = '';
 
   error: string = '';
+  validForm: boolean = false;
 
   constructor(
     private fb: FormBuilder, 
     private router: Router, 
     private authenticatorService: AuthenticatorService,
-    private openIdService: OpenIdService
+    public openIdService: OpenIdService
   ) { }
 
   ngOnInit(): void {
-    this.openIdService.authorizeFlow();
+  }
+
+  login() {
+    this.authenticatorService.login({username: this.username, password: this.password}).pipe(first()).subscribe(
+      {
+        next: async res => {
+          await this.authenticatorService.autoUpdateUserWithJwt(res.jwt!); 
+          this.router.navigate(['home'])
+        },
+        error: error => {this.error = 'invalid or wrong username or password'}
+      }
+    )
+
   }
 }

@@ -1,17 +1,17 @@
 <ul>
   <ng-container *ngFor="let item of menu">
-    <ng-container *ngIf="item.routerLink && !item.hideConditional">
-      <li><button mat-flat-button (click)="navigateUrl(item.routerLink)" routerLinkActive="router-link-active" >{{item.title}}</button></li>
+    <ng-container *ngIf="item.routerLink && !isHide(item)">
+      <li><button mat-flat-button (click)="click(item)" routerLinkActive="router-link-active" >{{item.title}}</button></li>
     </ng-container>
 
     <ng-container *ngIf="!item.routerLink">
       <li>
-        <button mat-icon-button  (click)="item.hideChildren = !item.hideChildren">
+        <button mat-icon-button  (click)="item.hideChildren = !item.hideChildren; click(item)">
           <mat-icon class="my-button">
             {{item.hideChildren ? 'expand_more' : 'chevron_right'}}
           </mat-icon>
         </button>
-        <b class="title" (click)="item.hideChildren = !item.hideChildren">{{item.title}}</b>
+        <b class="title" (click)="item.hideChildren = !item.hideChildren; click(item)">{{item.title}}</b>
       </li>
     </ng-container>
 

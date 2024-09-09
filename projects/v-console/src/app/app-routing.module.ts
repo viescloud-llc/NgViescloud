@@ -10,8 +10,8 @@ import { UsersComponent } from './Authentication/users/users.component';
 import { QuestionComponent } from './vgame/question/question.component';
 import { VenkinsHomeComponent } from './Venkins/venkins-home/venkins-home.component';
 import { ConfigMapComponent } from './Venkins/config-map/config-map.component';
-import { OpenIdComponent } from './openId/openId.component';
 import { AutoRouteComponent } from './Authentication/auto-route/auto-route.component';
+import { OpenIdComponent } from 'projects/viescloud-utils/src/lib/share-component/openId/openId.component';
 
 const routes: Routes = [
   {

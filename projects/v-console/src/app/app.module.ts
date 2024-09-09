@@ -15,7 +15,6 @@ import { UsersComponent } from './Authentication/users/users.component';
 import { QuestionComponent } from './vgame/question/question.component';
 import { VenkinsHomeComponent } from './Venkins/venkins-home/venkins-home.component';
 import { ConfigMapComponent } from './Venkins/config-map/config-map.component';
-import { OpenIdComponent } from './openId/openId.component';
 import { AutoRouteComponent } from './Authentication/auto-route/auto-route.component';
 import { RouteDialog } from './Authentication/auto-route/route-dialog/route-dialog.component';
 import { AppRoutingModule } from './app-routing.module';
@@ -39,7 +38,6 @@ const LIST = [
   QuestionComponent,
   VenkinsHomeComponent,
   ConfigMapComponent,
-  OpenIdComponent,
   AutoRouteComponent,
   RouteDialog
 ]
