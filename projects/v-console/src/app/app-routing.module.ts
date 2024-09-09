@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { HomeComponent } from './home/home.component';
-import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { RequestSenderComponent } from './request-sender/request-sender.component';
 import { RouteComponent } from './Authentication/route/route.component';
@@ -12,6 +11,7 @@ import { VenkinsHomeComponent } from './Venkins/venkins-home/venkins-home.compon
 import { ConfigMapComponent } from './Venkins/config-map/config-map.component';
 import { AutoRouteComponent } from './Authentication/auto-route/auto-route.component';
 import { OpenIdComponent } from 'projects/viescloud-utils/src/lib/share-component/openId/openId.component';
+import { LoginComponent } from 'projects/viescloud-utils/src/lib/share-component/login/login.component';
 
 const routes: Routes = [
   {

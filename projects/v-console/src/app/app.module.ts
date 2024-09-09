@@ -4,7 +4,6 @@ import { AppComponent } from './app.component';
 import { HeaderComponent } from './header/header.component';
 import { HomeComponent } from './home/home.component';
 import { SideDrawerComponent } from './side-drawer/side-drawer.component';
-import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestSenderComponent } from './request-sender/request-sender.component';
@@ -28,7 +27,6 @@ const LIST = [
   HeaderComponent,
   HomeComponent,
   SideDrawerComponent,
-  LoginComponent,
   RegisterComponent,
   RequestSenderComponent,
   RouteComponent,

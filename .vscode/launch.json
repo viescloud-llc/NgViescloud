@@ -3,17 +3,31 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "debug wrap",
-      "type": "pwa-chrome",
+      "name": "debug v-console",
+      "type": "chrome",
       "request": "launch",
-      "preLaunchTask": "npm: start_wrap",
+      "preLaunchTask": "npm: start_v-console",
       "url": "http://localhost:4200/"
     },
     {
-      "name": "ng serve",
-      "type": "pwa-chrome",
+      "name": "debug v-service",
+      "type": "chrome",
       "request": "launch",
-      "preLaunchTask": "npm: start",
+      "preLaunchTask": "npm: start_v-service",
+      "url": "http://localhost:4200/"
+    },
+    {
+      "name": "debug vmk",
+      "type": "chrome",
+      "request": "launch",
+      "preLaunchTask": "npm: start_vmk",
+      "url": "http://localhost:4200/"
+    },
+    {
+      "name": "debug wrap",
+      "type": "chrome",
+      "request": "launch",
+      "preLaunchTask": "npm: start_wrap",
       "url": "http://localhost:4200/"
     },
     {
