@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthenticatorService } from 'projects/viescloud-utils/src/lib/service/Authenticator.service';
 import { OpenIdService } from 'projects/viescloud-utils/src/lib/service/OpenId.service';
+import { WrapService } from 'projects/viescloud-utils/src/lib/service/Wrap.service';
 import { QuickSideDrawerMenu } from 'projects/viescloud-utils/src/lib/share-component/quick-side-drawer-menu/quick-side-drawer-menu.component';
 
 @Component({
@@ -10,7 +11,6 @@ import { QuickSideDrawerMenu } from 'projects/viescloud-utils/src/lib/share-comp
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'wrap';
 
   menu: QuickSideDrawerMenu[] = [
     {
@@ -24,13 +24,21 @@ export class AppComponent {
           title: 'Login',
           routerLink: '/login',
           hideConditional: () => this.authenticatorService.isLoginB,
-          click: () => this.openIdService.authorizeFlow()
         },
         {
           title: 'logout',
           routerLink: '/logout',
           hideConditional: () => !this.authenticatorService.isLoginB,
           click: () => this.authenticatorService.logoutWithoutReroute()
+        }
+      ]
+    },
+    {
+      title: 'Wrap',
+      children: [
+        {
+          title: 'Workspace',
+          routerLink: '/wrap-workspace',
         }
       ]
     },

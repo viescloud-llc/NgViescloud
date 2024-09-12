@@ -541,4 +541,20 @@ export class UtilsService {
       }, timeout ?? 1000);
     }
   }
+
+  static readBlobAsText(blob: Blob): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+  
+      reader.onload = () => {
+        resolve(reader.result as string);
+      };
+  
+      reader.onerror = () => {
+        reject(new Error('Failed to read Blob'));
+      };
+  
+      reader.readAsText(blob);
+    });
+  }
 }

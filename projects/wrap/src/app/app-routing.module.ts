@@ -4,6 +4,7 @@ import { LoginComponent } from 'projects/viescloud-utils/src/lib/share-component
 import { HomeComponent } from './Home/Home.component';
 import { OpenIdComponent } from 'projects/viescloud-utils/src/lib/share-component/openId/openId.component';
 import { LogoutComponent } from 'projects/viescloud-utils/src/lib/share-component/logout/logout.component';
+import { WrapWorkspaceComponent } from './wrap-workspace/wrap-workspace.component';
 
 const routes: Routes = [
   {
@@ -17,6 +18,10 @@ const routes: Routes = [
   {
     path: 'openId',
     component: OpenIdComponent
+  },
+  {
+    path: 'wrap-workspace',
+    component: WrapWorkspaceComponent
   },
 
   // default path

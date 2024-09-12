@@ -1,0 +1,20 @@
+<ul class = "margin-center">
+  <li>
+    <app-mat-form-field-input-option
+    [value]="currentWorkspace"
+    (valueChange)="onSelectWorkspace($event)"
+    [options]="options"
+    [noneLabel]="getNoneLabel()"
+    ></app-mat-form-field-input-option>
+  </li>
+  <li>
+    <h4>Current Mode: {{mode}}</h4>
+  </li>
+  <li>
+    <app-wrap
+    *ngIf="currentWorkSpaceIndex >= 0"
+    [(wrapWorkspace)]="wrapService.wrapWorkspaces[currentWorkSpaceIndex]"
+    [(mode)]="mode"
+    ></app-wrap>
+  </li>
+</ul>
