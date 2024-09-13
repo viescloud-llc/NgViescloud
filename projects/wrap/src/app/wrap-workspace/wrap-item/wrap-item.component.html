@@ -1,3 +1,33 @@
-<p>
-  wrap-item works!
-</p>
+<ng-container *ngIf="wrap.type.toString() === 'ITEM'; else Else">
+  <mat-card class="example-card" appearance="outlined">
+    <mat-card-header>
+      <mat-card-title-group>
+        <mat-card-title>{{wrap.title}}</mat-card-title>
+        <mat-card-subtitle>{{wrap.description}}</mat-card-subtitle>
+        <img *ngIf="wrap.icon" mat-card-sm-image [src]="wrap.icon" >
+      </mat-card-title-group>
+    </mat-card-header>
+    <mat-card-content>
+      <button mat-raised-button color="primary">some button</button>
+    </mat-card-content>
+  </mat-card>
+</ng-container>
+
+<ng-template #Else>
+  <mat-expansion-panel [expanded]="true">
+    <mat-expansion-panel-header>
+      <mat-panel-title> {{wrap.title}} </mat-panel-title>
+      <mat-panel-description> {{wrap.description}} </mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <ng-container *ngIf="wrap.children;">
+      <ng-container *ngFor="let item of wrap.children; let i = index; trackBy: trackByIndex;">
+        <app-wrap-item [wrap]="item" (wrapChange)="wrap.children[i] = $event" [(mode)]="mode"></app-wrap-item>
+      </ng-container>
+    </ng-container>
+    
+    <app-wrap-plus-button
+    (onNewWrap)="wrap.children.push($event)"
+    ></app-wrap-plus-button>
+  </mat-expansion-panel>
+</ng-template>

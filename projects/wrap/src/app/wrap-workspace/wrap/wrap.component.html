@@ -6,6 +6,8 @@
     ></app-wrap-item>
   </li>
   <li *ngIf="!wrapWorkspace.wrap">
-    <app-wrap-plus-button></app-wrap-plus-button>
+    <app-wrap-plus-button
+    (onNewWrap)="wrapWorkspace.wrap = $event"
+    ></app-wrap-plus-button>
   </li>
 </ul>

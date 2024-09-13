@@ -19,6 +19,27 @@ export enum WrapHotKey {
     ZERO = "0",
 }
 
+export enum WrapStatusAcceptResponseCode {
+    OK = "200",
+    CREATED = "201",
+    NO_CONTENT = "204",
+    ACCEPTED = "202",
+    BAD_REQUEST = "400",
+    NOT_FOUND = "404",
+    NOT_ACCEPTABLE = "406",
+    UNAUTHORIZED = "401",
+    FORBIDDEN = "403",
+    CONFLICT = "409",
+    TOO_MANY_REQUEST = "429",
+    NOT_IMPLEMENTED = "501",
+    SERVICE_UNAVAILABLE = "503",
+    GONE = "410",
+    UNPROCESSABLE_ENTITY = "422",
+    TOO_MANY_REQUESTS = "429",
+    REQUEST_TIMEOUT = "408",
+    INTERNAL_SERVER_ERROR = "500"
+}
+
 export class WrapWorkspace {
     name: string = '';
     backgroundPicture: string = '';
@@ -29,20 +50,26 @@ export class WrapWorkspace {
 export class Wrap {
     @MatInputEnum(WrapType)
     type: WrapType = WrapType.GROUP;
+    
     title: string = '';
+
     provider: string = '';
+
     description: string = '';
 
     @MatInputListSetting(false, true, true)
     tags: string[] = [''] as string[];
+
     icon: string = '';
+    
     @MatInputEnum(WrapHotKey)
     @MatInputDisplayLabel('Hot key')
     hotKey: WrapHotKey = WrapHotKey.NONE;
+
     color: string = '';
 
     @MatInputListSetting(false, true, true)
-    link: Link[] = [new Link()] as Link[];
+    links: Link[] = [new Link()] as Link[];
 
     @MatInputHide(true)
     children: Wrap[] = [];
@@ -50,15 +77,28 @@ export class Wrap {
 
 export class Link {
     bubble: string = ''; //fancy name for mode
+
+    @MatInputDisplayLabel('Service Url')
     serviceUrl: string = '';
+
+    @MatInputDisplayLabel('Status Check Url')
     statusCheckUrl: string = '';
+
     @MatInputListSetting(false, true, true)
     statusCheckHeaders: Header[] = [new Header()] as Header[];
-    statusCheckAcceptResponseCode: string = '';
+
+    @MatInputEnum(WrapStatusAcceptResponseCode)
+    @MatInputDisplayLabel('Status Check Accept Response Code')
+    statusCheckAcceptResponseCode: WrapStatusAcceptResponseCode = WrapStatusAcceptResponseCode.OK;
+
+    @MatInputDisplayLabel('Enable Status Check')
     enableStatusCheck: boolean = false;
 }
 
 export class Header {
+    @MatInputDisplayLabel('Header')
     name: string = '';
+
+    @MatInputDisplayLabel('Header Value')
     value: string = '';
 }
