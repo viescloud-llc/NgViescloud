@@ -1,3 +1,5 @@
+import { MatInputHide } from "./Mat.model";
+
 export class WrapWorkspace {
     name: string = '';
     backgroundPicture: string = '';
@@ -10,11 +12,13 @@ export class Wrap {
     title: string = '';
     provider: string = '';
     description: string = '';
-    tags: string[] = [''];
+    tags: string[] = [''] as string[];
     icon: string = '';
     hotKey: string = '';
     color: string = '';
-    link: Link[] = [new Link()];
+    link: Link[] = [new Link()] as Link[];
+
+    @MatInputHide(true)
     children: Wrap[] = [];
 }
 
@@ -22,7 +26,7 @@ export class Link {
     bubble: string = ''; //fancy name for mode
     serviceUrl: string = '';
     statusCheckUrl: string = '';
-    statusCheckHeaders: Header[] = [];
+    statusCheckHeaders: Header[] = [new Header()] as Header[];
     statusCheckAcceptResponseCode: string = '';
     enableStatusCheck: boolean = false;
 }
