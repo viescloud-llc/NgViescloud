@@ -10,11 +10,11 @@ export class Wrap {
     title: string = '';
     provider: string = '';
     description: string = '';
-    tags: string[] = [];
+    tags: string[] = [''];
     icon: string = '';
     hotKey: string = '';
     color: string = '';
-    link: Link[] = [];
+    link: Link[] = [new Link()];
     children: Wrap[] = [];
 }
 

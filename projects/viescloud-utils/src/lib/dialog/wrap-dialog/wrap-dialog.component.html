@@ -1,0 +1,13 @@
+<h1 mat-dialog-title>{{data.title ?? 'Wrap add/edit'}}</h1>
+<div mat-dialog-content>
+  <app-mat-form-field-input-dynamic
+  [(value)]="wrap"
+  [blankObject]="blankObject"
+  [showListAddItemButton]="true"
+  styleWidth="100%"
+  ></app-mat-form-field-input-dynamic>
+</div>
+<div mat-dialog-actions>
+  <button mat-raised-button color="primary" [mat-dialog-close]="wrap" cdkFocusInitial>Save</button>
+  <button mat-raised-button color="warn" mat-dialog-close>Cancel</button>
+</div>

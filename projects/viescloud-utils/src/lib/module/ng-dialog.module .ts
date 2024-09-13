@@ -12,6 +12,7 @@ import { ObjectDialog } from '../dialog/object-dialog/object-dialog.component';
 import { OrganizationUserDialog } from '../dialog/organization/organization-user-dialog/organization-user-dialog.component';
 import { LoadingDialog } from '../dialog/loading-dialog/loading-dialog.component';
 import { ProductDialog } from '../dialog/marketing/product-dialog/product-dialog.component';
+import { WrapDialog } from '../dialog/wrap-dialog/wrap-dialog.component';
 
 const list = [
   ConfirmDialog,
@@ -23,7 +24,8 @@ const list = [
   ObjectDialog,
   OrganizationUserDialog,
   LoadingDialog,
-  ProductDialog
+  ProductDialog,
+  WrapDialog
 ]
 
 @NgModule({
