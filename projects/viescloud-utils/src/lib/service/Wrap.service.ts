@@ -16,17 +16,25 @@ export class WrapService {
   constructor(private s3StorageServiceV1: S3StorageServiceV1) {}
 
   init() {
-    this.s3StorageServiceV1.getFileByFileName(this.WRAP_WORKSPACE).subscribe({
-      next: (data) => {
-        UtilsService.readBlobAsText(data).then((data) => {
-          this.wrapWorkspaces = JSON.parse(data);
-          this.wrapWorkspacesCopy = structuredClone(this.wrapWorkspaces);
-        })
-      }
-    })
+    let workspacesLocal = UtilsService.localStorageGetItem<WrapWorkspace[]>(this.WRAP_WORKSPACE);
+    if(workspacesLocal) {
+      this.wrapWorkspaces = workspacesLocal;
+      this.wrapWorkspacesCopy = structuredClone(this.wrapWorkspaces);
+    }
+    else {
+      this.s3StorageServiceV1.getFileByFileName(this.WRAP_WORKSPACE).subscribe({
+        next: (data) => {
+          UtilsService.readBlobAsText(data).then((data) => {
+            this.wrapWorkspaces = JSON.parse(data);
+            this.wrapWorkspacesCopy = structuredClone(this.wrapWorkspaces);
+          })
+        }
+      })
+    }
   }
 
-  saveWorkSpace(workspaces: WrapWorkspace[]) {
+  saveWorkSpaces(workspaces: WrapWorkspace[]) {
+    this.saveWorkspacesLocally(workspaces);
     this.s3StorageServiceV1.deleteFileByFileName(this.WRAP_WORKSPACE).subscribe({
       next: (data) => {
         let vfile: VFile = {
@@ -42,6 +50,18 @@ export class WrapService {
         })
       }
     })
+  }
+
+  saveWorkspacesLocally(workspaces: WrapWorkspace[]) {
+    UtilsService.localStorageSetItem(this.WRAP_WORKSPACE, workspaces);
+  }
+
+  saveThisWorkspaces() {
+    this.saveWorkSpaces(this.wrapWorkspaces);
+  }
+
+  saveThisWorkspacesLocally() {
+    this.saveWorkspacesLocally(this.wrapWorkspaces);
   }
 
   revert() {

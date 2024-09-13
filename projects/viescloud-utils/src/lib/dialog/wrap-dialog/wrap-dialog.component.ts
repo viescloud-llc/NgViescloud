@@ -13,7 +13,9 @@ export class WrapDialog implements OnInit {
 
   wrap!: Wrap;
   blankObject: Wrap = new Wrap();
-  options: MatOption<any>[] = [];
+  options: MatOption<any>[] = UtilsService.getEnumMatOptions(WrapType);
+
+  validForm: boolean = false;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: {wrap: Wrap, title?: string}
@@ -23,18 +25,5 @@ export class WrapDialog implements OnInit {
 
   ngOnInit() {
     
-  }
-
-  getOptions() {
-    if(this.options.length === 0) {
-      UtilsService.getEnumValues(WrapType).forEach(e => {
-        this.options.push({
-          value: e,
-          valueLabel: e.toString()
-        })
-      })
-    }
-
-    return this.options;
   }
 }

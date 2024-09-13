@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
 import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
 import { WrapWorkspace } from 'projects/viescloud-utils/src/lib/model/Wrap.model';
+import { AuthenticatorService } from 'projects/viescloud-utils/src/lib/service/Authenticator.service';
 import { UtilsService } from 'projects/viescloud-utils/src/lib/service/Utils.service';
 import { WrapService } from 'projects/viescloud-utils/src/lib/service/Wrap.service';
 
@@ -23,12 +26,21 @@ export class WrapWorkspaceComponent implements OnInit {
   currentWorkSpaceIndex: number = -1;
 
   mode: Mode = Mode.View;
+  modeOptions: MatOption<any>[] = UtilsService.getEnumMatOptions(Mode);
 
-  constructor(public wrapService: WrapService) { }
+  constructor(
+    public wrapService: WrapService,
+    private matDialog: MatDialog,
+    public authenticatorService: AuthenticatorService
+  ) { }
 
   ngOnInit() {
     this.wrapService.init();
     this.initOptions();
+    if(this.wrapService.wrapWorkspaces.length > 0) {
+      this.currentWorkspace = this.wrapService.wrapWorkspaces[0].name;
+      this.currentWorkSpaceIndex = 0;
+    }
   }
 
   initOptions() {
@@ -45,6 +57,32 @@ export class WrapWorkspaceComponent implements OnInit {
         valueLabel: this.ADD_NEW_WORKSPACE
       }
     )
+  }
+
+  removeThisWorkspace() {
+    let dialog = this.matDialog.open(ConfirmDialog, {
+      data: {
+        message: 'Are you sure you want to delete this workspace?',
+        title: 'Delete workspace',
+        ok: 'Delete',
+        cancel: 'Cancel'
+      }
+    })
+
+    dialog.afterClosed().subscribe(result => {
+      if(result) {
+        this.wrapService.wrapWorkspaces.splice(this.currentWorkSpaceIndex, 1);
+        this.initOptions();
+        if(this.wrapService.wrapWorkspaces.length > 0) {
+          this.currentWorkspace = this.wrapService.wrapWorkspaces[0].name;
+          this.currentWorkSpaceIndex = 0;
+        }
+        else {
+          this.currentWorkspace = '';
+          this.currentWorkSpaceIndex = -1;
+        }
+      }
+    })
   }
 
   onSelectWorkspace(name: string) {
@@ -70,4 +108,19 @@ export class WrapWorkspaceComponent implements OnInit {
       return '';
   }
 
+  saveLocally() {
+    let dialog = this.matDialog.open(ConfirmDialog, {data: {title: 'Save locally?', message: 'Are you sure you want to save this workspace locally?\nThis will only save to your browser storage', yes: 'save', no: 'cancel'}, width: '100%'});
+  
+    dialog.afterClosed().subscribe({
+      next: res => {
+        if(res) {
+          this.wrapService.saveThisWorkspacesLocally();
+        }
+      }
+    })
+  }
+
+  saveToServer() {
+    this.wrapService.saveThisWorkspaces();
+  }
 }

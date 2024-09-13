@@ -1,4 +1,4 @@
-import { MatInputDisplayLabel, MatInputEnum, MatInputHide, MatInputListSetting, MatInputOptions } from "./Mat.model";
+import { MatInputDisplayLabel, MatInputEnum, MatInputHide, MatInputListSetting, MatInputOptions, MatInputRequire } from "./Mat.model";
 
 export enum WrapType {
     GROUP = "GROUP",
@@ -44,13 +44,14 @@ export class WrapWorkspace {
     name: string = '';
     backgroundPicture: string = '';
     bubbles: string[] = [];
-    wrap?: Wrap = undefined;
+    wraps: Wrap[] = [];
 }
 
 export class Wrap {
     @MatInputEnum(WrapType)
     type: WrapType = WrapType.GROUP;
-    
+
+    @MatInputRequire(true)
     title: string = '';
 
     provider: string = '';
@@ -77,6 +78,8 @@ export class Wrap {
 
 export class Link {
     bubble: string = ''; //fancy name for mode
+    
+    label: string = '';
 
     @MatInputDisplayLabel('Service Url')
     serviceUrl: string = '';

@@ -1,5 +1,5 @@
-<ng-container *ngIf="wrap.type.toString() === 'ITEM'; else Else">
-  <mat-card class="example-card" appearance="outlined">
+<ng-container *ngIf="wrap.type.toString() === 'ITEM'; else Else" >
+  <mat-card class="example-card" appearance="outlined" (click)="edit(wrap)">
     <mat-card-header>
       <mat-card-title-group>
         <mat-card-title>{{wrap.title}}</mat-card-title>
@@ -8,16 +8,26 @@
       </mat-card-title-group>
     </mat-card-header>
     <mat-card-content>
-      <button mat-raised-button color="primary">some button</button>
+      <button *ngIf="mode === 'edit'" mat-raised-button color="primary" (click)="edit(wrap)">Edit</button>
+      <ng-container *ngFor="let link of wrap.links">
+        <button mat-raised-button color="primary" (click)="openLink(link)">
+          {{link.label || link.serviceUrl}}
+        </button>
+      </ng-container>
     </mat-card-content>
   </mat-card>
 </ng-container>
 
 <ng-template #Else>
-  <mat-expansion-panel [expanded]="true">
+  <mat-expansion-panel [expanded]="true" #panel>
     <mat-expansion-panel-header>
       <mat-panel-title> {{wrap.title}} </mat-panel-title>
-      <mat-panel-description> {{wrap.description}} </mat-panel-description>
+      <mat-panel-description *ngIf="mode === 'view'"> 
+        {{wrap.description}}
+      </mat-panel-description>
+      <mat-panel-description *ngIf="mode === 'edit'"> 
+        <button mat-raised-button color="primary" (click)="edit(wrap); panel.expanded = true">Edit</button>
+      </mat-panel-description>
     </mat-expansion-panel-header>
 
     <ng-container *ngIf="wrap.children;">
@@ -27,6 +37,7 @@
     </ng-container>
     
     <app-wrap-plus-button
+    *ngIf="mode === 'edit'"
     (onNewWrap)="wrap.children.push($event)"
     ></app-wrap-plus-button>
   </mat-expansion-panel>

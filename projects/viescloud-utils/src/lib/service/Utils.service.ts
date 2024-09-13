@@ -3,6 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, finalize, first, of, pipe, switchMap, tap } from 'rxjs';
 import { LoadingDialog } from '../dialog/loading-dialog/loading-dialog.component';
+import { MatOption } from '../model/Mat.model';
 
 export interface VFile {
   name: string,
@@ -575,5 +576,17 @@ export class UtilsService {
         return arr;
     }
     return [];  
+  }
+
+  static getEnumMatOptions(Enum: any): MatOption<any>[] {
+    let matOptions: MatOption<any>[] = [];
+      UtilsService.getEnumValues(Enum).forEach(e => {
+        matOptions.push({
+          value: e,
+          valueLabel: e.toString()
+        })
+      })
+
+    return matOptions;
   }
 }

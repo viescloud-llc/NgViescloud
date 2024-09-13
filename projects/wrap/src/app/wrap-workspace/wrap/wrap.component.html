@@ -1,13 +1,14 @@
 <ul *ngIf="wrapWorkspace" class="margin-center">
-  <li *ngIf="wrapWorkspace.wrap">
+  <li *ngFor="let wrap of wrapWorkspace.wraps; let i = index; trackBy: trackByIndex">
     <app-wrap-item
-    [(wrap)]="wrapWorkspace.wrap"
+    [wrap]="wrap"
+    (wrapChange)="wrapWorkspace.wraps[i] = $event"
     [(mode)]="mode"
     ></app-wrap-item>
   </li>
-  <li *ngIf="!wrapWorkspace.wrap">
+  <li *ngIf="mode === 'edit'">
     <app-wrap-plus-button
-    (onNewWrap)="wrapWorkspace.wrap = $event"
+    (onNewWrap)="wrapWorkspace.wraps.push($event)"
     ></app-wrap-plus-button>
   </li>
 </ul>
