@@ -49,9 +49,8 @@ export class WrapWorkspaceComponent implements OnInit {
 
   onSelectWorkspace(name: string) {
     if(name == this.ADD_NEW_WORKSPACE) {
-      let workspace: WrapWorkspace = {
-        name: 'workspace ' + (this.wrapService.wrapWorkspaces.length + 1)
-      }
+      let workspace: WrapWorkspace = new WrapWorkspace();
+      workspace.name = 'workspace ' + (this.wrapService.wrapWorkspaces.length + 1)
       this.wrapService.wrapWorkspaces.push(workspace);
       this.initOptions();
       this.currentWorkspace = workspace.name;

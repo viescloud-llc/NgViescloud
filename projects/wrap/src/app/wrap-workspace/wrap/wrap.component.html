@@ -1,3 +1,11 @@
-<ul class="margin-center">
-  
+<ul *ngIf="wrapWorkspace" class="margin-center">
+  <li *ngIf="wrapWorkspace.wrap">
+    <app-wrap-item
+    [(wrap)]="wrapWorkspace.wrap"
+    [(mode)]="mode"
+    ></app-wrap-item>
+  </li>
+  <li *ngIf="!wrapWorkspace.wrap">
+    <app-wrap-plus-button></app-wrap-plus-button>
+  </li>
 </ul>

@@ -8,12 +8,16 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AuthInterceptor } from 'projects/viescloud-utils/src/lib/guards/auth.interceptor';
 import { WrapWorkspaceComponent } from './wrap-workspace/wrap-workspace.component';
 import { WrapComponent } from './wrap-workspace/wrap/wrap.component';
+import { WrapItemComponent } from './wrap-workspace/wrap-item/wrap-item.component';
+import { WrapPlusButtonComponent } from './wrap-workspace/wrap-plus-button/wrap-plus-button.component';
 
 const LIST = [
   AppComponent,
   HomeComponent,
   WrapWorkspaceComponent,
-  WrapComponent
+  WrapComponent,
+  WrapItemComponent,
+  WrapPlusButtonComponent
 ]
 
 @NgModule({
