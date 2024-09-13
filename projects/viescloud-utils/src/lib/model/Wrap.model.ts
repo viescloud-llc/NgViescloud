@@ -1,4 +1,4 @@
-import { MatInputDisplayLabel, MatInputEnum, MatInputHide, MatInputOptions } from "./Mat.model";
+import { MatInputDisplayLabel, MatInputEnum, MatInputHide, MatInputListSetting, MatInputOptions } from "./Mat.model";
 
 export enum WrapType {
     GROUP = "GROUP",
@@ -32,12 +32,16 @@ export class Wrap {
     title: string = '';
     provider: string = '';
     description: string = '';
+
+    @MatInputListSetting(false, true, true)
     tags: string[] = [''] as string[];
     icon: string = '';
     @MatInputEnum(WrapHotKey)
     @MatInputDisplayLabel('Hot key')
     hotKey: WrapHotKey = WrapHotKey.NONE;
     color: string = '';
+
+    @MatInputListSetting(false, true, true)
     link: Link[] = [new Link()] as Link[];
 
     @MatInputHide(true)
@@ -48,6 +52,7 @@ export class Link {
     bubble: string = ''; //fancy name for mode
     serviceUrl: string = '';
     statusCheckUrl: string = '';
+    @MatInputListSetting(false, true, true)
     statusCheckHeaders: Header[] = [new Header()] as Header[];
     statusCheckAcceptResponseCode: string = '';
     enableStatusCheck: boolean = false;

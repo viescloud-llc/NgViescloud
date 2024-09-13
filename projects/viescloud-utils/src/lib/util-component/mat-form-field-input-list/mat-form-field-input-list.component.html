@@ -25,19 +25,8 @@
       [focusoutEmit]="false"
       ></app-mat-form-field-input>
     </li>
-    <ng-container *ngIf="blankObjectType !=='object' && blankObjectType !=='array'">
-      <li *ngFor="let item of value; let i = index; trackBy: trackByIndex;">
-        <app-mat-form-field-input
-        [label]="label + ' ' + (i + 1)"
-        [value]="item" (valueChange)="value[i] = $event"
-        styleWidth="100%"
-        [required]="required"
-        customIconLabel="remove_circle"
-        (onCustomIconClick)="remove(i)"
-        ></app-mat-form-field-input>
-      </li>
-    </ng-container>
-    <ng-container *ngIf="blankObjectType =='object'">
+    
+    <ng-container *ngIf="blankObjectType =='object'; else Else">
       <ng-container *ngFor="let item of value; let i = index; trackBy: trackByIndex;">
         <app-mat-form-field-input-dynamic
         [label]="label"
@@ -49,6 +38,20 @@
         <hr>
       </ng-container>
     </ng-container>
+
+    <ng-template #Else>
+      <li *ngFor="let item of value; let i = index; trackBy: trackByIndex;">
+        <app-mat-form-field-input
+        [label]="label + ' ' + (i + 1)"
+        [value]="item" (valueChange)="value[i] = $event"
+        styleWidth="100%"
+        [required]="required"
+        customIconLabel="remove_circle"
+        (onCustomIconClick)="remove(i)"
+        ></app-mat-form-field-input>
+      </li>
+    </ng-template>
+
     <li *ngIf="showAddItemButton">
       <button mat-raised-button color="primary" style="width: 100%;" (click)="addNewItem()" [disabled]="reachMaxSize()">Add new {{label}}</button>
     </li>

@@ -126,8 +126,11 @@ export class MatFormFieldInputListComponent extends MatFormFieldComponent {
   }
 
   updateBlankObjectType() {
-    if(Array.isArray(this.blankObject))
-      this.blankObjectType = 'array';
+    if(Array.isArray(this.blankObject)) {
+      if(this.blankObject.length > 0)
+        this.blankObject = this.blankObject[0];
+      this.blankObjectType = typeof this.blankObject;
+    }
     else if(typeof this.blankObject === 'object')
       this.blankObjectType = 'object';
     else

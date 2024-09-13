@@ -21,7 +21,7 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
   isTextArea: boolean = false;
 
   @Input()
-  isSlideToggle: boolean = true;
+  isSlideToggle: boolean = false;
 
   @Input()
   isOptions: boolean = false;
