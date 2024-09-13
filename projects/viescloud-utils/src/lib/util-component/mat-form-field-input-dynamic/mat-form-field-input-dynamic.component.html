@@ -2,7 +2,7 @@
   <app-mat-form-field-input
     [label]="label"
     [placeholder]="placeholder"
-    [value]="value" (valueChange)="value = $event"
+    [(value)]="value"
     (onValueChange)="emitValue()"
     [styleWidth]="styleWidth"
     [disable]="disable"
@@ -16,7 +16,7 @@
   <app-mat-form-field-input-option
     [label]="label"
     [placeholder]="placeholder"
-    [value]="value" (valueChange)="value = $event"
+    [(value)]="value"
     (onValueChange)="emitValue()"
     [options]="options"
     noneLabel=""
@@ -35,6 +35,21 @@
   [disabled]="disable"
   [required]="required"
   >{{label}}</mat-slide-toggle>
+</ng-container>
+
+<ng-container *ngIf="isOptions" appMatFormFieldGroup (onAllInputCheck)="validInput = $event">
+  <app-mat-form-field-input-option
+    [label]="label"
+    [placeholder]="placeholder"
+    [(value)]="value"
+    (onValueChange)="emitValue()"
+    [options]="matOptions!"
+    noneLabel=""
+    [styleWidth]="styleWidth"
+    [disable]="disable"
+    [required]="required"
+    [blankObject]="blankObject"
+  ></app-mat-form-field-input-option>
 </ng-container>
 
 <ng-container *ngIf="isValueNonMultipleStringLine()" appMatFormFieldGroup (onAllInputCheck)="validInput = $event">
@@ -71,7 +86,7 @@
   <app-mat-form-field-input-list
   [label]="label"
   [placeholder]="placeholder"
-  [value]="value" (valueChange)="value = $event"
+  [(value)]="value"
   (onValueChange)="emitValue()"
   [required]="required"
   [styleWidth]="styleWidth"
@@ -100,11 +115,13 @@
       [disable]="containDisable(item)"
       [required]="containRequire(item)"
       [isTextArea]="containTextArea(item)"
+      [isOptions]="containOptions(item)"
       [blankObject]="item.blankObject"
       [objectLabel]="item.key"
       [showListSizeInput]="containListShowInputSize(item)"
       [showListAddItemButton]="containListShowAddItemButton(item)"
       [showListRemoveItemButton]="containListShowRemoveItemButton(item)"
+      [matOptions]="item.matOptions"
       ></app-mat-form-field-input-dynamic>
     </li>
   </ul>

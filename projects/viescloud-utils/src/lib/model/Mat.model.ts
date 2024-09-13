@@ -1,3 +1,5 @@
+import { UtilsService } from "../service/Utils.service";
+
 export enum PropertyMatcherEnum {
     CASE_SENSITIVE = "CASE_SENSITIVE",
     CONTAINS = "CONTAINS",
@@ -25,6 +27,7 @@ export enum MatItemSettingType {
     INDEX = <any>'IndexItem',
     TEXT_AREA = <any>'TextAreaItem',
     EXPANSION_PANEL = <any>'ExpansionPanelItem',
+    OPTIONS = <any>'OptionsItem',
     HIDE = <any>'HideItem',
     LIST_SHOW_LIST_SIZE_INPUT = <any>'ListShowListSizeInputItem',
     LIST_SHOW_REMOVE_ITEM_BUTTON = <any>'ListShowRemoveItemButtonItem',
@@ -183,17 +186,9 @@ export class MatFromFieldInputDynamicItem {
     value: any;
     settings: MatItemSetting[] = [];
     index?: number;
+    matOptions: MatOption<any>[] = [];
 
-    constructor(ref: any, blankObject: any, keyLabel: string, value: any, settings: MatItemSetting[], index?: number, label?: string, placeholder?: string) {
-        this.ref = ref;
-        this.blankObject = blankObject;
-        this.key = keyLabel;
-        this.value = value;
-        this.settings = settings;
-        this.index = index ?? 0;
-        this.label = label ?? keyLabel;
-        this.placeholder = placeholder ?? '';
-    }
+    constructor() {}
 
     setValueFn(value: any) {
         this.ref[this.key] = value;
@@ -338,6 +333,52 @@ export const MatInputExpansionPanel = (disable?: boolean) => {
     }
 }
 
+
+/**
+ * This function generates options for a dynamic input field.
+ *
+ * @param {Array<string|number>} options - An array of options to be used in the input field.
+ * @return {Function} A function that adds options to an object.
+ */
+export const MatInputOptions = (options: (string | number)[], noneLabel?: string | number, noneValue?: string | number) => {
+    return function MatInputOptions(object: any, key: any) {
+        let matOptions: MatOption<any>[] = [];
+        if(noneLabel) {
+            matOptions.push({
+                value: noneValue,
+                valueLabel: noneLabel.toString()
+            })
+        }
+        options.forEach(option => {
+            matOptions.push({
+                value: option,
+                valueLabel: option.toString()
+            })
+        })
+        addValue(object, key, MatItemSettingType.OPTIONS.toString(), matOptions, matOptions);
+    }
+}
+
+export const MatInputEnum = (Enum: any, noneLabel?: string | number, noneValue?: string | number) => {
+    return function MatInputEnum(object: any, key: any) {
+        let matOptions: MatOption<any>[] = [];
+        let enumArray = UtilsService.getEnumValues(Enum);
+        if(noneLabel) {
+            matOptions.push({
+                value: noneValue,
+                valueLabel: noneLabel.toString()
+            })
+        }
+        enumArray.forEach(option => {
+            matOptions.push({
+                value: option,
+                valueLabel: option.toString()
+            })
+        })
+        addValue(object, key, MatItemSettingType.OPTIONS.toString(), matOptions, matOptions);
+    }
+}
+
 /**
  * this function is all in one setting for dynamic input component
  * @param index indexing input
@@ -421,6 +462,16 @@ export const addGetPrototype = (object: any) => {
     })
 }
 
+/**
+ * Adds a new property to the given object with a name derived from the key and suffix.
+ *
+ * @param {any} object - The object to which the property will be added.
+ * @param {any} key - The base name of the property.
+ * @param {string} surFix - The suffix to append to the key to form the property name.
+ * @param {any} value - The value of the property.
+ * @param {any} defaultValue - The default value to use if the value is null or undefined.
+ * @return {void}
+ */
 const addValue = (object: any, key: any, surFix: string, value: any, defaultValue: any) => {
     let name = key + surFix;
 

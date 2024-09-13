@@ -1,6 +1,7 @@
 import { Component, Input, SimpleChanges, forwardRef } from '@angular/core';
 import { MatFormFieldComponent } from '../mat-form-field/mat-form-field.component';
 import { MatFromFieldInputDynamicItem, MatItemSetting, MatItemSettingType, MatOption } from '../../model/Mat.model';
+import { UtilsService } from '../../service/Utils.service';
 
 @Component({
   selector: 'app-mat-form-field-input-dynamic',
@@ -20,9 +21,10 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
   isTextArea: boolean = false;
 
   @Input()
-  isSlideToggle: boolean = false;
-  
-  validInput: boolean = false;
+  isSlideToggle: boolean = true;
+
+  @Input()
+  isOptions: boolean = false;
 
   @Input()
   showListSizeInput: boolean = false;
@@ -32,6 +34,9 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
 
   @Input()
   showListAddItemButton: boolean = true;
+
+  @Input()
+  matOptions?: MatOption<any>[];
 
   // mat option
   options: MatOption<any>[] = [
@@ -50,6 +55,8 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
   objectLabel?: string;
 
   items: MatFromFieldInputDynamicItem[] = [];
+
+  validInput: boolean = false;
 
   constructor() {
     super();
@@ -91,15 +98,17 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
 
     for (const [key] of Object.entries(this.blankObject)) {
       if(!this.getHideSettingValue(key)) {
-        this.items.push(new MatFromFieldInputDynamicItem(
-          this.value, 
-          this.getKeyBlankObject(key), 
-          key, 
-          this.getValue(key), 
-          this.getSettings(key), 
-          this.getIndexSettingValue(key, defaultIndex),
-          this.getLabelSettingValue(key), 
-          this.getPlaceholderSettingValue(key)));
+        let item = new MatFromFieldInputDynamicItem();
+        item.ref = this.value;
+        item.blankObject = this.getKeyBlankObject(key);
+        item.key = key;
+        item.value = this.getValue(key);
+        item.settings = this.getSettings(key);
+        item.index = this.getIndexSettingValue(key, defaultIndex);
+        item.label = this.getLabelSettingValue(key);
+        item.placeholder = this.getPlaceholderSettingValue(key);
+        item.matOptions = this.getMatOptions(key);
+        this.items.push(item);
       }
       defaultIndex++;
     }
@@ -148,6 +157,10 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
 
   private getPlaceholderSettingValue(key: string): string {
     return this.getSettingValue(key, MatItemSettingType.CUSTOM_PLACEHOLDER, '');
+  }
+
+  private getMatOptions(key: string): MatOption<any>[] {
+    return this.getSettingValue(key, MatItemSettingType.OPTIONS, []);
   }
 
   private getSettings(key: string): MatItemSetting[] {
@@ -206,11 +219,19 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
     return item.containSetting(MatItemSettingType.LIST_SHOW_REMOVE_ITEM_BUTTON);
   }
 
+  public containOptions(item: MatFromFieldInputDynamicItem) {
+    return item.containSetting(MatItemSettingType.OPTIONS);
+  }
+
   override isValueMultipleStringLine(): boolean {
-      return super.isValueMultipleStringLine() || this.isTextArea;
+      return (super.isValueMultipleStringLine() || this.isTextArea) && !this.isOptions;
   }
 
   override isValueNonMultipleStringLine(): boolean {
-    return super.isValueNonMultipleStringLine() && !this.isTextArea;
+    return (super.isValueNonMultipleStringLine() && !this.isTextArea) && !this.isOptions;
+  }
+
+  override isValueNumber(): boolean {
+    return super.isValueNumber() && !this.isOptions;
   }
 }

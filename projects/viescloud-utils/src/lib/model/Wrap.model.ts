@@ -1,4 +1,23 @@
-import { MatInputHide } from "./Mat.model";
+import { MatInputDisplayLabel, MatInputEnum, MatInputHide, MatInputOptions } from "./Mat.model";
+
+export enum WrapType {
+    GROUP = "GROUP",
+    ITEM = "ITEM"
+}
+
+export enum WrapHotKey {
+    NONE = "NONE",
+    ONE = "1",
+    TWO = "2",
+    THREE = "3",
+    FOUR = "4",
+    FIVE = "5",
+    SIX = "6",
+    SEVEN = "7",
+    EIGHT = "8",
+    NINE = "9",
+    ZERO = "0",
+}
 
 export class WrapWorkspace {
     name: string = '';
@@ -8,13 +27,16 @@ export class WrapWorkspace {
 }
 
 export class Wrap {
+    @MatInputEnum(WrapType)
     type: WrapType = WrapType.GROUP;
     title: string = '';
     provider: string = '';
     description: string = '';
     tags: string[] = [''] as string[];
     icon: string = '';
-    hotKey: string = '';
+    @MatInputEnum(WrapHotKey)
+    @MatInputDisplayLabel('Hot key')
+    hotKey: WrapHotKey = WrapHotKey.NONE;
     color: string = '';
     link: Link[] = [new Link()] as Link[];
 
@@ -34,9 +56,4 @@ export class Link {
 export class Header {
     name: string = '';
     value: string = '';
-}
-
-export enum WrapType {
-    GROUP = "GROUP",
-    ITEM = "ITEM"
 }

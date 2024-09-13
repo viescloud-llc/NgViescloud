@@ -557,4 +557,23 @@ export class UtilsService {
       reader.readAsText(blob);
     });
   }
+
+  static isEnum(obj: any): boolean {
+    return typeof obj === "object" && Object.keys(obj).length > 0 && Object.values(obj).every(val => {
+        return typeof val === 'string' || typeof val === 'number';
+    });
+  }
+
+  static getEnumValues(enumObj: any): (string | number)[] {
+    if (UtilsService.isEnum(enumObj)) {
+        let arr: (string | number)[] = [];
+        Object.values(enumObj).forEach(value => {
+            if (typeof value === "string" || typeof value === "number") {
+                arr.push(value);
+            }
+        })
+        return arr;
+    }
+    return [];  
+  }
 }
