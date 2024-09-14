@@ -1,11 +1,9 @@
 <ng-container *ngIf="wrap.type.toString() === 'ITEM'; else Else" >
-  <mat-card class="example-card" appearance="outlined" (click)="edit(wrap)">
+  <mat-card appearance="outlined" (click)="edit(wrap)">
     <mat-card-header>
-      <mat-card-title-group>
-        <mat-card-title>{{wrap.title}}</mat-card-title>
-        <mat-card-subtitle>{{wrap.description}}</mat-card-subtitle>
-        <img *ngIf="wrap.icon" mat-card-sm-image [src]="wrap.icon" >
-      </mat-card-title-group>
+      <div mat-card-avatar [ngStyle]="{background: 'url(' + wrap.icon + ')', backgroundSize: 'cover'}"></div>
+      <mat-card-title>{{wrap.title}}</mat-card-title>
+      <mat-card-subtitle>{{wrap.description}}</mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
       <button *ngIf="mode === 'edit'" mat-raised-button color="primary" (click)="edit(wrap)">Edit</button>
@@ -30,7 +28,7 @@
       </mat-panel-description>
     </mat-expansion-panel-header>
 
-    <ng-container *ngIf="wrap.children;">
+    <ng-container *ngIf="wrap.children;" class="container">
       <ng-container *ngFor="let item of wrap.children; let i = index; trackBy: trackByIndex;">
         <app-wrap-item [wrap]="item" (wrapChange)="wrap.children[i] = $event" [(mode)]="mode"></app-wrap-item>
       </ng-container>
