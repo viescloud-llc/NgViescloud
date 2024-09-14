@@ -127,7 +127,7 @@ export class SmbStorageServiceV1 extends ObjectStorage {
   }
 
   protected override getPrefixes(): string[] {
-    return ['smb', 'v1'];
+    return ['osm', 'smb', 'v1'];
   }
 
 }
@@ -142,7 +142,7 @@ export class S3StorageServiceV1 extends ObjectStorage {
   }
 
   protected override getPrefixes(): string[] {
-    return ['s3', 'v1'];
+    return ['osm', 's3', 'v1'];
   }
 
 }
@@ -157,7 +157,7 @@ export class DatabaseStorageServiceV1 extends ObjectStorage {
   }
 
   protected override getPrefixes(): string[] {
-    return ['database', 'v1'];
+    return ['osm', 'database', 'v1'];
   }
 
 }
