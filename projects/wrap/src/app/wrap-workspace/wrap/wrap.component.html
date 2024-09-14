@@ -1,4 +1,4 @@
-<ul *ngIf="wrapWorkspace" class="container">
+<ul *ngIf="wrapWorkspace" class="flex-row-container">
   <li *ngFor="let wrap of wrapWorkspace.wraps; let i = index; trackBy: trackByIndex">
     <app-wrap-item
     [wrap]="wrap"

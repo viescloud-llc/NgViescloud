@@ -3,6 +3,15 @@
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
+@mixin hover-effect($bg-color: #f0f0f0, $text-color: #000, $transition-time: 0.3s) {
+    transition: background-color $transition-time, color $transition-time;
+    
+    &:hover {
+      background-color: $bg-color;
+      color: $text-color;
+    }
+}
+
 textarea
 {
     resize: both;
@@ -152,4 +161,26 @@ a
     @extend .min-fit;
     max-width: 700px;
     width: 100%;
+}
+
+.flex-row-container {
+    display: flex;
+    flex-direction: row; /* Items in a row */
+    justify-content: flex-start; /* Align items to the start */
+    align-items: center; /* Vertically align items */
+    gap: 1rem; /* Space between the items */
+    flex-wrap: wrap;
+}
+
+.cursor-hover-change-color {
+    &:hover {
+        cursor: pointer;
+    }
+    @include hover-effect(#f0f0f0, #000, 0.3s);
+}
+
+.cursor-hover {
+    &:hover {
+        cursor: pointer;
+    }
 }

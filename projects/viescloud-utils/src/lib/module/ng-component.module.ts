@@ -21,6 +21,7 @@ import { LoginComponent } from '../share-component/login/login.component';
 import { OpenIdComponent } from '../share-component/openId/openId.component';
 import { SideDrawerMenuComponent } from '../share-component/side-drawer-menu/side-drawer-menu.component';
 import { QuickSideDrawerMenuComponent } from '../share-component/quick-side-drawer-menu/quick-side-drawer-menu.component';
+import { ClickStopPropagationDirective } from '../directive/ClickStopPropagation.directive';
 
 const UTILS = [
   CopyToClipboardUtilComponent,
@@ -30,14 +31,15 @@ const UTILS = [
   FilterNamePipe,
   FilterNameReversePipe,
   MatTableComponent,
-  MatFormFieldComponent,
   MatFormFieldGroupDirective,
+  MatFormFieldComponent,
   MatFormFieldInputTextAreaComponent,
   MatFormFieldInputTimeComponent,
   MatFormFieldInputOptionComponent,
   MatFormFieldInputListComponent,
   MatFormFieldInputDynamicComponent,
-  MatFormFieldInputListOptionComponent
+  MatFormFieldInputListOptionComponent,
+  ClickStopPropagationDirective
 ]
 
 const COMPONENTS = [

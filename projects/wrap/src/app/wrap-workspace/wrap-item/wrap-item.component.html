@@ -1,12 +1,12 @@
 <ng-container *ngIf="wrap.type.toString() === 'ITEM'; else Else" >
-  <mat-card appearance="outlined" (click)="edit(wrap)">
+  <mat-card appearance="outlined" class="cursor-hover" (click)="edit(wrap)">
     <mat-card-header>
       <div mat-card-avatar [ngStyle]="{background: 'url(' + wrap.icon + ')', backgroundSize: 'cover'}"></div>
       <mat-card-title>{{wrap.title}}</mat-card-title>
       <mat-card-subtitle>{{wrap.description}}</mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
-      <button *ngIf="mode === 'edit'" mat-raised-button color="primary" (click)="edit(wrap)">Edit</button>
+      <button *ngIf="mode === 'edit'" mat-raised-button color="primary" (click)="edit(wrap)" ViescloudClickStopPropagation>Edit</button>
       <ng-container *ngFor="let link of wrap.links">
         <button mat-raised-button color="primary" (click)="openLink(link)">
           {{link.label || link.serviceUrl}}
@@ -18,25 +18,26 @@
 
 <ng-template #Else>
   <mat-expansion-panel [expanded]="true" #panel>
-    <mat-expansion-panel-header>
-      <mat-panel-title> {{wrap.title}} </mat-panel-title>
+    <mat-expansion-panel-header >
+      <mat-panel-title><b>{{wrap.title}}</b></mat-panel-title>
       <mat-panel-description *ngIf="mode === 'view'"> 
         {{wrap.description}}
       </mat-panel-description>
       <mat-panel-description *ngIf="mode === 'edit'"> 
-        <button mat-raised-button color="primary" (click)="edit(wrap); panel.expanded = true">Edit</button>
+        <button mat-raised-button color="primary" (click)="edit(wrap)">Edit</button>
       </mat-panel-description>
     </mat-expansion-panel-header>
-
-    <ng-container *ngIf="wrap.children;" class="container">
-      <ng-container *ngFor="let item of wrap.children; let i = index; trackBy: trackByIndex;">
-        <app-wrap-item [wrap]="item" (wrapChange)="wrap.children[i] = $event" [(mode)]="mode"></app-wrap-item>
+    <div class="flex-row-container">
+      <ng-container *ngIf="wrap.children;">
+        <ng-container *ngFor="let item of wrap.children; let i = index; trackBy: trackByIndex;">
+          <app-wrap-item [wrap]="item" (wrapChange)="wrap.children[i] = $event" [(mode)]="mode"></app-wrap-item>
+        </ng-container>
       </ng-container>
-    </ng-container>
-    
-    <app-wrap-plus-button
-    *ngIf="mode === 'edit'"
-    (onNewWrap)="wrap.children.push($event)"
-    ></app-wrap-plus-button>
+  
+      <app-wrap-plus-button
+      *ngIf="mode === 'edit'"
+      (onNewWrap)="wrap.children.push($event)"
+      ></app-wrap-plus-button>
+    </div>
   </mat-expansion-panel>
 </ng-template>
