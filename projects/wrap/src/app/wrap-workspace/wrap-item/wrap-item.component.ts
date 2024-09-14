@@ -26,6 +26,12 @@ export class WrapItemComponent extends TrackByIndex implements OnInit {
   @Output()
   modeChange: EventEmitter<Mode> = new EventEmitter();
 
+  @Output()
+  onMoveLeft: EventEmitter<void> = new EventEmitter();
+
+  @Output()
+  onMoveRight: EventEmitter<void> = new EventEmitter();
+
   constructor(private matDialog: MatDialog) { 
     super();
   }
@@ -150,5 +156,28 @@ export class WrapItemComponent extends TrackByIndex implements OnInit {
 
   displayItemTooltip(wrap: Wrap) {
     this.displayTooltip(this.getItemTooltip(wrap));
+  }
+
+  moveLeft(index: number) {
+    let toIndex = index - 1;
+    if(toIndex < 0)
+      toIndex = this.wrap.children.length - 1;
+    this.swap(this.wrap, index, toIndex);
+  }
+
+  moveRight(index: number) {
+    let toIndex = index + 1;
+    if(toIndex > this.wrap.children.length - 1)
+      toIndex = 0;
+    this.swap(this.wrap, index, toIndex);
+  }
+
+  swap(wrap: Wrap, fromIndex: number, toIndex: number) {
+    if(toIndex < 0 || toIndex >= wrap.children.length)
+      return;
+    
+    let temp = wrap.children[fromIndex];
+    wrap.children[fromIndex] = wrap.children[toIndex];
+    wrap.children[toIndex] = temp;
   }
 }

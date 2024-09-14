@@ -3,14 +3,21 @@
     <mat-card-header>
       <div mat-card-avatar [ngStyle]="{background: 'url(' + wrap.icon + ')', backgroundSize: 'cover'}"></div>
       <mat-card-title>{{wrap.title}}</mat-card-title>
-      <mat-card-subtitle>{{wrap.description}}</mat-card-subtitle>
+      <mat-card-subtitle *ngIf="wrap.hotKey !== 'NONE'">Hot Key: {{wrap.hotKey}}</mat-card-subtitle>
       <mat-icon (click)="displayItemTooltip(wrap)" [matTooltip]="getItemTooltip(wrap)" matTooltipClass="tooltip-multiline" matTooltipPosition="above" viescloudClickStopPropagation>
         info
       </mat-icon>
     </mat-card-header>
     <mat-card-content>
-      <button *ngIf="mode === 'edit'" mat-raised-button color="primary" (click)="edit(wrap)" viescloudClickStopPropagation>Edit</button>
+      {{wrap.description}}
     </mat-card-content>
+    <mat-card-footer *ngIf="mode === 'edit'">
+      <mat-chip-set>
+        <mat-chip matTooltip="Move Left" (click)="onMoveLeft.emit()"viescloudClickStopPropagation>←</mat-chip>
+        <mat-chip matTooltip="Edit"(click)="edit(wrap)" viescloudClickStopPropagation>✎</mat-chip>
+        <mat-chip matTooltip="Move Right"(click)="onMoveRight.emit()"viescloudClickStopPropagation>→</mat-chip>
+      </mat-chip-set>
+    </mat-card-footer>
   </mat-card>
 </ng-container>
 
@@ -25,20 +32,39 @@
         info_outline
       </mat-icon>
       <mat-panel-description *ngIf="mode === 'edit'"> 
-        <button mat-raised-button color="primary" (click)="edit(wrap)" viescloudClickStopPropagation>Edit</button>
+        <button mat-raised-button color="primary" matTooltip="Move Left" (click)="onMoveLeft.emit()" viescloudClickStopPropagation>←</button>
+        <button mat-raised-button color="primary" matTooltip="Edit" (click)="edit(wrap)" viescloudClickStopPropagation>✎</button>
+        <button mat-raised-button color="primary" matTooltip="Move Right" (click)="onMoveRight.emit()" viescloudClickStopPropagation>→</button>
       </mat-panel-description>
     </mat-expansion-panel-header>
     <div class="flex-row-container">
+
       <ng-container *ngIf="wrap.children;">
         <ng-container *ngFor="let item of wrap.children; let i = index; trackBy: trackByIndex;">
-          <app-wrap-item [wrap]="item" (wrapChange)="wrap.children[i] = $event" [(mode)]="mode"></app-wrap-item>
+
+          <app-wrap-plus-button
+          *ngIf="mode === 'edit'"
+          matTooltip="Add new Wrap Here"
+          (onNewWrap)="wrap.children.splice(i, 0, $event)"
+          ></app-wrap-plus-button>
+
+          <app-wrap-item 
+          [wrap]="item" 
+          (wrapChange)="wrap.children[i] = $event" 
+          [(mode)]="mode"
+          (onMoveLeft)="moveLeft(i)"
+          (onMoveRight)="moveRight(i)"
+          ></app-wrap-item>
+
         </ng-container>
       </ng-container>
   
       <app-wrap-plus-button
       *ngIf="mode === 'edit'"
+      matTooltip="Add new Wrap Here"
       (onNewWrap)="wrap.children.push($event)"
       ></app-wrap-plus-button>
+      
     </div>
   </mat-expansion-panel>
 </ng-template>

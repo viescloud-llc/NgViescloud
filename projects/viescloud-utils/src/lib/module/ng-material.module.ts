@@ -30,6 +30,7 @@ import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {MatSliderModule} from '@angular/material/slider';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatTooltipModule} from '@angular/material/tooltip';
+import {MatChipsModule} from '@angular/material/chips';
 
 const list = [
   MatButtonModule,
@@ -61,7 +62,8 @@ const list = [
   MatSlideToggleModule,
   MatSliderModule,
   MatProgressSpinnerModule,
-  MatTooltipModule
+  MatTooltipModule,
+  MatChipsModule
 ]
 
 @NgModule({

@@ -4,6 +4,8 @@
     [wrap]="wrap"
     (wrapChange)="wrapWorkspace.wraps[i] = $event"
     [(mode)]="mode"
+    (onMoveLeft)="moveLeft(i)"
+    (onMoveRight)="moveRight(i)"
     ></app-wrap-item>
   </li>
   <li *ngIf="mode === 'edit'">
