@@ -4,27 +4,28 @@
       <div mat-card-avatar [ngStyle]="{background: 'url(' + wrap.icon + ')', backgroundSize: 'cover'}"></div>
       <mat-card-title>{{wrap.title}}</mat-card-title>
       <mat-card-subtitle>{{wrap.description}}</mat-card-subtitle>
+      <mat-icon (click)="displayItemTooltip(wrap)" [matTooltip]="getItemTooltip(wrap)" matTooltipClass="tooltip-multiline" matTooltipPosition="above" viescloudClickStopPropagation>
+        info
+      </mat-icon>
     </mat-card-header>
     <mat-card-content>
-      <button *ngIf="mode === 'edit'" mat-raised-button color="primary" (click)="edit(wrap)" ViescloudClickStopPropagation>Edit</button>
-      <ng-container *ngFor="let link of wrap.links">
-        <button mat-raised-button color="primary" (click)="openLink(link)">
-          {{link.label || link.serviceUrl}}
-        </button>
-      </ng-container>
+      <button *ngIf="mode === 'edit'" mat-raised-button color="primary" (click)="edit(wrap)" viescloudClickStopPropagation>Edit</button>
     </mat-card-content>
   </mat-card>
 </ng-container>
 
 <ng-template #Else>
-  <mat-expansion-panel [expanded]="true" #panel>
+  <mat-expansion-panel hideToggle [expanded]="true" #panel>
     <mat-expansion-panel-header >
-      <mat-panel-title><b>{{wrap.title}}</b></mat-panel-title>
+      <mat-panel-title>{{wrap.title}}</mat-panel-title>
       <mat-panel-description *ngIf="mode === 'view'"> 
-        {{wrap.description}}
+        {{wrap.description.replaceAll('\n', ', ')}}
       </mat-panel-description>
+      <mat-icon (click)="displayGroupTooltip(wrap)" [matTooltip]="getGroupTooltip(wrap)" matTooltipClass="tooltip-multiline" matTooltipPosition="above" viescloudClickStopPropagation>
+        info_outline
+      </mat-icon>
       <mat-panel-description *ngIf="mode === 'edit'"> 
-        <button mat-raised-button color="primary" (click)="edit(wrap)">Edit</button>
+        <button mat-raised-button color="primary" (click)="edit(wrap)" viescloudClickStopPropagation>Edit</button>
       </mat-panel-description>
     </mat-expansion-panel-header>
     <div class="flex-row-container">

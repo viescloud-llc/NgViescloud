@@ -22,6 +22,7 @@ import { OpenIdComponent } from '../share-component/openId/openId.component';
 import { SideDrawerMenuComponent } from '../share-component/side-drawer-menu/side-drawer-menu.component';
 import { QuickSideDrawerMenuComponent } from '../share-component/quick-side-drawer-menu/quick-side-drawer-menu.component';
 import { ClickStopPropagationDirective } from '../directive/ClickStopPropagation.directive';
+import { TooltipDirective } from '../directive/Tooltip.directive';
 
 const UTILS = [
   CopyToClipboardUtilComponent,
@@ -39,7 +40,8 @@ const UTILS = [
   MatFormFieldInputListComponent,
   MatFormFieldInputDynamicComponent,
   MatFormFieldInputListOptionComponent,
-  ClickStopPropagationDirective
+  ClickStopPropagationDirective,
+  TooltipDirective
 ]
 
 const COMPONENTS = [

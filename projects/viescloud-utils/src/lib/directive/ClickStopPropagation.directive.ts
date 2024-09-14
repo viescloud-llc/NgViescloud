@@ -1,7 +1,7 @@
 import { Directive, HostListener } from '@angular/core';
 
 @Directive({
-  selector: '[ViescloudClickStopPropagation]'
+  selector: '[viescloudClickStopPropagation]'
 })
 export class ClickStopPropagationDirective {
 

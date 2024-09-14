@@ -12,6 +12,10 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     }
 }
 
+::ng-deep .tooltip-multiline {
+    white-space: pre-line;     
+}
+
 textarea
 {
     resize: both;
