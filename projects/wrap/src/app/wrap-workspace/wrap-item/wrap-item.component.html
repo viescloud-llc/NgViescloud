@@ -1,5 +1,5 @@
 <ng-container *ngIf="wrap.type.toString() === 'ITEM'; else Else" >
-  <mat-card appearance="outlined" class="cursor-hover" (click)="edit(wrap)">
+  <mat-card appearance="outlined" class="cursor-hover" (click)="open(wrap)">
     <mat-card-header>
       <div mat-card-avatar [ngStyle]="{background: 'url(' + wrap.icon + ')', backgroundSize: 'cover'}"></div>
       <mat-card-title>{{wrap.title}}</mat-card-title>

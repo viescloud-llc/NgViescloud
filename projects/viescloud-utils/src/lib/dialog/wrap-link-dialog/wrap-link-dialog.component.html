@@ -1,0 +1,20 @@
+<h1 mat-dialog-title>{{wrap.title}}</h1>
+<div mat-dialog-content>
+  <ul class="flex-row-container">
+    <li *ngFor="let link of wrap.links">
+      <button 
+      mat-raised-button 
+      color="primary" 
+      class="square-button" 
+      (click)="openLink(link)"
+      [matTooltip]="link.serviceUrl"
+      matTooltipPosition="above"
+      >
+        {{link.label || link.serviceUrl}}
+      </button>
+    </li>
+  </ul>
+</div>
+<div mat-dialog-actions>
+  <button mat-raised-button color="primary" mat-dialog-close cdkFocusInitial style="width: 100%;">close</button>
+</div>

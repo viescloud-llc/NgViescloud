@@ -5,6 +5,7 @@ import { TrackByIndex } from 'projects/viescloud-utils/src/lib/directive/TrackBy
 import { MatDialog } from '@angular/material/dialog';
 import { WrapDialog } from 'projects/viescloud-utils/src/lib/dialog/wrap-dialog/wrap-dialog.component';
 import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
+import { WrapLinkDialog } from 'projects/viescloud-utils/src/lib/dialog/wrap-link-dialog/wrap-link-dialog.component';
 
 @Component({
   selector: 'app-wrap-item',
@@ -32,6 +33,33 @@ export class WrapItemComponent extends TrackByIndex implements OnInit {
   ngOnInit() {
     if(!this.wrap.children)
       this.wrap.children = [];
+  }
+
+  open(wrap: Wrap) {
+    if(this.mode === Mode.Edit)
+      this.edit(wrap);
+    else if(wrap.links.length <= 0) {
+      return;
+    }
+    else if(wrap.links.length > 1) {
+      let dialog = this.matDialog.open(WrapLinkDialog, {
+        data: {
+          wrap: wrap
+        },
+        width: 'max-content'
+      })
+
+      dialog.afterClosed().subscribe({
+        next: result => {
+          if(result) {
+            dialog.close();
+          }
+        }
+      })
+    }
+    else {
+      this.openLink(wrap.links[0]);
+    }
   }
 
   edit(wrap: Wrap) {

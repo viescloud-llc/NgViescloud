@@ -1,0 +1,12 @@
+.square-button {
+    width: fit-content;    // Set a fixed width (change as needed)
+    height: 50px;   // Set the height to be equal to width
+    max-height: fit-content;
+    border-radius: 10px;  // Adjust the corner rounding
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-size: xx-large;  // Adjust font size as needed
+    padding: 50px;
+  }
