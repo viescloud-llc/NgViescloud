@@ -107,9 +107,20 @@ export class MatFormFieldInputComponent extends MatFormFieldComponent {
 
     this.addValidator();
 
+    this.initFilteredOptions();
+  }
+
+  override ngOnChanges(changes: SimpleChanges): void {
+    super.ngOnChanges(changes);
+    if (changes['options'] && this.filteredOptions) {
+      this.initFilteredOptions();
+    }
+  }
+
+  private initFilteredOptions() {
     this.filteredOptions = this.formControl.valueChanges.pipe(
       startWith(''),
-      map(value => this._filter(value || '')),
+      map(value => this._filter(value || ''))
     );
   }
 

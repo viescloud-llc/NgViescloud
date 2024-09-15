@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { WrapWorkspace } from '../model/Wrap.model';
+import { Wrap, WrapWorkspace } from '../model/Wrap.model';
 import { S3StorageServiceV1 } from './ObjectStorageManager.service';
 import { UtilsService, VFile } from './Utils.service';
 import { MatDialog } from '@angular/material/dialog';
@@ -13,6 +13,8 @@ export class WrapService {
 
   wrapWorkspaces: WrapWorkspace[] = [];
   wrapWorkspacesCopy: WrapWorkspace[] = [];
+
+  suggestionMap: Map<WrapWorkspace, Set<string>> = new Map();
 
   constructor(
     private s3StorageServiceV1: S3StorageServiceV1,
@@ -96,5 +98,40 @@ export class WrapService {
 
   isValueChange(): boolean {
     return !UtilsService.isEqual(this.wrapWorkspaces, this.wrapWorkspacesCopy);
+  }
+
+  foreachWrapInWorkspace(workspace: WrapWorkspace, callback: (wrap: Wrap) => void) {
+    workspace.wraps.forEach(wrap => {
+      this.foreachWrap(wrap, callback);
+    })
+  }
+
+  foreachWrap(wrap: Wrap, callback: (wrap: Wrap) => void) {
+    callback(wrap);
+    if(wrap.children) {
+      wrap.children.forEach(child => {
+        this.foreachWrap(child, callback);
+      })
+    }
+  }
+
+  getSuggestions(workspace: WrapWorkspace): string[] {
+    let suggestions = this.suggestionMap.get(workspace) || new Set<string>;
+
+    if(suggestions.size === 0) {
+      this.foreachWrapInWorkspace(workspace, (wrap) => {
+        suggestions.add(wrap.title);
+        if(wrap.tags && wrap.tags.length > 0)
+          wrap.tags.forEach(tag => suggestions.add(tag));
+        if(wrap.provider)
+          suggestions.add(wrap.provider);
+        if(wrap.links && wrap.links.length > 0)
+          wrap.links.forEach(link => suggestions.add(link.serviceUrl));
+      })
+      suggestions.delete('');
+      this.suggestionMap.set(workspace, suggestions);
+    }
+
+    return Array.from(suggestions);
   }
 }

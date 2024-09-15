@@ -1,3 +1,12 @@
+<app-mat-form-field-input
+*ngIf="wrapWorkspace && mode === 'view'"
+label="Search"
+placeholder="Google, YouTube, ..."
+[(value)]="searchText"
+styleWidth="100%"
+[options]="searchOptions"
+></app-mat-form-field-input>
+
 <ul *ngIf="wrapWorkspace" class="flex-row-container">
   <li *ngFor="let wrap of wrapWorkspace.wraps; let i = index; trackBy: trackByIndex">
     <app-wrap-item

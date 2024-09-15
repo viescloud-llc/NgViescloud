@@ -13,8 +13,8 @@
       <div class="wrap-details">
         <p><strong>Provider:</strong> {{ wrap.provider || 'N/A' }}</p>
         <p><strong>Description:</strong> {{ wrap.description || 'No description' }}</p>
-        <p><strong>Tags:</strong> {{ wrap.tags?.length ? wrap.tags.join(', ') : 'None' }}</p>
-        <p><strong>Links:</strong> {{ wrap.links?.length || 0 }}</p>
+        <p><strong>Tags:</strong> {{ wrap.tags && wrap.tags.length ? wrap.tags.join(', ') : 'None' }}</p>
+        <p><strong>Links:</strong> {{ wrap.links && wrap.links.length || 0 }}</p>
         <p><strong>Hot Key:</strong> {{ wrap.hotKey }}</p>
         <p><strong>Color:</strong> {{ wrap.color || 'Default' }}</p>
       </div>

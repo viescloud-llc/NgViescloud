@@ -4,6 +4,7 @@ import { Mode } from '../wrap-workspace.component';
 import { TrackByIndex } from 'projects/viescloud-utils/src/lib/directive/TrackByIndex';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
+import { WrapService } from 'projects/viescloud-utils/src/lib/service/Wrap.service';
 
 @Component({
   selector: 'app-wrap',
@@ -24,11 +25,15 @@ export class WrapComponent extends TrackByIndex implements OnInit {
   @Output()
   modeChange: EventEmitter<Mode> = new EventEmitter();
 
-  constructor(private matDialog: MatDialog) {
+  searchText: string = '';
+  searchOptions: string[] = [];
+
+  constructor(private matDialog: MatDialog, private wrapService: WrapService) {
     super();
   }
 
   ngOnInit() {
+    this.searchOptions = this.wrapService.getSuggestions(this.wrapWorkspace)
   }
 
   moveLeft(index: number) {
