@@ -34,8 +34,8 @@ export class WrapWorkspaceComponent implements OnInit {
     public authenticatorService: AuthenticatorService
   ) { }
 
-  ngOnInit() {
-    this.wrapService.init();
+  async ngOnInit() {
+    await this.wrapService.init();
     this.initOptions();
     if(this.wrapService.wrapWorkspaces.length > 0) {
       this.currentWorkspace = this.wrapService.wrapWorkspaces[0].name;

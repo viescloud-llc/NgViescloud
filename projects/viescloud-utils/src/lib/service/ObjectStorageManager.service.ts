@@ -81,6 +81,35 @@ export abstract class ObjectStorage {
     return this.httpClient.get<Metadata>(`${this.getURI()}${this.getPrefixPath()}/metadata?id=${id}`).pipe(first());
   }
 
+  putFileById(id: number, vFile: VFile, publicity?: boolean) {
+    if(vFile.rawFile) {
+      const formData = new FormData();
+      formData.append('file', vFile.rawFile, vFile.name);
+      return this.httpClient.put<Metadata>(`${this.getURI()}${this.getPrefixPath()}/file?publicity=${publicity ?? false}&id=${id}`, formData).pipe(first());
+    }
+    else
+      throw Error('File can not be null');
+  }
+
+  putFileByFileName(fileName: string, vFile: VFile, publicity?: boolean) {
+    if(vFile.rawFile) {
+      const formData = new FormData();  
+      formData.append('file', vFile.rawFile, vFile.name);
+      return this.httpClient.put<Metadata>(`${this.getURI()}${this.getPrefixPath()}/file?publicity=${publicity ?? false}&fileName=${fileName}`, formData).pipe(first());
+    }
+    else
+      throw Error('File can not be null');
+  }
+
+  putFileByPath(path: string, vFile: VFile, publicity?: boolean) {
+    if(vFile.rawFile) {
+      const formData = new FormData();
+      formData.append('file', vFile.rawFile, vFile.name);
+      return this.httpClient.put<Metadata>(`${this.getURI()}${this.getPrefixPath()}/file?publicity=${publicity ?? false}&path=${path}`, formData).pipe(first());
+    }
+    else
+      throw Error('File can not be null');
+  }
 
   postFile(vFile: VFile, publicity?: boolean) {
     if(vFile.rawFile) {

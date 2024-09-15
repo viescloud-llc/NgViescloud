@@ -19,43 +19,35 @@ export class WrapService {
     private matDialog: MatDialog
   ) {}
 
-  init() {
-    let workspacesLocal = UtilsService.localStorageGetItem<WrapWorkspace[]>(this.WRAP_WORKSPACE);
-    if(workspacesLocal) {
-      this.wrapWorkspaces = workspacesLocal;
-      this.wrapWorkspacesCopy = structuredClone(this.wrapWorkspaces);
-    }
-    else {
-      this.s3StorageServiceV1.getFileByFileName(this.WRAP_WORKSPACE).pipe(UtilsService.waitLoadingDialog(this.matDialog)).subscribe({
-        next: (data) => {
-          UtilsService.readBlobAsText(data).then((data) => {
-            this.wrapWorkspaces = JSON.parse(data);
-            this.wrapWorkspacesCopy = structuredClone(this.wrapWorkspaces);
-          })
-        }
-      })
-    }
-  }
-
-  saveWorkSpaces(workspaces: WrapWorkspace[]) {
-    this.saveWorkspacesLocally(workspaces);
-    
-    this.s3StorageServiceV1.getFileMetadataByFileName(this.WRAP_WORKSPACE).pipe(UtilsService.waitLoadingDialog(this.matDialog)).subscribe({
-      next: (data) => {
-        this.s3StorageServiceV1.deleteFileByFileName(this.WRAP_WORKSPACE).pipe(UtilsService.waitLoadingDialog(this.matDialog)).subscribe({
-          next: (data) => {}
-        });
-      },
-      error: (error) => {
-        this.uploadWorkspaces(workspaces);
-      },
-      complete: () => {
-        this.uploadWorkspaces(workspaces);
+  init(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      let workspacesLocal = UtilsService.localStorageGetItem<WrapWorkspace[]>(this.WRAP_WORKSPACE);
+      if(workspacesLocal) {
+        this.wrapWorkspaces = workspacesLocal;
+        this.wrapWorkspacesCopy = structuredClone(this.wrapWorkspaces);
+        resolve();
+      }
+      else {
+        this.s3StorageServiceV1.getFileByFileName(this.WRAP_WORKSPACE).pipe(UtilsService.waitLoadingDialog(this.matDialog)).subscribe({
+          next: (data) => {
+            UtilsService.readBlobAsText(data).then((data) => {
+              this.wrapWorkspaces = JSON.parse(data);
+              this.wrapWorkspacesCopy = structuredClone(this.wrapWorkspaces);
+              this.saveThisWorkspacesLocally();
+              resolve();
+            })
+          },
+          error: (error) => {
+            reject();
+          }
+        })
       }
     })
   }
 
-  uploadWorkspaces(workspaces: WrapWorkspace[]) {
+  saveWorkSpaces(workspaces: WrapWorkspace[]) {
+    this.saveWorkspacesLocally(workspaces);
+
     let vfile: VFile = {
       name: this.WRAP_WORKSPACE,
       type: 'text',
@@ -63,11 +55,27 @@ export class WrapService {
       rawFile: new Blob([JSON.stringify(workspaces)], {type: 'application/json'}),
       value: JSON.stringify(workspaces)
     }
-    this.s3StorageServiceV1.postFile(vfile, false).pipe(UtilsService.waitLoadingDialog(this.matDialog)).subscribe({
+    
+    this.s3StorageServiceV1.getFileMetadataByFileName(this.WRAP_WORKSPACE).pipe(UtilsService.waitLoadingDialog(this.matDialog)).subscribe({
       next: (data) => {
-        this.init();
+        this.s3StorageServiceV1.putFileByFileName(this.WRAP_WORKSPACE, vfile, false).pipe(UtilsService.waitLoadingDialog(this.matDialog)).subscribe({
+          next: (data) => {
+            this.init();
+          }
+        })
+      },
+      error: (error) => {
+        this.s3StorageServiceV1.postFile(vfile, false).pipe(UtilsService.waitLoadingDialog(this.matDialog)).subscribe({
+          next: (data) => {
+            this.init();
+          }
+        })
       }
     })
+  }
+
+  uploadWorkspaces(workspaces: WrapWorkspace[]) {
+    
   }
 
   saveWorkspacesLocally(workspaces: WrapWorkspace[]) {
