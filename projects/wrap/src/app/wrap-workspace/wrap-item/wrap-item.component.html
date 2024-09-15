@@ -9,13 +9,14 @@
       </mat-icon>
     </mat-card-header>
     <mat-card-content>
-      {{wrap.description}}
+      <p class="multiline">{{wrap.description}}</p>
     </mat-card-content>
     <mat-card-footer *ngIf="mode === 'edit'">
       <mat-chip-set>
-        <mat-chip matTooltip="Move Left" (click)="onMoveLeft.emit()"viescloudClickStopPropagation>←</mat-chip>
-        <mat-chip matTooltip="Edit"(click)="edit(wrap)" viescloudClickStopPropagation>✎</mat-chip>
-        <mat-chip matTooltip="Move Right"(click)="onMoveRight.emit()"viescloudClickStopPropagation>→</mat-chip>
+        <mat-chip matTooltip="Move Left" (click)="onMoveLeft.emit()"viescloudClickStopPropagation><mat-icon>keyboard_arrow_left</mat-icon></mat-chip>
+        <mat-chip matTooltip="Edit"(click)="edit(wrap)" viescloudClickStopPropagation><mat-icon>edit</mat-icon></mat-chip>
+        <mat-chip matTooltip="Edit"(click)="onDelete.emit()" viescloudClickStopPropagation><mat-icon>delete</mat-icon></mat-chip>
+        <mat-chip matTooltip="Move Right"(click)="onMoveRight.emit()"viescloudClickStopPropagation><mat-icon>keyboard_arrow_right</mat-icon></mat-chip>
       </mat-chip-set>
     </mat-card-footer>
   </mat-card>
@@ -32,9 +33,10 @@
         info_outline
       </mat-icon>
       <mat-panel-description *ngIf="mode === 'edit'"> 
-        <button mat-raised-button color="primary" matTooltip="Move Left" (click)="onMoveLeft.emit()" viescloudClickStopPropagation>←</button>
-        <button mat-raised-button color="primary" matTooltip="Edit" (click)="edit(wrap)" viescloudClickStopPropagation>✎</button>
-        <button mat-raised-button color="primary" matTooltip="Move Right" (click)="onMoveRight.emit()" viescloudClickStopPropagation>→</button>
+        <button mat-raised-button color="primary" matTooltip="Move Left" (click)="onMoveLeft.emit()" viescloudClickStopPropagation><mat-icon>keyboard_arrow_left</mat-icon></button>
+        <button mat-raised-button color="primary" matTooltip="Edit" (click)="edit(wrap)" viescloudClickStopPropagation><mat-icon>edit</mat-icon></button>
+        <button mat-raised-button color="primary" matTooltip="Delete" (click)="onDelete.emit()" viescloudClickStopPropagation><mat-icon>delete</mat-icon></button>
+        <button mat-raised-button color="primary" matTooltip="Move Right" (click)="onMoveRight.emit()" viescloudClickStopPropagation><mat-icon>keyboard_arrow_right</mat-icon></button>
       </mat-panel-description>
     </mat-expansion-panel-header>
     <div class="flex-row-container">
@@ -54,6 +56,7 @@
           [(mode)]="mode"
           (onMoveLeft)="moveLeft(i)"
           (onMoveRight)="moveRight(i)"
+          (onDelete)="deleteWrap(i)"
           ></app-wrap-item>
 
         </ng-container>

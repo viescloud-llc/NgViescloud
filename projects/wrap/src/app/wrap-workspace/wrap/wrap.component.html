@@ -6,6 +6,7 @@
     [(mode)]="mode"
     (onMoveLeft)="moveLeft(i)"
     (onMoveRight)="moveRight(i)"
+    (onDelete)="deleteWrap(i)"
     ></app-wrap-item>
   </li>
   <li *ngIf="mode === 'edit'">

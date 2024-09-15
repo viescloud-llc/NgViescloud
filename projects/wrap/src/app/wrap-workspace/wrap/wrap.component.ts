@@ -2,6 +2,8 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Wrap, WrapWorkspace } from 'projects/viescloud-utils/src/lib/model/Wrap.model';
 import { Mode } from '../wrap-workspace.component';
 import { TrackByIndex } from 'projects/viescloud-utils/src/lib/directive/TrackByIndex';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-wrap',
@@ -22,7 +24,7 @@ export class WrapComponent extends TrackByIndex implements OnInit {
   @Output()
   modeChange: EventEmitter<Mode> = new EventEmitter();
 
-  constructor() {
+  constructor(private matDialog: MatDialog) {
     super();
   }
 
@@ -50,6 +52,28 @@ export class WrapComponent extends TrackByIndex implements OnInit {
     let temp = this.wrapWorkspace.wraps[fromIndex];
     this.wrapWorkspace.wraps[fromIndex] = this.wrapWorkspace.wraps[toIndex];
     this.wrapWorkspace.wraps[toIndex] = temp;
+    this.wrapWorkspaceChange.emit(this.wrapWorkspace);
+  }
+
+  deleteWrap(index: number) {
+    let dialog = this.matDialog.open(ConfirmDialog, {
+      data: {
+        message: 'Are you sure you want to delete this wrap?',
+        title: 'Confirm Delete',
+        yes: 'Delete',
+        no: 'Cancel'
+      },
+      width: '100%'
+    })
+
+    dialog.afterClosed().subscribe({
+      next: result => {
+        if(result) {
+          this.wrapWorkspace.wraps.splice(index, 1);
+          this.wrapWorkspaceChange.emit(this.wrapWorkspace);
+        }
+      }
+    })
   }
 
 }

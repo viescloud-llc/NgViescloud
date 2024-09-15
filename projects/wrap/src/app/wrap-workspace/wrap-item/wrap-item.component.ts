@@ -32,6 +32,9 @@ export class WrapItemComponent extends TrackByIndex implements OnInit {
   @Output()
   onMoveRight: EventEmitter<void> = new EventEmitter();
 
+  @Output()
+  onDelete: EventEmitter<void> = new EventEmitter();
+
   constructor(private matDialog: MatDialog) { 
     super();
   }
@@ -158,6 +161,27 @@ export class WrapItemComponent extends TrackByIndex implements OnInit {
     this.displayTooltip(this.getItemTooltip(wrap));
   }
 
+  deleteWrap(index: number) {
+    let dialog = this.matDialog.open(ConfirmDialog, {
+      data: {
+        message: 'Are you sure you want to delete this wrap?',
+        title: 'Confirm Delete',
+        yes: 'Delete',
+        no: 'Cancel'
+      },
+      width: '100%'
+    })
+
+    dialog.afterClosed().subscribe({
+      next: result => {
+        if(result) {
+          this.wrap.children.splice(index, 1);
+          this.wrapChange.emit(this.wrap);
+        }
+      }
+    })
+  }
+
   moveLeft(index: number) {
     let toIndex = index - 1;
     if(toIndex < 0)
@@ -179,5 +203,6 @@ export class WrapItemComponent extends TrackByIndex implements OnInit {
     let temp = wrap.children[fromIndex];
     wrap.children[fromIndex] = wrap.children[toIndex];
     wrap.children[toIndex] = temp;
+    this.wrapChange.emit(this.wrap);
   }
 }

@@ -1,4 +1,4 @@
-import { MatInputDisplayLabel, MatInputEnum, MatInputHide, MatInputListSetting, MatInputOptions, MatInputRequire } from "./Mat.model";
+import { MatInputDisplayLabel, MatInputEnum, MatInputHide, MatInputListSetting, MatInputOptions, MatInputRequire, MatInputTextArea } from "./Mat.model";
 
 export enum WrapType {
     GROUP = "GROUP",
@@ -56,6 +56,7 @@ export class Wrap {
 
     provider: string = '';
 
+    @MatInputTextArea(true)
     description: string = '';
 
     @MatInputListSetting(false, true, true)
