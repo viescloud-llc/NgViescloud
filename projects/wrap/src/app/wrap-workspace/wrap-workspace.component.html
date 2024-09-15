@@ -9,7 +9,8 @@
     ></app-mat-form-field-input-option>
 
     <app-mat-form-field-input-option
-    [(value)]="mode"
+    [value]="mode"
+    (valueChange)="onSelectMode($event)"
     label="Mode"
     noneLabel=""
     [options]="modeOptions"

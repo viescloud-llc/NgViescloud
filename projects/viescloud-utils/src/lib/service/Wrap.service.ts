@@ -23,16 +23,14 @@ export class WrapService {
     return new Promise((resolve, reject) => {
       let workspacesLocal = UtilsService.localStorageGetItem<WrapWorkspace[]>(this.WRAP_WORKSPACE);
       if(workspacesLocal) {
-        this.wrapWorkspaces = workspacesLocal;
-        this.wrapWorkspacesCopy = structuredClone(this.wrapWorkspaces);
+        this.setWorkspaces(workspacesLocal);
         resolve();
       }
       else {
         this.s3StorageServiceV1.getFileByFileName(this.WRAP_WORKSPACE).pipe(UtilsService.waitLoadingDialog(this.matDialog)).subscribe({
           next: (data) => {
             UtilsService.readBlobAsText(data).then((data) => {
-              this.wrapWorkspaces = JSON.parse(data);
-              this.wrapWorkspacesCopy = structuredClone(this.wrapWorkspaces);
+              this.setWorkspaces(JSON.parse(data));
               this.saveThisWorkspacesLocally();
               resolve();
             })
@@ -43,6 +41,11 @@ export class WrapService {
         })
       }
     })
+  }
+
+  private setWorkspaces(workspacesLocal: WrapWorkspace[]) {
+    this.wrapWorkspaces = workspacesLocal;
+    this.wrapWorkspacesCopy = structuredClone(this.wrapWorkspaces);
   }
 
   saveWorkSpaces(workspaces: WrapWorkspace[]) {
@@ -74,12 +77,9 @@ export class WrapService {
     })
   }
 
-  uploadWorkspaces(workspaces: WrapWorkspace[]) {
-    
-  }
-
   saveWorkspacesLocally(workspaces: WrapWorkspace[]) {
     UtilsService.localStorageSetItem(this.WRAP_WORKSPACE, workspaces);
+    this.init();
   }
 
   saveThisWorkspaces() {
@@ -92,5 +92,9 @@ export class WrapService {
 
   revert() {
     this.wrapWorkspaces = structuredClone(this.wrapWorkspacesCopy);
+  }
+
+  isValueChange(): boolean {
+    return !UtilsService.isEqual(this.wrapWorkspaces, this.wrapWorkspacesCopy);
   }
 }

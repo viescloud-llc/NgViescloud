@@ -123,4 +123,22 @@ export class WrapWorkspaceComponent implements OnInit {
   saveToServer() {
     this.wrapService.saveThisWorkspaces();
   }
+
+  onSelectMode(mode: any) {
+    let tempMode = this.mode;
+    this.mode = mode;
+
+    if(mode === Mode.View && this.wrapService.isValueChange()) {
+      let dialog = this.matDialog.open(ConfirmDialog, {data: {title: 'Save?', message: 'Are you sure you want to change mode to view?\nNote: Workspace is not yet saved', yes: 'save', no: 'cancel'}, width: '100%'});
+  
+      dialog.afterClosed().subscribe({
+        next: res => {
+          if(res)
+            this.mode = mode;
+          else
+            this.mode = tempMode;
+        }
+      })
+    }
+  }
 }
