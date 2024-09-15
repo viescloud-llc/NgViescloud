@@ -10,6 +10,8 @@ import { WrapWorkspaceComponent } from './wrap-workspace/wrap-workspace.componen
 import { WrapComponent } from './wrap-workspace/wrap/wrap.component';
 import { WrapItemComponent } from './wrap-workspace/wrap-item/wrap-item.component';
 import { WrapPlusButtonComponent } from './wrap-workspace/wrap-plus-button/wrap-plus-button.component';
+import { WrapJsonComponent } from './wrap-workspace/wrap-json/wrap-json.component';
+import { WrapTreeComponent } from './wrap-workspace/wrap-tree/wrap-tree.component';
 
 const LIST = [
   AppComponent,
@@ -17,7 +19,9 @@ const LIST = [
   WrapWorkspaceComponent,
   WrapComponent,
   WrapItemComponent,
-  WrapPlusButtonComponent
+  WrapPlusButtonComponent,
+  WrapJsonComponent,
+  WrapTreeComponent
 ]
 
 @NgModule({

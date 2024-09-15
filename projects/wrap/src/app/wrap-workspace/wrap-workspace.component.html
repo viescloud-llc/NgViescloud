@@ -17,19 +17,35 @@
     styleWidth="50%"
     ></app-mat-form-field-input-option>
   </li>
-  <li *ngIf="mode.toString() === 'edit' && currentWorkSpaceIndex >= 0">
+  <li *ngIf="mode !== 'view' && currentWorkSpaceIndex >= 0">
     <button mat-raised-button color="warn" (click)="removeThisWorkspace()">Remove this workspace</button>
   </li>
-  <li *ngIf="mode.toString() === 'edit'">
-    <button mat-raised-button color="primary" (click)="saveLocally()">Save locally</button>
+  <li *ngIf="mode !== 'view'">
+    <br>
+    <button mat-raised-button color="primary" (click)="saveLocally()" [disabled]="!wrapService.isValueChange()">Save locally</button>
     <button mat-raised-button color="primary" (click)="saveToServer()" [disabled]="!authenticatorService.isLoginB">Save to Server</button>
   </li>
+  <li *ngIf="mode === 'tree'">
+    <br>
+    <button mat-raised-button color="primary" (click)="toggleExpandAllTree()">{{expandAllTree ? 'Collapse All' : 'Expand All'}}</button>
+  </li>
   <br>
-  <li>
+  <li *ngIf="mode === 'view' || mode === 'edit'">
     <app-wrap
     *ngIf="currentWorkSpaceIndex >= 0"
     [(wrapWorkspace)]="wrapService.wrapWorkspaces[currentWorkSpaceIndex]"
     [(mode)]="mode"
     ></app-wrap>
+  </li>
+  <li *ngIf="mode === 'json'">
+    <app-wrap-json
+    [(wrapWorkspace)]="wrapService.wrapWorkspaces[currentWorkSpaceIndex]"
+    ></app-wrap-json>
+  </li>
+  <li *ngIf="mode === 'tree'">
+    <app-wrap-tree
+    [(wrapWorkspace)]="wrapService.wrapWorkspaces[currentWorkSpaceIndex]"
+    [expandAll]="expandAllTree"
+    ></app-wrap-tree>
   </li>
 </ul>

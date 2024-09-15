@@ -9,7 +9,9 @@ import { WrapService } from 'projects/viescloud-utils/src/lib/service/Wrap.servi
 
 export enum Mode {
   View = 'view',
-  Edit = 'edit'
+  Edit = 'edit',
+  TREE = 'tree',
+  JSON = 'json'
 }
 
 @Component({
@@ -27,6 +29,8 @@ export class WrapWorkspaceComponent implements OnInit {
 
   mode: Mode = Mode.View;
   modeOptions: MatOption<any>[] = UtilsService.getEnumMatOptions(Mode);
+
+  expandAllTree: boolean | null = null;
 
   constructor(
     public wrapService: WrapService,
@@ -129,7 +133,7 @@ export class WrapWorkspaceComponent implements OnInit {
     this.mode = mode;
 
     if(mode === Mode.View && this.wrapService.isValueChange()) {
-      let dialog = this.matDialog.open(ConfirmDialog, {data: {title: 'Save?', message: 'Are you sure you want to change mode to view?\nNote: Workspace is not yet saved', yes: 'save', no: 'cancel'}, width: '100%'});
+      let dialog = this.matDialog.open(ConfirmDialog, {data: {title: 'Save?', message: 'Are you sure you want to change mode to view?\nNote: Workspace is not yet saved', yes: 'OK', no: 'Cancel'}, width: '100%'});
   
       dialog.afterClosed().subscribe({
         next: res => {
@@ -140,5 +144,9 @@ export class WrapWorkspaceComponent implements OnInit {
         }
       })
     }
+  }
+
+  toggleExpandAllTree(): void {
+    this.expandAllTree = this.expandAllTree === null || this.expandAllTree === false ? true : false;
   }
 }
