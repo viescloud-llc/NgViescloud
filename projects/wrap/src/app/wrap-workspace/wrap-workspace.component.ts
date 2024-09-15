@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
+import { InputDialog } from 'projects/viescloud-utils/src/lib/dialog/input-dialog/input-dialog.component';
 import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
 import { WrapWorkspace } from 'projects/viescloud-utils/src/lib/model/Wrap.model';
 import { AuthenticatorService } from 'projects/viescloud-utils/src/lib/service/Authenticator.service';
+import { SettingService } from 'projects/viescloud-utils/src/lib/service/Setting.service';
 import { UtilsService } from 'projects/viescloud-utils/src/lib/service/Utils.service';
 import { WrapService } from 'projects/viescloud-utils/src/lib/service/Wrap.service';
 
@@ -35,7 +37,8 @@ export class WrapWorkspaceComponent implements OnInit {
   constructor(
     public wrapService: WrapService,
     private matDialog: MatDialog,
-    public authenticatorService: AuthenticatorService
+    public authenticatorService: AuthenticatorService,
+    private settingService: SettingService
   ) { }
 
   async ngOnInit() {
@@ -44,6 +47,7 @@ export class WrapWorkspaceComponent implements OnInit {
     if(this.wrapService.wrapWorkspaces.length > 0) {
       this.currentWorkspace = this.wrapService.wrapWorkspaces[0].name;
       this.currentWorkSpaceIndex = 0;
+      this.settingService.backgroundImageUrl = this.wrapService.wrapWorkspaces[0].backgroundPicture;
     }
   }
 
@@ -103,6 +107,8 @@ export class WrapWorkspaceComponent implements OnInit {
       this.currentWorkspace = name;
       this.currentWorkSpaceIndex = this.wrapService.wrapWorkspaces.findIndex(e => UtilsService.isEqual(e.name, name));
     }
+
+    this.settingService.backgroundImageUrl = this.wrapService.wrapWorkspaces[this.currentWorkSpaceIndex].backgroundPicture;
   }
 
   getNoneLabel() {
@@ -148,5 +154,27 @@ export class WrapWorkspaceComponent implements OnInit {
 
   toggleExpandAllTree(): void {
     this.expandAllTree = this.expandAllTree === null || this.expandAllTree === false ? true : false;
+  }
+
+  changeBackgroundUrl() {
+    let dialog = this.matDialog.open(InputDialog, {
+      data: {
+        title: 'Change Background Image URL',
+        label: 'Background Image URL',
+        yes: 'OK',
+        no: 'Cancel',
+        input: this.settingService.backgroundImageUrl
+      },
+      width: '100%'
+    })
+
+    dialog.afterClosed().subscribe({
+      next: res => {
+        if(res) {
+          this.wrapService.wrapWorkspaces[this.currentWorkSpaceIndex].backgroundPicture = res;
+          this.settingService.backgroundImageUrl = res;
+        }
+      }
+    })
   }
 }

@@ -14,6 +14,8 @@ export class SettingService {
 
   displayHeader: boolean = true;
 
+  backgroundImageUrl: string = '';
+
   constructor(private httpClient: HttpClient, private router: Router) { }
 
   getGatewayUrl(): string {

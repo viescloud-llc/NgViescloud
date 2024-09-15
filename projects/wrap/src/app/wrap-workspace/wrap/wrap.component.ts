@@ -5,6 +5,7 @@ import { TrackByIndex } from 'projects/viescloud-utils/src/lib/directive/TrackBy
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
 import { WrapService } from 'projects/viescloud-utils/src/lib/service/Wrap.service';
+import { SettingService } from 'projects/viescloud-utils/src/lib/service/Setting.service';
 
 @Component({
   selector: 'app-wrap',
@@ -28,7 +29,11 @@ export class WrapComponent extends TrackByIndex implements OnInit {
   searchText: string = '';
   searchOptions: string[] = [];
 
-  constructor(private matDialog: MatDialog, private wrapService: WrapService) {
+  constructor(
+    private matDialog: MatDialog, 
+    private wrapService: WrapService,
+    private settingService: SettingService
+  ) {
     super();
   }
 

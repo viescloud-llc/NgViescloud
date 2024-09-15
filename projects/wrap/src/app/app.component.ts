@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthenticatorService } from 'projects/viescloud-utils/src/lib/service/Authenticator.service';
 import { OpenIdService } from 'projects/viescloud-utils/src/lib/service/OpenId.service';
+import { SettingService } from 'projects/viescloud-utils/src/lib/service/Setting.service';
 import { WrapService } from 'projects/viescloud-utils/src/lib/service/Wrap.service';
 import { QuickSideDrawerMenu } from 'projects/viescloud-utils/src/lib/share-component/quick-side-drawer-menu/quick-side-drawer-menu.component';
 
@@ -60,6 +61,20 @@ export class AppComponent {
   constructor(
     public router: Router, 
     private authenticatorService: AuthenticatorService,
-    private openIdService: OpenIdService
+    private openIdService: OpenIdService,
+    private settingService: SettingService
   ) { }
+
+  getBackgroundImageNgStyle(): any {
+    if(this.settingService.backgroundImageUrl) {
+      let style = {
+        'background-image': `url(${this.settingService.backgroundImageUrl})`,
+        'background-size': 'cover',
+        'background-position': 'center center'
+      }
+      return style;
+    }
+    else 
+      return '';
+  }
 }
