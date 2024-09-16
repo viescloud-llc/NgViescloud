@@ -27,6 +27,7 @@ export class WrapWorkspaceComponent implements OnInit, OnDestroy {
 
   DEFAULT_WRAP_PREFIX = 'wrap/';
   ADD_NEW_WORKSPACE = 'Add new workspace ...';
+  WORKSPACE_QUERY_PARAM = 'workspace';
 
   options: MatOption<string>[] = [];
   currentWorkspace: string = '';
@@ -53,11 +54,15 @@ export class WrapWorkspaceComponent implements OnInit, OnDestroy {
 
   async ngOnInit() {
     await this.wrapService.init();
+
     this.initOptions();
     if(this.wrapService.wrapWorkspaces.length > 0) {
-      this.currentWorkspace = this.wrapService.wrapWorkspaces[0].name;
-      this.currentWorkSpaceIndex = 0;
-      this.loadBackgroundImage(this.wrapService.wrapWorkspaces[0].backgroundPicture);
+      let index = Number.parseInt(UtilsService.getQueryParam(this.WORKSPACE_QUERY_PARAM) || '0');
+      if(index < 0 && index >= this.wrapService.wrapWorkspaces.length)
+        index = 0;
+      this.currentWorkspace = this.wrapService.wrapWorkspaces[index].name;
+      this.currentWorkSpaceIndex = index;
+      this.loadBackgroundImage(this.wrapService.wrapWorkspaces[index].backgroundPicture);
     }
   }
 
@@ -112,10 +117,12 @@ export class WrapWorkspaceComponent implements OnInit, OnDestroy {
       this.currentWorkspace = workspace.name;
       this.mode = Mode.Edit;
       this.currentWorkSpaceIndex = this.wrapService.wrapWorkspaces.length - 1;
+      UtilsService.setQueryParam(this.WORKSPACE_QUERY_PARAM, this.currentWorkSpaceIndex.toString());
     }
     else {
       this.currentWorkspace = name;
       this.currentWorkSpaceIndex = this.wrapService.wrapWorkspaces.findIndex(e => UtilsService.isEqual(e.name, name));
+      UtilsService.setQueryParam(this.WORKSPACE_QUERY_PARAM, this.currentWorkSpaceIndex.toString());
     }
 
     this.loadBackgroundImage(this.wrapService.wrapWorkspaces[this.currentWorkSpaceIndex].backgroundPicture);

@@ -70,13 +70,13 @@ export class ProductComponent extends FixChangeDetection implements OnInit {
 
     switch(num) {
       case 0:
-        UtilsService.updateQueryParam("tab", "overall");
+        UtilsService.setQueryParam("tab", "overall");
         break;
       case 2:
-        UtilsService.updateQueryParam("tab", "pinterest");
+        UtilsService.setQueryParam("tab", "pinterest");
         break;
       default:
-        UtilsService.updateQueryParam("tab", "basic");
+        UtilsService.setQueryParam("tab", "basic");
     }
   }
 }

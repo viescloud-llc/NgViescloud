@@ -522,7 +522,7 @@ export class UtilsService {
     return queryParams[key] ?? null;
   }
 
-  static updateQueryParam(param: string, value: string | null) {
+  static setQueryParam(param: string, value: string | null) {
     const currentUrl = window.location.href;
     const url = new URL(currentUrl);
     const params = new URLSearchParams(url.search);

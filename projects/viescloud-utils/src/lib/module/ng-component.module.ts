@@ -9,7 +9,7 @@ import { FilterNamePipe } from '../pipes/filter-name.pipe';
 import { FilterNameReversePipe } from '../pipes/filter-name-reverse.pipe';
 import { MatTableComponent } from '../util-component/mat-table/mat-table.component';
 import { MatFormFieldGroupDirective } from '../directive/mat-form-field-group.directive';
-import { MatFormFieldInputTextAreaComponent } from '../util-component/mat-form-field-text-area/mat-form-field-input-text-area.component';
+import { MatFormFieldInputTextAreaComponent } from '../util-component/mat-form-field-input-text-area/mat-form-field-input-text-area.component';
 import { MatFormFieldComponent } from '../util-component/mat-form-field/mat-form-field.component';
 import { MatFormFieldInputTimeComponent } from '../util-component/mat-form-field-input-time/mat-form-field-input-time.component';
 import { MatFormFieldInputOptionComponent } from '../util-component/mat-form-field-input-option/mat-form-field-input-option.component';
@@ -24,6 +24,7 @@ import { QuickSideDrawerMenuComponent } from '../share-component/quick-side-draw
 import { ClickStopPropagationDirective } from '../directive/ClickStopPropagation.directive';
 import { TooltipDirective } from '../directive/Tooltip.directive';
 import { ApplicationSettingComponent } from '../share-component/application-setting/application-setting.component';
+import { MatFormFieldInputRgbColorPickerComponent } from '../util-component/mat-form-field-input-rgb-color-picker/mat-form-field-input-rgb-color-picker.component';
 
 const UTILS = [
   CopyToClipboardUtilComponent,
@@ -41,6 +42,7 @@ const UTILS = [
   MatFormFieldInputListComponent,
   MatFormFieldInputDynamicComponent,
   MatFormFieldInputListOptionComponent,
+  MatFormFieldInputRgbColorPickerComponent,
   ClickStopPropagationDirective,
   TooltipDirective,
   ApplicationSettingComponent
