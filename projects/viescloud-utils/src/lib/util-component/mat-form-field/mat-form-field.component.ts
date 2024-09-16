@@ -3,6 +3,7 @@ import { ThemePalette } from '@angular/material/core';
 import { MatFormFieldAppearance } from '@angular/material/form-field';
 import { FixChangeDetection } from '../../directive/FixChangeDetection';
 import { UtilsService } from '../../service/Utils.service';
+import { RgbColor } from '../../model/Rgb.model';
 
 @Component({
   selector: 'app-mat-form-field',
@@ -204,5 +205,9 @@ export class MatFormFieldComponent extends FixChangeDetection implements OnInit,
       return false;
     else
       return true;
+  }
+
+  isValueRgbColor(): boolean {
+    return this.value instanceof RgbColor;
   }
 }

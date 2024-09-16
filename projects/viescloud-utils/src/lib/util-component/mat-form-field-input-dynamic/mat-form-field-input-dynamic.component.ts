@@ -3,6 +3,19 @@ import { MatFormFieldComponent } from '../mat-form-field/mat-form-field.componen
 import { MatFromFieldInputDynamicItem, MatItemSetting, MatItemSettingType, MatOption } from '../../model/Mat.model';
 import { UtilsService } from '../../service/Utils.service';
 
+export enum DynamicMatInputType {
+  UNKOWN = 'unkown',
+  NUMBER = 'number',
+  BOOLEAN = 'boolean',
+  BOOLEAN_SLIDE_TOGGLE = 'booleanSlideToggle',
+  OPTIONS = 'options',
+  STRING = 'string',
+  STRING_MULTIPLE_LINE = 'stringMultipleLine',
+  ARRAY = 'array',
+  OBJECT = 'object',
+  TIME = 'time',
+}
+
 @Component({
   selector: 'app-mat-form-field-input-dynamic',
   templateUrl: './mat-form-field-input-dynamic.component.html',
@@ -58,6 +71,8 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
 
   validInput: boolean = false;
 
+  inputType: DynamicMatInputType = DynamicMatInputType.UNKOWN;
+
   constructor() {
     super();
   }
@@ -83,6 +98,27 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
 
   override isValidInput(): boolean {
     return this.validInput;
+  }
+
+  private setInputType() {
+    if(this.isValueNumber())
+      this.inputType = DynamicMatInputType.NUMBER;
+    else if(this.isValueBoolean() && !this.isSlideToggle)
+      this.inputType = DynamicMatInputType.BOOLEAN;
+    else if(this.isValueBoolean() && this.isSlideToggle)
+      this.inputType = DynamicMatInputType.BOOLEAN_SLIDE_TOGGLE;
+    else if(this.isOptions)
+      this.inputType = DynamicMatInputType.OPTIONS;
+    else if(this.isValueNonMultipleStringLine())
+      this.inputType = DynamicMatInputType.STRING;
+    else if(this.isValueMultipleStringLine())
+      this.inputType = DynamicMatInputType.STRING_MULTIPLE_LINE;
+    else if(this.isValueArray())
+      this.inputType = DynamicMatInputType.ARRAY;
+    else if(this.isValueObject() && !this.isValueArray())
+      this.inputType = DynamicMatInputType.OBJECT;
+    else
+      this.inputType = DynamicMatInputType.UNKOWN;
   }
 
   //dynamic object
@@ -126,8 +162,6 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
     else
       return blankObj;
   }
-
-  
 
   private getValue(key: string) {
     let value = this.value[key];

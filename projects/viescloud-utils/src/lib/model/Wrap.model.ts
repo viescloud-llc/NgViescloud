@@ -1,4 +1,5 @@
 import { MatInputDisplayLabel, MatInputEnum, MatInputHide, MatInputListSetting, MatInputOptions, MatInputRequire, MatInputTextArea } from "./Mat.model";
+import { RgbColor } from "./Rgb.model";
 
 export enum WrapType {
     GROUP = "GROUP",
@@ -68,7 +69,7 @@ export class Wrap {
     @MatInputDisplayLabel('Hot key')
     hotKey: WrapHotKey = WrapHotKey.NONE;
 
-    color: string = '';
+    color: RgbColor = new RgbColor();
 
     @MatInputListSetting(false, true, true)
     links: Link[] = [new Link()] as Link[];
