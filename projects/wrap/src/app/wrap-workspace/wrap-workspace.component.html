@@ -23,7 +23,7 @@
   <li *ngIf="mode !== 'view'">
     <br>
     <button mat-raised-button color="primary" (click)="changeBackgroundUrl()">Change background</button>
-    <button mat-raised-button color="primary" (click)="saveToServer()" [disabled]="!authenticatorService.isLoginB">Upload background</button>
+    <button mat-raised-button color="primary" (click)="uploadBackgroundImage()" [disabled]="!authenticatorService.isLoginB">Upload background</button>
   </li>
   <li *ngIf="mode !== 'view'">
     <br>

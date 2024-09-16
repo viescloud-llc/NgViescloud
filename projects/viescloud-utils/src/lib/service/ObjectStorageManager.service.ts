@@ -2,8 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'projects/environments/environment.prod';
 import { first, Observable } from 'rxjs';
-import { VFile } from './Utils.service';
+import { UtilsService, VFile } from './Utils.service';
 import { Metadata } from '../model/ObjectStorageManager.model';
+import { MatDialog } from '@angular/material/dialog';
 
 export abstract class ObjectStorage {
   constructor(private httpClient: HttpClient) { }
@@ -143,6 +144,92 @@ export abstract class ObjectStorage {
 
   deleteFileByPath(path: string) {
     return this.httpClient.delete<Metadata>(`${this.getURI()}${this.getPrefixPath()}/file?path=${path}`).pipe(first());
+  }
+
+  putFileAndGetViescloudUrl(vFile: VFile, publicity?: boolean, matDialog?: MatDialog) {
+    return new Promise<string>((resolve, reject) => {
+      if(vFile.rawFile) {
+        if(matDialog) {
+          this.getFileMetadataByFileName(vFile.name).pipe(UtilsService.waitLoadingDialog(matDialog)).subscribe({
+            next: (data1) => {
+              if(data1) {
+                this.putFileByFileName(vFile.name, vFile, publicity).pipe(UtilsService.waitLoadingDialog(matDialog)).subscribe({
+                  next: (data2) => {
+                    resolve(this.generateViesLinkFromPath(data2.path!));
+                  },
+                  error: (error) => {
+                    reject(error);
+                  }
+                })
+              }
+            },
+            error: (error) => {
+              this.postFile(vFile, publicity).pipe(UtilsService.waitLoadingDialog(matDialog)).subscribe({
+                next: (data3) => {
+                  resolve(this.generateViesLinkFromPath(data3.path!));
+                },
+                error: (error) => {
+                  reject(error);
+                }
+              })
+            }
+          })
+        }
+        else {
+          this.getFileMetadataByFileName(vFile.name).subscribe({
+            next: (data1) => {
+              if(data1) {
+                this.putFileByFileName(vFile.name, vFile, publicity).subscribe({
+                  next: (data2) => {
+                    resolve(this.generateViesLinkFromPath(data2.path!));
+                  },
+                  error: (error) => {
+                    reject(error);
+                  }
+                })
+              }
+            },
+            error: (error) => {
+              this.postFile(vFile, publicity).subscribe({
+                next: (data3) => {
+                  resolve(this.generateViesLinkFromPath(data3.path!));
+                },
+                error: (error) => {
+                  reject(error);
+                }
+              })
+            }
+          })
+        }
+      }
+      else
+        reject('File can not be null');
+    })
+  }
+
+  generateObjectUrlFromViescloudUrl(viescloudUrl: string, matDialog?: MatDialog) {
+    return new Promise<string>((resolve, reject) => {
+      if(matDialog) {
+        this.httpClient.get(viescloudUrl, {responseType: 'blob'}).pipe(first()).pipe(UtilsService.waitLoadingDialog(matDialog)).subscribe({
+          next: (data) => {
+            resolve(URL.createObjectURL(data));
+          },
+          error: (error) => {
+            reject(error);
+          }
+        })
+      }
+      else {
+        this.httpClient.get(viescloudUrl, {responseType: 'blob'}).pipe(first()).subscribe({
+          next: (data) => {
+            resolve(URL.createObjectURL(data));
+          },
+          error: (error) => {
+            reject(error);
+          }
+        })
+      }
+    })
   }
 }
 
