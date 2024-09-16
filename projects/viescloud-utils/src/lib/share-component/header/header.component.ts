@@ -6,6 +6,11 @@ import { OpenIdService } from '../../service/OpenId.service';
 import { AuthenticatorService } from '../../service/Authenticator.service';
 import { SettingService } from '../../service/Setting.service';
 
+export enum DRAWER_STATE {
+  OPEN = 'open',
+  CLOSE = 'close'
+}
+
 @Component({
   selector: 'viescloud-header',
   templateUrl: './header.component.html',
@@ -21,10 +26,12 @@ export class HeaderComponent implements OnInit {
     public authenticatorService: AuthenticatorService, 
     private router: Router,
     private settingService: SettingService
-    ) { }
+    ) { 
+      settingService.header = this;
+    }
 
   ngOnInit() {
-    this.drawer?.toggle();
+    this.toggleDrawer(this.settingService.getDisplayDrawer() ? DRAWER_STATE.OPEN : DRAWER_STATE.CLOSE);
     this.authenticatorService.isLoginCall();
   }
 
@@ -49,9 +56,17 @@ export class HeaderComponent implements OnInit {
   }
 
   getDisplayHeader(): boolean {
-    let display = this.settingService.getDisplayHeader();
-    if (!display)
-      this.drawer?.close();
-    return display;
+    return this.settingService.getDisplayHeader();
+  }
+
+  toggleDrawer(state?: DRAWER_STATE): void {
+    if(state) {
+      if(state === DRAWER_STATE.OPEN)
+        this.drawer?.open();
+      else if(state === DRAWER_STATE.CLOSE)
+        this.drawer?.close();
+    }
+    else
+      this.drawer?.toggle();
   }
 }

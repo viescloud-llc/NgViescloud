@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { environment } from 'projects/environments/environment.prod';
 import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
@@ -23,7 +23,7 @@ export enum Mode {
   templateUrl: './wrap-workspace.component.html',
   styleUrls: ['./wrap-workspace.component.scss']
 })
-export class WrapWorkspaceComponent implements OnInit {
+export class WrapWorkspaceComponent implements OnInit, OnDestroy {
 
   DEFAULT_WRAP_PREFIX = 'wrap/';
   ADD_NEW_WORKSPACE = 'Add new workspace ...';
@@ -47,6 +47,9 @@ export class WrapWorkspaceComponent implements OnInit {
     private utilService: UtilsService,
     private s3StorageService: S3StorageServiceV1
   ) { }
+  ngOnDestroy(): void {
+    this.loadBackgroundImage('');
+  }
 
   async ngOnInit() {
     await this.wrapService.init();
@@ -146,7 +149,7 @@ export class WrapWorkspaceComponent implements OnInit {
     this.mode = mode;
 
     if(mode === Mode.View && this.wrapService.isValueChange()) {
-      let dialog = this.matDialog.open(ConfirmDialog, {data: {title: 'Save?', message: 'Are you sure you want to change mode to view?\nNote: Workspace is not yet saved', yes: 'OK', no: 'Cancel'}, width: '100%'});
+      let dialog = this.matDialog.open(ConfirmDialog, {data: {title: 'Save?', message: 'Are you sure you want to change mode to view?\nNote: It will not be saved to server. Therefore, it will be lost if you close the window.', yes: 'OK', no: 'Cancel'}, width: '100%'});
   
       dialog.afterClosed().subscribe({
         next: res => {
@@ -190,7 +193,7 @@ export class WrapWorkspaceComponent implements OnInit {
 
     if(vfile) {
       vfile.name = this.DEFAULT_WRAP_PREFIX + this.currentWorkspace + '.' + vfile.extension;
-      let url = await this.s3StorageService.putFileAndGetViescloudUrl(vfile, false, this.matDialog);
+      let url = await this.s3StorageService.putOrPostFileAndGetViescloudUrl(vfile, false, this.matDialog);
       this.wrapService.wrapWorkspaces[this.currentWorkSpaceIndex].backgroundPicture = url;
       this.loadBackgroundImage(url);
     }

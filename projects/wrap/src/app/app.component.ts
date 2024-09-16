@@ -44,6 +44,15 @@ export class AppComponent {
       ]
     },
     {
+      title: 'Settings',
+      children: [
+        {
+          title: 'Application Setting',
+          routerLink: '/setting/application-setting'
+        }
+      ]
+    },
+    {
       title: 'About',
       children: [
         {
@@ -59,7 +68,9 @@ export class AppComponent {
     private authenticatorService: AuthenticatorService,
     private openIdService: OpenIdService,
     private settingService: SettingService
-  ) { }
+  ) { 
+    settingService.init('wrap');
+  }
 
   getBackgroundImageNgStyle(): any {
     if(this.settingService.backgroundImageUrl) {

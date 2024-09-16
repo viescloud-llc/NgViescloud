@@ -6,6 +6,7 @@ import { OpenIdComponent } from 'projects/viescloud-utils/src/lib/share-componen
 import { LogoutComponent } from 'projects/viescloud-utils/src/lib/share-component/logout/logout.component';
 import { WrapWorkspaceComponent } from './wrap-workspace/wrap-workspace.component';
 import { PolicyComponent } from './policy/policy.component';
+import { ApplicationSettingComponent } from 'projects/viescloud-utils/src/lib/share-component/application-setting/application-setting.component';
 
 const routes: Routes = [
   {
@@ -23,6 +24,15 @@ const routes: Routes = [
   {
     path: 'wrap-workspace',
     component: WrapWorkspaceComponent
+  },
+  {
+    path: 'setting',
+    children: [
+      {
+        path: 'application-setting',
+        component: ApplicationSettingComponent
+      }
+    ]
   },
   {
     path: 'policy',

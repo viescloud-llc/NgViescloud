@@ -41,6 +41,12 @@ export enum MatTableSettingType {
     HIDE = <any>'HideColumn'
 }
 
+export enum UserPermission {
+    READ = "READ",
+    WRITE = "WRITE",
+    DELETE = "DELETE"
+}
+
 export class MatItemSetting {
     type: MatItemSettingType | string;
     value: any;
@@ -230,13 +236,7 @@ export class SharedUser {
     }
 }
 
-export enum UserPermission {
-    READ = "READ",
-    WRITE = "WRITE",
-    DELETE = "DELETE"
-}
-
-// Mat input
+// ------------------------------ Mat input -----------------------------
 
 /**
  * this function set a field dynamic input to disable

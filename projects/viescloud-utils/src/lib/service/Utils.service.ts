@@ -446,20 +446,25 @@ export class UtilsService {
     });
   }
 
-  static waitLoadingDialog<T>(matDialog: MatDialog) {
-    let dialog = matDialog.open(LoadingDialog, {
-      disableClose: true
-    });
-    
-    return pipe(
-      UtilsService.startWithTap<T>(() => {
-        dialog.afterClosed().subscribe({
-          next: () => {}
-        })
-      }),
-      finalize<T>(() => dialog.close()),
-      first<T>()
-    );
+  static waitLoadingDialog<T>(matDialog?: MatDialog) {
+    if(matDialog) {
+      let dialog = matDialog.open(LoadingDialog, {
+        disableClose: true
+      });
+      
+      return pipe(
+        UtilsService.startWithTap<T>(() => {
+          dialog.afterClosed().subscribe({
+            next: () => {}
+          })
+        }),
+        finalize<T>(() => dialog.close()),
+        first<T>()
+      );
+    }
+    else {
+      return pipe();
+    }
   }
 
   static openLoadingDialog(matDialog: MatDialog, timeout?: number) {

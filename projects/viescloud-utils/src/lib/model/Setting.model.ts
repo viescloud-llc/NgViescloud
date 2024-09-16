@@ -1,9 +1,7 @@
 export class GeneralSetting {
-    a: string = 'a';
-    b: number = 0;
-    c: boolean = false;
-    d: D = new D(); 
-    e: D[] = [];
+    displayHeader: boolean = true;
+    displayDrawer: boolean = true;
+    backgroundImageUrl: string = '';
 }
 
 export class D {

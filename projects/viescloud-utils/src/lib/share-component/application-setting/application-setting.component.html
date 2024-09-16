@@ -1,0 +1,22 @@
+<ul class="margin-center">
+  <li><h1 class="text-center">Application Setting</h1></li>
+  <li><h4>Display Setting</h4></li>
+  <li>
+    <app-mat-form-field-input-dynamic
+    label="Initial Display Header (this setting usually should not be changed)"
+    [(value)]="generalSetting.displayHeader"
+    [isSlideToggle]="true"
+    ></app-mat-form-field-input-dynamic>
+  </li>
+  <li>
+    <app-mat-form-field-input-dynamic
+    label="Initial Display Drawer"
+    [(value)]="generalSetting.displayDrawer"
+    [isSlideToggle]="true"
+    ></app-mat-form-field-input-dynamic>
+  </li>
+  <li>
+    <button mat-raised-button color="primary" (click)="saveLocally()" [disabled]="!isValueChange()">Save Locally</button>
+    <button mat-raised-button color="primary" (click)="saveToServer()" [disabled]="!authenticatorService.isLoginB">Save to Server</button>
+  </li>
+</ul>
