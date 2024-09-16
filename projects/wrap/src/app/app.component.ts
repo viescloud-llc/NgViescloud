@@ -47,12 +47,8 @@ export class AppComponent {
       title: 'About',
       children: [
         {
-          title: 'Legal',
-          routerLink: '/legal'
-        },
-        {
-          title: 'Privacy',
-          routerLink: '/privacy'
+          title: 'Policy',
+          routerLink: '/policy'
         }
       ]
     }

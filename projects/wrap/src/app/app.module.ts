@@ -12,6 +12,7 @@ import { WrapItemComponent } from './wrap-workspace/wrap-item/wrap-item.componen
 import { WrapPlusButtonComponent } from './wrap-workspace/wrap-plus-button/wrap-plus-button.component';
 import { WrapJsonComponent } from './wrap-workspace/wrap-json/wrap-json.component';
 import { WrapTreeComponent } from './wrap-workspace/wrap-tree/wrap-tree.component';
+import { PolicyComponent } from './policy/policy.component';
 
 const LIST = [
   AppComponent,
@@ -21,12 +22,13 @@ const LIST = [
   WrapItemComponent,
   WrapPlusButtonComponent,
   WrapJsonComponent,
-  WrapTreeComponent
+  WrapTreeComponent,
+  PolicyComponent
 ]
 
 @NgModule({
-  declarations: [		
-      ...LIST
+  declarations: [			
+      ...LIST,
    ],
   imports: [
     ViescloudUtilsModule,
