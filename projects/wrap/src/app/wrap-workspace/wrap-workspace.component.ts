@@ -12,8 +12,8 @@ import { UtilsService } from 'projects/viescloud-utils/src/lib/service/Utils.ser
 import { WrapService } from 'projects/viescloud-utils/src/lib/service/Wrap.service';
 
 export enum Mode {
-  View = 'view',
-  Edit = 'edit',
+  VIEW = 'view',
+  EDIT = 'edit',
   TREE = 'tree',
   JSON = 'json'
 }
@@ -25,6 +25,7 @@ export enum Mode {
 })
 export class WrapWorkspaceComponent implements OnInit, OnDestroy {
 
+  Mode = Mode;
   DEFAULT_WRAP_PREFIX = 'wrap/';
   ADD_NEW_WORKSPACE = 'Add new workspace ...';
   WORKSPACE_QUERY_PARAM = 'workspace';
@@ -33,12 +34,10 @@ export class WrapWorkspaceComponent implements OnInit, OnDestroy {
   currentWorkspace: string = '';
   currentWorkSpaceIndex: number = -1;
 
-  mode: Mode = Mode.View;
+  mode: Mode = Mode.VIEW;
   modeOptions: MatOption<any>[] = UtilsService.getEnumMatOptions(Mode);
 
   expandAllTree: boolean | null = null;
-
-  cacheImageUrlMap = new Map<string, string>();
 
   constructor(
     public wrapService: WrapService,
@@ -115,7 +114,7 @@ export class WrapWorkspaceComponent implements OnInit, OnDestroy {
       this.wrapService.wrapWorkspaces.push(workspace);
       this.initOptions();
       this.currentWorkspace = workspace.name;
-      this.mode = Mode.Edit;
+      this.mode = Mode.EDIT;
       this.currentWorkSpaceIndex = this.wrapService.wrapWorkspaces.length - 1;
       UtilsService.setQueryParam(this.WORKSPACE_QUERY_PARAM, this.currentWorkSpaceIndex.toString());
     }
@@ -155,7 +154,7 @@ export class WrapWorkspaceComponent implements OnInit, OnDestroy {
     let tempMode = this.mode;
     this.mode = mode;
 
-    if(mode === Mode.View && this.wrapService.isValueChange()) {
+    if(mode === Mode.VIEW && this.wrapService.isValueChange()) {
       let dialog = this.matDialog.open(ConfirmDialog, {data: {title: 'Save?', message: 'Are you sure you want to change mode to view?\nNote: It will not be saved to server. Therefore, it will be lost if you close the window.', yes: 'OK', no: 'Cancel'}, width: '100%'});
   
       dialog.afterClosed().subscribe({
@@ -202,22 +201,16 @@ export class WrapWorkspaceComponent implements OnInit, OnDestroy {
       vfile.name = this.DEFAULT_WRAP_PREFIX + this.currentWorkspace + '.' + vfile.extension;
       let url = await this.s3StorageService.putOrPostFileAndGetViescloudUrl(vfile, false, this.matDialog);
       this.wrapService.wrapWorkspaces[this.currentWorkSpaceIndex].backgroundPicture = url;
+      this.s3StorageService.objectUrlCache.delete(url);
       this.loadBackgroundImage(url);
     }
   }
 
   loadBackgroundImage(url: string) {
     if(url.includes(environment.gateway_api)) {
-
-      if(this.cacheImageUrlMap.has(url)) {
-        this.settingService.backgroundImageUrl = this.cacheImageUrlMap.get(url)!;
-      } 
-      else {
-        this.s3StorageService.generateObjectUrlFromViescloudUrl(url).then(res => {
-          this.cacheImageUrlMap.set(url, res);
-          this.settingService.backgroundImageUrl = res;
-        })
-      }
+      this.s3StorageService.generateObjectUrlFromViescloudUrl(url).then(res => {
+        this.settingService.backgroundImageUrl = res;
+      })
     } 
     else {
       this.settingService.backgroundImageUrl = url;

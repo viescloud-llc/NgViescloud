@@ -6,6 +6,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { WrapDialog } from 'projects/viescloud-utils/src/lib/dialog/wrap-dialog/wrap-dialog.component';
 import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
 import { WrapLinkDialog } from 'projects/viescloud-utils/src/lib/dialog/wrap-link-dialog/wrap-link-dialog.component';
+import { RgbColor } from 'projects/viescloud-utils/src/lib/model/Rgb.model';
 
 @Component({
   selector: 'app-wrap-item',
@@ -45,7 +46,7 @@ export class WrapItemComponent extends TrackByIndex implements OnInit {
   }
 
   open(wrap: Wrap) {
-    if(this.mode === Mode.Edit)
+    if(this.mode === Mode.EDIT)
       this.edit(wrap);
     else if(wrap.links.length <= 0) {
       return;
@@ -72,10 +73,10 @@ export class WrapItemComponent extends TrackByIndex implements OnInit {
   }
 
   edit(wrap: Wrap) {
-    if(this.mode === Mode.Edit) {
+    if(this.mode === Mode.EDIT) {
       var dialog = this.matDialog.open(WrapDialog, {
         data: {
-          wrap: wrap,
+          wrap: structuredClone(wrap),
           title: 'Edit Wrap'
         },
         width: '100%'
@@ -101,7 +102,7 @@ export class WrapItemComponent extends TrackByIndex implements OnInit {
     \tProvider: ${wrap.provider || 'None'}
     \tDescription: ${wrap.description}
     \tTags: ${wrap.tags.join(', ')}
-    \tColor: ${wrap.color}
+    \tColor: ${this.colorStr(wrap.color)}
     \tChildren: ${wrap.children.length} items`;
   }
 
@@ -112,7 +113,15 @@ export class WrapItemComponent extends TrackByIndex implements OnInit {
     \tTags: ${wrap.tags.join(', ')}
     \tHot Key: ${wrap.hotKey}
     \t${this.getItemLinkTooltip(wrap)}
-    \tColor: ${wrap.color}`;
+    \tColor: ${this.colorStr(wrap.color)}`;
+  }
+
+  private colorStr(color: RgbColor) {
+    if(color.name) {
+      return `rgb(${color.r}, ${color.g}, ${color.b})`;
+    }
+    else
+      return 'default';
   }
 
   getItemLinkTooltip(wrap: Wrap) {

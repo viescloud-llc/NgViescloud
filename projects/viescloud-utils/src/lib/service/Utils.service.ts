@@ -594,4 +594,10 @@ export class UtilsService {
 
     return matOptions;
   }
+
+  static async isObjectUrlValid(url: string): Promise<boolean> {
+    return fetch(url)
+      .then(response => response.ok)
+      .catch(() => false);
+  }
 }
