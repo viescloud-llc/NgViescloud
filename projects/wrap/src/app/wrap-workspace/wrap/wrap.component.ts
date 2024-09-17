@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Wrap, WrapWorkspace } from 'projects/viescloud-utils/src/lib/model/Wrap.model';
-import { Mode } from '../wrap-workspace.component';
+import { WrapMode } from '../wrap-workspace.component';
 import { TrackByIndex } from 'projects/viescloud-utils/src/lib/directive/TrackByIndex';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
@@ -21,10 +21,10 @@ export class WrapComponent extends TrackByIndex implements OnInit {
   wrapWorkspaceChange: EventEmitter<WrapWorkspace> = new EventEmitter();
 
   @Input()
-  mode!: Mode
+  mode!: WrapMode
 
   @Output()
-  modeChange: EventEmitter<Mode> = new EventEmitter();
+  modeChange: EventEmitter<WrapMode> = new EventEmitter();
 
   searchText: string = '';
   searchOptions: string[] = [];

@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Mode } from '../wrap-workspace.component';
-import { Link, Wrap } from 'projects/viescloud-utils/src/lib/model/Wrap.model';
+import { WrapMode } from '../wrap-workspace.component';
+import { Link, Wrap, WrapHotKey, WrapType } from 'projects/viescloud-utils/src/lib/model/Wrap.model';
 import { TrackByIndex } from 'projects/viescloud-utils/src/lib/directive/TrackByIndex';
 import { MatDialog } from '@angular/material/dialog';
 import { WrapDialog } from 'projects/viescloud-utils/src/lib/dialog/wrap-dialog/wrap-dialog.component';
@@ -22,10 +22,10 @@ export class WrapItemComponent extends TrackByIndex implements OnInit {
   wrapChange: EventEmitter<Wrap> = new EventEmitter();
 
   @Input()
-  mode!: Mode;
+  mode!: WrapMode;
 
   @Output()
-  modeChange: EventEmitter<Mode> = new EventEmitter();
+  modeChange: EventEmitter<WrapMode> = new EventEmitter();
 
   @Output()
   onMoveLeft: EventEmitter<void> = new EventEmitter();
@@ -35,6 +35,10 @@ export class WrapItemComponent extends TrackByIndex implements OnInit {
 
   @Output()
   onDelete: EventEmitter<void> = new EventEmitter();
+
+  WrapType = WrapType;
+  Mode = WrapMode;
+  WrapHotKey = WrapHotKey;
 
   constructor(private matDialog: MatDialog) { 
     super();
@@ -46,7 +50,7 @@ export class WrapItemComponent extends TrackByIndex implements OnInit {
   }
 
   open(wrap: Wrap) {
-    if(this.mode === Mode.EDIT)
+    if(this.mode === WrapMode.EDIT)
       this.edit(wrap);
     else if(wrap.links.length <= 0) {
       return;
@@ -73,7 +77,7 @@ export class WrapItemComponent extends TrackByIndex implements OnInit {
   }
 
   edit(wrap: Wrap) {
-    if(this.mode === Mode.EDIT) {
+    if(this.mode === WrapMode.EDIT) {
       var dialog = this.matDialog.open(WrapDialog, {
         data: {
           wrap: structuredClone(wrap),

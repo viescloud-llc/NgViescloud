@@ -11,7 +11,7 @@ import { SettingService } from 'projects/viescloud-utils/src/lib/service/Setting
 import { UtilsService } from 'projects/viescloud-utils/src/lib/service/Utils.service';
 import { WrapService } from 'projects/viescloud-utils/src/lib/service/Wrap.service';
 
-export enum Mode {
+export enum WrapMode {
   VIEW = 'view',
   EDIT = 'edit',
   TREE = 'tree',
@@ -25,7 +25,7 @@ export enum Mode {
 })
 export class WrapWorkspaceComponent implements OnInit, OnDestroy {
 
-  Mode = Mode;
+  Mode = WrapMode;
   DEFAULT_WRAP_PREFIX = 'wrap/';
   ADD_NEW_WORKSPACE = 'Add new workspace ...';
   WORKSPACE_QUERY_PARAM = 'workspace';
@@ -34,8 +34,8 @@ export class WrapWorkspaceComponent implements OnInit, OnDestroy {
   currentWorkspace: string = '';
   currentWorkSpaceIndex: number = -1;
 
-  mode: Mode = Mode.VIEW;
-  modeOptions: MatOption<any>[] = UtilsService.getEnumMatOptions(Mode);
+  mode: WrapMode = WrapMode.VIEW;
+  modeOptions: MatOption<any>[] = UtilsService.getEnumMatOptions(WrapMode);
 
   expandAllTree: boolean | null = null;
 
@@ -114,7 +114,7 @@ export class WrapWorkspaceComponent implements OnInit, OnDestroy {
       this.wrapService.wrapWorkspaces.push(workspace);
       this.initOptions();
       this.currentWorkspace = workspace.name;
-      this.mode = Mode.EDIT;
+      this.mode = WrapMode.EDIT;
       this.currentWorkSpaceIndex = this.wrapService.wrapWorkspaces.length - 1;
       UtilsService.setQueryParam(this.WORKSPACE_QUERY_PARAM, this.currentWorkSpaceIndex.toString());
     }
@@ -154,7 +154,7 @@ export class WrapWorkspaceComponent implements OnInit, OnDestroy {
     let tempMode = this.mode;
     this.mode = mode;
 
-    if(mode === Mode.VIEW && this.wrapService.isValueChange()) {
+    if(mode === WrapMode.VIEW && this.wrapService.isValueChange()) {
       let dialog = this.matDialog.open(ConfirmDialog, {data: {title: 'Save?', message: 'Are you sure you want to change mode to view?\nNote: It will not be saved to server. Therefore, it will be lost if you close the window.', yes: 'OK', no: 'Cancel'}, width: '100%'});
   
       dialog.afterClosed().subscribe({
