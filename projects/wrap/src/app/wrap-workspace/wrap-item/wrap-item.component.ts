@@ -239,7 +239,7 @@ export class WrapItemComponent extends TrackByIndex implements OnInit, OnDestroy
   }
 
   getNgStyle(wrap: Wrap) {
-    if(wrap.color) {
+    if(wrap.color && wrap.color.name) {
       return {
         'background-color': `rgb(${wrap.color.r}, ${wrap.color.g}, ${wrap.color.b})`
       };
