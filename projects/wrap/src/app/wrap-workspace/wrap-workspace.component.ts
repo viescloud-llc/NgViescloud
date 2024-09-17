@@ -52,7 +52,7 @@ export class WrapWorkspaceComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
-    await this.wrapService.init();
+    await this.wrapService.init().catch(e => {});
 
     this.initOptions();
     if(this.wrapService.wrapWorkspaces.length > 0) {
