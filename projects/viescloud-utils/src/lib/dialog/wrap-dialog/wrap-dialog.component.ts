@@ -3,13 +3,14 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Wrap, WrapType } from '../../model/Wrap.model';
 import { UtilsService } from '../../service/Utils.service';
 import { MatOption } from '../../model/Mat.model';
+import { FixChangeDetection } from '../../directive/FixChangeDetection';
 
 @Component({
   selector: 'app-wrap-dialog',
   templateUrl: './wrap-dialog.component.html',
   styleUrls: ['./wrap-dialog.component.scss']
 })
-export class WrapDialog implements OnInit {
+export class WrapDialog extends FixChangeDetection implements OnInit {
 
   wrap!: Wrap;
   blankObject: Wrap = new Wrap();
@@ -22,6 +23,7 @@ export class WrapDialog implements OnInit {
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: {wrap: Wrap, title?: string}
   ) { 
+    super();
     this.wrap = this.data.wrap;
   }
 
