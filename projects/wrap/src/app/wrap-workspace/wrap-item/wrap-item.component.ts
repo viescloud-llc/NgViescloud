@@ -218,4 +218,14 @@ export class WrapItemComponent extends TrackByIndex implements OnInit {
     wrap.children[toIndex] = temp;
     this.wrapChange.emit(this.wrap);
   }
+
+  getNgStyle(wrap: Wrap) {
+    if(wrap.color) {
+      return {
+        'background-color': `rgb(${wrap.color.r}, ${wrap.color.g}, ${wrap.color.b})`
+      };
+    }
+    else
+      return null;
+  }
 }

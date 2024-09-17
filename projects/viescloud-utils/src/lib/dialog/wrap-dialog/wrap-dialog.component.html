@@ -1,7 +1,7 @@
 <h1 mat-dialog-title>{{data.title ?? 'Wrap add/edit'}}</h1>
 <div mat-dialog-content appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
   <app-mat-form-field-input-dynamic
-    *ngIf="wrap.type.toString() === 'ITEM'; else Else"
+    *ngIf="wrap.type.toString() === WrapType.ITEM; else Else"
     [(value)]="wrap"
     [blankObject]="blankObject"
     styleWidth="100%"
@@ -53,6 +53,14 @@
         [showSizeInput]="false"
         [blankObject]="''"
         ></app-mat-form-field-input-list>
+        <br>
+      </li>
+      <li>
+        <app-mat-form-field-input-rgb-color-picker
+        [(value)]="wrap.color"
+        label="Wrap"
+        styleWidth="100%"
+        ></app-mat-form-field-input-rgb-color-picker>
       </li>
     </ul>
   </ng-template>

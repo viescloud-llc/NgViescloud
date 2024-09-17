@@ -17,6 +17,8 @@ export class WrapDialog implements OnInit {
 
   validForm: boolean = false;
 
+  WrapType = WrapType;
+
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: {wrap: Wrap, title?: string}
   ) { 

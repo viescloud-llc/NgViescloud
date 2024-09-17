@@ -1,5 +1,5 @@
 <ng-container *ngIf="wrap.type === WrapType.ITEM; else Else" >
-  <mat-card appearance="outlined" class="cursor-hover" (click)="open(wrap)">
+  <mat-card appearance="outlined" class="cursor-hover" (click)="open(wrap)" [ngStyle]="getNgStyle(wrap)">
     <mat-card-header>
       <div mat-card-avatar [ngStyle]="{background: 'url(' + wrap.icon + ')', backgroundSize: 'cover'}"></div>
       <mat-card-title>{{wrap.title}}</mat-card-title>
@@ -23,7 +23,7 @@
 </ng-container>
 
 <ng-template #Else>
-  <mat-expansion-panel hideToggle [expanded]="true" #panel>
+  <mat-expansion-panel hideToggle [expanded]="true" #panel [ngStyle]="getNgStyle(wrap)">
     <mat-expansion-panel-header >
       <mat-panel-title>{{wrap.title}}</mat-panel-title>
       <mat-panel-description *ngIf="mode === Mode.VIEW"> 
