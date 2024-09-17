@@ -10,7 +10,10 @@
   <ul>
     <li>
       <app-mat-form-field-input-option
+      [label]="label"
+      [placeholder]="placeholder"
       [(value)]="value"
+      (onValueChange)="emitValue()"
       [options]="sampleOptions"
       [required]="required"
       [disable]="disable"

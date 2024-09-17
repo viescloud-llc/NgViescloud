@@ -1,129 +1,161 @@
-<ng-container *ngIf="isValueNumber()" appMatFormFieldGroup (onAllInputCheck)="validInput = $event">
-  <app-mat-form-field-input
-    [label]="label"
-    [placeholder]="placeholder"
-    [(value)]="value"
-    (onValueChange)="emitValue()"
-    [styleWidth]="styleWidth"
-    [disable]="disable"
-    [required]="required"
-    defaultType="number"
-    [blankObject]="blankObject"
-  ></app-mat-form-field-input>
-</ng-container>
+<ng-container [ngSwitch]="inputType" appMatFormFieldGroup (onAllInputCheck)="validInput = $event">
 
-<ng-container *ngIf="isValueBoolean() && !isSlideToggle" appMatFormFieldGroup (onAllInputCheck)="validInput = $event">
-  <app-mat-form-field-input-option
-    [label]="label"
-    [placeholder]="placeholder"
-    [(value)]="value"
-    (onValueChange)="emitValue()"
-    [options]="options"
-    noneLabel=""
-    [styleWidth]="styleWidth"
-    [disable]="disable"
-    [required]="required"
-    [blankObject]="blankObject"
-  ></app-mat-form-field-input-option>
-</ng-container>
-
-<ng-container *ngIf="isValueBoolean() && isSlideToggle" appMatFormFieldGroup (onAllInputCheck)="validInput = $event">
-  <mat-slide-toggle 
-  [color]="matColor"
-  [(ngModel)]="value" 
-  (ngModelChange)="emitValue()"
-  [disabled]="disable"
-  [required]="required"
-  >{{label}}</mat-slide-toggle>
-</ng-container>
-
-<ng-container *ngIf="isOptions" appMatFormFieldGroup (onAllInputCheck)="validInput = $event">
-  <app-mat-form-field-input-option
-    [label]="label"
-    [placeholder]="placeholder"
-    [(value)]="value"
-    (onValueChange)="emitValue()"
-    [options]="matOptions!"
-    noneLabel=""
-    [styleWidth]="styleWidth"
-    [disable]="disable"
-    [required]="required"
-    [blankObject]="blankObject"
-  ></app-mat-form-field-input-option>
-</ng-container>
-
-<ng-container *ngIf="isValueNonMultipleStringLine()" appMatFormFieldGroup (onAllInputCheck)="validInput = $event">
-  <app-mat-form-field-input
-  [label]="label"
-  [placeholder]="placeholder"
-  [value]="value" (valueChange)="value = $event"
-  (onValueChange)="emitValue()"
-  [required]="required"
-  [showVisibleSwitch]="isPassword"
-  [validateEmail]="isEmail"
-  [styleWidth]="styleWidth"
-  [disable]="disable"
-  [required]="required"
-  [blankObject]="blankObject"
-  ></app-mat-form-field-input>
-</ng-container>
-
-<ng-container *ngIf="isValueMultipleStringLine()" appMatFormFieldGroup (onAllInputCheck)="validInput = $event">
-  <app-mat-form-field-input-text-area
-  [label]="label"
-  [placeholder]="placeholder"
-  [value]="value" (valueChange)="value = $event"
-  (onValueChange)="emitValue()"
-  [required]="required"
-  [styleWidth]="styleWidth"
-  [disable]="disable"
-  [required]="required"
-  [blankObject]="blankObject"
-  ></app-mat-form-field-input-text-area>
-</ng-container>
-
-<ng-container *ngIf="isValueArray()" appMatFormFieldGroup (onAllInputCheck)="validInput = $event">
-  <app-mat-form-field-input-list
-  [label]="label"
-  [placeholder]="placeholder"
-  [(value)]="value"
-  (onValueChange)="emitValue()"
-  [required]="required"
-  [styleWidth]="styleWidth"
-  [disable]="disable"
-  [required]="required"
-  [blankObject]="blankObject"
-  [showSizeInput]="showListSizeInput"
-  [showAddItemButton]="showListAddItemButton"
-  [showRemoveItemButton]="showListRemoveItemButton"
-  [blankObject]="blankObject"
-  ></app-mat-form-field-input-list>
-  <br>
-</ng-container>
-
-<ng-container *ngIf="isValueObject() && !isValueArray()" appMatFormFieldGroup (onAllInputCheck)="validInput = $event">
-  <ul>
-    <li>
-      <h2 class="text-center" *ngIf="objectLabel">{{objectLabel}}</h2>
-    </li>
-    <li *ngFor="let item of items">
-      <app-mat-form-field-input-dynamic
-      [label]="item.label"
-      [placeholder]="item.placeholder"
-      [value]="item.value" (valueChange)="item.setValueFn($event)"
+  <!-- Number Input -->
+  <ng-container *ngSwitchCase="DynamicMatInputType.NUMBER">
+    <app-mat-form-field-input
+      [label]="label"
+      [placeholder]="placeholder"
+      [(value)]="value"
+      (onValueChange)="emitValue()"
       [styleWidth]="styleWidth"
-      [disable]="containDisable(item)"
-      [required]="containRequire(item)"
-      [isTextArea]="containTextArea(item)"
-      [isOptions]="containOptions(item)"
-      [blankObject]="item.blankObject"
-      [objectLabel]="item.key"
-      [showListSizeInput]="containListShowInputSize(item)"
-      [showListAddItemButton]="containListShowAddItemButton(item)"
-      [showListRemoveItemButton]="containListShowRemoveItemButton(item)"
-      [matOptions]="item.matOptions"
-      ></app-mat-form-field-input-dynamic>
-    </li>
-  </ul>
-</ng-container>
+      [disable]="disable"
+      [required]="required"
+      defaultType="number"
+      [blankObject]="blankObject"
+    ></app-mat-form-field-input>
+  </ng-container>
 
+  <!-- Boolean Input (not slide toggle) -->
+  <ng-container *ngSwitchCase="DynamicMatInputType.BOOLEAN">
+    <app-mat-form-field-input-option
+      [label]="label"
+      [placeholder]="placeholder"
+      [(value)]="value"
+      (onValueChange)="emitValue()"
+      [options]="options"
+      noneLabel=""
+      [styleWidth]="styleWidth"
+      [disable]="disable"
+      [required]="required"
+      [blankObject]="blankObject"
+    ></app-mat-form-field-input-option>
+  </ng-container>
+
+  <!-- Boolean Input (slide toggle) -->
+  <ng-container *ngSwitchCase="DynamicMatInputType.BOOLEAN_SLIDE_TOGGLE">
+    <mat-slide-toggle 
+      [color]="matColor"
+      [(ngModel)]="value" 
+      (ngModelChange)="emitValue()"
+      [disabled]="disable"
+      [required]="required">
+      {{label}}
+    </mat-slide-toggle>
+  </ng-container>
+
+  <!-- Options Input -->
+  <ng-container *ngSwitchCase="DynamicMatInputType.OPTIONS">
+    <app-mat-form-field-input-option
+      [label]="label"
+      [placeholder]="placeholder"
+      [(value)]="value"
+      (onValueChange)="emitValue()"
+      [options]="matOptions!"
+      noneLabel=""
+      [styleWidth]="styleWidth"
+      [disable]="disable"
+      [required]="required"
+      [blankObject]="blankObject"
+    ></app-mat-form-field-input-option>
+  </ng-container>
+
+  <!-- String Input (Single Line) -->
+  <ng-container *ngSwitchCase="DynamicMatInputType.STRING">
+    <app-mat-form-field-input
+      [label]="label"
+      [placeholder]="placeholder"
+      [value]="value" (valueChange)="value = $event"
+      (onValueChange)="emitValue()"
+      [required]="required"
+      [showVisibleSwitch]="isPassword"
+      [validateEmail]="isEmail"
+      [styleWidth]="styleWidth"
+      [disable]="disable"
+      [required]="required"
+      [blankObject]="blankObject"
+    ></app-mat-form-field-input>
+  </ng-container>
+
+  <!-- String Input (Multiple Lines) -->
+  <ng-container *ngSwitchCase="DynamicMatInputType.STRING_MULTIPLE_LINE">
+    <app-mat-form-field-input-text-area
+      [label]="label"
+      [placeholder]="placeholder"
+      [value]="value" (valueChange)="value = $event"
+      (onValueChange)="emitValue()"
+      [required]="required"
+      [styleWidth]="styleWidth"
+      [disable]="disable"
+      [required]="required"
+      [blankObject]="blankObject"
+    ></app-mat-form-field-input-text-area>
+  </ng-container>
+
+  <!-- rgb color Input -->
+  <ng-container *ngSwitchCase="DynamicMatInputType.RGB_COLOR">
+    <app-mat-form-field-input-rgb-color-picker
+    [label]="label"
+    [placeholder]="placeholder"
+    [(value)]="value"
+    (onValueChange)="emitValue()"
+    [styleWidth]="styleWidth"
+    [disable]="disable"
+    [required]="required"
+    [blankObject]="blankObject"
+    ></app-mat-form-field-input-rgb-color-picker>
+    <br>
+  </ng-container>
+
+  <!-- Array Input -->
+  <ng-container *ngSwitchCase="DynamicMatInputType.ARRAY">
+    <app-mat-form-field-input-list
+      [label]="label"
+      [placeholder]="placeholder"
+      [(value)]="value"
+      (onValueChange)="emitValue()"
+      [required]="required"
+      [styleWidth]="styleWidth"
+      [disable]="disable"
+      [required]="required"
+      [blankObject]="blankObject"
+      [showSizeInput]="showListSizeInput"
+      [showAddItemButton]="showListAddItemButton"
+      [showRemoveItemButton]="showListRemoveItemButton"
+      [blankObject]="blankObject"
+    ></app-mat-form-field-input-list>
+    <br>
+  </ng-container>
+
+  <!-- Object Input -->
+  <ng-container *ngSwitchCase="DynamicMatInputType.OBJECT">
+    <ul>
+      <li>
+        <h2 class="text-center" *ngIf="objectLabel">{{objectLabel}}</h2>
+      </li>
+      <li *ngFor="let item of items">
+        <app-mat-form-field-input-dynamic
+          [label]="item.label"
+          [placeholder]="item.placeholder"
+          [value]="item.value" (valueChange)="item.setValueFn($event)"
+          [styleWidth]="styleWidth"
+          [disable]="containDisable(item)"
+          [required]="containRequire(item)"
+          [isTextArea]="containTextArea(item)"
+          [isOptions]="containOptions(item)"
+          [blankObject]="item.blankObject"
+          [objectLabel]="item.key"
+          [showListSizeInput]="containListShowInputSize(item)"
+          [showListAddItemButton]="containListShowAddItemButton(item)"
+          [showListRemoveItemButton]="containListShowRemoveItemButton(item)"
+          [matOptions]="item.matOptions"
+        ></app-mat-form-field-input-dynamic>
+      </li>
+    </ul>
+  </ng-container>
+
+  <!-- Unknown Input Type -->
+  <ng-container *ngSwitchDefault>
+    <p>Unknown input type</p>
+  </ng-container>
+
+</ng-container>

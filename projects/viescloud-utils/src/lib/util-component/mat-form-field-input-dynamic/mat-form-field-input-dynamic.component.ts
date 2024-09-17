@@ -13,7 +13,8 @@ export enum DynamicMatInputType {
   STRING_MULTIPLE_LINE = 'stringMultipleLine',
   ARRAY = 'array',
   OBJECT = 'object',
-  TIME = 'time',
+  DATE_TIME = 'dateTime',
+  RGB_COLOR = 'rgbColor',
 }
 
 @Component({
@@ -71,6 +72,7 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
 
   validInput: boolean = false;
 
+  DynamicMatInputType = DynamicMatInputType;
   inputType: DynamicMatInputType = DynamicMatInputType.UNKOWN;
 
   constructor() {
@@ -94,6 +96,7 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
   init() {
     if(this.isValueObject() && this.blankObject && !this.isValueArray())
       this.parseItems();
+    this.setInputType();
   }
 
   override isValidInput(): boolean {
@@ -113,6 +116,8 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
       this.inputType = DynamicMatInputType.STRING;
     else if(this.isValueMultipleStringLine())
       this.inputType = DynamicMatInputType.STRING_MULTIPLE_LINE;
+    else if(this.isValueRgbColor())
+      this.inputType = DynamicMatInputType.RGB_COLOR;
     else if(this.isValueArray())
       this.inputType = DynamicMatInputType.ARRAY;
     else if(this.isValueObject() && !this.isValueArray())
