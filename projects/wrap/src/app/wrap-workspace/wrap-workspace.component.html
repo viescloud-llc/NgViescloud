@@ -19,6 +19,7 @@
   </li>
   <li *ngIf="mode !== Mode.VIEW && currentWorkSpaceIndex >= 0">
     <button mat-raised-button color="warn" (click)="removeThisWorkspace()">Remove this workspace</button>
+    <button mat-raised-button color="primary" (click)="changeWorkspaceName()">Change Workspace name</button>
   </li>
   <li *ngIf="mode !== Mode.VIEW">
     <br>
@@ -27,7 +28,7 @@
   </li>
   <li *ngIf="mode !== Mode.VIEW">
     <br>
-    <button mat-raised-button color="primary" (click)="wrapService.revert()" [disabled]="!wrapService.isValueChange()">Revert</button>
+    <button mat-raised-button color="warn" (click)="wrapService.revert()" [disabled]="!wrapService.isValueChange()">Revert</button>
     <button mat-raised-button color="primary" (click)="saveLocally()" [disabled]="!wrapService.isValueChange()">Save locally</button>
     <button mat-raised-button color="primary" (click)="saveToServer()" [disabled]="!authenticatorService.isLoginB">Save to Server</button>
   </li>

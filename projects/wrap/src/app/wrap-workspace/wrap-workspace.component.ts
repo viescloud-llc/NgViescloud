@@ -216,4 +216,27 @@ export class WrapWorkspaceComponent implements OnInit, OnDestroy {
       this.settingService.backgroundImageUrl = url;
     }
   }
+
+  changeWorkspaceName() {
+    let dialog = this.matDialog.open(InputDialog, {
+      data: {
+        title: 'Change Workspace Name',
+        label: 'Workspace Name',
+        yes: 'OK',
+        no: 'Cancel',
+        input: this.wrapService.wrapWorkspaces[this.currentWorkSpaceIndex].name
+      },
+      width: '100%'
+    })
+
+    dialog.afterClosed().subscribe({
+      next: res => {
+        if(res) {
+          this.wrapService.wrapWorkspaces[this.currentWorkSpaceIndex].name = res;
+          this.initOptions();
+          this.currentWorkspace = res;
+        }
+      }
+    })
+  }
 }
