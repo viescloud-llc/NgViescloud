@@ -25,6 +25,7 @@ import { ClickStopPropagationDirective } from '../directive/ClickStopPropagation
 import { TooltipDirective } from '../directive/Tooltip.directive';
 import { ApplicationSettingComponent } from '../share-component/application-setting/application-setting.component';
 import { MatFormFieldInputRgbColorPickerComponent } from '../util-component/mat-form-field-input-rgb-color-picker/mat-form-field-input-rgb-color-picker.component';
+import { DisableKeyCaptureOnInputDirective } from '../directive/DisableKeyCaptureOnInput.directive';
 
 const UTILS = [
   CopyToClipboardUtilComponent,
@@ -45,7 +46,8 @@ const UTILS = [
   MatFormFieldInputRgbColorPickerComponent,
   ClickStopPropagationDirective,
   TooltipDirective,
-  ApplicationSettingComponent
+  ApplicationSettingComponent,
+  DisableKeyCaptureOnInputDirective
 ]
 
 const COMPONENTS = [

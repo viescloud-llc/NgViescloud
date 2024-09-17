@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { WrapMode } from '../wrap-workspace.component';
 import { Link, Wrap, WrapHotKey, WrapType } from 'projects/viescloud-utils/src/lib/model/Wrap.model';
 import { TrackByIndex } from 'projects/viescloud-utils/src/lib/directive/TrackByIndex';
@@ -7,13 +7,15 @@ import { WrapDialog } from 'projects/viescloud-utils/src/lib/dialog/wrap-dialog/
 import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
 import { WrapLinkDialog } from 'projects/viescloud-utils/src/lib/dialog/wrap-link-dialog/wrap-link-dialog.component';
 import { RgbColor } from 'projects/viescloud-utils/src/lib/model/Rgb.model';
+import { KeyCaptureService } from 'projects/viescloud-utils/src/lib/service/KeyCapture.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-wrap-item',
   templateUrl: './wrap-item.component.html',
   styleUrls: ['./wrap-item.component.scss']
 })
-export class WrapItemComponent extends TrackByIndex implements OnInit {
+export class WrapItemComponent extends TrackByIndex implements OnInit, OnDestroy {
 
   @Input()
   wrap!: Wrap;
@@ -40,13 +42,30 @@ export class WrapItemComponent extends TrackByIndex implements OnInit {
   Mode = WrapMode;
   WrapHotKey = WrapHotKey;
 
-  constructor(private matDialog: MatDialog) { 
+  keyCaptureEvent?: Subscription;
+
+  constructor(
+    private matDialog: MatDialog,
+    private keyCaptureService: KeyCaptureService
+  ) { 
     super();
+  }
+  ngOnDestroy(): void {
+    if(this.keyCaptureEvent)
+      this.keyCaptureEvent.unsubscribe();
   }
 
   ngOnInit() {
     if(!this.wrap.children)
       this.wrap.children = [];
+
+    this.keyCaptureEvent = this.keyCaptureService.keyEvents$.subscribe({
+      next: event => {
+        if(this.wrap.hotKey && event.key === this.wrap.hotKey) {
+          this.open(this.wrap);
+        }
+      }
+    })
   }
 
   open(wrap: Wrap) {

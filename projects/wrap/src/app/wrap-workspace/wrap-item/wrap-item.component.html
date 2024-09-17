@@ -24,7 +24,7 @@
 
 <ng-template #Else>
   <mat-expansion-panel hideToggle [expanded]="true" #panel [ngStyle]="getNgStyle(wrap)">
-    <mat-expansion-panel-header >
+    <mat-expansion-panel-header>
       <mat-panel-title>{{wrap.title}}</mat-panel-title>
       <mat-panel-description *ngIf="mode === Mode.VIEW"> 
         {{wrap.description.replaceAll('\n', ', ')}}

@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { AuthenticatorService } from 'projects/viescloud-utils/src/lib/service/Authenticator.service';
+import { KeyCaptureService } from 'projects/viescloud-utils/src/lib/service/KeyCapture.service';
 import { OpenIdService } from 'projects/viescloud-utils/src/lib/service/OpenId.service';
 import { SettingService } from 'projects/viescloud-utils/src/lib/service/Setting.service';
 import { WrapService } from 'projects/viescloud-utils/src/lib/service/Wrap.service';
@@ -67,9 +69,28 @@ export class AppComponent {
     public router: Router, 
     private authenticatorService: AuthenticatorService,
     private openIdService: OpenIdService,
-    private settingService: SettingService
+    private settingService: SettingService,
+    private keyCaptureService: KeyCaptureService,
+    private matDialog: MatDialog
   ) { 
     settingService.init('wrap');
+    this.listenToDialogEvents();
+  }
+
+  // Subscribe to MatDialog open and close events
+  listenToDialogEvents() {
+    this.matDialog.afterOpened.subscribe(() => {
+      this.keyCaptureService.disableCapture();
+    });
+
+    this.matDialog.afterAllClosed.subscribe(() => {
+      this.keyCaptureService.enableCapture();
+    });
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent) {
+    this.keyCaptureService.captureKey(event);
   }
 
   getBackgroundImageNgStyle(): any {
