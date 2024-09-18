@@ -47,7 +47,7 @@ export class WrapItemComponent extends TrackByIndex implements OnInit, OnDestroy
   keyCaptureEvent?: Subscription;
 
   statusUrlMap = new Map<string, number>();
-  expireTime = 5000; // 5 seconds
+  expireTime = 30000; // 30 seconds
 
   constructor(
     private matDialog: MatDialog,
