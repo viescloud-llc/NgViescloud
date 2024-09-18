@@ -9,6 +9,8 @@ import { WrapLinkDialog } from 'projects/viescloud-utils/src/lib/dialog/wrap-lin
 import { RgbColor } from 'projects/viescloud-utils/src/lib/model/Rgb.model';
 import { KeyCaptureService } from 'projects/viescloud-utils/src/lib/service/KeyCapture.service';
 import { Subscription } from 'rxjs';
+import { ExpiableMap } from 'projects/viescloud-utils/src/lib/model/ExpirableMap.model';
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-wrap-item',
@@ -44,9 +46,13 @@ export class WrapItemComponent extends TrackByIndex implements OnInit, OnDestroy
 
   keyCaptureEvent?: Subscription;
 
+  statusUrlMap = new Map<string, number>();
+  expireTime = 5000; // 5 seconds
+
   constructor(
     private matDialog: MatDialog,
-    private keyCaptureService: KeyCaptureService
+    private keyCaptureService: KeyCaptureService,
+    private httpClient: HttpClient
   ) { 
     super();
   }
@@ -59,6 +65,11 @@ export class WrapItemComponent extends TrackByIndex implements OnInit, OnDestroy
     if(!this.wrap.children)
       this.wrap.children = [];
 
+    this.statusCheck();
+    setInterval(() => {
+      this.statusCheck();
+    }, this.expireTime);
+
     this.keyCaptureEvent = this.keyCaptureService.keyEvents$.subscribe({
       next: event => {
         if(this.wrap.hotKey && event.key === this.wrap.hotKey) {
@@ -66,6 +77,30 @@ export class WrapItemComponent extends TrackByIndex implements OnInit, OnDestroy
         }
       }
     })
+  }
+
+  private statusCheck() {
+    if (this.wrap.links && this.wrap.links.length > 0) {
+      this.wrap.links.forEach(link => {
+        if (link.enableStatusCheck && link.statusCheckUrl) {
+          let headers = new HttpHeaders();
+          if (link.statusCheckHeaders && link.statusCheckHeaders.length > 0) {
+            link.statusCheckHeaders.forEach(header => {
+              headers.append(header.name, header.value);
+            });
+          }
+
+          this.httpClient.get(link.statusCheckUrl, { headers: headers, observe: 'response' }).subscribe({
+            next: (response: HttpResponse<any>) => {
+              this.statusUrlMap.set(link.statusCheckUrl, response.status);
+            },
+            error: (response: HttpResponse<any>) => {
+              this.statusUrlMap.set(link.statusCheckUrl, response.status);
+            }
+          });
+        }
+      });
+    }
   }
 
   open(wrap: Wrap) {
@@ -77,7 +112,8 @@ export class WrapItemComponent extends TrackByIndex implements OnInit, OnDestroy
     else if(wrap.links.length > 1) {
       let dialog = this.matDialog.open(WrapLinkDialog, {
         data: {
-          wrap: wrap
+          wrap: wrap,
+          statusUrlMap: this.statusUrlMap
         },
         width: 'max-content'
       })
@@ -239,12 +275,18 @@ export class WrapItemComponent extends TrackByIndex implements OnInit, OnDestroy
   }
 
   getNgStyle(wrap: Wrap) {
-    if(wrap.color && wrap.color.name) {
-      return {
-        'background-color': `rgb(${wrap.color.r}, ${wrap.color.g}, ${wrap.color.b})`
-      };
+    return {
+      'background': wrap.backgroundPicture ? `url(${wrap.backgroundPicture})` : '',
+      'backgroundSize': 'cover',
+      'background-color': wrap.color && wrap.color.name ? `rgb(${wrap.color.r}, ${wrap.color.g}, ${wrap.color.b})` : ''
     }
-    else
-      return null;
+  }
+
+  getNgStyleLinkCheck(link: Link) {
+    let status = this.statusUrlMap.get(link.statusCheckUrl);
+
+    return {
+      'color': status === Number.parseInt(link.statusCheckAcceptResponseCode) ? 'green' : 'red'
+    }
   }
 }

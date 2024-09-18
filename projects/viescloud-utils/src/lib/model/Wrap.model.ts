@@ -44,7 +44,6 @@ export enum WrapStatusAcceptResponseCode {
 export class WrapWorkspace {
     name: string = '';
     backgroundPicture: string = '';
-    bubbles: string[] = [];
     wraps: Wrap[] = [];
 }
 
@@ -55,6 +54,7 @@ export class Wrap {
     @MatInputRequire(true)
     title: string = '';
 
+    @MatInputDisplayLabel("Provider", "e.g Google, Facebook, Twitter")
     provider: string = '';
 
     @MatInputTextArea(true)
@@ -63,30 +63,34 @@ export class Wrap {
     @MatInputListSetting(false, true, true)
     tags: string[] = [''] as string[];
 
+    @MatInputDisplayLabel("Icon url", "e.g https://image.png")
     icon: string = '';
     
     @MatInputEnum(WrapHotKey)
     @MatInputDisplayLabel('Hot key')
     hotKey: WrapHotKey = WrapHotKey.NONE;
 
+    @MatInputDisplayLabel('Wrap')
     color: RgbColor = new RgbColor();
 
     @MatInputListSetting(false, true, true)
     links: Link[] = [new Link()] as Link[];
+
+    @MatInputDisplayLabel('Background picture url', 'e.g https://image.png')
+    backgroundPicture: string = '';
 
     @MatInputHide(true)
     children: Wrap[] = [];
 }
 
 export class Link {
-    bubble: string = ''; //fancy name for mode
-    
+    @MatInputDisplayLabel('Label', 'e.g dev, prod, stage')
     label: string = '';
 
-    @MatInputDisplayLabel('Service Url')
+    @MatInputDisplayLabel('Service Url', 'e.g https://service.com')
     serviceUrl: string = '';
 
-    @MatInputDisplayLabel('Status Check Url')
+    @MatInputDisplayLabel('Status Check Url', 'e.g https://service.com')
     statusCheckUrl: string = '';
 
     @MatInputListSetting(false, true, true)
@@ -101,9 +105,9 @@ export class Link {
 }
 
 export class Header {
-    @MatInputDisplayLabel('Header')
+    @MatInputDisplayLabel('Header', 'e.g Authorization')
     name: string = '';
 
-    @MatInputDisplayLabel('Header Value')
+    @MatInputDisplayLabel('Header Value', 'e.g Bearer ...')
     value: string = '';
 }

@@ -61,6 +61,16 @@
         label="Wrap"
         styleWidth="100%"
         ></app-mat-form-field-input-rgb-color-picker>
+        <br>
+      </li>
+      <li>
+        <app-mat-form-field-input
+        [(value)]="wrap.backgroundPicture"
+        label="Background picture url"
+        placeholder="e.g https://image.jpg"
+        styleWidth="100%"
+        [blankObject]="''"
+        ></app-mat-form-field-input>
       </li>
     </ul>
   </ng-template>

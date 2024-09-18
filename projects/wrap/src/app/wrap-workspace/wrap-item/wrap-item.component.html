@@ -9,6 +9,19 @@
       </mat-icon>
     </mat-card-header>
     <mat-card-content>
+      <ng-container *ngIf="wrap.links && wrap.links.length > 0">
+        <ng-container *ngFor="let link of wrap.links">
+          <mat-icon 
+          *ngIf="link.enableStatusCheck && link.statusCheckUrl" 
+          [ngStyle]="getNgStyleLinkCheck(link)"
+          [matTooltip]="statusUrlMap.get(link.statusCheckUrl) + ' ' + link.statusCheckUrl"
+          matTooltipClass="tooltip-multiline" 
+          matTooltipPosition="above" 
+          viescloudClickStopPropagation>
+            lens
+          </mat-icon>
+        </ng-container>
+      </ng-container>
       <p class="multiline">{{wrap.description}}</p>
     </mat-card-content>
     <mat-card-footer *ngIf="mode === Mode.EDIT">
