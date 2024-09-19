@@ -1,7 +1,7 @@
 <ng-container *ngIf="wrap.type === WrapType.ITEM; else Else" >
   <mat-card appearance="outlined" class="cursor-hover" (click)="open(wrap)" [ngStyle]="getNgStyle(wrap)">
     <mat-card-header>
-      <div mat-card-avatar [ngStyle]="{background: 'url(' + wrap.icon + ')', backgroundSize: 'cover'}"></div>
+      <img mat-card-avatar [src]="wrap.icon" alt="!?"/>
       <mat-card-title>{{wrap.title}}</mat-card-title>
       <mat-card-subtitle *ngIf="wrap.hotKey !== WrapHotKey.NONE">Hot Key: {{wrap.hotKey}}</mat-card-subtitle>
       <mat-icon (click)="displayItemTooltip(wrap)" [matTooltip]="getItemTooltip(wrap)" matTooltipClass="tooltip-multiline" matTooltipPosition="above" viescloudClickStopPropagation>
