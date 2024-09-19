@@ -29,6 +29,8 @@ export class WrapComponent extends TrackByIndex implements OnInit {
   searchText: string = '';
   searchOptions: string[] = [];
 
+  Mode = WrapMode;
+
   constructor(
     private matDialog: MatDialog, 
     private wrapService: WrapService,
@@ -84,6 +86,21 @@ export class WrapComponent extends TrackByIndex implements OnInit {
         }
       }
     })
+  }
+
+  getFilteredWraps(): Wrap[] {
+    let containTuples = this.wrapService.containMap.get(this.wrapWorkspace);
+    if(!containTuples) 
+      return [];
+
+    let result = new Set<Wrap>();
+    containTuples.forEach(tuple => {
+      if(tuple.first.includes(this.searchText)) {
+        result.add(tuple.second);
+      }
+    })
+
+    return Array.from(result);
   }
 
 }

@@ -3,6 +3,7 @@ import { Wrap, WrapWorkspace } from '../model/Wrap.model';
 import { S3StorageServiceV1 } from './ObjectStorageManager.service';
 import { UtilsService, VFile } from './Utils.service';
 import { MatDialog } from '@angular/material/dialog';
+import { Tuple } from '../model/Mat.model';
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +16,7 @@ export class WrapService {
   wrapWorkspacesCopy: WrapWorkspace[] = [];
 
   suggestionMap: Map<WrapWorkspace, Set<string>> = new Map();
+  containMap: Map<WrapWorkspace, Tuple<string, Wrap>[]> = new Map();
 
   constructor(
     private s3StorageServiceV1: S3StorageServiceV1,
@@ -119,19 +121,37 @@ export class WrapService {
     let suggestions = this.suggestionMap.get(workspace) || new Set<string>;
 
     if(suggestions.size === 0) {
-      this.foreachWrapInWorkspace(workspace, (wrap) => {
+      let tuples: Tuple<string, Wrap>[] = [];
+      this.foreachWrapInWorkspace(workspace, wrap => {
         suggestions.add(wrap.title);
-        if(wrap.tags && wrap.tags.length > 0)
-          wrap.tags.forEach(tag => suggestions.add(tag));
-        if(wrap.provider)
+        tuples.push({first: wrap.title, second: wrap});
+        if(wrap.tags && wrap.tags.length > 0) {
+          wrap.tags.forEach(tag => {
+            suggestions.add(tag);
+            tuples.push({first: tag, second: wrap});
+          });
+        }
+        if(wrap.provider) {
           suggestions.add(wrap.provider);
-        if(wrap.links && wrap.links.length > 0)
-          wrap.links.forEach(link => suggestions.add(link.serviceUrl));
+          tuples.push({first: wrap.provider, second: wrap});
+        }
+        if(wrap.links && wrap.links.length > 0) {
+          wrap.links.forEach(link => {
+            suggestions.add(link.serviceUrl)
+            tuples.push({first: link.serviceUrl, second: wrap});
+          });
+        }
       })
       suggestions.delete('');
+      tuples = tuples.filter(e => e.first);
       this.suggestionMap.set(workspace, suggestions);
+      this.containMap.set(workspace, tuples);
     }
 
     return Array.from(suggestions);
+  }
+
+  getTuples(workspace: WrapWorkspace): Tuple<string, Wrap>[] {
+    return this.containMap.get(workspace) || [];
   }
 }

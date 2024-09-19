@@ -236,6 +236,11 @@ export class SharedUser {
     }
 }
 
+export interface Tuple<T, U> {
+    first: T;
+    second: U;
+}
+
 // ------------------------------ Mat input -----------------------------
 
 /**

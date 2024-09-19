@@ -217,6 +217,9 @@ export class Wrap {
     @MatInputRequire(true)
     title: string = '';
 
+    @MatInputListSetting(false, true, true)
+    links: Link[] = [new Link()] as Link[];
+
     @MatInputDisplayLabel("Provider", "e.g Google, Facebook, Twitter")
     provider: string = '';
 
@@ -235,9 +238,6 @@ export class Wrap {
 
     @MatInputDisplayLabel('Wrap')
     color: RgbColor = new RgbColor();
-
-    @MatInputListSetting(false, true, true)
-    links: Link[] = [new Link()] as Link[];
 
     @MatInputDisplayLabel('Background picture url', 'e.g https://image.png')
     backgroundPicture: string = '';

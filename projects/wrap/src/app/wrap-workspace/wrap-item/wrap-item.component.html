@@ -12,9 +12,10 @@
       <ng-container *ngIf="wrap.links && wrap.links.length > 0">
         <ng-container *ngFor="let link of wrap.links">
           <mat-icon 
+          (click)="openLink(link)"
           *ngIf="link.enableStatusCheck && link.statusCheckUrl" 
           [ngStyle]="getNgStyleLinkCheck(link)"
-          [matTooltip]="statusUrlMap.get(link.statusCheckUrl) + ' ' + link.statusCheckUrl"
+          [matTooltip]="statusUrlMap.get(link.statusCheckUrl) + ' ' + link.serviceUrl"
           matTooltipClass="tooltip-multiline" 
           matTooltipPosition="above" 
           viescloudClickStopPropagation>
