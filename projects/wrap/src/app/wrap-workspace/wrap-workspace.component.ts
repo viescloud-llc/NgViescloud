@@ -239,4 +239,24 @@ export class WrapWorkspaceComponent implements OnInit, OnDestroy {
       }
     })
   }
+
+  reSync() {
+    let dialog = this.matDialog.open(ConfirmDialog, {
+      data: {
+        message: 'Are you sure you want to re-sync?\nNote: All your changes locally will be lost.',
+        title: 'Re-sync',
+        yes: 'Re-sync',
+        no: 'Cancel'
+      },
+      width: '100%'
+    })
+
+    dialog.afterClosed().subscribe({
+      next: res => {
+        if(res) {
+          this.wrapService.reSync();
+        }
+      }
+    })
+  }
 }

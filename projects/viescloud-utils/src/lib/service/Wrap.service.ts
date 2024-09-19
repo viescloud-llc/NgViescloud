@@ -31,20 +31,24 @@ export class WrapService {
         resolve();
       }
       else {
-        this.s3StorageServiceV1.getFileByFileName(this.WRAP_WORKSPACE).pipe(UtilsService.waitLoadingDialog(this.matDialog)).subscribe({
-          next: (data) => {
-            UtilsService.readBlobAsText(data).then((data) => {
-              this.setWorkspaces(JSON.parse(data));
-              this.saveThisWorkspacesLocally();
-              resolve();
-            })
-          },
-          error: (error) => {
-            reject();
-          }
-        })
+        this.syncToServer(resolve, reject);
       }
     })
+  }
+
+  private syncToServer(resolve: (value: void | PromiseLike<void>) => void, reject: (reason?: any) => void) {
+    this.s3StorageServiceV1.getFileByFileName(this.WRAP_WORKSPACE).pipe(UtilsService.waitLoadingDialog(this.matDialog)).subscribe({
+      next: (data) => {
+        UtilsService.readBlobAsText(data).then((data) => {
+          this.setWorkspaces(JSON.parse(data));
+          this.saveThisWorkspacesLocally();
+          resolve();
+        });
+      },
+      error: (error) => {
+        reject();
+      }
+    });
   }
 
   private setWorkspaces(workspacesLocal: WrapWorkspace[]) {
@@ -153,5 +157,11 @@ export class WrapService {
 
   getTuples(workspace: WrapWorkspace): Tuple<string, Wrap>[] {
     return this.containMap.get(workspace) || [];
+  }
+
+  reSync() {
+    return new Promise<void>((resolve, reject) => {
+      this.syncToServer(resolve, reject);
+    }) 
   }
 }
