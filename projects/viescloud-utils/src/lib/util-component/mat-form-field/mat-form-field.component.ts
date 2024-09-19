@@ -208,6 +208,6 @@ export class MatFormFieldComponent extends FixChangeDetection implements OnInit,
   }
 
   isValueRgbColor(): boolean {
-    return this.value instanceof RgbColor;
+    return this.value instanceof RgbColor || (this.blankObject && this.blankObject instanceof RgbColor);
   }
 }
