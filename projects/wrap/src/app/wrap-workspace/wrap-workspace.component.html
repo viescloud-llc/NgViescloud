@@ -20,6 +20,7 @@
   <li *ngIf="mode !== Mode.VIEW && currentWorkSpaceIndex >= 0">
     <button mat-raised-button color="warn" (click)="removeThisWorkspace()">Remove this workspace</button>
     <button mat-raised-button color="primary" (click)="changeWorkspaceName()">Change Workspace name</button>
+    <button mat-raised-button color="primary" (click)="changeWorkspaceCorsProxyUrl()">Change Workspace Cors Proxy URL</button>
   </li>
   <li *ngIf="mode !== Mode.VIEW">
     <br>

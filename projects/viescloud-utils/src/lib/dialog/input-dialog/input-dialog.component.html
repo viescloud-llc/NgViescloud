@@ -4,6 +4,7 @@
   *ngIf="!data.multipleLine"
   [label]="label"
   [value]="input" (valueChange)="input = $event.toString()"
+  [placeholder]="data.placeholder ?? ''"
   [autoResize]="true"
   styleWidth="100%"
   ></app-mat-form-field-input>
@@ -11,6 +12,7 @@
   *ngIf="data.multipleLine"
   [label]="label"
   [value]="input" (valueChange)="input = $event.toString()"
+  [placeholder]="data.placeholder ?? ''"
   cols="50"
   rows="10"
   styleWidth="100%"

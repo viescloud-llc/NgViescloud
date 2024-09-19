@@ -28,6 +28,9 @@ export class WrapItemComponent extends TrackByIndex implements OnInit, OnDestroy
   @Input()
   mode!: WrapMode;
 
+  @Input()
+  corsProxyUrl: string = '';
+
   @Output()
   modeChange: EventEmitter<WrapMode> = new EventEmitter();
 
@@ -83,6 +86,7 @@ export class WrapItemComponent extends TrackByIndex implements OnInit, OnDestroy
     if (this.wrap.links && this.wrap.links.length > 0) {
       this.wrap.links.forEach(link => {
         if (link.enableStatusCheck && link.statusCheckUrl) {
+          
           let headers = new HttpHeaders();
           if (link.statusCheckHeaders && link.statusCheckHeaders.length > 0) {
             link.statusCheckHeaders.forEach(header => {
@@ -90,7 +94,7 @@ export class WrapItemComponent extends TrackByIndex implements OnInit, OnDestroy
             });
           }
 
-          this.httpClient.get(link.statusCheckUrl, { headers: headers, observe: 'response' }).subscribe({
+          this.httpClient.get(`${this.corsProxyUrl}${link.statusCheckUrl}`, { headers: headers, observe: 'response' }).subscribe({
             next: (response: HttpResponse<any>) => {
               this.statusUrlMap.set(link.statusCheckUrl, response.status);
             },

@@ -68,6 +68,7 @@
           [wrap]="item" 
           (wrapChange)="wrap.children[i] = $event" 
           [(mode)]="mode"
+          [corsProxyUrl]="corsProxyUrl"
           (onMoveLeft)="moveLeft(i)"
           (onMoveRight)="moveRight(i)"
           (onDelete)="deleteWrap(i)"

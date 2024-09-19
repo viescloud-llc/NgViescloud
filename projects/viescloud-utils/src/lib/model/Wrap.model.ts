@@ -207,6 +207,7 @@ export enum WrapStatusAcceptResponseCode {
 export class WrapWorkspace {
     name: string = '';
     backgroundPicture: string = '';
+    corsProxyUrl: string = 'https://thingproxy.freeboard.io/fetch/';
     wraps: Wrap[] = [];
 }
 

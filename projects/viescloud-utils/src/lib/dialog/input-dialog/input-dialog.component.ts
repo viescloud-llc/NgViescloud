@@ -14,7 +14,7 @@ export class InputDialog implements OnInit {
   label: string = 'Input';
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: { title: string, label?: string, yes?: string, no?: string, multipleLine: boolean, input?: string }
+    @Inject(MAT_DIALOG_DATA) public data: { title: string, label?: string, yes?: string, no?: string, multipleLine: boolean, input?: string , placeholder?: string}
   ) { }
 
   ngOnInit() {

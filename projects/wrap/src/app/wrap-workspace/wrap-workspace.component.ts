@@ -259,4 +259,26 @@ export class WrapWorkspaceComponent implements OnInit, OnDestroy {
       }
     })
   }
+
+  changeWorkspaceCorsProxyUrl() {
+    let dialog = this.matDialog.open(InputDialog, {
+      data: {
+        title: 'Change Workspace CORS Proxy URL',
+        label: 'CORS Proxy URL',
+        yes: 'OK',
+        no: 'Cancel',
+        input: this.wrapService.wrapWorkspaces[this.currentWorkSpaceIndex].corsProxyUrl,
+        placeholder: 'e.g https://cors-anywhere.herokuapp.com/'
+      },
+      width: '100%'
+    })
+
+    dialog.afterClosed().subscribe({
+      next: res => {
+        if(res) {
+          this.wrapService.wrapWorkspaces[this.currentWorkSpaceIndex].corsProxyUrl = res;
+        }
+      }
+    })
+  }
 }
