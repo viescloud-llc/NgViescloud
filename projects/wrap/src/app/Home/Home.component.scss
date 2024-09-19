@@ -1,61 +1,74 @@
-// Define some colors for the site
-$primary-color: #3498db;
-$secondary-color: #2ecc71;
-$background-color: #f4f4f4;
-$text-color: #333;
+/* Color palette */
+$background-color: #f5f7fa; /* Light neutral background */
+$primary-color: #2c3e50;    /* Dark blue-gray for text */
+$accent-color: #3498db;     /* Blue accent */
+$feature-bg: #ecf0f1;       /* Soft gray background for features */
+$footer-bg: #34495e;        /* Dark blue-gray for footer */
+$text-light: #bdc3c7;       /* Light gray for footer text */
 
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: $background-color;
-    color: $text-color;
+/* Global styles */
+html, body {
+  height: 100%; /* Full height for sticky footer */
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Arial', sans-serif;
+  background-color: $background-color;
+  color: $primary-color;
+  line-height: 1.6;
 }
 
 header {
-    background-color: $primary-color;
-    color: #fff;
-    text-align: center;
-    padding: 2rem;
-    
-    h1 {
-        margin: 0;
-        font-size: 2.5rem;
-    }
-    
-    p {
-        font-size: 1.2rem;
-    }
+  background-color: $accent-color;
+  color: white;
+  text-align: center;
+  padding: 2rem;
+  h1 {
+    font-size: 2.5rem;
+    margin: 0;
+  }
+  p {
+    font-size: 1.2rem;
+    margin: 0.5rem 0 0;
+  }
 }
 
 main {
-    padding: 2rem;
-    
-    .features {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-around;
-        
-        .feature {
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin: 1rem;
-            padding: 1.5rem;
-            width: calc(33% - 2rem);
-            text-align: center;
-            
-            h2 {
-                color: $secondary-color;
-                margin-top: 0;
-            }
-            
-            p {
-                font-size: 1rem;
-            }
-        }
+  flex: 1; /* Makes main content take up available space */
+  padding: 2rem;
+}
+
+.features {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-top: 2rem;
+
+  .feature {
+    background-color: $feature-bg;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    flex: 1;
+    text-align: center;
+
+    h2 {
+      color: $primary-color;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
     }
+
+    p {
+      font-size: 1rem;
+      color: darken($primary-color, 10%);
+    }
+
+    &:hover {
+      background-color: lighten($feature-bg, 5%);
+      transform: translateY(-5px);
+      transition: 0.3s ease;
+    }
+  }
 }
 
 footer {
