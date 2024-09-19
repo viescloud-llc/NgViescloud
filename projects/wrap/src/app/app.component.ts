@@ -27,6 +27,7 @@ export class AppComponent {
           title: 'Login',
           routerLink: '/login',
           hideConditional: () => this.authenticatorService.isLoginB,
+          click: () => this.openIdService.authorizeFlow()
         },
         {
           title: 'logout',
