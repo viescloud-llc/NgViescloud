@@ -9,7 +9,9 @@
       </mat-icon>
     </mat-card-header>
     <mat-card-content>
-      <ng-container *ngIf="wrap.links && wrap.links.length > 0">
+
+      <!-- TODO find a better link status check althernative -->
+      <!-- <ng-container *ngIf="wrap.links && wrap.links.length > 0">
         <ng-container *ngFor="let link of wrap.links">
           <mat-icon 
           (click)="openLink(link)"
@@ -22,7 +24,8 @@
             lens
           </mat-icon>
         </ng-container>
-      </ng-container>
+      </ng-container> -->
+
       <p class="multiline">{{wrap.description}}</p>
     </mat-card-content>
     <mat-card-footer *ngIf="mode === Mode.EDIT">

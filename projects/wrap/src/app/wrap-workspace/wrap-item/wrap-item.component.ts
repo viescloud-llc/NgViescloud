@@ -83,28 +83,30 @@ export class WrapItemComponent extends TrackByIndex implements OnInit, OnDestroy
   }
 
   private statusCheck() {
-    if (this.wrap.links && this.wrap.links.length > 0) {
-      this.wrap.links.forEach(link => {
-        if (link.enableStatusCheck && link.statusCheckUrl) {
-          
-          let headers = new HttpHeaders();
-          if (link.statusCheckHeaders && link.statusCheckHeaders.length > 0) {
-            link.statusCheckHeaders.forEach(header => {
-              headers.append(header.name, header.value);
-            });
-          }
+    //TODO find a better link status check althernative
 
-          this.httpClient.get(`${this.corsProxyUrl}${link.statusCheckUrl}`, { headers: headers, observe: 'response' }).subscribe({
-            next: (response: HttpResponse<any>) => {
-              this.statusUrlMap.set(link.statusCheckUrl, response.status);
-            },
-            error: (response: HttpResponse<any>) => {
-              this.statusUrlMap.set(link.statusCheckUrl, response.status);
-            }
-          });
-        }
-      });
-    }
+    // if (this.wrap.links && this.wrap.links.length > 0) {
+    //   this.wrap.links.forEach(link => {
+    //     if (link.enableStatusCheck && link.statusCheckUrl) {
+          
+    //       let headers = new HttpHeaders();
+    //       if (link.statusCheckHeaders && link.statusCheckHeaders.length > 0) {
+    //         link.statusCheckHeaders.forEach(header => {
+    //           headers.append(header.name, header.value);
+    //         });
+    //       }
+
+    //       this.httpClient.get(`${this.corsProxyUrl}${link.statusCheckUrl}`, { headers: headers, observe: 'response' }).subscribe({
+    //         next: (response: HttpResponse<any>) => {
+    //           this.statusUrlMap.set(link.statusCheckUrl, response.status);
+    //         },
+    //         error: (response: HttpResponse<any>) => {
+    //           this.statusUrlMap.set(link.statusCheckUrl, response.status);
+    //         }
+    //       });
+    //     }
+    //   });
+    // }
   }
 
   open(wrap: Wrap) {

@@ -254,16 +254,20 @@ export class Link {
     @MatInputDisplayLabel('Service Url', 'e.g https://service.com')
     serviceUrl: string = '';
 
+    @MatInputHide(true)
     @MatInputDisplayLabel('Status Check Url', 'e.g https://service.com')
     statusCheckUrl: string = '';
 
+    @MatInputHide(true)
     @MatInputListSetting(false, true, true)
     statusCheckHeaders: Header[] = [new Header()] as Header[];
 
+    @MatInputHide(true)
     @MatInputEnum(WrapStatusAcceptResponseCode)
     @MatInputDisplayLabel('Status Check Accept Response Code')
     statusCheckAcceptResponseCode: WrapStatusAcceptResponseCode = WrapStatusAcceptResponseCode.OK;
 
+    @MatInputHide(true)
     @MatInputDisplayLabel('Enable Status Check')
     enableStatusCheck: boolean = false;
 }
