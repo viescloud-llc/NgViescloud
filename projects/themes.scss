@@ -1,0 +1,202 @@
+@import '@angular/material/theming';
+@include mat-core();
+
+// Dark Themes
+$indigo-pink-dark: mat-dark-theme((
+  color: (
+    primary: mat-palette($mat-indigo),
+    accent: mat-palette($mat-pink),
+    warn: mat-palette($mat-red),
+  )
+));
+
+// Existing Dark Themes
+$pink-blue-dark: mat-dark-theme((
+  color: (
+    primary: mat-palette($mat-pink),
+    accent: mat-palette($mat-blue),
+    warn: mat-palette($mat-deep-orange),
+  )
+));
+
+$purple-green-dark: mat-dark-theme((
+  color: (
+    primary: mat-palette($mat-purple),
+    accent: mat-palette($mat-green),
+    warn: mat-palette($mat-deep-orange),
+  )
+));
+
+$deep-purple-amber-dark: mat-dark-theme((
+  color: (
+    primary: mat-palette($mat-deep-purple),
+    accent: mat-palette($mat-amber),
+    warn: mat-palette($mat-red),
+  )
+));
+
+// New Dark Themes
+$teal-amber-dark: mat-dark-theme((
+  color: (
+    primary: mat-palette($mat-teal),
+    accent: mat-palette($mat-amber),
+    warn: mat-palette($mat-red),
+  )
+));
+
+$blue-orange-dark: mat-dark-theme((
+  color: (
+    primary: mat-palette($mat-blue),
+    accent: mat-palette($mat-orange),
+    warn: mat-palette($mat-red),
+  )
+));
+
+$brown-green-dark: mat-dark-theme((
+  color: (
+    primary: mat-palette($mat-brown),
+    accent: mat-palette($mat-green),
+    warn: mat-palette($mat-red),
+  )
+));
+
+$cyan-deep-purple-dark: mat-dark-theme((
+  color: (
+    primary: mat-palette($mat-cyan),
+    accent: mat-palette($mat-deep-purple),
+    warn: mat-palette($mat-red),
+  )
+));
+
+// Light Themes
+$indigo-pink-light: mat-light-theme((
+  color: (
+    primary: mat-palette($mat-indigo),
+    accent: mat-palette($mat-pink),
+    warn: mat-palette($mat-red),
+  )
+));
+
+// Existing Light Themes
+$pink-blue-light: mat-light-theme((
+  color: (
+    primary: mat-palette($mat-pink),
+    accent: mat-palette($mat-blue),
+    warn: mat-palette($mat-deep-orange),
+  )
+));
+
+$purple-green-light: mat-light-theme((
+  color: (
+    primary: mat-palette($mat-purple),
+    accent: mat-palette($mat-green),
+    warn: mat-palette($mat-deep-orange),
+  )
+));
+
+$deep-purple-amber-light: mat-light-theme((
+  color: (
+    primary: mat-palette($mat-deep-purple),
+    accent: mat-palette($mat-amber),
+    warn: mat-palette($mat-red),
+  )
+));
+
+// New Light Themes
+$teal-amber-light: mat-light-theme((
+  color: (
+    primary: mat-palette($mat-teal),
+    accent: mat-palette($mat-amber),
+    warn: mat-palette($mat-red),
+  )
+));
+
+$blue-orange-light: mat-light-theme((
+  color: (
+    primary: mat-palette($mat-blue),
+    accent: mat-palette($mat-orange),
+    warn: mat-palette($mat-red),
+  )
+));
+
+$brown-green-light: mat-light-theme((
+  color: (
+    primary: mat-palette($mat-brown),
+    accent: mat-palette($mat-green),
+    warn: mat-palette($mat-red),
+  )
+));
+
+$cyan-deep-purple-light: mat-light-theme((
+  color: (
+    primary: mat-palette($mat-cyan),
+    accent: mat-palette($mat-deep-purple),
+    warn: mat-palette($mat-red),
+  )
+));
+
+// Create separate classes for each theme
+.theme-indigo-pink-dark {
+  @include angular-material-theme($indigo-pink-dark);
+}
+
+.theme-pink-blue-dark {
+  @include angular-material-theme($pink-blue-dark);
+}
+
+.theme-purple-green-dark {
+  @include angular-material-theme($purple-green-dark);
+}
+
+.theme-deep-purple-amber-dark {
+  @include angular-material-theme($deep-purple-amber-dark);
+}
+
+.theme-teal-amber-dark {
+  @include angular-material-theme($teal-amber-dark);
+}
+
+.theme-blue-orange-dark {
+  @include angular-material-theme($blue-orange-dark);
+}
+
+.theme-brown-green-dark {
+  @include angular-material-theme($brown-green-dark);
+}
+
+.theme-cyan-deep-purple-dark {
+  @include angular-material-theme($cyan-deep-purple-dark);
+}
+
+// Light Themes
+.theme-indigo-pink-light {
+  @include angular-material-theme($indigo-pink-light);
+}
+
+.theme-pink-blue-light {
+  @include angular-material-theme($pink-blue-light);
+}
+
+.theme-purple-green-light {
+  @include angular-material-theme($purple-green-light);
+}
+
+.theme-deep-purple-amber-light {
+  @include angular-material-theme($deep-purple-amber-light);
+}
+
+.theme-teal-amber-light {
+  @include angular-material-theme($teal-amber-light);
+}
+
+.theme-blue-orange-light {
+  @include angular-material-theme($blue-orange-light);
+}
+
+.theme-brown-green-light {
+  @include angular-material-theme($brown-green-light);
+}
+
+.theme-cyan-deep-purple-light {
+  @include angular-material-theme($cyan-deep-purple-light);
+}

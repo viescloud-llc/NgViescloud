@@ -5,7 +5,6 @@ import { AuthenticatorService } from '../../service/Authenticator.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialog } from '../../dialog/confirm-dialog/confirm-dialog.component';
 import { UtilsService } from '../../service/Utils.service';
-import { MatOption, PrebuildTheme } from '../../model/Mat.model';
 
 @Component({
   selector: 'app-application-setting',

@@ -1,15 +1,11 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable, Renderer2 } from '@angular/core';
-import { Router } from '@angular/router';
 import { environment } from 'projects/environments/environment.prod';
 import { DRAWER_STATE, HeaderComponent } from '../share-component/header/header.component';
 import { S3StorageServiceV1 } from './ObjectStorageManager.service';
 import { UtilsService, VFile } from './Utils.service';
 import { GeneralSetting } from '../model/Setting.model';
-import { AuthenticatorService } from './Authenticator.service';
 import { MatDialog } from '@angular/material/dialog';
-import { MatOption, PrebuildTheme } from '../model/Mat.model';
-import { OverlayContainer } from '@angular/cdk/overlay';
+import { MatTheme } from '../model/theme.model';
 
 @Injectable({
   providedIn: 'root'
@@ -17,20 +13,19 @@ import { OverlayContainer } from '@angular/cdk/overlay';
 export class SettingService {
   private GENERAL_SETTING_KEY = 'generalSetting.json';
   private generalSetting: GeneralSetting = new GeneralSetting();
-  private prebuildThemes = UtilsService.getEnumValues(PrebuildTheme) as string[];
+  private matThemes = UtilsService.getEnumValues(MatTheme) as string[];
   
   prefix = '';
   currentMenu = "main";
   apiGatewayUrl: string = environment.gateway_api;
   backgroundImageUrl: string = '';
   header?: HeaderComponent;
-  currentTheme: PrebuildTheme = PrebuildTheme.PURPLE_GREEN;
-  matThemeOptions = UtilsService.getEnumMatOptions(PrebuildTheme);
+  currentTheme: MatTheme = MatTheme.TealAmberLight;
+  matThemeOptions = UtilsService.getEnumMatOptions(MatTheme);
 
   constructor(
     private s3StorageService: S3StorageServiceV1,
-    private matDialog: MatDialog,
-    private overlayContainer: OverlayContainer
+    private matDialog: MatDialog
   ) { }
 
   init(prefix: string) {
@@ -111,15 +106,12 @@ export class SettingService {
     });
   }
 
-  changeTheme(prebuildTheme: PrebuildTheme) {
+  changeTheme(matTheme: MatTheme) {
     // Remove any previous theme class from the body
-    // document.body.classList.remove(... this.prebuildThemes);
+    document.body.classList.remove(... this.matThemes);
     
     // Add the selected theme class
-    // document.body.classList.add(prebuildTheme);
-
-    this.overlayContainer.getContainerElement().classList.remove(... this.prebuildThemes);
-    this.overlayContainer.getContainerElement().classList.add(prebuildTheme);
+    document.body.classList.add(matTheme);
   }
 
   changeToCurrentTheme() {

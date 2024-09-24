@@ -2,7 +2,6 @@ import { Component, HostListener, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { KeyCaptureService } from '../../service/KeyCapture.service';
 import { SettingService } from '../../service/Setting.service';
-import { PrebuildTheme } from '../../model/Mat.model';
 
 @Component({
   selector: 'app-ViescloudApplication',
