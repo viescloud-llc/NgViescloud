@@ -16,6 +16,12 @@
     ></app-mat-form-field-input-dynamic>
   </li>
   <li>
+    <app-mat-form-field-input-option
+    label="Theme"
+    noneLabel=""
+    ></app-mat-form-field-input-option>
+  </li>
+  <li>
     <button mat-raised-button color="primary" (click)="saveLocally()" [disabled]="!isValueChange()">Save Locally</button>
     <button mat-raised-button color="primary" (click)="saveToServer()" [disabled]="!authenticatorService.isLoginB">Save to Server</button>
   </li>

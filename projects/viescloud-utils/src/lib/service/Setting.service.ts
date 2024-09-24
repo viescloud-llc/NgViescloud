@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, Renderer2 } from '@angular/core';
 import { Router } from '@angular/router';
 import { environment } from 'projects/environments/environment.prod';
 import { DRAWER_STATE, HeaderComponent } from '../share-component/header/header.component';
@@ -24,7 +24,8 @@ export class SettingService {
 
   constructor(
     private s3StorageService: S3StorageServiceV1,
-    private matDialog: MatDialog
+    private matDialog: MatDialog,
+    
   ) { }
 
   init(prefix: string) {
@@ -101,6 +102,19 @@ export class SettingService {
     this.s3StorageService.putOrPostFile(vFile, false, this.matDialog).then((data) => {}).catch((error) => {
       window.alert(error);
     });
+  }
+
+  changeTheme(theme: string) {
+    // Remove any previous theme class from the body
+    document.body.classList.remove(
+      'theme-indigo-pink',
+      'theme-deeppurple-amber',
+      'theme-purple-green',
+      'theme-pink-bluegrey'
+    );
+    
+    // Add the selected theme class
+    document.body.classList.add(theme);
   }
 
 }

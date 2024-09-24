@@ -26,6 +26,7 @@ import { TooltipDirective } from '../directive/Tooltip.directive';
 import { ApplicationSettingComponent } from '../share-component/application-setting/application-setting.component';
 import { MatFormFieldInputRgbColorPickerComponent } from '../util-component/mat-form-field-input-rgb-color-picker/mat-form-field-input-rgb-color-picker.component';
 import { DisableKeyCaptureOnInputDirective } from '../directive/DisableKeyCaptureOnInput.directive';
+import { ViescloudApplication } from '../share-component/ViescloudApplication/ViescloudApplication.component';
 
 const UTILS = [
   CopyToClipboardUtilComponent,
@@ -47,7 +48,8 @@ const UTILS = [
   ClickStopPropagationDirective,
   TooltipDirective,
   ApplicationSettingComponent,
-  DisableKeyCaptureOnInputDirective
+  DisableKeyCaptureOnInputDirective,
+  ViescloudApplication
 ]
 
 const COMPONENTS = [

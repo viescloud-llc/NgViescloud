@@ -53,5 +53,4 @@ export class ApplicationSettingComponent implements OnInit {
   isValueChange(): boolean {
     return !UtilsService.isEqual(this.generalSetting, this.generalSettingCopy);
   }
-
 }
