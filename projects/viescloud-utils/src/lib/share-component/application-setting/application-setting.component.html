@@ -19,6 +19,9 @@
     <app-mat-form-field-input-option
     label="Theme"
     noneLabel=""
+    [(value)]="settingService.currentTheme"
+    [options]="settingService.matThemeOptions"
+    (valueChange)="settingService.changeToCurrentTheme()"
     ></app-mat-form-field-input-option>
   </li>
   <li>

@@ -8,6 +8,8 @@ import { UtilsService, VFile } from './Utils.service';
 import { GeneralSetting } from '../model/Setting.model';
 import { AuthenticatorService } from './Authenticator.service';
 import { MatDialog } from '@angular/material/dialog';
+import { MatOption, PrebuildTheme } from '../model/Mat.model';
+import { OverlayContainer } from '@angular/cdk/overlay';
 
 @Injectable({
   providedIn: 'root'
@@ -15,17 +17,20 @@ import { MatDialog } from '@angular/material/dialog';
 export class SettingService {
   private GENERAL_SETTING_KEY = 'generalSetting.json';
   private generalSetting: GeneralSetting = new GeneralSetting();
+  private prebuildThemes = UtilsService.getEnumValues(PrebuildTheme) as string[];
   
   prefix = '';
   currentMenu = "main";
   apiGatewayUrl: string = environment.gateway_api;
   backgroundImageUrl: string = '';
   header?: HeaderComponent;
+  currentTheme: PrebuildTheme = PrebuildTheme.PURPLE_GREEN;
+  matThemeOptions = UtilsService.getEnumMatOptions(PrebuildTheme);
 
   constructor(
     private s3StorageService: S3StorageServiceV1,
     private matDialog: MatDialog,
-    
+    private overlayContainer: OverlayContainer
   ) { }
 
   init(prefix: string) {
@@ -44,6 +49,8 @@ export class SettingService {
     else {
       this.generalSetting = setting;
     }
+
+    this.changeTheme(this.currentTheme);
   }
 
   getCopyOfGeneralSetting(): GeneralSetting {
@@ -104,17 +111,18 @@ export class SettingService {
     });
   }
 
-  changeTheme(theme: string) {
+  changeTheme(prebuildTheme: PrebuildTheme) {
     // Remove any previous theme class from the body
-    document.body.classList.remove(
-      'theme-indigo-pink',
-      'theme-deeppurple-amber',
-      'theme-purple-green',
-      'theme-pink-bluegrey'
-    );
+    // document.body.classList.remove(... this.prebuildThemes);
     
     // Add the selected theme class
-    document.body.classList.add(theme);
+    // document.body.classList.add(prebuildTheme);
+
+    this.overlayContainer.getContainerElement().classList.remove(... this.prebuildThemes);
+    this.overlayContainer.getContainerElement().classList.add(prebuildTheme);
   }
 
+  changeToCurrentTheme() {
+    this.changeTheme(this.currentTheme);
+  }
 }

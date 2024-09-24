@@ -47,6 +47,13 @@ export enum UserPermission {
     DELETE = "DELETE"
 }
 
+export enum PrebuildTheme {
+    INDIGO_PINK = 'theme-indigo-pink',
+    DEEP_PURPLE_AMBER = 'theme-deeppurple-amber',
+    PURPLE_GREEN = 'theme-purple-green',
+    PINK_BLUEGREY = 'theme-pink-bluegrey'
+}
+
 export class MatItemSetting {
     type: MatItemSettingType | string;
     value: any;
