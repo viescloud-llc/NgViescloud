@@ -4,7 +4,7 @@
   <input 
   #input 
   matInput 
-  [ngStyle]="{color: error ? 'red' : defaultTextColor}" 
+  [ngStyle]="getInputColorNgStyle()" 
   [type]="defaultType" 
   (keyup.enter)="emitEnter()" 
   (keydown)="addKey($event)"
@@ -22,7 +22,7 @@
   <mat-hint *ngIf="isValueString() && maxlength" align="end">{{value.toString().length}} / {{maxlength}}</mat-hint>
   <mat-hint *ngIf="showMinMaxHint && isValueNumber() && value" align="end">
     <ng-container *ngIf="min">{{min + '\<'}}</ng-container>
-    <span [ngStyle]="{color: exceedMax() || exceedMin() ? 'red' : defaultTextColor}">{{value}}</span>
+    <span [ngStyle]="getInputHintColorNgStyle()">{{value}}</span>
     <ng-container *ngIf="max">{{'\<' + max}}</ng-container>
   </mat-hint>
 

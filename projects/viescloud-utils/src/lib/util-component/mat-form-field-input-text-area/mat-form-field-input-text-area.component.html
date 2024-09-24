@@ -3,7 +3,7 @@
   <textarea 
   #input 
   matInput 
-  [ngStyle]="{color: error ? 'red' : defaultTextColor}" 
+  [ngStyle]="getInputColorNgStyle()" 
   [(ngModel)]="value" 
   (ngModelChange)="emitValueWithCondition();" 
   (keyup.enter)="emitEnter()" 

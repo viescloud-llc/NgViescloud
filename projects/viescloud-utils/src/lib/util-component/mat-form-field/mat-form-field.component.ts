@@ -61,7 +61,8 @@ export class MatFormFieldComponent extends FixChangeDetection implements OnInit,
   @Input()
   autoResize: boolean = false;
 
-  defaultTextColor = 'black';
+  @Input()
+  defaultErrorTextColor = 'red';
   
   //key capture
   keyDown: string[] = [];
@@ -209,5 +210,15 @@ export class MatFormFieldComponent extends FixChangeDetection implements OnInit,
 
   isValueRgbColor(): boolean {
     return this.value instanceof RgbColor || (this.blankObject && this.blankObject instanceof RgbColor);
+  }
+
+  getInputColorNgStyle() {
+    if(this.error) {
+      return {
+        color: this.defaultErrorTextColor
+      }
+    }
+    else  
+     return {};
   }
 }

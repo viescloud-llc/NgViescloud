@@ -291,4 +291,14 @@ export class MatFormFieldInputComponent extends MatFormFieldComponent {
   override isValueNumber(): boolean {
     return this.defaultType === 'number' || typeof this.value === 'number';
   }
+
+  getInputHintColorNgStyle() {
+    if(this.exceedMax() || this.exceedMin()) {
+      return {
+        color: this.defaultErrorTextColor
+      }
+    }
+    else
+      return {}
+  }
 }
