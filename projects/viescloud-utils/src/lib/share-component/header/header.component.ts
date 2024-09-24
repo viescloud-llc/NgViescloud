@@ -21,6 +21,9 @@ export class HeaderComponent implements OnInit {
   @Input()
   drawer?: MatDrawer;
 
+  @Input()
+  imageSrc = '';
+
   constructor(
     public openIdService: OpenIdService,
     public authenticatorService: AuthenticatorService, 
