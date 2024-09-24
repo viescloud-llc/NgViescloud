@@ -41,6 +41,7 @@ export class ApplicationSettingComponent implements OnInit {
     dialog.afterClosed().subscribe(res => {
       if (res) {
         this.settingService.saveSettingLocally(this.generalSetting);
+        this.ngOnInit();
       }
     })
   }

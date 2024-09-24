@@ -20,7 +20,6 @@ export class SettingService {
   apiGatewayUrl: string = environment.gateway_api;
   backgroundImageUrl: string = '';
   header?: HeaderComponent;
-  currentTheme: MatTheme = MatTheme.TealAmberLight;
   matThemeOptions = UtilsService.getEnumMatOptions(MatTheme);
 
   constructor(
@@ -37,15 +36,20 @@ export class SettingService {
         next: (blob) => {
           UtilsService.readBlobAsText(blob).then((data) => {
             this.generalSetting = JSON.parse(data);  
+            this.applySetting();
           })
         }
       })
     }
     else {
       this.generalSetting = setting;
+      this.applySetting();
     }
+  }
 
-    this.changeTheme(this.currentTheme);
+  private applySetting() {
+    this.generalSetting.theme = this.generalSetting.theme ? this.generalSetting.theme : MatTheme.CyanDeepPurpleLight;
+    this.changeTheme(this.generalSetting.theme);
   }
 
   getCopyOfGeneralSetting(): GeneralSetting {
@@ -115,6 +119,6 @@ export class SettingService {
   }
 
   changeToCurrentTheme() {
-    this.changeTheme(this.currentTheme);
+    this.changeTheme(this.generalSetting.theme);
   }
 }

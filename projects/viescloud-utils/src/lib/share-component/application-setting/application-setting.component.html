@@ -1,4 +1,4 @@
-<ul class="margin-center">
+<ul class="margin-center" *ngIf="generalSetting">
   <li><h1 class="text-center">Application Setting</h1></li>
   <li><h4>Display Setting</h4></li>
   <li>
@@ -19,9 +19,9 @@
     <app-mat-form-field-input-option
     label="Theme"
     noneLabel=""
-    [(value)]="settingService.currentTheme"
+    [(value)]="generalSetting.theme"
     [options]="settingService.matThemeOptions"
-    (valueChange)="settingService.changeToCurrentTheme()"
+    (valueChange)="settingService.changeTheme(generalSetting.theme)"
     ></app-mat-form-field-input-option>
   </li>
   <li>
