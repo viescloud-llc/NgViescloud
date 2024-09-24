@@ -193,16 +193,16 @@ export class WrapItemComponent extends TrackByIndex implements OnInit, OnDestroy
     let link: string = 'Links: ';
     wrap.links.forEach((e, i) => {
       link += `\n\t${i + 1}. ${e.label}: ${e.serviceUrl}`
-      link += `\n\t\t- Enable Status Check: ${e.enableStatusCheck ? 'Enabled' : 'Disabled'}`
-      if(e.statusCheckUrl)
-        link += `\n\t\t- Status Check Url: ${e.statusCheckUrl}`
-      if(e.statusCheckHeaders) {
-        e.statusCheckHeaders.forEach((header, j) => {
-          link += `\n\t\t- Status Check Header ${j + 1}: ${header.name}: ${header.value}`
-        })
-      }
-      if(e.statusCheckAcceptResponseCode)
-        link += `\n\t\t- Status Check Accept Response Code: ${e.statusCheckAcceptResponseCode}`
+      // link += `\n\t\t- Enable Status Check: ${e.enableStatusCheck ? 'Enabled' : 'Disabled'}`
+      // if(e.statusCheckUrl)
+      //   link += `\n\t\t- Status Check Url: ${e.statusCheckUrl}`
+      // if(e.statusCheckHeaders) {
+      //   e.statusCheckHeaders.forEach((header, j) => {
+      //     link += `\n\t\t- Status Check Header ${j + 1}: ${header.name}: ${header.value}`
+      //   })
+      // }
+      // if(e.statusCheckAcceptResponseCode)
+      //   link += `\n\t\t- Status Check Accept Response Code: ${e.statusCheckAcceptResponseCode}`
     })
     return link;
   }

@@ -29,7 +29,7 @@ export class WrapLinkDialog implements OnInit {
 
   getToolTip(link: Link) {
     if(this.statusUrlMap) {
-      return `${this.statusUrlMap.get(link.statusCheckUrl)} ${link.serviceUrl}`
+      return `${this.statusUrlMap.get(link.statusCheckUrl) || ''} ${link.serviceUrl}`
     }
     else {
       return link.serviceUrl;
