@@ -45,6 +45,7 @@ export class SettingService {
       next: (blob) => {
         UtilsService.readBlobAsText(blob).then((data) => {
           this.generalSetting = JSON.parse(data);
+          this.saveSettingLocally(this.generalSetting);
           this.applySetting();
         });
       }
