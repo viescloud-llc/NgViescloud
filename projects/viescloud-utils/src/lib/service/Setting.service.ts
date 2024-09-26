@@ -32,14 +32,7 @@ export class SettingService {
     let setting = UtilsService.localStorageGetItem<GeneralSetting>(this.GENERAL_SETTING_KEY);
 
     if (!setting) {
-      this.s3StorageService.getFileByFileName(`${prefix}/${this.GENERAL_SETTING_KEY}`).pipe(UtilsService.waitLoadingDialog(this.matDialog)).subscribe({
-        next: (blob) => {
-          UtilsService.readBlobAsText(blob).then((data) => {
-            this.generalSetting = JSON.parse(data);  
-            this.applySetting();
-          })
-        }
-      })
+      this.syncFromServer(prefix);
     }
     else {
       this.generalSetting = setting;
@@ -47,7 +40,18 @@ export class SettingService {
     }
   }
 
-  private applySetting() {
+  syncFromServer(prefix: string) {
+    this.s3StorageService.getFileByFileName(`${prefix}/${this.GENERAL_SETTING_KEY}`).pipe(UtilsService.waitLoadingDialog(this.matDialog)).subscribe({
+      next: (blob) => {
+        UtilsService.readBlobAsText(blob).then((data) => {
+          this.generalSetting = JSON.parse(data);
+          this.applySetting();
+        });
+      }
+    });
+  }
+
+  applySetting() {
     this.generalSetting.theme = this.generalSetting.theme ? this.generalSetting.theme : MatTheme.CyanDeepPurpleLight;
     this.changeTheme(this.generalSetting.theme);
   }

@@ -47,11 +47,36 @@ export class ApplicationSettingComponent implements OnInit {
   }
 
   saveToServer() {
-    if(this.settingService.prefix)
+    if(this.settingService.prefix) {
       this.settingService.saveSettingToServer(this.settingService.prefix, this.generalSetting);
+      this.ngOnInit();
+    }
   }
 
   isValueChange(): boolean {
     return !UtilsService.isEqual(this.generalSetting, this.generalSettingCopy);
+  }
+
+  revert() {
+    this.generalSetting = structuredClone(this.generalSettingCopy);
+    this.settingService.applySetting();
+  }
+
+  reSync() {
+    let dialog = this.matDialog.open(ConfirmDialog, {
+      data: {
+        message: 'Are you sure you want to re-sync?\nNote: All your changes locally will be lost.',
+        title: 'Re-sync',
+        yes: 'Re-sync',
+        no: 'Cancel'
+      },
+      width: '100%'
+    })
+
+    dialog.afterClosed().subscribe(res => {
+      if(res) {
+        this.settingService.syncFromServer(this.settingService.prefix);
+      }
+    })
   }
 }
