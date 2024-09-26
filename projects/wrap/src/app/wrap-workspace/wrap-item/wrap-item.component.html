@@ -65,6 +65,7 @@
           *ngIf="mode === Mode.EDIT"
           matTooltip="Add new Wrap Here"
           (onNewWrap)="wrap.children.splice(i, 0, $event)"
+          [adviceWrapType]="WrapType.ITEM"
           ></app-wrap-plus-button>
 
           <app-wrap-item 
@@ -84,6 +85,7 @@
       *ngIf="mode === Mode.EDIT"
       matTooltip="Add new Wrap Here"
       (onNewWrap)="wrap.children.push($event)"
+      [adviceWrapType]="WrapType.ITEM"
       ></app-wrap-plus-button>
       
     </div>
