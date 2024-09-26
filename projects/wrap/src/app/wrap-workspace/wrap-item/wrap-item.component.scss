@@ -1,3 +1,19 @@
 ::ng-deep .tooltip-multiline {
     white-space: pre-line;     
 }
+
+.mat-icon-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    padding: 8px;  // Adjust padding to get the desired size for the circle
+    cursor: pointer;
+    transition: all 0.3s ease;
+  
+    &:hover {
+      outline: 2px solid #007bff; // Change the color for the outline
+      outline-offset: 2px;        // Offset to give space around the icon
+      background-color: rgba(0, 123, 255, 0.1); // Optional background color
+    }
+  }

@@ -11,6 +11,7 @@ import { KeyCaptureService } from 'projects/viescloud-utils/src/lib/service/KeyC
 import { Subscription } from 'rxjs';
 import { ExpiableMap } from 'projects/viescloud-utils/src/lib/model/ExpirableMap.model';
 import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-wrap-item',

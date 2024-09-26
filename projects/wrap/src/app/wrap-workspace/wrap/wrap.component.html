@@ -8,7 +8,7 @@ styleWidth="100%"
 [options]="searchOptions"
 ></app-mat-form-field-input>
 
-<ul *ngIf="wrapWorkspace" class="flex-row-container">
+<ul *ngIf="wrapWorkspace" class="flex-row-container" cdkDropListGroup>
   <ng-container *ngIf="searchText && mode === Mode.VIEW; else Else">
     <li *ngFor="let wrap of getFilteredWraps(); let i = index; trackBy: trackByIndex">
       <app-wrap-item
@@ -24,7 +24,7 @@ styleWidth="100%"
   </ng-container>
 
   <ng-template #Else>
-    <li *ngFor="let wrap of wrapWorkspace.wraps; let i = index; trackBy: trackByIndex">
+    <li *ngFor="let wrap of wrapWorkspace.wraps; let i = index; trackBy: trackByIndex" cdkDropList>
       <app-wrap-item
       [wrap]="wrap"
       (wrapChange)="wrapWorkspace.wraps[i] = $event"

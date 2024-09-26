@@ -1,4 +1,4 @@
-<ng-container *ngIf="wrap.type === WrapType.ITEM; else Else" >
+<div *ngIf="wrap.type === WrapType.ITEM; else Else" cdkDrag [cdkDragDisabled]="mode !== Mode.EDIT">
   <mat-card appearance="outlined" class="cursor-hover" (click)="open(wrap)" [ngStyle]="getNgStyle(wrap)">
     <mat-card-header>
       <img mat-card-avatar [src]="wrap.icon" alt="!?"/>
@@ -6,6 +6,15 @@
       <mat-card-subtitle *ngIf="wrap.hotKey !== WrapHotKey.NONE">Hot Key: {{wrap.hotKey}}</mat-card-subtitle>
       <mat-icon (click)="displayItemTooltip(wrap)" [matTooltip]="getItemTooltip(wrap)" matTooltipClass="tooltip-multiline" matTooltipPosition="above" viescloudClickStopPropagation>
         info
+      </mat-icon>
+      <mat-icon 
+      *ngIf="mode === Mode.EDIT" 
+      class="mat-icon-button" 
+      mat-icon-button 
+      cdkDragHandle 
+      viescloudClickStopPropagation
+      [matTooltip]="'Drag To Move'">
+        drag_indicator
       </mat-icon>
     </mat-card-header>
     <mat-card-content>
@@ -37,26 +46,38 @@
       </mat-chip-set>
     </mat-card-footer>
   </mat-card>
-</ng-container>
+</div>
 
 <ng-template #Else>
-  <mat-expansion-panel hideToggle [expanded]="true" #panel [ngStyle]="getNgStyle(wrap)">
+  <mat-expansion-panel hideToggle [expanded]="true" #panel [ngStyle]="getNgStyle(wrap)" cdkDrag [cdkDragDisabled]="mode !== Mode.EDIT">
     <mat-expansion-panel-header>
       <mat-panel-title>{{wrap.title}}</mat-panel-title>
       <mat-panel-description *ngIf="mode === Mode.VIEW"> 
         {{wrap.description.replaceAll('\n', ', ')}}
       </mat-panel-description>
-      <mat-icon (click)="displayGroupTooltip(wrap)" [matTooltip]="getGroupTooltip(wrap)" matTooltipClass="tooltip-multiline" matTooltipPosition="above" viescloudClickStopPropagation>
-        info_outline
-      </mat-icon>
+      
       <mat-panel-description *ngIf="mode === Mode.EDIT"> 
         <button mat-raised-button color="primary" matTooltip="Move Left" (click)="onMoveLeft.emit()" viescloudClickStopPropagation><mat-icon>keyboard_arrow_left</mat-icon></button>
         <button mat-raised-button color="primary" matTooltip="Edit" (click)="edit(wrap)" viescloudClickStopPropagation><mat-icon>edit</mat-icon></button>
         <button mat-raised-button color="primary" matTooltip="Delete" (click)="onDelete.emit()" viescloudClickStopPropagation><mat-icon>delete</mat-icon></button>
         <button mat-raised-button color="primary" matTooltip="Move Right" (click)="onMoveRight.emit()" viescloudClickStopPropagation><mat-icon>keyboard_arrow_right</mat-icon></button>
       </mat-panel-description>
+
+      <mat-icon (click)="displayGroupTooltip(wrap)" [matTooltip]="getGroupTooltip(wrap)" matTooltipClass="tooltip-multiline" matTooltipPosition="above" viescloudClickStopPropagation>
+        info_outline
+      </mat-icon>
+      <mat-icon 
+      *ngIf="mode === Mode.EDIT" 
+      class="mat-icon-button" 
+      mat-icon-button 
+      cdkDragHandle 
+      viescloudClickStopPropagation
+      [matTooltip]="'Drag To Move'">
+        drag_indicator
+      </mat-icon>
+
     </mat-expansion-panel-header>
-    <div class="flex-row-container">
+    <div class="flex-row-container" cdkDropList>
 
       <ng-container *ngIf="wrap.children;">
         <ng-container *ngFor="let item of wrap.children; let i = index; trackBy: trackByIndex;">
