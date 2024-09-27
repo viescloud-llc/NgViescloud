@@ -21,7 +21,7 @@ export class WrapComponent extends TrackByIndex implements OnInit {
   wrapWorkspaceChange: EventEmitter<WrapWorkspace> = new EventEmitter();
 
   @Input()
-  mode!: WrapMode
+  mode!: WrapMode;
 
   @Output()
   modeChange: EventEmitter<WrapMode> = new EventEmitter();
