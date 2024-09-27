@@ -95,7 +95,7 @@ export class WrapComponent extends TrackByIndex implements OnInit {
 
     let result = new Set<Wrap>();
     containTuples.forEach(tuple => {
-      if(tuple.first.includes(this.searchText)) {
+      if(tuple.first.toLowerCase().includes(this.searchText.toLowerCase())) {
         result.add(tuple.second);
       }
     })
