@@ -11,6 +11,7 @@ import { ProductComponent } from './marketing/productList/product/product.compon
 import { ProductListComponent } from './marketing/productList/productList.component';
 import { OathPinterestComponent } from './oath/oath-pinterest/oath-pinterest.component';
 import { LogoutComponent } from 'projects/viescloud-utils/src/lib/share-component/logout/logout.component';
+import { ApplicationSettingComponent } from 'projects/viescloud-utils/src/lib/share-component/application-setting/application-setting.component';
 
 const routes: Routes = [
   {
@@ -49,8 +50,17 @@ const routes: Routes = [
     ]
   },
   {
-    path: 'connected-service',
-    component: ConnectedServiceComponent
+    path: 'setting',
+    children: [
+      {
+        path: 'connected-service',
+        component: ConnectedServiceComponent
+      },
+      {
+        path: 'application-setting',
+        component: ApplicationSettingComponent
+      }
+    ]
   },
   {
     path: 'oath',

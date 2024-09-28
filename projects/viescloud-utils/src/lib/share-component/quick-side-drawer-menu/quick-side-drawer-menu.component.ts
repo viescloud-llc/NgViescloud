@@ -21,10 +21,9 @@ export class QuickSideDrawerMenuComponent implements OnInit {
   @Input()
   menu!: QuickSideDrawerMenu[];
 
-  @Input()
-  router!: Router;
-
-  constructor() { }
+  constructor(
+    private router: Router
+  ) { }
 
   ngOnInit() {
 

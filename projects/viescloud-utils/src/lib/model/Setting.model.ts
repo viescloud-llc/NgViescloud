@@ -4,7 +4,7 @@ export class GeneralSetting {
     displayHeader: boolean = true;
     displayDrawer: boolean = true;
     backgroundImageUrl: string = '';
-    theme: MatTheme = MatTheme.CyanDeepPurpleLight;
+    theme: MatTheme = MatTheme.CyanDeepPurpleDark;
 }
 
 export class D {
