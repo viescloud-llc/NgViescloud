@@ -6,6 +6,8 @@ import { UtilsService, VFile } from './Utils.service';
 import { GeneralSetting } from '../model/Setting.model';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTheme } from '../model/theme.model';
+import { AuthenticatorService } from './Authenticator.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +16,7 @@ export class SettingService {
   private GENERAL_SETTING_KEY = 'generalSetting.json';
   private generalSetting: GeneralSetting = new GeneralSetting();
   private matThemes = UtilsService.getEnumValues(MatTheme) as string[];
+  private onLoginSubscription: any = null;
   
   prefix = '';
   currentMenu = "main";
@@ -24,10 +27,20 @@ export class SettingService {
 
   constructor(
     private s3StorageService: S3StorageServiceV1,
-    private matDialog: MatDialog
+    private matDialog: MatDialog,
+    private snackBar: MatSnackBar
   ) { }
 
-  init(prefix: string) {
+  init(prefix: string, authenticatorService?: AuthenticatorService) {
+
+    if (authenticatorService && this.onLoginSubscription == null) {
+      this.onLoginSubscription = authenticatorService.onLogin$.subscribe({
+        next: () => {
+          this.init(prefix);
+        }
+      })
+    }
+
     this.prefix = prefix;
     let setting = UtilsService.localStorageGetItem<GeneralSetting>(this.GENERAL_SETTING_KEY);
 
@@ -38,16 +51,21 @@ export class SettingService {
       this.generalSetting = setting;
       this.applySetting();
     }
+
   }
 
   syncFromServer(prefix: string) {
-    this.s3StorageService.getFileByFileName(`${prefix}/${this.GENERAL_SETTING_KEY}`).pipe(UtilsService.waitLoadingDialog(this.matDialog)).subscribe({
+    this.s3StorageService.getFileByFileName(`${prefix}/${this.GENERAL_SETTING_KEY}`).pipe(UtilsService.waitLoadingSnackBarDynamicString(this.snackBar, `Loading ${prefix}/${this.GENERAL_SETTING_KEY}`, 40, 'Dismiss')).subscribe({
       next: (blob) => {
         UtilsService.readBlobAsText(blob).then((data) => {
           this.generalSetting = JSON.parse(data);
           this.saveSettingLocally(this.generalSetting);
           this.applySetting();
         });
+      },
+      error: (error) => {
+        this.generalSetting = new GeneralSetting();
+        this.applySetting();
       }
     });
   }

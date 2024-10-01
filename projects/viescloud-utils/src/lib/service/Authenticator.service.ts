@@ -3,7 +3,7 @@ import { Injectable, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Jwt, OpenIdRequest, Route, Swaggers, User, UserRole } from '../model/Authenticator.model';
 import { SettingService } from './Setting.service';
-import { Observable, first, interval } from 'rxjs';
+import { Observable, Subject, first, interval } from 'rxjs';
 import { UsernameExistResponse } from '../model/Response.model';
 import { DateTime } from '../model/Mat.model';
 
@@ -11,6 +11,11 @@ import { DateTime } from '../model/Mat.model';
   providedIn: 'root'
 })
 export class AuthenticatorService {
+  
+  private onLoginSubject = new Subject<void>();
+  onLogin$ = this.onLoginSubject.asObservable();
+  private onLogoutSubject = new Subject<void>();
+  onLogout$ = this.onLogoutSubject.asObservable();
 
   jwt?: string | null;
   currentUser?: User | null;
@@ -30,7 +35,6 @@ export class AuthenticatorService {
   }
 
   // Authentication
-  
 
   private async updateUser(): Promise<boolean>
   {
@@ -38,6 +42,9 @@ export class AuthenticatorService {
       this.httpClient.get<User>(`${this.settingService.getGatewayUrl()}/user`)
       .pipe(first()).subscribe(
         res => {
+          if(this.isLoginB === false && this.currentUser === null)
+            this.onLoginSubject.next();
+
           this.currentUser = res;
           this.isLoginB = true;
           resolve(true);
@@ -65,7 +72,6 @@ export class AuthenticatorService {
   }
 
   async isLoginCall(): Promise<void> {
-    
     await this.updateUser().then(b => this.isLoginB = b);
   }
 
@@ -90,6 +96,7 @@ export class AuthenticatorService {
       error => {},
       () => {}
     );
+    this.onLogoutSubject.next();
   }
   
   logout(): void {

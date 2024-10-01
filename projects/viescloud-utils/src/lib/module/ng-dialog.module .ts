@@ -14,8 +14,9 @@ import { LoadingDialog } from '../dialog/loading-dialog/loading-dialog.component
 import { ProductDialog } from '../dialog/marketing/product-dialog/product-dialog.component';
 import { WrapDialog } from '../dialog/wrap-dialog/wrap-dialog.component';
 import { WrapLinkDialog } from '../dialog/wrap-link-dialog/wrap-link-dialog.component';
+import { StringSnackBar } from '../snack/string-snack-bar/string-snack-bar.component';
 
-const list = [
+const DIALOG = [
   ConfirmDialog,
   InputDialog,
   LobbyDialog,
@@ -30,13 +31,23 @@ const list = [
   WrapLinkDialog
 ]
 
+const SNACK = [
+  StringSnackBar
+]
+
 @NgModule({
-  declarations: list,
+  declarations: [
+    ...DIALOG,
+    ...SNACK
+  ],
   imports: [
     NgMaterialModule,
     NgEssentialModule,
     NgComponentModule
   ],
-  exports: list
+  exports: [
+    ...DIALOG,
+    ...SNACK
+  ]
 })
 export class NgDialogModule { }

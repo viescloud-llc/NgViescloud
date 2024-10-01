@@ -47,6 +47,19 @@ export enum UserPermission {
     DELETE = "DELETE"
 }
 
+export enum MatSnackBarHorizontalPosition {
+    START = "start",
+    CENTER = "center",
+    END = "end",
+    LEFT = "left",
+    RIGHT = "right"
+}
+
+export enum MatSnackBarVerticalPosition {
+    TOP = "top",
+    BOTTOM = "bottom"
+}
+
 export class MatItemSetting {
     type: MatItemSettingType | string;
     value: any;

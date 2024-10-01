@@ -4,6 +4,7 @@ import { S3StorageServiceV1 } from './ObjectStorageManager.service';
 import { UtilsService, VFile } from './Utils.service';
 import { MatDialog } from '@angular/material/dialog';
 import { Tuple } from '../model/Mat.model';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Injectable({
   providedIn: 'root'

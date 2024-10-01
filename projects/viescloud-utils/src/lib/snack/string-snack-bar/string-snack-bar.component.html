@@ -1,0 +1,8 @@
+<div class="snack-content">
+  <span 
+    (mouseover)="isHovered = true" 
+    (mouseout)="isHovered = false">
+    {{ isHovered && viewFullOnHover ? fullMessage : truncatedMessage }}
+  </span>
+  <button *ngIf="dismissLabel" mat-button color="warn" class="dismiss-button" (click)="onDismiss()">{{dismissLabel}}</button>
+</div>

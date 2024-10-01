@@ -5,10 +5,13 @@ import { first, Observable } from 'rxjs';
 import { UtilsService, VFile } from './Utils.service';
 import { Metadata } from '../model/ObjectStorageManager.model';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 export abstract class ObjectStorage {
   objectUrlCache = new Map<string, string>();
-  constructor(private httpClient: HttpClient) { }
+  constructor(
+    private httpClient: HttpClient
+  ) { }
 
   protected getURI(): string {
     return environment.gateway_api;
@@ -192,7 +195,7 @@ export abstract class ObjectStorage {
     })
   }
 
-  generateObjectUrlFromViescloudUrl(viescloudUrl: string, matDialog?: MatDialog) {
+  generateObjectUrlFromViescloudUrl(viescloudUrl: string, matDialog?: MatDialog, snackBar?: MatSnackBar) {
     return new Promise<string>((resolve, reject) => {
       if(this.objectUrlCache.has(viescloudUrl)) {
         UtilsService.isObjectUrlValid(this.objectUrlCache.get(viescloudUrl)!)
@@ -200,17 +203,21 @@ export abstract class ObjectStorage {
           resolve(this.objectUrlCache.get(viescloudUrl)!);
         })
         .catch((error) => {
-          this.generateObjectUrl(viescloudUrl, matDialog, resolve, reject);
+          this.generateObjectUrl(viescloudUrl, matDialog, snackBar, resolve, reject);
         })
       } 
       else {
-        this.generateObjectUrl(viescloudUrl, matDialog, resolve, reject);
+        this.generateObjectUrl(viescloudUrl, matDialog, snackBar, resolve, reject);
       }
     })
   }
 
-  private generateObjectUrl(viescloudUrl: string, matDialog: MatDialog | undefined, resolve: (value: string | PromiseLike<string>) => void, reject: (reason?: any) => void) {
-    this.httpClient.get(viescloudUrl, { responseType: 'blob' }).pipe(first()).pipe(UtilsService.waitLoadingDialog(matDialog)).subscribe({
+  private generateObjectUrl(viescloudUrl: string, matDialog: MatDialog | undefined, snackBar: MatSnackBar | undefined, resolve: (value: string | PromiseLike<string>) => void, reject: (reason?: any) => void) {
+    this.httpClient.get(viescloudUrl, { responseType: 'blob' })
+    .pipe(first())
+    .pipe(UtilsService.waitLoadingDialog(matDialog))
+    .pipe(UtilsService.waitLoadingSnackBarDynamicString(snackBar, `Loading ${viescloudUrl}`, 40, 'Dismiss'))
+    .subscribe({
       next: (data) => {
         let url = URL.createObjectURL(data);
         this.objectUrlCache.set(viescloudUrl, url);

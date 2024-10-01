@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { environment } from 'projects/environments/environment.prod';
 import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
 import { InputDialog } from 'projects/viescloud-utils/src/lib/dialog/input-dialog/input-dialog.component';
@@ -45,7 +46,8 @@ export class WrapWorkspaceComponent implements OnInit, OnDestroy {
     public authenticatorService: AuthenticatorService,
     private settingService: SettingService,
     private utilService: UtilsService,
-    private s3StorageService: S3StorageServiceV1
+    private s3StorageService: S3StorageServiceV1,
+    private snackBar: MatSnackBar
   ) { }
   ngOnDestroy(): void {
     this.loadBackgroundImage('');
@@ -208,7 +210,7 @@ export class WrapWorkspaceComponent implements OnInit, OnDestroy {
 
   loadBackgroundImage(url: string) {
     if(url.includes(environment.gateway_api)) {
-      this.s3StorageService.generateObjectUrlFromViescloudUrl(url).then(res => {
+      this.s3StorageService.generateObjectUrlFromViescloudUrl(url, undefined, this.snackBar).then(res => {
         this.settingService.backgroundImageUrl = res;
       })
     } 

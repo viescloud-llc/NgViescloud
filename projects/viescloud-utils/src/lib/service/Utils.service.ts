@@ -3,7 +3,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, finalize, first, of, pipe, switchMap, tap } from 'rxjs';
 import { LoadingDialog } from '../dialog/loading-dialog/loading-dialog.component';
-import { MatOption } from '../model/Mat.model';
+import { MatOption, MatSnackBarHorizontalPosition, MatSnackBarVerticalPosition } from '../model/Mat.model';
+import { MatSnackBar, MatSnackBarRef } from '@angular/material/snack-bar';
+import { StringSnackBar } from '../snack/string-snack-bar/string-snack-bar.component';
 
 export interface VFile {
   name: string,
@@ -446,6 +448,40 @@ export class UtilsService {
     });
   }
 
+  static waitLoadingSnackBar<T>(snackBar?: MatSnackBar, message: string = 'Loading...', action?: string, duration: number = -1, matSnackBarHorizontalPosition: MatSnackBarHorizontalPosition = MatSnackBarHorizontalPosition.RIGHT, matSnackBarVerticalPosition: MatSnackBarVerticalPosition = MatSnackBarVerticalPosition.BOTTOM) {
+    if(snackBar) {
+      let bar: MatSnackBarRef<any>;
+      
+      return pipe(
+        UtilsService.startWithTap<T>(() => {
+          bar = UtilsService.openSnackBar(snackBar, message, action, duration, matSnackBarHorizontalPosition, matSnackBarVerticalPosition);
+        }),
+        finalize<T>(() => bar.dismiss()),
+        first<T>()
+      );
+    }
+    else {
+      return pipe();
+    }
+  }
+
+  static waitLoadingSnackBarDynamicString<T>(snackBar?: MatSnackBar, message: string = 'Loading...', maxLength: number = 40, action?: string, duration: number = -1, matSnackBarHorizontalPosition: MatSnackBarHorizontalPosition = MatSnackBarHorizontalPosition.RIGHT, matSnackBarVerticalPosition: MatSnackBarVerticalPosition = MatSnackBarVerticalPosition.BOTTOM) {
+    if(snackBar) {
+      let bar: MatSnackBarRef<any>;
+      
+      return pipe(
+        UtilsService.startWithTap<T>(() => {
+          bar = UtilsService.openSnackBarDynamicString(snackBar, message, maxLength, action, duration, matSnackBarHorizontalPosition, matSnackBarVerticalPosition);
+        }),
+        finalize<T>(() => bar.dismiss()),
+        first<T>()
+      );
+    }
+    else {
+      return pipe();
+    }
+  }
+
   static waitLoadingDialog<T>(matDialog?: MatDialog) {
     if(matDialog) {
       let dialog = matDialog.open(LoadingDialog, {
@@ -599,5 +635,34 @@ export class UtilsService {
     return fetch(url)
       .then(response => response.ok)
       .catch(() => false);
+  }
+
+  static openSnackBar(snackBar: MatSnackBar, message: string, action?: string, duration: number = 2000, matSnackBarHorizontalPosition: MatSnackBarHorizontalPosition = MatSnackBarHorizontalPosition.CENTER, matSnackBarVerticalPosition: MatSnackBarVerticalPosition = MatSnackBarVerticalPosition.BOTTOM) {
+    return snackBar.open(message, action, {
+      duration: duration,
+      horizontalPosition: matSnackBarHorizontalPosition,
+      verticalPosition: matSnackBarVerticalPosition
+    });
+  }
+
+  static openSnackBarDynamicString(snackBar: MatSnackBar, message: string, maxLength: number = 40, action?: string, duration: number = 2000, matSnackBarHorizontalPosition: MatSnackBarHorizontalPosition = MatSnackBarHorizontalPosition.CENTER, matSnackBarVerticalPosition: MatSnackBarVerticalPosition = MatSnackBarVerticalPosition.BOTTOM) {
+    return snackBar.openFromComponent(StringSnackBar, {
+        data: {
+          message: message,
+          maxLength: maxLength,
+          dismissLabel: action,
+          viewFullOnHover: true
+        },
+        duration: duration,
+        horizontalPosition: matSnackBarHorizontalPosition,
+        verticalPosition: matSnackBarVerticalPosition
+      });
+  }
+
+  static getMaxString(str: string, length: number, replaceWith: string = '...'): string {
+    if(str.length > length) {
+      return str.substring(0, length) + replaceWith;
+    }
+    return str;
   }
 }

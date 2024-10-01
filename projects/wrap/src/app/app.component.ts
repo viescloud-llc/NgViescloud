@@ -75,6 +75,6 @@ export class AppComponent extends ViescloudApplication {
     override matDialog: MatDialog
   ) { 
     super(matDialog, keyCaptureService, settingService);
-    settingService.init('wrap');
+    settingService.init('wrap', authenticatorService);
   }
 }
