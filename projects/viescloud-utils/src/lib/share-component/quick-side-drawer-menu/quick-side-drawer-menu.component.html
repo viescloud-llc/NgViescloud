@@ -4,7 +4,7 @@
       <li [class]="routerLinkActive(item)"><button mat-flat-button (click)="click(item)">{{item.title}}</button></li>
     </ng-container>
 
-    <ng-container *ngIf="!item.routerLink">
+    <ng-container *ngIf="!item.routerLink && !isHide(item)">
       <li>
         <button mat-icon-button  (click)="item.hideChildren = !item.hideChildren; click(item)">
           <mat-icon class="my-button">
@@ -13,10 +13,11 @@
         </button>
         <b class="title" (click)="item.hideChildren = !item.hideChildren; click(item)">{{item.title}}</b>
       </li>
-    </ng-container>
 
-    <ng-container *ngIf="item.children && !item.hideChildren">
-      <viescloud-quick-side-drawer-menu [menu]="item.children"></viescloud-quick-side-drawer-menu>
+      <ng-container *ngIf="item.children && !item.hideChildren">
+        <viescloud-quick-side-drawer-menu [menu]="item.children"></viescloud-quick-side-drawer-menu>
+      </ng-container>
+      
     </ng-container>
   </ng-container>
 </ul>

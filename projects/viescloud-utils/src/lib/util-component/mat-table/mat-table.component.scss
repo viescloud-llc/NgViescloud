@@ -1,0 +1,15 @@
+.full-width-table {
+    width: 100%;
+    table-layout: fixed; // Ensures cells are equally distributed
+}
+
+.mat-header-cell, .mat-cell {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap; // Prevents long content from breaking the layout
+    padding: 8px;
+}
+
+.mat-header-row, .mat-row {
+    display: table-row; // Adjust if necessary based on your material theme
+}

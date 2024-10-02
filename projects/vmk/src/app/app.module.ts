@@ -12,16 +12,9 @@ import { ProductOverallComponent } from './marketing/productList/product/product
 import { ProductComponent } from './marketing/productList/product/product.component';
 import { ProductListComponent } from './marketing/productList/productList.component';
 import { OathPinterestComponent } from './oath/oath-pinterest/oath-pinterest.component';
-import { SideDrawerMainMenuComponent } from './side-drawer/side-drawer-main-menu/side-drawer-main-menu.component';
-import { SideDrawerComponent } from './side-drawer/side-drawer.component';
 import { ViescloudUtilsModule } from 'projects/viescloud-utils/src/public-api';
 import { AuthInterceptor } from 'projects/viescloud-utils/src/lib/guards/auth.interceptor';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-
-const SIDE_DRAWER = [
-  SideDrawerComponent,
-  SideDrawerMainMenuComponent,
-]
 
 const LIST = [
   AppComponent,
@@ -43,7 +36,6 @@ const MARKETING = [
 @NgModule({
   declarations: [
     AppComponent,
-    ...SIDE_DRAWER,
     ...LIST,
     ...MARKETING
   ],

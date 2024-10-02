@@ -39,6 +39,7 @@ export class AppComponent extends ViescloudApplication {
     },
     {
       title: 'Marketing',
+      hideConditional: () => !this.authenticatorService.isLoginB,
       children: [
         {
           title: 'Products',
@@ -55,7 +56,8 @@ export class AppComponent extends ViescloudApplication {
       children: [
         {
           title: 'Connected Service',
-          routerLink: '/setting/connected-service'
+          routerLink: '/setting/connected-service',
+          hideConditional: () => !this.authenticatorService.isLoginB
         },
         {
           title: 'Application Setting',

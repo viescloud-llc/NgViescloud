@@ -1,4 +1,4 @@
-<div *ngIf="displayFilter">
+<ng-container *ngIf="displayFilter">
     <mat-form-field style="width: 100%;">
         <mat-label>Filter</mat-label>
         <input matInput (keyup)="applyFilter($event)" placeholder="Ex. username" [(ngModel)]="filter">
@@ -7,9 +7,9 @@
             <mat-icon>close</mat-icon>
         </button>
     </mat-form-field>
-</div>
-<div>
-    <table mat-table [dataSource]="dataSource" matSort style="width: 100%;">
+</ng-container>
+<ng-container>
+    <table mat-table [dataSource]="dataSource" matSort class="full-width-table">
 
         <ng-container *ngFor="let column of displayedColumns" [matColumnDef]="column">
             <th mat-header-cell *matHeaderCellDef mat-sort-header [sortActionDescription]="'Sort by ' + column">
@@ -32,7 +32,7 @@
             <td class="mat-cell" colspan="4">No data matching the filter "{{filter}}"</td>
         </tr>
     </table>
-</div>
-<div *ngIf="displayPagination">
+</ng-container>
+<ng-container *ngIf="displayPagination">
     <mat-paginator  [pageSizeOptions]="pagination" aria-label="Select page of users"></mat-paginator>
-</div>
+</ng-container>

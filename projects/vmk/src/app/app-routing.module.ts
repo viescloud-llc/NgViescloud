@@ -54,6 +54,7 @@ const routes: Routes = [
     children: [
       {
         path: 'connected-service',
+        canActivate: [AuthGuard],
         component: ConnectedServiceComponent
       },
       {
