@@ -8,6 +8,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatTheme } from '../model/theme.model';
 import { AuthenticatorService } from './Authenticator.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { ConfirmDialog } from '../dialog/confirm-dialog/confirm-dialog.component';
+import { OpenIdService } from './OpenId.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +19,7 @@ export class SettingService {
   private generalSetting: GeneralSetting = new GeneralSetting();
   private matThemes = UtilsService.getEnumValues(MatTheme) as string[];
   private onLoginSubscription: any = null;
+  private onTimeoutLogoutSubscription: any = null;
   
   prefix = '';
   currentMenu = "main";
@@ -28,20 +31,16 @@ export class SettingService {
   constructor(
     private s3StorageService: S3StorageServiceV1,
     private matDialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private openIdService: OpenIdService
   ) { }
 
   init(prefix: string, authenticatorService?: AuthenticatorService) {
 
-    if (authenticatorService && this.onLoginSubscription == null) {
-      this.onLoginSubscription = authenticatorService.onLogin$.subscribe({
-        next: () => {
-          this.init(prefix);
-        }
-      })
-    }
+    this.subscribeToSubject(authenticatorService, prefix);
 
     this.prefix = prefix;
+
     let setting = UtilsService.localStorageGetItem<GeneralSetting>(this.GENERAL_SETTING_KEY);
 
     if (!setting) {
@@ -52,6 +51,25 @@ export class SettingService {
       this.applySetting();
     }
 
+  }
+
+  private subscribeToSubject(authenticatorService: AuthenticatorService | undefined, prefix: string) {
+    if (authenticatorService && this.onLoginSubscription == null) {
+      this.onLoginSubscription = authenticatorService.onLogin$.subscribe({
+        next: () => {
+          this.init(prefix);
+        }
+      });
+    }
+
+    if (authenticatorService && this.onTimeoutLogoutSubscription == null) {
+      this.onTimeoutLogoutSubscription = authenticatorService.onTimeoutLogout$.subscribe({
+        next: () => {
+          if(this.generalSetting.promptLoginWhenTimeoutLogout)
+            this.promptLoginWhenTimeoutLogout();
+        }
+      });
+    }
   }
 
   syncFromServer(prefix: string) {
@@ -84,32 +102,32 @@ export class SettingService {
   }
 
   getDisplayHeader(): boolean {
-    return this.generalSetting.displayHeader;
+    return this.generalSetting.initDisplayHeader;
   }
 
   setDisplayHeader(value: boolean): void {
-    this.generalSetting.displayHeader = value;
+    this.generalSetting.initDisplayHeader = value;
   }
 
   getDisplayDrawer(): boolean {
-    return this.generalSetting.displayDrawer;
+    return this.generalSetting.initDisplayDrawer;
   }
 
   setDisplayDrawer(value: boolean): void {
-    this.generalSetting.displayDrawer = value;
+    this.generalSetting.initDisplayDrawer = value;
     if(this.header) {
-      this.header.toggleDrawer(this.generalSetting.displayDrawer ? DRAWER_STATE.OPEN : DRAWER_STATE.CLOSE);
+      this.header.toggleDrawer(this.generalSetting.initDisplayDrawer ? DRAWER_STATE.OPEN : DRAWER_STATE.CLOSE);
     }
   }
 
   toggleDisplayHeader(): void {
-    this.generalSetting.displayDrawer = !this.generalSetting.displayDrawer;
+    this.generalSetting.initDisplayDrawer = !this.generalSetting.initDisplayDrawer;
   }
 
   toggleDisplayDrawer(): void {
-    this.generalSetting.displayDrawer = !this.generalSetting.displayDrawer;
+    this.generalSetting.initDisplayDrawer = !this.generalSetting.initDisplayDrawer;
     if(this.header) {
-      this.header.toggleDrawer(this.generalSetting.displayDrawer ? DRAWER_STATE.OPEN : DRAWER_STATE.CLOSE);
+      this.header.toggleDrawer(this.generalSetting.initDisplayDrawer ? DRAWER_STATE.OPEN : DRAWER_STATE.CLOSE);
     }
   }
 
@@ -143,5 +161,25 @@ export class SettingService {
 
   changeToCurrentTheme() {
     this.changeTheme(this.generalSetting.theme);
+  }
+
+  promptLoginWhenTimeoutLogout() {
+    let dialog = this.matDialog.open(ConfirmDialog, {
+      data: {
+        title: 'Login?',
+        message: 'You have been logged out due to inactivity.\nDo you want to login again?',
+        yes: 'Login',
+        no: 'Cancel'
+      },
+      width: '100%'
+    })
+
+    dialog.afterClosed().subscribe({
+      next: res => {
+        if(res) {
+          this.openIdService.authorizeFlow();
+        }
+      }
+    })
   }
 }

@@ -16,6 +16,8 @@ export class AuthenticatorService {
   onLogin$ = this.onLoginSubject.asObservable();
   private onLogoutSubject = new Subject<void>();
   onLogout$ = this.onLogoutSubject.asObservable();
+  private onTimeoutLogoutSubject = new Subject<void>();
+  onTimeoutLogout$ = this.onTimeoutLogoutSubject.asObservable();
 
   jwt?: string | null;
   currentUser?: User | null;
@@ -23,7 +25,11 @@ export class AuthenticatorService {
 
   private prefix = "authenticator"
 
-  constructor(private httpClient: HttpClient, private router: Router, private settingService: SettingService) { 
+  constructor(
+    private httpClient: HttpClient, 
+    private router: Router,
+    private settingService: SettingService
+  ) { 
     this.jwt = localStorage.getItem("jwt");
     setInterval(() => {
       this.isLoginCall();
@@ -36,8 +42,7 @@ export class AuthenticatorService {
 
   // Authentication
 
-  private async updateUser(): Promise<boolean>
-  {
+  private async updateUser(): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
       this.httpClient.get<User>(`${this.settingService.getGatewayUrl()}/user`)
       .pipe(first()).subscribe(
@@ -50,24 +55,24 @@ export class AuthenticatorService {
           resolve(true);
         },
         error => {
+          if(this.isLoginB === true && this.currentUser !== null && this.currentUser !== undefined)
+            this.onTimeoutLogoutSubject.next();
+
           this.currentUser = null;
           this.isLoginB = false;
           resolve(false);
-        },
-        () => resolve(true)
+        }
       );
     });
   }
 
-  async autoUpdateUserWithJwt(jwt: string): Promise<void>
-  {
+  async autoUpdateUserWithJwt(jwt: string): Promise<void> {
     this.jwt = jwt;
     localStorage.setItem("jwt", jwt);
     await this.autoUpdateUser();
   }
 
-  async autoUpdateUser(): Promise<void>
-  {
+  async autoUpdateUser(): Promise<void> {
     await this.updateUser().then().catch();
   }
 

@@ -1,8 +1,9 @@
 import { MatTheme } from "./theme.model";
 
 export class GeneralSetting {
-    displayHeader: boolean = true;
-    displayDrawer: boolean = true;
+    initDisplayHeader: boolean = true;
+    initDisplayDrawer: boolean = true;
+    promptLoginWhenTimeoutLogout: boolean = true;
     backgroundImageUrl: string = '';
     theme: MatTheme = MatTheme.CyanDeepPurpleDark;
 }

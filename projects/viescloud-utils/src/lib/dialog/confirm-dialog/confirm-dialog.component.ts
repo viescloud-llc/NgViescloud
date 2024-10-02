@@ -24,4 +24,8 @@ export class ConfirmDialog implements OnInit {
       this.no = this.data.no;
   }
 
+  isMultipleLine(): boolean {
+    return this.data.message.includes('\n');
+  }
+
 }

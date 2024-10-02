@@ -1,6 +1,13 @@
 <h1 mat-dialog-title>{{data.title}}</h1>
 <div mat-dialog-content>
+  <app-mat-form-field-input
+  *ngIf="!isMultipleLine()"
+  [value]="data.message"
+  [disable]="true"
+  styleWidth="100%"
+  ></app-mat-form-field-input>
   <app-mat-form-field-input-text-area
+  *ngIf="isMultipleLine()"
   [value]="data.message"
   [autoResizeHeight]="true"
   [disable]="true"
