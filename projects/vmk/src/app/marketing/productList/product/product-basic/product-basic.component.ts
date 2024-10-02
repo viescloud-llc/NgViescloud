@@ -8,6 +8,8 @@ import { ProductService, ProductCategoryService } from 'projects/viescloud-utils
 import { SmbService } from 'projects/viescloud-utils/src/lib/service/Smb.service';
 import { Router } from '@angular/router';
 import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
+import { QuickSideDrawerMenuService } from 'projects/viescloud-utils/src/lib/service/QuickSideDrawerMenu.service';
+import { ProductMenuComponent } from '../product-menu/product-menu.component';
 
 @Component({
   selector: 'app-product-basic',
@@ -41,7 +43,8 @@ export class ProductBasicComponent implements OnInit, OnChanges {
     protected productService: ProductService,
     protected smbService: SmbService,
     protected route: Router,
-    protected data: ProductData
+    protected data: ProductData,
+    protected sideMenuService: QuickSideDrawerMenuService
   ) { 
     data.onAddFileSubscribers.push({
       afterAdd: (f, fl) => {
@@ -78,6 +81,8 @@ export class ProductBasicComponent implements OnInit, OnChanges {
     if(!this.product.id) {
       this.product.pinterestPinData = undefined;
     }
+
+    this.sideMenuService.loadComponent(ProductMenuComponent);
   }
 
   isProductChange() {

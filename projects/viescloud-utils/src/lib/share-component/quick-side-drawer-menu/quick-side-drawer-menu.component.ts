@@ -1,5 +1,6 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, Type, ViewChild, ViewContainerRef } from '@angular/core';
 import { Router } from '@angular/router';
+import { QuickSideDrawerMenuService } from '../../service/QuickSideDrawerMenu.service';
 
 export class QuickSideDrawerMenu {
   title: string = '';
@@ -9,6 +10,7 @@ export class QuickSideDrawerMenu {
   hideChildren?: boolean;
   click?: () => void;
   children?: QuickSideDrawerMenu[];
+  loadComponentOnClick?: Type<any>;
 }
 
 @Component({
@@ -21,12 +23,33 @@ export class QuickSideDrawerMenuComponent implements OnInit {
   @Input()
   menu!: QuickSideDrawerMenu[];
 
+  @Input()
+  isRoot: boolean = true;
+
+  @Input() 
+  loadComponent?: Type<any>;
+
+  @Output()
+  onClickLoadComponent: EventEmitter<Type<any>> = new EventEmitter<Type<any>>();
+
+  @ViewChild('dynamicComponentContainer', { read: ViewContainerRef, static: true })
+  container!: ViewContainerRef;
+
   constructor(
-    private router: Router
-  ) { }
+    private router: Router,
+    private quickSideDrawerMenuService: QuickSideDrawerMenuService
+  ) { 
+    
+  }
 
   ngOnInit() {
+    if(this.loadComponent)
+      this.onLoadComponent(this.loadComponent);
+    else
+      this.container.clear();
 
+    if(this.isRoot)
+      this.quickSideDrawerMenuService.setMenu(this);
   }
 
   navigateUrl(url: string) {
@@ -34,6 +57,14 @@ export class QuickSideDrawerMenuComponent implements OnInit {
   }
 
   click(item: QuickSideDrawerMenu) {
+
+    if (item.loadComponentOnClick) {
+      this.onClickLoadComponent.emit(item.loadComponentOnClick);
+    }
+    else {
+      this.onClickLoadComponent.emit(undefined);
+    }
+    
     if (item.click) {
       item.click();
     }
@@ -60,4 +91,30 @@ export class QuickSideDrawerMenuComponent implements OnInit {
       return '';
   }
 
+  /**
+   * When a menu item is clicked, this function is called with the component type that should be loaded.
+   * If this is the root menu, the component is loaded into the container.
+   * @param loadItem The component type to load.
+   */
+  onLoadComponent(loadItem: Type<any>) {
+    if (this.isRoot) {
+      this.loadComponent = loadItem;
+      this.container.clear();
+      if(loadItem)
+        this.container.createComponent(loadItem);
+    }
+  }
+
+  clearLoadComponent() {
+    this.loadComponent = undefined;
+    this.container.clear();
+  }
+
+  back() {
+    if(this.container.length > 0) {
+      this.container.clear();
+    } else {
+      this.container.createComponent(this.loadComponent!);
+    }
+  }
 }

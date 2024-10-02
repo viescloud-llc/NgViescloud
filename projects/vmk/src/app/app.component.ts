@@ -6,6 +6,7 @@ import { OpenIdService } from 'projects/viescloud-utils/src/lib/service/OpenId.s
 import { SettingService } from 'projects/viescloud-utils/src/lib/service/Setting.service';
 import { QuickSideDrawerMenu } from 'projects/viescloud-utils/src/lib/share-component/quick-side-drawer-menu/quick-side-drawer-menu.component';
 import { ViescloudApplication } from 'projects/viescloud-utils/src/lib/share-component/ViescloudApplication/ViescloudApplication.component';
+import { ProductMenuComponent } from './marketing/productList/product/product-menu/product-menu.component';
 
 @Component({
   selector: 'app-root',
@@ -43,7 +44,7 @@ export class AppComponent extends ViescloudApplication {
       children: [
         {
           title: 'Products',
-          routerLink: '/marketing/products',
+          routerLink: '/marketing/products'
         },
         {
           title: 'Categories',

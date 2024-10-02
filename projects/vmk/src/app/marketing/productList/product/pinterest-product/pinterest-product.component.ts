@@ -9,6 +9,7 @@ import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-d
 import { ViesPinterestService, ProductService } from 'projects/viescloud-utils/src/lib/service/AffiliateMarketing.service';
 import { SmbService } from 'projects/viescloud-utils/src/lib/service/Smb.service';
 import { PinRequest, MediaSourceMultipleImage, MediaSourceImageUrl, MediaSourceVideo, Category, PinterestPinData, MediaSourceType, FileLink } from 'projects/viescloud-utils/src/lib/model/AffiliateMarketing.model';
+import { QuickSideDrawerMenuService } from 'projects/viescloud-utils/src/lib/service/QuickSideDrawerMenu.service';
 
 @Component({
   selector: 'app-pinterest-product',
@@ -39,9 +40,10 @@ export class PinterestProductComponent extends ProductBasicComponent {
     protected override productService: ProductService,
     protected override smbService: SmbService,
     protected override route: Router,
-    protected override data: ProductData
+    protected override data: ProductData,
+    protected override sideMenuService: QuickSideDrawerMenuService
   ) { 
-    super(matDialog, productService, smbService, route, data);
+    super(matDialog, productService, smbService, route, data, sideMenuService);
   }
   
   override ngOnChanges(changes?: SimpleChanges): void {

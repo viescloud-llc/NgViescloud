@@ -15,6 +15,7 @@ import { OathPinterestComponent } from './oath/oath-pinterest/oath-pinterest.com
 import { ViescloudUtilsModule } from 'projects/viescloud-utils/src/public-api';
 import { AuthInterceptor } from 'projects/viescloud-utils/src/lib/guards/auth.interceptor';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { ProductMenuComponent } from './marketing/productList/product/product-menu/product-menu.component';
 
 const LIST = [
   AppComponent,
@@ -30,7 +31,8 @@ const MARKETING = [
   ProductBasicComponent,
   PinterestProductComponent,
   ProductDisplayComponent,
-  ProductOverallComponent
+  ProductOverallComponent,
+  ProductMenuComponent
 ]
 
 @NgModule({
