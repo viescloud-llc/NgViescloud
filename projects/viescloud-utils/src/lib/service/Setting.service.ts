@@ -20,6 +20,7 @@ export class SettingService {
   private matThemes = UtilsService.getEnumValues(MatTheme) as string[];
   private onLoginSubscription: any = null;
   private onTimeoutLogoutSubscription: any = null;
+  private authenticatorService: AuthenticatorService | undefined;
   
   prefix = '';
   currentMenu = "main";
@@ -36,13 +37,13 @@ export class SettingService {
   ) { }
 
   init(prefix: string, authenticatorService?: AuthenticatorService) {
-
-    this.subscribeToSubject(authenticatorService, prefix);
+    
+    this.subscribeToSubject(prefix, authenticatorService);
 
     this.prefix = prefix;
 
     let setting = UtilsService.localStorageGetItem<GeneralSetting>(this.GENERAL_SETTING_KEY);
-
+    
     if (!setting) {
       this.syncFromServer(prefix);
     }
@@ -53,22 +54,26 @@ export class SettingService {
 
   }
 
-  private subscribeToSubject(authenticatorService: AuthenticatorService | undefined, prefix: string) {
-    if (authenticatorService && this.onLoginSubscription == null) {
-      this.onLoginSubscription = authenticatorService.onLogin$.subscribe({
-        next: () => {
-          this.init(prefix);
-        }
-      });
-    }
+  private subscribeToSubject(prefix: string, authenticatorService: AuthenticatorService | undefined) {
+    if(authenticatorService) {
+      this.authenticatorService = authenticatorService;
 
-    if (authenticatorService && this.onTimeoutLogoutSubscription == null) {
-      this.onTimeoutLogoutSubscription = authenticatorService.onTimeoutLogout$.subscribe({
-        next: () => {
-          if(this.generalSetting.promptLoginWhenTimeoutLogout)
-            this.promptLoginWhenTimeoutLogout();
-        }
-      });
+      if(this.onLoginSubscription == null) {
+        this.onLoginSubscription = authenticatorService.onLogin$.subscribe({
+          next: () => {
+            this.init(prefix);
+          }
+        });
+      }
+
+      if(this.onTimeoutLogoutSubscription == null) {
+        this.onTimeoutLogoutSubscription = authenticatorService.onTimeoutLogout$.subscribe({
+          next: () => {
+            if(this.generalSetting.promptLoginWhenTimeoutLogout)
+              this.promptLoginWhenTimeoutLogout();
+          }
+        });
+      }
     }
   }
 

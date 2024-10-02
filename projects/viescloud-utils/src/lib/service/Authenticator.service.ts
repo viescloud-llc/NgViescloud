@@ -32,7 +32,8 @@ export class AuthenticatorService {
   ) { 
     this.jwt = localStorage.getItem("jwt");
     setInterval(() => {
-      this.isLoginCall();
+      if(this.jwt !== null || this.jwt !== undefined)
+        this.isLoginCall();
     }, 120000); //2 mins
   }
 
