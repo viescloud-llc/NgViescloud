@@ -10,6 +10,8 @@ import { Router } from '@angular/router';
 import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
 import { QuickSideDrawerMenuService } from 'projects/viescloud-utils/src/lib/service/QuickSideDrawerMenu.service';
 import { ProductMenuComponent } from '../product-menu/product-menu.component';
+import { S3StorageServiceV1 } from 'projects/viescloud-utils/src/lib/service/ObjectStorageManager.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-product-basic',
@@ -19,6 +21,7 @@ import { ProductMenuComponent } from '../product-menu/product-menu.component';
 export class ProductBasicComponent implements OnInit, OnChanges {
 
   product!: Product;
+  vFiles: VFile[] = [];
 
   //blank object
   blankProduct = new Product();
@@ -33,16 +36,11 @@ export class ProductBasicComponent implements OnInit, OnChanges {
   constructor(
     protected matDialog: MatDialog,
     protected productService: ProductService,
-    protected smbService: SmbService,
+    protected s3StorageService: S3StorageServiceV1,
     protected route: Router,
     protected data: ProductData,
-  ) { 
-    data.onAddFileSubscribers.push({
-      afterAdd: (f, fl) => {
-        this.afterAddFile(f, fl);
-      }
-    })
-  }
+    protected snackBar: MatSnackBar
+  ) { }
 
   ngOnChanges(changes: SimpleChanges): void {
     
@@ -50,10 +48,30 @@ export class ProductBasicComponent implements OnInit, OnChanges {
 
   ngOnInit() {
     this.product = structuredClone(this.data.product);
+    if(!this.product.fileLinks)
+      this.product.fileLinks = [];
+    this.product.fileLinks.forEach(fileLink => {
+      this.s3StorageService.fetchFile(fileLink.link)
+      .pipe(UtilsService.waitLoadingSnackBarDynamicString(this.snackBar))
+      .subscribe({
+        next: res => {
+          this.vFiles.push(res);
+        }
+      })
+    })
   }
 
   isProductChange() {
     return !UtilsService.isEqual(this.product, this.data.product);
+  }
+
+  async onUploadFile() {
+    let vfile = await UtilsService.uploadFileAsVFile("image/jpeg, image/png, image/webp, video/mp4, video/webm");
+    this.vFiles = [...this.vFiles, vfile];
+  }
+
+  onFetchFile() {
+    
   }
 
   afterAddFile(vFile: VFile, fileLink: FileLink) {
@@ -65,7 +83,7 @@ export class ProductBasicComponent implements OnInit, OnChanges {
     // }
   }
 
-  afterRemoveFile(index: number) {
+  onRemoveFile(index: number) {
     this.data.files.splice(index, 1);
     this.product.fileLinks!.splice(index, 1);
   }
@@ -77,13 +95,13 @@ export class ProductBasicComponent implements OnInit, OnChanges {
 
   async save() {
     for (const [index, fileLink] of this.product.fileLinks!.entries()) {
-      if (!fileLink.external && !this.smbService.containViesLink(fileLink.link)) {
+      if (!fileLink.external && !this.s3StorageService.containViesLink(fileLink.link)) {
         const file = this.data.files[index];
         try {
           const metadata = await firstValueFrom(
-            this.smbService.postFile(file).pipe(UtilsService.waitLoadingDialog(this.matDialog))
+            this.s3StorageService.postFile(file).pipe(UtilsService.waitLoadingDialog(this.matDialog))
           );
-          fileLink.link = this.smbService.generateViesLinkFromPath(metadata.path);
+          fileLink.link = this.s3StorageService.generateViesLinkFromPath(metadata.path!);
         } catch (error: any) {
           window.alert('Error uploading file: ' + error.error.reason);
           return;

@@ -3,7 +3,7 @@
     <app-product-display
     [files]="vFiles"
     [(selectedIndex)]="selectedFileIndex"
-    (onRemoveFile)="afterRemoveFile($event)"
+    (onRemoveFile)="onRemoveFile($event)"
     [fileOptions]="fileOptions"
     (onSelectFileOption)="importFileFromProduct($event)"
     (onAddFile)="addNewFile()"

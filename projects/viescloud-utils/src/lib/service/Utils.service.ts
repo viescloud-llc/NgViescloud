@@ -12,6 +12,7 @@ export interface VFile {
   type: string,
   extension: string,
   rawFile?: globalThis.File | Blob;
+  orginalLink?: string;
   value: string;
 }
 
@@ -46,39 +47,25 @@ export class UtilsService {
     }
   }
 
-  static async fetchMedia(uri: string): Promise<VFile> {
+  static async fetchAsVFile(uri: string): Promise<VFile> {
     try {
       const response = await fetch(uri);
       if (!response.ok) {
-        throw new Error('Failed to fetch media');
+        throw new Error('Failed to fetch file');
       }
-      
+
       let contentType = response.headers.get('Content-Type');
       let extension = '';
+      let fileName = uri.substring(uri.lastIndexOf('/') + 1);
+
       if (!contentType) {
-        const fileName = uri.substring(uri.lastIndexOf('/') + 1); // Extract file name from URI
-        extension = fileName.split('.').pop()?.toLowerCase() || ''; // Extract extension from file name
-        // Map common file extensions to MIME types (add more as needed)
-        switch (extension) {
-          case 'jpg':
-          case 'jpeg':
-            contentType = 'image/jpeg';
-            break;
-          case 'png':
-            contentType = 'image/png';
-            break;
-          case 'webp':
-            contentType = 'image/webp';
-            break;
-          case 'mp4':
-            contentType = 'video/mp4';
-            break;
-          // Add more cases for other file types if necessary
-          default:
-            throw new Error('Content type not found');
-        }
+        // If Content-Type is not provided, derive it from the file name
+        const fileName = uri.substring(uri.lastIndexOf('/') + 1);
+        extension = fileName.split('.').pop()?.toLowerCase() || '';
+        contentType = this.mapExtensionToContentType(extension);
       } else {
-        extension = contentType.split('/')[1]; // Extract extension from content type
+        // If Content-Type is provided, extract extension from it
+        extension = contentType.split('/')[1];
       }
 
       const blob = await response.blob();
@@ -88,6 +75,7 @@ export class UtilsService {
         type: contentType,
         extension: extension,
         rawFile: blob,
+        orginalLink: uri,
         value: ''
       };
 
@@ -95,6 +83,31 @@ export class UtilsService {
     } catch (error) {
       throw error;
     }
+  }
+
+  // Helper method to map file extensions to MIME types
+  static mapExtensionToContentType(extension: string): string {
+    const extensionMap: { [key: string]: string } = {
+      'jpg': 'image/jpeg',
+      'jpeg': 'image/jpeg',
+      'png': 'image/png',
+      'gif': 'image/gif',
+      'webp': 'image/webp',
+      'mp4': 'video/mp4',
+      'avi': 'video/x-msvideo',
+      'mp3': 'audio/mpeg',
+      'wav': 'audio/wav',
+      'pdf': 'application/pdf',
+      'txt': 'text/plain',
+      'doc': 'application/msword',
+      'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'ppt': 'application/vnd.ms-powerpoint',
+      'pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      'zip': 'application/zip',
+      // Add more mappings as needed
+    };
+
+    return extensionMap[extension] || 'application/octet-stream'; // Default type if not found
   }
 
   static async resizeVideo(file: File, resolution: '1080p' | '720p' | '480p' | '360p'): Promise<string> {
@@ -213,6 +226,40 @@ export class UtilsService {
   }
 
   async uploadFile(accept: string): Promise<VFile> {
+    return new Promise<VFile>((resolve, reject) => {
+      let fileInput = document.createElement("input");
+      fileInput.accept = accept;
+      fileInput.type = 'file';
+      fileInput.click();
+
+      fileInput.onchange = (e) => {
+        let rawFile = fileInput.files![0];
+        let fileName = rawFile.name;
+        let fileType = rawFile.type;
+        let lastIndex = fileName.lastIndexOf('.') > 0 ? fileName.lastIndexOf('.') + 1 : fileName.length;
+        let extension = fileName.substring(lastIndex);
+
+        let reader = new FileReader();
+
+        reader.onload = () => {
+          let value: string = reader.result && typeof reader.result === 'string' ? reader.result : '';
+          let file: VFile = {
+            name: fileName,
+            type: fileType,
+            rawFile: rawFile,
+            value: value,
+            extension: extension
+          }
+
+          fileInput.remove();
+          resolve(file);
+        };
+        reader.readAsText(rawFile);
+      };
+    });
+  }
+
+  static async uploadFileAsVFile(accept: string): Promise<VFile> {
     return new Promise<VFile>((resolve, reject) => {
       let fileInput = document.createElement("input");
       fileInput.accept = accept;

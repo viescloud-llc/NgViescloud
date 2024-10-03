@@ -7,9 +7,10 @@ import { UtilsService, VFile } from 'projects/viescloud-utils/src/lib/service/Ut
 import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
 import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
 import { ViesPinterestService, ProductService } from 'projects/viescloud-utils/src/lib/service/AffiliateMarketing.service';
-import { SmbService } from 'projects/viescloud-utils/src/lib/service/Smb.service';
 import { PinRequest, MediaSourceMultipleImage, MediaSourceImageUrl, MediaSourceVideo, Category, PinterestPinData, MediaSourceType, FileLink } from 'projects/viescloud-utils/src/lib/model/AffiliateMarketing.model';
 import { QuickSideDrawerMenuService } from 'projects/viescloud-utils/src/lib/service/QuickSideDrawerMenu.service';
+import { S3StorageServiceV1 } from 'projects/viescloud-utils/src/lib/service/ObjectStorageManager.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-pinterest-product',
@@ -18,7 +19,6 @@ import { QuickSideDrawerMenuService } from 'projects/viescloud-utils/src/lib/ser
 })
 export class PinterestProductComponent extends ProductBasicComponent {
 
-  vFiles: VFile[] = [];
   fileOptions: MatOption<number>[] = [];
   boardNameOptions: MatOption<string>[] = [];
 
@@ -36,11 +36,12 @@ export class PinterestProductComponent extends ProductBasicComponent {
     protected pinterestService: ViesPinterestService,
     protected override matDialog: MatDialog,
     protected override productService: ProductService,
-    protected override smbService: SmbService,
+    protected override s3StorageService: S3StorageServiceV1,
     protected override route: Router,
-    protected override data: ProductData
+    protected override data: ProductData,
+    protected override snackBar: MatSnackBar
   ) { 
-    super(matDialog, productService, smbService, route, data);
+    super(matDialog, productService, s3StorageService, route, data, snackBar);
   }
   
   override ngOnChanges(changes?: SimpleChanges): void {
@@ -202,7 +203,7 @@ export class PinterestProductComponent extends ProductBasicComponent {
       return this.blankMediaSourceVideo;
   }
 
-  override afterRemoveFile(index: number): void {
+  override onRemoveFile(index: number): void {
       this.vFiles.splice(index, 1);
       this.initVFileOptions();
 

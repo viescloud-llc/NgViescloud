@@ -57,7 +57,7 @@ export class ProductData {
 
   async fetchFile(uri: string) {
     return new Promise<void>((resolve, reject) => {
-      UtilsService.fetchMedia(uri).then(file => {
+      UtilsService.fetchAsVFile(uri).then(file => {
         if(file.type.toLowerCase() === 'mp4' || file.type === 'webm' || file.type === 'jpg' || file.type === 'png' || file.type === 'jpeg') {
           let newFileName = UtilsService.makeId(20) + '.' + file.extension;
           let fileLink: FileLink = {

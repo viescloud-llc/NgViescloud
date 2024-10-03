@@ -7,6 +7,8 @@ import { ProductService } from 'projects/viescloud-utils/src/lib/service/Affilia
 import { SmbService } from 'projects/viescloud-utils/src/lib/service/Smb.service';
 import { PinResponse } from 'projects/viescloud-utils/src/lib/model/AffiliateMarketing.model';
 import { QuickSideDrawerMenuService } from 'projects/viescloud-utils/src/lib/service/QuickSideDrawerMenu.service';
+import { S3StorageServiceV1 } from 'projects/viescloud-utils/src/lib/service/ObjectStorageManager.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-product-overall',
@@ -20,11 +22,12 @@ export class ProductOverallComponent extends ProductBasicComponent {
   constructor(
     protected override matDialog: MatDialog,
     protected override productService: ProductService,
-    protected override smbService: SmbService,
+    protected override s3StorageService: S3StorageServiceV1,
     protected override route: Router,
-    protected override data: ProductData
+    protected override data: ProductData,
+    protected override snackBar: MatSnackBar
   ) { 
-    super(matDialog, productService, smbService, route, data);
+    super(matDialog, productService, s3StorageService, route, data, snackBar);
   }
 
   override ngOnChanges(changes: SimpleChanges): void {

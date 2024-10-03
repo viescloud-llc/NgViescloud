@@ -9,6 +9,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
 export abstract class ObjectStorage {
   objectUrlCache = new Map<string, string>();
+  vfileCache = new Map<string, VFile>();
   constructor(
     private httpClient: HttpClient
   ) { }
@@ -225,6 +226,60 @@ export abstract class ObjectStorage {
       },
       error: (error) => {
         reject(error);
+      }
+    });
+  }
+
+  fetchFile(uri: string): Observable<VFile> {
+    return new Observable<VFile>(observer => {
+      if(this.vfileCache.has(uri)) {
+        observer.next(this.vfileCache.get(uri)!);
+        observer.complete();
+        return;
+      } 
+      else if(!this.containViesLink(uri)) {
+        UtilsService.fetchAsVFile(uri).then(file => {
+          this.vfileCache.set(uri, file);
+          observer.next(file);
+          observer.complete();
+        }).catch(err => {
+          observer.error(err);
+        })
+      } 
+      else {
+        this.httpClient.get(uri, { observe: 'response', responseType: 'blob' })
+          .subscribe({
+            next: (response) => {
+              let contentType = response.headers.get('Content-Type') || '';
+              let fileName = uri.substring(uri.lastIndexOf('/') + 1);
+              let extension = '';
+  
+              if (!contentType) {
+                // If Content-Type is not provided, derive it from the file name
+                extension = fileName.split('.').pop()?.toLowerCase() || '';
+                contentType = UtilsService.mapExtensionToContentType(extension);
+              } else {
+                // If Content-Type is provided, extract extension from it
+                extension = contentType.split('/')[1];
+              }
+        
+              const vFile: VFile = {
+                name: fileName,
+                type: contentType,
+                extension: extension,
+                rawFile: response.body as Blob,
+                orginalLink: uri,
+                value: ''
+              };
+  
+              this.vfileCache.set(uri, vFile);
+              observer.next(vFile);
+              observer.complete();
+            },
+            error: (error) => {
+              observer.error(error);
+            }
+          });
       }
     });
   }

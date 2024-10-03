@@ -4,6 +4,8 @@ import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-d
 import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
 import { UtilsService, VFile } from 'projects/viescloud-utils/src/lib/service/Utils.service';
 import { ProductData } from '../data/product-data.service';
+import { SmbService } from 'projects/viescloud-utils/src/lib/service/Smb.service';
+import { SmbStorageServiceV1 } from 'projects/viescloud-utils/src/lib/service/ObjectStorageManager.service';
 
 @Component({
   selector: 'app-product-display',
@@ -43,12 +45,16 @@ export class ProductDisplayComponent implements OnInit, OnChanges {
   ];
 
   @Input()
-  files: VFile[] = [];
-
-  @Input()
   selectedIndex: number = 0;
+
   @Output()
   selectedIndexChange = new EventEmitter<number>();
+
+  @Input()
+  uploadError = '';
+
+  @Input()
+  files: VFile[] = [];
 
   @Input()
   fileOptions: MatOption<number>[] = [];
@@ -60,34 +66,41 @@ export class ProductDisplayComponent implements OnInit, OnChanges {
   onSelectFileOption = new EventEmitter<number>();
 
   @Output()
-  onAddFile = new EventEmitter<void>();
+  onFetchFile = new EventEmitter<void>();
+
+  @Output()
+  onUploadFile = new EventEmitter<void>();
+
+  inputUri = '';
+  selectedResolution: '1080p' | '720p' | '480p' | '360p' | 'original' = '480p';
 
   constructor(
-    private matDialog: MatDialog,
-    public data: ProductData
+    private matDialog: MatDialog
   ) { }
+
   ngOnChanges(changes: SimpleChanges): void {
-    if(changes['data']) {
-      this.data.populateAllFile(this.data.selectedResolution);
+    if(changes['files'])
+      this.populateAllFile(this.selectedResolution);
+  }
+
+  async ngOnInit() {
+    this.populateAllFile(this.selectedResolution);
+  }
+
+  async populateAllFile(selectedResolution: '1080p' | '720p' | '480p' | '360p' | 'original') {
+    for(let file of this.files) {
+      if(file.rawFile) {
+        if(file.extension === 'mp4' || file.extension === 'webm') {
+            file.value = window.URL.createObjectURL(file.rawFile);
+        }
+        else {
+          if(selectedResolution !== 'original')
+            file.value = await UtilsService.resizeImage(file.rawFile, selectedResolution);
+          else
+            file.value = window.URL.createObjectURL(file.rawFile);
+        }
+      }
     }
-  }
-  ngOnInit(): void {
-    this.data.populateAllFile(this.data.selectedResolution);
-  }
-
-  fetchFile() {
-    this.data.fetchFile(this.data.inputUri).then(() => {
-      this.data.inputUri = '';
-      this.data.populateAllFile(this.data.selectedResolution);
-      this.onAddFile.emit();
-    });
-  }
-
-  uploadFile() {
-    this.data.uploadFile().then(() => {
-      this.data.populateAllFile(this.data.selectedResolution);
-      this.onAddFile.emit();
-    })
   }
   
   removeFile(index: number) {
@@ -104,7 +117,7 @@ export class ProductDisplayComponent implements OnInit, OnChanges {
   }
 
   getWidthResolution() {
-   switch(this.data.selectedResolution) {
+   switch(this.selectedResolution) {
      case '1080p':
       return this.resolutions['1080p'].width;
      case '720p':
@@ -119,7 +132,7 @@ export class ProductDisplayComponent implements OnInit, OnChanges {
   }
 
   getHeightResolution() {
-   switch(this.data.selectedResolution) {
+   switch(this.selectedResolution) {
      case '1080p':
       return this.resolutions['1080p'].height;
      case '720p':

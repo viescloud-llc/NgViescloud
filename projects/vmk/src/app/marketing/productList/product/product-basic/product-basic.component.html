@@ -1,9 +1,11 @@
 <ul class="margin-center" appMatFormFieldGroup (onAllInputCheck)="validInput = $event">
   <li>
     <app-product-display
-    [files]="data.files"
+    [files]="vFiles"
     [(selectedIndex)]="selectedFileIndex"
-    (onRemoveFile)="afterRemoveFile($event)"
+    (onUploadFile)="onUploadFile()"
+    (onFetchFile)="onFetchFile()"
+    (onRemoveFile)="onRemoveFile($event)"
     ></app-product-display>
   </li>
   <ng-container *ngIf="product.fileLinks">
