@@ -221,10 +221,6 @@ export class PinterestProductComponent extends ProductBasicComponent {
       }
   }
 
-  override afterAddFile(vFile: VFile, fileLink: FileLink): void {
-    this.ngOnChanges();
-  }
-
   protected addNewFile(): void {
     this.importFileFromProduct(this.data.files.length - 1);
     this.selectedFileIndex = this.vFiles.length - 1;

@@ -66,7 +66,7 @@ export class ProductDisplayComponent implements OnInit, OnChanges {
   onSelectFileOption = new EventEmitter<number>();
 
   @Output()
-  onFetchFile = new EventEmitter<void>();
+  onFetchFile = new EventEmitter<string>();
 
   @Output()
   onUploadFile = new EventEmitter<void>();
@@ -79,8 +79,10 @@ export class ProductDisplayComponent implements OnInit, OnChanges {
   ) { }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if(changes['files'])
+    if(changes['files']) {
       this.populateAllFile(this.selectedResolution);
+      this.inputUri = '';
+    }
   }
 
   async ngOnInit() {

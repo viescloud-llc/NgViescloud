@@ -22,6 +22,7 @@ export class ProductBasicComponent implements OnInit, OnChanges {
 
   product!: Product;
   vFiles: VFile[] = [];
+  vFilesCopy: VFile[] = [];
 
   //blank object
   blankProduct = new Product();
@@ -47,67 +48,94 @@ export class ProductBasicComponent implements OnInit, OnChanges {
   }
 
   ngOnInit() {
+    this.vFiles = [];
+    this.vFilesCopy = [];
+
     this.product = structuredClone(this.data.product);
+
     if(!this.product.fileLinks)
       this.product.fileLinks = [];
+
     this.product.fileLinks.forEach(fileLink => {
       this.s3StorageService.fetchFile(fileLink.link)
       .pipe(UtilsService.waitLoadingSnackBarDynamicString(this.snackBar))
       .subscribe({
         next: res => {
-          this.vFiles.push(res);
+          this.pushVFile(res);
+          this.vFilesCopy = structuredClone(this.vFiles);
         }
       })
     })
   }
 
   isProductChange() {
-    return !UtilsService.isEqual(this.product, this.data.product);
+    return !UtilsService.isEqual(this.product, this.data.product) || !UtilsService.isEqual(this.vFiles, this.vFilesCopy);
   }
 
   async onUploadFile() {
     let vfile = await UtilsService.uploadFileAsVFile("image/jpeg, image/png, image/webp, video/mp4, video/webm");
-    this.vFiles = [...this.vFiles, vfile];
+    this.pushVFile(vfile);
   }
 
-  onFetchFile() {
-    
-  }
-
-  afterAddFile(vFile: VFile, fileLink: FileLink) {
-    // if(this.selectedTabIndex == this.currentTabIndex) {
-    //   if(!this.product.fileLinks)
-    //     this.product.fileLinks = [];
-    //   this.product.fileLinks.push(fileLink);
-    //   this.selectedFileIndex = this.data.files.length - 1;
-    // }
+  onFetchFile(uri: string) {
+    this.s3StorageService.fetchFile(uri)
+    .pipe(UtilsService.waitLoadingSnackBarDynamicString(this.snackBar))
+    .subscribe({
+      next: res => {
+        this.pushVFile(res);
+      }
+    });
   }
 
   onRemoveFile(index: number) {
-    this.data.files.splice(index, 1);
-    this.product.fileLinks!.splice(index, 1);
+    this.vFiles.splice(index, 1);
+  }
+
+  pushVFile(vFile: VFile) {
+    vFile.name = UtilsService.makeId(30) + vFile.extension;
+    this.vFiles = [...this.vFiles, vFile];
+    this.selectedFileIndex = this.vFiles.length - 1;
   }
 
   reverse() {
     this.ngOnInit();
-    this.data.syncFileLinks();
+  }
+
+  async syncVFiles() {
+
+    //post new file
+    this.vFiles.forEach(async (vFile, index) => {
+      if(this.vFilesCopy.findIndex(e => e.name === vFile.name) < 0) {
+        const metadata = await firstValueFrom(this.s3StorageService.postFile(vFile).pipe(UtilsService.waitLoadingDialog(this.matDialog)));
+        vFile.orginalLink = this.s3StorageService.generateViesLinkFromPath(metadata.path!);
+      }
+    })
+
+    //add link to product if not exist
+    this.vFiles.forEach(async (vFile, index) => {
+      if(this.product.fileLinks!.findIndex(e => e.link === vFile.orginalLink) < 0) {
+        this.product.fileLinks!.push({
+          id: 0,
+          link: vFile.orginalLink!, 
+          mediaType: vFile.type,
+          external: false
+        });
+      }
+    });
+
+    //remove link from product if not exist in vFiles
+    for(let i = 0; i < this.product.fileLinks!.length; i++) {
+      if(this.vFiles.findIndex(e => e.orginalLink === this.product.fileLinks![i].link) < 0) {
+        let link = this.s3StorageService.extractPathFromViesLink(this.product.fileLinks![i].link);
+        await firstValueFrom(this.s3StorageService.deleteFileByPath(link).pipe(UtilsService.waitLoadingDialog(this.matDialog)));
+        this.product.fileLinks!.splice(i, 1);
+        i--;
+      }
+    }
   }
 
   async save() {
-    for (const [index, fileLink] of this.product.fileLinks!.entries()) {
-      if (!fileLink.external && !this.s3StorageService.containViesLink(fileLink.link)) {
-        const file = this.data.files[index];
-        try {
-          const metadata = await firstValueFrom(
-            this.s3StorageService.postFile(file).pipe(UtilsService.waitLoadingDialog(this.matDialog))
-          );
-          fileLink.link = this.s3StorageService.generateViesLinkFromPath(metadata.path!);
-        } catch (error: any) {
-          window.alert('Error uploading file: ' + error.error.reason);
-          return;
-        }
-      }
-    }
+    this.syncVFiles();
 
     if(!this.product.id) {
       this.productService.post(this.product).pipe(UtilsService.waitLoadingDialog(this.matDialog)).subscribe({

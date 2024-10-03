@@ -4,7 +4,7 @@
     [files]="vFiles"
     [(selectedIndex)]="selectedFileIndex"
     (onUploadFile)="onUploadFile()"
-    (onFetchFile)="onFetchFile()"
+    (onFetchFile)="onFetchFile($event)"
     (onRemoveFile)="onRemoveFile($event)"
     ></app-product-display>
   </li>

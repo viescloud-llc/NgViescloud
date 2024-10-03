@@ -226,37 +226,7 @@ export class UtilsService {
   }
 
   async uploadFile(accept: string): Promise<VFile> {
-    return new Promise<VFile>((resolve, reject) => {
-      let fileInput = document.createElement("input");
-      fileInput.accept = accept;
-      fileInput.type = 'file';
-      fileInput.click();
-
-      fileInput.onchange = (e) => {
-        let rawFile = fileInput.files![0];
-        let fileName = rawFile.name;
-        let fileType = rawFile.type;
-        let lastIndex = fileName.lastIndexOf('.') > 0 ? fileName.lastIndexOf('.') + 1 : fileName.length;
-        let extension = fileName.substring(lastIndex);
-
-        let reader = new FileReader();
-
-        reader.onload = () => {
-          let value: string = reader.result && typeof reader.result === 'string' ? reader.result : '';
-          let file: VFile = {
-            name: fileName,
-            type: fileType,
-            rawFile: rawFile,
-            value: value,
-            extension: extension
-          }
-
-          fileInput.remove();
-          resolve(file);
-        };
-        reader.readAsText(rawFile);
-      };
-    });
+    return UtilsService.uploadFileAsVFile(accept);
   }
 
   static async uploadFileAsVFile(accept: string): Promise<VFile> {

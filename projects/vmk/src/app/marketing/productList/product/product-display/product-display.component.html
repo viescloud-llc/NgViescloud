@@ -43,8 +43,8 @@
   placeholder="Ex. https://example.com"
   [(value)]="inputUri"
   styleWidth="100%"
-  (onEnter)="onFetchFile.emit()"
-  (onCustomIconClick)="onFetchFile.emit()"
+  (onEnter)="onFetchFile.emit(inputUri)"
+  (onCustomIconClick)="onFetchFile.emit(inputUri)"
   [customIconLabel]="'cloud_upload'"
   (onValueChange)="uploadError = ''"
   ></app-mat-form-field-input>
