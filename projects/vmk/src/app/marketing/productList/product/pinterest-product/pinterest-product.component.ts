@@ -32,18 +32,15 @@ export class PinterestProductComponent extends ProductBasicComponent {
   width: number = 1080;
   height: number = 1920;
 
-  override currentTabIndex: number = 2;
-
   constructor(
     protected pinterestService: ViesPinterestService,
     protected override matDialog: MatDialog,
     protected override productService: ProductService,
     protected override smbService: SmbService,
     protected override route: Router,
-    protected override data: ProductData,
-    protected override sideMenuService: QuickSideDrawerMenuService
+    protected override data: ProductData
   ) { 
-    super(matDialog, productService, smbService, route, data, sideMenuService);
+    super(matDialog, productService, smbService, route, data);
   }
   
   override ngOnChanges(changes?: SimpleChanges): void {

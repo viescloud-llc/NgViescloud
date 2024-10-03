@@ -21,7 +21,6 @@ export class ProductData {
 
   //data
   product!: Product;
-  // productCopy!: Product;
   categories: Category[] = [];
   productCategoriesOptions: MatOption<Category>[] = [];
   files: VFile[] = [];
@@ -115,16 +114,13 @@ export class ProductData {
   async loadProduct(id: number) {
     return new Promise<void>((resolve, reject) => {
       if (id <= 0) {
-        this.product = new Product();
-        this.product.fileLinks = [];
-        // this.productCopy = structuredClone(this.product);
+        this.loadNewProduct();
         resolve();
       }
       else {
         this.productService.get(id).pipe(UtilsService.waitLoadingDialog(this.matDialog)).subscribe({
           next: res => {
             this.product = res;
-            // this.productCopy = structuredClone(res);
           },
           error: err => {
             if (err.status === 404)
@@ -139,6 +135,12 @@ export class ProductData {
         });
       }
     })
+  }
+
+  private loadNewProduct() {
+    this.product = new Product();
+    this.product.fileLinks = [];
+    this.product.pinterestPinData = undefined;
   }
 
   async syncFileLinks() {

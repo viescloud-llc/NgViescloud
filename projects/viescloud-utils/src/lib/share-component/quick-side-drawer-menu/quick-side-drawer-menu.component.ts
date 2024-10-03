@@ -29,6 +29,9 @@ export class QuickSideDrawerMenuComponent implements OnInit {
   @Input() 
   loadComponent?: Type<any>;
 
+  @Input()
+  registerWithService: boolean = true;
+
   @Output()
   onClickLoadComponent: EventEmitter<Type<any>> = new EventEmitter<Type<any>>();
 
@@ -38,9 +41,7 @@ export class QuickSideDrawerMenuComponent implements OnInit {
   constructor(
     private router: Router,
     private quickSideDrawerMenuService: QuickSideDrawerMenuService
-  ) { 
-    
-  }
+  ) { }
 
   ngOnInit() {
     if(this.loadComponent)
@@ -48,7 +49,7 @@ export class QuickSideDrawerMenuComponent implements OnInit {
     else
       this.container.clear();
 
-    if(this.isRoot)
+    if(this.isRoot && this.registerWithService)
       this.quickSideDrawerMenuService.setMenu(this);
   }
 

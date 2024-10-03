@@ -18,15 +18,7 @@ import { ProductMenuComponent } from '../product-menu/product-menu.component';
 })
 export class ProductBasicComponent implements OnInit, OnChanges {
 
-  @Input()
-  selectedTabIndex = 0;
-
-  @Output()
-  selectedTabIndexChange = new EventEmitter<number>();
-
   product!: Product;
-
-  currentTabIndex = 1;
 
   //blank object
   blankProduct = new Product();
@@ -44,7 +36,6 @@ export class ProductBasicComponent implements OnInit, OnChanges {
     protected smbService: SmbService,
     protected route: Router,
     protected data: ProductData,
-    protected sideMenuService: QuickSideDrawerMenuService
   ) { 
     data.onAddFileSubscribers.push({
       afterAdd: (f, fl) => {
@@ -54,48 +45,24 @@ export class ProductBasicComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if(this.selectedTabIndex != this.currentTabIndex && this.product && this.isProductChange()) {
-      let dialog = this.matDialog.open(ConfirmDialog, {
-        data: {
-          title: `You have unsaved changes`,
-          message: 'you have unsaved changes. Do you want to discard/undo them?',
-          yes: 'Yes',
-          no: 'No'
-        }
-      })
-
-      dialog.afterClosed().subscribe({
-        next: res => {
-          if(res) {
-            this.reverse();
-          }
-          else
-            this.selectedTabIndexChange.emit(this.currentTabIndex);
-        }
-      })
-    }
+    
   }
 
   ngOnInit() {
     this.product = structuredClone(this.data.product);
-    if(!this.product.id) {
-      this.product.pinterestPinData = undefined;
-    }
-
-    this.sideMenuService.loadComponent(ProductMenuComponent);
   }
 
   isProductChange() {
-    return !UtilsService.isEqual(this.data.product, this.product);
+    return !UtilsService.isEqual(this.product, this.data.product);
   }
 
   afterAddFile(vFile: VFile, fileLink: FileLink) {
-    if(this.selectedTabIndex == this.currentTabIndex) {
-      if(!this.product.fileLinks)
-        this.product.fileLinks = [];
-      this.product.fileLinks.push(fileLink);
-      this.selectedFileIndex = this.data.files.length - 1;
-    }
+    // if(this.selectedTabIndex == this.currentTabIndex) {
+    //   if(!this.product.fileLinks)
+    //     this.product.fileLinks = [];
+    //   this.product.fileLinks.push(fileLink);
+    //   this.selectedFileIndex = this.data.files.length - 1;
+    // }
   }
 
   afterRemoveFile(index: number) {

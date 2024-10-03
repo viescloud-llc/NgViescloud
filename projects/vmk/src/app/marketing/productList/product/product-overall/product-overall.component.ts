@@ -15,8 +15,6 @@ import { QuickSideDrawerMenuService } from 'projects/viescloud-utils/src/lib/ser
 })
 export class ProductOverallComponent extends ProductBasicComponent {
 
-  override currentTabIndex: number = 0;
-
   blankPinResponse: PinResponse = new PinResponse();
 
   constructor(
@@ -24,10 +22,9 @@ export class ProductOverallComponent extends ProductBasicComponent {
     protected override productService: ProductService,
     protected override smbService: SmbService,
     protected override route: Router,
-    protected override data: ProductData,
-    protected override sideMenuService: QuickSideDrawerMenuService
+    protected override data: ProductData
   ) { 
-    super(matDialog, productService, smbService, route, data, sideMenuService);
+    super(matDialog, productService, smbService, route, data);
   }
 
   override ngOnChanges(changes: SimpleChanges): void {

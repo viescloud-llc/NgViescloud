@@ -11,7 +11,7 @@ export class QuickSideDrawerMenuService {
   constructor() { }
 
   setMenu(menu: QuickSideDrawerMenuComponent) {
-    if(menu.isRoot === true)
+    if(menu.isRoot === true && this.menu === undefined)
       this.menu = menu;
   }
 

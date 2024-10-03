@@ -573,6 +573,30 @@ export class UtilsService {
     window.history.pushState({}, '', newUrl);
   }
 
+  /**
+   * Retrieves the value of a URL path variable.
+   * @param variableName - The name of the path variable to retrieve.
+   * @returns The value of the path variable, or null if it is not found.
+   * @example path = '/users/123' and variableName = 'users' => returns '123'
+   */
+  static getPathVariable(variableName: string): string | null {
+    // Get the current URL using window.location.href
+    const url = window.location.href;
+    
+    // Split the URL into segments
+    const segments = url.split('/').filter(segment => segment); // Remove empty segments
+
+    // Find the index of the variable name
+    const index = segments.indexOf(variableName);
+
+    // If the variable exists and is not the last segment, return the next segment
+    if (index !== -1 && index + 1 < segments.length) {
+      return segments[index + 1];
+    }
+
+    return null; // Return null if the variable is not found
+  }
+
   static reTryIfFail(fn: () => any, timeout?: number) {
     try {
       fn();

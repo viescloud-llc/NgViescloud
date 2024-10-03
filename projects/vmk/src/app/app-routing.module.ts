@@ -12,6 +12,8 @@ import { ProductListComponent } from './marketing/productList/productList.compon
 import { OathPinterestComponent } from './oath/oath-pinterest/oath-pinterest.component';
 import { LogoutComponent } from 'projects/viescloud-utils/src/lib/share-component/logout/logout.component';
 import { ApplicationSettingComponent } from 'projects/viescloud-utils/src/lib/share-component/application-setting/application-setting.component';
+import { ProductBasicComponent } from './marketing/productList/product/product-basic/product-basic.component';
+import { ProductOverallComponent } from './marketing/productList/product/product-overall/product-overall.component';
 
 const routes: Routes = [
   {
@@ -37,7 +39,22 @@ const routes: Routes = [
     children: [
       {
         path: 'products/:id',
-        component: ProductComponent
+        component: ProductComponent,
+        children: [
+          {
+            path: 'overall',
+            component: ProductOverallComponent
+          },
+          {
+            path: 'basic',
+            component: ProductBasicComponent
+          },
+          {
+            path: '',
+            redirectTo: 'basic',
+            pathMatch: 'full'
+          }
+        ]
       },
       {
         path: 'products',

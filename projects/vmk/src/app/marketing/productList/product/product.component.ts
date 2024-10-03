@@ -1,4 +1,4 @@
-import { AfterContentInit, AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterContentInit, AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
@@ -13,6 +13,9 @@ import { VFile, UtilsService } from 'projects/viescloud-utils/src/lib/service/Ut
 import { ProductData } from './data/product-data.service';
 import { PinterestProductComponent } from './pinterest-product/pinterest-product.component';
 import { LoadingDialog } from 'projects/viescloud-utils/src/lib/dialog/loading-dialog/loading-dialog.component';
+import { QuickSideDrawerMenu } from 'projects/viescloud-utils/src/lib/share-component/quick-side-drawer-menu/quick-side-drawer-menu.component';
+import { QuickSideDrawerMenuService } from 'projects/viescloud-utils/src/lib/service/QuickSideDrawerMenu.service';
+import { ProductMenuComponent } from './product-menu/product-menu.component';
 
 @Component({
   selector: 'app-product',
@@ -21,35 +24,19 @@ import { LoadingDialog } from 'projects/viescloud-utils/src/lib/dialog/loading-d
 })
 export class ProductComponent extends FixChangeDetection implements OnInit {
 
-  isValidBasicDataInput: boolean = false;
-  isValidPinterestDataInput: boolean = false;
-  selectedTabIndex: number = 0;
-
   constructor(
     private route: ActivatedRoute,
     private matDialog: MatDialog,
-    public data: ProductData
+    public data: ProductData,
+    private sideMenuService: QuickSideDrawerMenuService
   ) { 
     super();
   }
 
   async ngOnInit(): Promise<void> {
-    let tab = UtilsService.getQueryParam("tab");
-    if(tab) {
-      switch(tab) {
-        case 'basic':
-          this.selectedTabIndex = 1;
-          break;
-        case 'pinterest':
-          this.selectedTabIndex = 2;
-          break;
-        default:
-          this.selectedTabIndex = 0;
-      }
-    }
+    this.sideMenuService.loadComponent(ProductMenuComponent);
 
     let loading = UtilsService.openLoadingDialog(this.matDialog, 5000);
-
     this.data.error = "";
     this.data.uploadError = "";
     let id = Number(this.route.snapshot.paramMap.get('id'));
@@ -59,24 +46,5 @@ export class ProductComponent extends FixChangeDetection implements OnInit {
     await this.data.syncFileLinks();
 
     loading.close();
-  }
-
-  isAllValidInput() {
-    return this.isValidBasicDataInput && this.isValidPinterestDataInput;
-  }
-
-  changeTabIndex(num: number) {
-    this.selectedTabIndex = num;
-
-    switch(num) {
-      case 0:
-        UtilsService.setQueryParam("tab", "overall");
-        break;
-      case 2:
-        UtilsService.setQueryParam("tab", "pinterest");
-        break;
-      default:
-        UtilsService.setQueryParam("tab", "basic");
-    }
   }
 }

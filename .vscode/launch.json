@@ -3,6 +3,20 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "type": "firefox",
+      "request": "launch",
+      "name": "Launch Firefox",
+      "url": "http://localhost:4200",
+      "webRoot": "${workspaceFolder}",
+      "reAttach": true,
+      "pathMappings": [
+        {
+          "url": "webpack:///projects",
+          "path": "${workspaceFolder}/projects"
+        }
+      ]
+    },
+    {
       "name": "debug v-console",
       "type": "chrome",
       "request": "launch",
