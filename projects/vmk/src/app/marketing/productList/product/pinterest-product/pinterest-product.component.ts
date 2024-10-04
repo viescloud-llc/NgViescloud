@@ -67,7 +67,7 @@ export class PinterestProductComponent extends ProductBasicComponent {
 
   private finishLoading() {
     if(this.data.product) {
-      if(this.data.product.fileLinks && this.data.product.fileLinks.length > 0 && this.data.files.length == 0)
+      if(this.data.product.fileLinks && this.data.product.fileLinks.length > 0)
         return false;
     
       return true;
@@ -103,84 +103,84 @@ export class PinterestProductComponent extends ProductBasicComponent {
   }
 
   syncVFile() {
-    this.vFiles = [];
+    // this.vFiles = [];
 
-    if(this.product && this.product.pinterestPinData && this.product.pinterestPinData.pinRequest.media_source) {
-      let mediaSource = this.product.pinterestPinData.pinRequest.media_source;
+    // if(this.product && this.product.pinterestPinData && this.product.pinterestPinData.pinRequest.media_source) {
+    //   let mediaSource = this.product.pinterestPinData.pinRequest.media_source;
       
-      if(mediaSource instanceof MediaSourceMultipleImage || (mediaSource && mediaSource.source_type == MediaSourceType.IMAGES)) {
-        let mediaSource = this.product.pinterestPinData!.pinRequest.media_source as MediaSourceMultipleImage;
-        for(let i = 0; i < this.data.files.length; i++) {
-          let file = this.data.files[i];
-          if(mediaSource.items.findIndex(e => e.url === file.name || e.url.substring(e.url.lastIndexOf('/') + 1) === file.name) >= 0)
-            this.vFiles.push(file);
-        }
-      }
-      else if(mediaSource instanceof MediaSourceImageUrl || (mediaSource && mediaSource.source_type == MediaSourceType.IMAGE)) {
-        let mediaSource = this.product.pinterestPinData!.pinRequest.media_source as MediaSourceImageUrl;
-        let fileIndex = this.data.files.findIndex(e => UtilsService.isEqual(e.name, mediaSource.url) || mediaSource.url.substring(e.name.lastIndexOf('/') + 1) === e.name);
-        if(fileIndex >= 0)
-          this.vFiles.push(this.data.files[fileIndex]);
-      }
-    }
+    //   if(mediaSource instanceof MediaSourceMultipleImage || (mediaSource && mediaSource.source_type == MediaSourceType.IMAGES)) {
+    //     let mediaSource = this.product.pinterestPinData!.pinRequest.media_source as MediaSourceMultipleImage;
+    //     for(let i = 0; i < this.data.files.length; i++) {
+    //       let file = this.data.files[i];
+    //       if(mediaSource.items.findIndex(e => e.url === file.name || e.url.substring(e.url.lastIndexOf('/') + 1) === file.name) >= 0)
+    //         this.vFiles.push(file);
+    //     }
+    //   }
+    //   else if(mediaSource instanceof MediaSourceImageUrl || (mediaSource && mediaSource.source_type == MediaSourceType.IMAGE)) {
+    //     let mediaSource = this.product.pinterestPinData!.pinRequest.media_source as MediaSourceImageUrl;
+    //     let fileIndex = this.data.files.findIndex(e => UtilsService.isEqual(e.name, mediaSource.url) || mediaSource.url.substring(e.name.lastIndexOf('/') + 1) === e.name);
+    //     if(fileIndex >= 0)
+    //       this.vFiles.push(this.data.files[fileIndex]);
+    //   }
+    // }
   }
 
   initVFileOptions() {
-    this.fileOptions = [];
-    if(this.product && this.product.pinterestPinData) {
-      let mediaSource = this.product.pinterestPinData.pinRequest.media_source;
-      let mediaSourceType = !mediaSource ? null : mediaSource instanceof MediaSourceMultipleImage ? 'image/' : 'video/'
-      for(let i = 0; i < (this.product.fileLinks ? this.product.fileLinks!.length : 0); i++) {
-        let link = this.product.fileLinks![i];
-        let file = this.data.files[i];
+    // this.fileOptions = [];
+    // if(this.product && this.product.pinterestPinData) {
+    //   let mediaSource = this.product.pinterestPinData.pinRequest.media_source;
+    //   let mediaSourceType = !mediaSource ? null : mediaSource instanceof MediaSourceMultipleImage ? 'image/' : 'video/'
+    //   for(let i = 0; i < (this.product.fileLinks ? this.product.fileLinks!.length : 0); i++) {
+    //     let link = this.product.fileLinks![i];
+    //     let file = this.data.files[i];
   
-        if(!this.vFiles.some(e => UtilsService.isEqual(e, file))) {
-          if(!mediaSourceType || (file && file.type.startsWith(mediaSourceType))) {
-            this.fileOptions.push({
-              value: i,
-              valueLabel: "File " + (i + 1) + ": " + link.link
-            })
-          }
-        }
-      }
-    }
+    //     if(!this.vFiles.some(e => UtilsService.isEqual(e, file))) {
+    //       if(!mediaSourceType || (file && file.type.startsWith(mediaSourceType))) {
+    //         this.fileOptions.push({
+    //           value: i,
+    //           valueLabel: "File " + (i + 1) + ": " + link.link
+    //         })
+    //       }
+    //     }
+    //   }
+    // }
   }
 
   importFileFromProduct(index: number) {
-    let file = this.data.files[index];
-    let fileLink = this.product.fileLinks![index];
-    this.vFiles.push(file);
+    // let file = this.data.files[index];
+    // let fileLink = this.product.fileLinks![index];
+    // this.vFiles.push(file);
 
-    if(this.vFiles.length == 1) {
-      if(file.type.startsWith('image/')) {
-        this.product.pinterestPinData!.pinRequest.media_source = new MediaSourceImageUrl();
-      }
-      else if (file.type.startsWith('video/')) {
-        this.product.pinterestPinData!.pinRequest.media_source = new MediaSourceVideo();
-      }
-    }
+    // if(this.vFiles.length == 1) {
+    //   if(file.type.startsWith('image/')) {
+    //     this.product.pinterestPinData!.pinRequest.media_source = new MediaSourceImageUrl();
+    //   }
+    //   else if (file.type.startsWith('video/')) {
+    //     this.product.pinterestPinData!.pinRequest.media_source = new MediaSourceVideo();
+    //   }
+    // }
 
-    if(file.type.startsWith('image/')) {
-      if(this.vFiles.length == 1) {
-        let mediaSoruce = this.product.pinterestPinData!.pinRequest.media_source as MediaSourceImageUrl;
-        mediaSoruce.url = fileLink.link;
-        mediaSoruce.is_standard = true;
-      }
-      else if(this.vFiles.length == 2) {
-        let currentMediaSoruce = this.product.pinterestPinData!.pinRequest.media_source as MediaSourceImageUrl;
-        let newMediaSource = new MediaSourceMultipleImage();
-        newMediaSource.items = [];
-        this.addItem(newMediaSource, currentMediaSoruce.url);
-        this.addItem(newMediaSource, fileLink.link);
-        this.product.pinterestPinData!.pinRequest.media_source = newMediaSource;
-      }
-      else {
-        let mediaSoruce = this.product.pinterestPinData!.pinRequest.media_source as MediaSourceMultipleImage;
-        this.addItem(mediaSoruce, fileLink.link);
-      }
-    }
+    // if(file.type.startsWith('image/')) {
+    //   if(this.vFiles.length == 1) {
+    //     let mediaSoruce = this.product.pinterestPinData!.pinRequest.media_source as MediaSourceImageUrl;
+    //     mediaSoruce.url = fileLink.link;
+    //     mediaSoruce.is_standard = true;
+    //   }
+    //   else if(this.vFiles.length == 2) {
+    //     let currentMediaSoruce = this.product.pinterestPinData!.pinRequest.media_source as MediaSourceImageUrl;
+    //     let newMediaSource = new MediaSourceMultipleImage();
+    //     newMediaSource.items = [];
+    //     this.addItem(newMediaSource, currentMediaSoruce.url);
+    //     this.addItem(newMediaSource, fileLink.link);
+    //     this.product.pinterestPinData!.pinRequest.media_source = newMediaSource;
+    //   }
+    //   else {
+    //     let mediaSoruce = this.product.pinterestPinData!.pinRequest.media_source as MediaSourceMultipleImage;
+    //     this.addItem(mediaSoruce, fileLink.link);
+    //   }
+    // }
 
-    this.initVFileOptions();
+    // this.initVFileOptions();
   }
 
   private addItem(mediaSoruce: MediaSourceMultipleImage, url: string) {
@@ -222,36 +222,36 @@ export class PinterestProductComponent extends ProductBasicComponent {
   }
 
   protected addNewFile(): void {
-    this.importFileFromProduct(this.data.files.length - 1);
+    // this.importFileFromProduct(this.data.files.length - 1);
     this.selectedFileIndex = this.vFiles.length - 1;
     this.initVFileOptions();
   }
 
   autoFillInformation() {
-    let dialog = this.matDialog.open(ConfirmDialog, {data: {title: 'Auto fill information', message: 'You are about to auto fill and overwrite your pinterest Information with your product information. Do you want to continue?', no: 'cancel', yes: 'ok'}});
-    dialog.afterClosed().subscribe({
-      next: res => {
-        if(res) {
-          let product = this.product;
-          let pinRequest = structuredClone(product.pinterestPinData!.pinRequest);
-          pinRequest.title = product.title;
-          pinRequest.link = product.marketingLink;
-          pinRequest.alt_text = product.marketingLink;
-          pinRequest.description = product.description;
-          pinRequest.note = `Original Link: ${product.originalLink}\nPrice: ${product.price}`;
-          pinRequest.media_source = undefined;
-          pinRequest.boardName = product.category.name;
-          this.product.pinterestPinData!.pinRequest = pinRequest;
-          this.vFiles = [];
-          for(let [i, file] of this.data.files.entries()) {
-            if(file.type.startsWith('image/')) {
-              this.importFileFromProduct(i);
-            }
-          }
-          this.initVFileOptions();
-        }
-      }
-    })
+    // let dialog = this.matDialog.open(ConfirmDialog, {data: {title: 'Auto fill information', message: 'You are about to auto fill and overwrite your pinterest Information with your product information. Do you want to continue?', no: 'cancel', yes: 'ok'}});
+    // dialog.afterClosed().subscribe({
+    //   next: res => {
+    //     if(res) {
+    //       let product = this.product;
+    //       let pinRequest = structuredClone(product.pinterestPinData!.pinRequest);
+    //       pinRequest.title = product.title;
+    //       pinRequest.link = product.marketingLink;
+    //       pinRequest.alt_text = product.marketingLink;
+    //       pinRequest.description = product.description;
+    //       pinRequest.note = `Original Link: ${product.originalLink}\nPrice: ${product.price}`;
+    //       pinRequest.media_source = undefined;
+    //       pinRequest.boardName = product.category.name;
+    //       this.product.pinterestPinData!.pinRequest = pinRequest;
+    //       this.vFiles = [];
+    //       for(let [i, file] of this.data.files.entries()) {
+    //         if(file.type.startsWith('image/')) {
+    //           this.importFileFromProduct(i);
+    //         }
+    //       }
+    //       this.initVFileOptions();
+    //     }
+    //   }
+    // })
   }
 
   uploadProduct() {

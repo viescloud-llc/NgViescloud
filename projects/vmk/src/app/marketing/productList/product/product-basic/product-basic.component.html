@@ -8,15 +8,6 @@
     (onRemoveFile)="onRemoveFile($event)"
     ></app-product-display>
   </li>
-  <ng-container *ngIf="product.fileLinks">
-    <hr>
-    <li *ngFor="let link of product.fileLinks; let i = index">
-      <b>
-        File {{i + 1}}: 
-      </b>
-      {{link.link}}, <b>external:</b> {{link.external}}
-    </li>
-  </ng-container>
   <hr>
   <li>
     <button mat-raised-button color="primary" (click)="data.addNewCategory()">Add new categories</button>

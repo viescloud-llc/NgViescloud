@@ -58,7 +58,7 @@ export class ProductBasicComponent implements OnInit, OnChanges {
 
     this.product.fileLinks.forEach(fileLink => {
       this.s3StorageService.fetchFile(fileLink.link)
-      .pipe(UtilsService.waitLoadingSnackBarDynamicString(this.snackBar))
+      .pipe(UtilsService.waitLoadingSnackBarDynamicString(this.snackBar, `Loading ${fileLink.link}`))
       .subscribe({
         next: res => {
           this.pushVFile(res);
@@ -92,7 +92,7 @@ export class ProductBasicComponent implements OnInit, OnChanges {
   }
 
   pushVFile(vFile: VFile) {
-    vFile.name = UtilsService.makeId(30) + vFile.extension;
+    vFile.name = UtilsService.makeId(30) + '.' + vFile.extension;
     this.vFiles = [...this.vFiles, vFile];
     this.selectedFileIndex = this.vFiles.length - 1;
   }
@@ -102,61 +102,71 @@ export class ProductBasicComponent implements OnInit, OnChanges {
   }
 
   async syncVFiles() {
-
-    //post new file
-    this.vFiles.forEach(async (vFile, index) => {
-      if(this.vFilesCopy.findIndex(e => e.name === vFile.name) < 0) {
-        const metadata = await firstValueFrom(this.s3StorageService.postFile(vFile).pipe(UtilsService.waitLoadingDialog(this.matDialog)));
-        vFile.orginalLink = this.s3StorageService.generateViesLinkFromPath(metadata.path!);
+    try {
+      // Post new file
+      for (const vFile of this.vFiles) {
+        if (this.vFilesCopy.findIndex(e => e.name === vFile.name) < 0) {
+          const metadata = await firstValueFrom(this.s3StorageService.postFile(vFile).pipe(UtilsService.waitLoadingDialog(this.matDialog)));
+          vFile.originalLink = this.s3StorageService.generateViesLinkFromPath(metadata.path!);
+        }
       }
-    })
-
-    //add link to product if not exist
-    this.vFiles.forEach(async (vFile, index) => {
-      if(this.product.fileLinks!.findIndex(e => e.link === vFile.orginalLink) < 0) {
-        this.product.fileLinks!.push({
-          id: 0,
-          link: vFile.orginalLink!, 
-          mediaType: vFile.type,
-          external: false
-        });
+  
+      // Add link to product if not exist
+      for (const vFile of this.vFiles) {
+        if (this.product.fileLinks!.findIndex(e => e.link === vFile.originalLink) < 0) {
+          this.product.fileLinks!.push({
+            id: 0,
+            link: vFile.originalLink!,
+            mediaType: vFile.type,
+            external: false
+          });
+        }
       }
-    });
-
-    //remove link from product if not exist in vFiles
-    for(let i = 0; i < this.product.fileLinks!.length; i++) {
-      if(this.vFiles.findIndex(e => e.orginalLink === this.product.fileLinks![i].link) < 0) {
-        let link = this.s3StorageService.extractPathFromViesLink(this.product.fileLinks![i].link);
-        await firstValueFrom(this.s3StorageService.deleteFileByPath(link).pipe(UtilsService.waitLoadingDialog(this.matDialog)));
-        this.product.fileLinks!.splice(i, 1);
-        i--;
+  
+      // Remove link from product if not exist in vFiles
+      for (let i = 0; i < this.product.fileLinks!.length; i++) {
+        if (this.vFiles.findIndex(e => e.originalLink === this.product.fileLinks![i].link) < 0) {
+          const link = this.s3StorageService.extractPathFromViesLink(this.product.fileLinks![i].link);
+          await firstValueFrom(this.s3StorageService.deleteFileByPath(link).pipe(UtilsService.waitLoadingDialog(this.matDialog)));
+          this.product.fileLinks!.splice(i, 1);
+          i--;
+        }
       }
+    } catch (error) {
+      console.error('Error during file synchronization:', error);
+      throw error;
     }
   }
-
+  
   async save() {
-    this.syncVFiles();
-
-    if(!this.product.id) {
-      this.productService.post(this.product).pipe(UtilsService.waitLoadingDialog(this.matDialog)).subscribe({
-        next: res => {
-          this.route.navigate(['/marketing/products/', res.id]);
-        },
-        error: err => {
-          this.data.error = 'Error saving product, please try again by refreshing the page';
-        }
-      });
-    }
-    else {
-      this.productService.put(this.product.id, this.product).pipe(UtilsService.waitLoadingDialog(this.matDialog)).subscribe({
-        next: res => {
-          this.product = res;
-          this.data.product = structuredClone(res);
-        },
-        error: err => {
-          this.data.error = 'Error saving product, please try again by refreshing the page';
-        }
-      });
+    try {
+      await this.syncVFiles();
+  
+      if (!this.product.id) {
+        this.productService.post(this.product).pipe(UtilsService.waitLoadingDialog(this.matDialog)).subscribe({
+          next: res => {
+            this.route.navigate(['/marketing/products/', res.id]);
+          },
+          error: err => {
+            this.data.error = 'Error saving product, please try again by refreshing the page';
+            console.error('Error posting product:', err);
+          }
+        });
+      } else {
+        this.productService.put(this.product.id, this.product).pipe(UtilsService.waitLoadingDialog(this.matDialog)).subscribe({
+          next: res => {
+            this.data.product = res;
+            this.product = structuredClone(this.data.product);
+          },
+          error: err => {
+            this.data.error = 'Error saving product, please try again by refreshing the page';
+            console.error('Error updating product:', err);
+          }
+        });
+      }
+    } catch (error) {
+      this.data.error = 'Error saving product, please try again by refreshing the page';
+      console.error('Error in save operation:', error);
     }
   }
 }

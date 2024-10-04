@@ -85,6 +85,6 @@ export class AppComponent extends ViescloudApplication {
     private openIdService: OpenIdService
   ) {
     super(matDialog, keyCaptureService, settingService);
-    settingService.init(this.title);
+    settingService.init(this.title, authenticatorService);
   }
 }

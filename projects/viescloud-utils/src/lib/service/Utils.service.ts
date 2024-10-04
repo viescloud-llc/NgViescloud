@@ -12,7 +12,7 @@ export interface VFile {
   type: string,
   extension: string,
   rawFile?: globalThis.File | Blob;
-  orginalLink?: string;
+  originalLink?: string;
   value: string;
 }
 
@@ -75,7 +75,7 @@ export class UtilsService {
         type: contentType,
         extension: extension,
         rawFile: blob,
-        orginalLink: uri,
+        originalLink: uri,
         value: ''
       };
 

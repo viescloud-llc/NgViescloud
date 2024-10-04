@@ -268,7 +268,7 @@ export abstract class ObjectStorage {
                 type: contentType,
                 extension: extension,
                 rawFile: response.body as Blob,
-                orginalLink: uri,
+                originalLink: uri,
                 value: ''
               };
   

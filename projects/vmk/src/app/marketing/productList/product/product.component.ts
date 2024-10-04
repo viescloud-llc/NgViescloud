@@ -38,12 +38,10 @@ export class ProductComponent extends FixChangeDetection implements OnInit {
 
     let loading = UtilsService.openLoadingDialog(this.matDialog, 5000);
     this.data.error = "";
-    this.data.uploadError = "";
     let id = Number(this.route.snapshot.paramMap.get('id'));
 
     await this.data.loadCategories();
     await this.data.loadProduct(id);
-    await this.data.syncFileLinks();
 
     loading.close();
   }
