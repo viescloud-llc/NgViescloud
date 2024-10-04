@@ -26,8 +26,6 @@ export class ProductBasicComponent implements OnInit, OnChanges {
 
   //blank object
   blankProduct = new Product();
-  blankFileLink: FileLink = new FileLink();
-  blankPinRequest = new PinRequest()
 
   //input
   selectedFileIndex = 0;
@@ -50,22 +48,25 @@ export class ProductBasicComponent implements OnInit, OnChanges {
   ngOnInit() {
     this.vFiles = [];
     this.vFilesCopy = [];
-
     this.product = structuredClone(this.data.product);
-
     if(!this.product.fileLinks)
       this.product.fileLinks = [];
+    this.initFetchVFiles();
+  }
 
-    this.product.fileLinks.forEach(fileLink => {
-      this.s3StorageService.fetchFile(fileLink.link)
-      .pipe(UtilsService.waitLoadingSnackBarDynamicString(this.snackBar, `Loading ${fileLink.link}`))
-      .subscribe({
-        next: res => {
-          this.pushVFile(res);
-          this.vFilesCopy = structuredClone(this.vFiles);
-        }
-      })
-    })
+  initFetchVFiles() {
+    if(this.product.fileLinks) {
+      this.product.fileLinks.forEach(fileLink => {
+        this.s3StorageService.fetchFile(fileLink.link)
+          .pipe(UtilsService.waitLoadingSnackBarDynamicString(this.snackBar, `Loading ${fileLink.link}`))
+          .subscribe({
+            next: res => {
+              this.pushVFile(res);
+              this.vFilesCopy = structuredClone(this.vFiles);
+            }
+          });
+      });
+    }
   }
 
   isProductChange() {
@@ -75,16 +76,21 @@ export class ProductBasicComponent implements OnInit, OnChanges {
   async onUploadFile() {
     let vfile = await UtilsService.uploadFileAsVFile("image/jpeg, image/png, image/webp, video/mp4, video/webm");
     this.pushVFile(vfile);
+    return vfile;
   }
 
   onFetchFile(uri: string) {
-    this.s3StorageService.fetchFile(uri)
-    .pipe(UtilsService.waitLoadingSnackBarDynamicString(this.snackBar))
-    .subscribe({
-      next: res => {
-        this.pushVFile(res);
-      }
-    });
+    return new Promise<VFile>((resolve, reject) => {
+      this.s3StorageService.fetchFile(uri)
+      .pipe(UtilsService.waitLoadingSnackBarDynamicString(this.snackBar))
+      .subscribe({
+        next: res => {
+          this.pushVFile(res);
+          resolve(res);
+        },
+        error: err => reject(err)
+      });
+    })
   }
 
   onRemoveFile(index: number) {

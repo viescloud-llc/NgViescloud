@@ -28,6 +28,7 @@ export class PinterestProductComponent extends ProductBasicComponent {
   blankMediaSourceVideo: MediaSourceVideo = new MediaSourceVideo();
   blankCategory: Category = new Category();
   protected blankInitData?: PinterestPinData;
+  blankPinRequest = new PinRequest();
 
   width: number = 1080;
   height: number = 1920;

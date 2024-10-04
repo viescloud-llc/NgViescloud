@@ -1,0 +1,37 @@
+<ul class="margin-center" appMatFormFieldGroup (onAllInputCheck)="validInput = $event">
+  <li>
+    <app-product-display
+    [files]="vFiles"
+    [(selectedIndex)]="selectedFileIndex"
+    (onUploadFile)="onUploadFile()"
+    (onFetchFile)="onFetchFile($event)"
+    (onRemoveFile)="onRemoveFile($event)"
+    ></app-product-display>
+  </li>
+  <ng-container *ngIf="pinRequest.media_source">
+    <hr>
+    <li>
+      <app-mat-form-field-input-dynamic
+      [(value)]="pinRequest.media_source"
+      [blankObject]="getMediaSourceBlankObject()"
+      styleWidth="100%"
+      ></app-mat-form-field-input-dynamic>
+    </li>
+  </ng-container>
+  <hr>
+  <li>
+    <app-mat-form-field-input-dynamic
+    [(value)]="pinRequest"
+    [blankObject]="blankPinRequest"
+    styleWidth="100%"
+    ></app-mat-form-field-input-dynamic>
+  </li>
+
+  <li>
+    <button mat-raised-button color="primary" style="width: 100%;" (click)="uploadProduct()" [disabled]="isProductChange() || !validInput">{{pinResponse ? 'Modify Pin in Pinterest' : 'Upload Pin to Pinterest'}}</button>
+  </li>
+  <li>
+    <button mat-raised-button color="primary" style="width: 50%;" [disabled]="!isProductChange() || !validInput" (click)="save()">{{product.id ? 'Modify' : 'Add'}}</button>
+    <button mat-raised-button color="warn" style="width: 50%;" [disabled]="!isProductChange()" (click)="reverse()">Undo Change</button>
+  </li>
+</ul>
