@@ -28,7 +28,7 @@
   </li>
 
   <li>
-    <button mat-raised-button color="primary" style="width: 100%;" (click)="uploadProduct()" [disabled]="isProductChange() || !validInput">{{pinResponse ? 'Modify Pin in Pinterest' : 'Upload Pin to Pinterest'}}</button>
+    <button mat-raised-button *ngIf="pinRequest.media_source" color="primary" style="width: 100%;" (click)="uploadProduct()" [disabled]="isProductChange() || !validInput">{{pinResponse ? 'Modify Pin in Pinterest' : 'Upload Pin to Pinterest'}}</button>
   </li>
   <li>
     <button mat-raised-button color="primary" style="width: 50%;" [disabled]="!isProductChange() || !validInput" (click)="save()">{{product.id ? 'Modify' : 'Add'}}</button>
