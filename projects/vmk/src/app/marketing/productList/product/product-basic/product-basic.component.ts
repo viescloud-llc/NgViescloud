@@ -56,6 +56,7 @@ export class ProductBasicComponent implements OnInit, OnChanges {
 
   initFetchVFiles() {
     if(this.product.fileLinks) {
+      this.product.fileLinks = this.product.fileLinks.filter(e => e.link);
       this.product.fileLinks.forEach(fileLink => {
         this.s3StorageService.fetchFile(fileLink.link)
           .pipe(UtilsService.waitLoadingSnackBarDynamicString(this.snackBar, `Loading ${fileLink.link}`))
@@ -70,7 +71,10 @@ export class ProductBasicComponent implements OnInit, OnChanges {
   }
 
   isProductChange() {
-    return !UtilsService.isEqual(this.product, this.data.product) || !UtilsService.isEqual(this.vFiles, this.vFilesCopy);
+    let vf1 = structuredClone(this.vFiles).map((vf: VFile) => {vf.value = ''; return vf});
+    let vf2 = structuredClone(this.vFilesCopy).map((vf: VFile) => {vf.value = ''; return vf});
+
+    return !UtilsService.isEqual(this.product, this.data.product) || !UtilsService.isEqual(vf1, vf2);
   }
 
   async onUploadFile() {
