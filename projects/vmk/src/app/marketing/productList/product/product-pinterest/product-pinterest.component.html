@@ -3,9 +3,11 @@
     <app-product-display
     [files]="vFiles"
     [(selectedIndex)]="selectedFileIndex"
+    [fileOptions]="fileOptions"
     (onUploadFile)="onUploadFile()"
     (onFetchFile)="onFetchFile($event)"
     (onRemoveFile)="onRemoveFile($event)"
+    (onSelectFileOption)="onSelectFileOptions($event)"
     ></app-product-display>
   </li>
   <ng-container *ngIf="pinRequest.media_source">

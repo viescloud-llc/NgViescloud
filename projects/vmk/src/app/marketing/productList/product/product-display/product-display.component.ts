@@ -57,13 +57,13 @@ export class ProductDisplayComponent implements OnInit, OnChanges {
   files: VFile[] = [];
 
   @Input()
-  fileOptions: MatOption<number>[] = [];
+  fileOptions: MatOption<string>[] = [];
   
   @Output()
   onRemoveFile = new EventEmitter<number>();
 
   @Output()
-  onSelectFileOption = new EventEmitter<number>();
+  onSelectFileOption = new EventEmitter<string>();
 
   @Output()
   onFetchFile = new EventEmitter<string>();

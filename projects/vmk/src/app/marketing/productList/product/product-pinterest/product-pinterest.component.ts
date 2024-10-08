@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ProductBasicComponent } from '../product-basic/product-basic.component';
 import { Image, MediaSource, MediaSourceImageUrl, MediaSourceMultipleImage, MediaSourceType, MediaSourceVideo, PinRequest, PinResponse, PinterestPinData } from 'projects/viescloud-utils/src/lib/model/AffiliateMarketing.model';
 import { UtilsService, VFile } from 'projects/viescloud-utils/src/lib/service/Utils.service';
+import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
 
 @Component({
   selector: 'app-product-pinterest',
@@ -12,6 +13,9 @@ export class ProductPinterestComponent extends ProductBasicComponent {
 
   pinRequest!: PinRequest;
   pinResponse?: PinResponse;
+
+  fileOptions: MatOption<string>[] = [];
+  boardNameOptions: MatOption<string>[] = [];
 
   //blank object
   blankPinRequest = new PinRequest();
@@ -34,6 +38,7 @@ export class ProductPinterestComponent extends ProductBasicComponent {
     this.pinRequest = this.product.pinterestPinData.pinRequest;
     this.pinResponse = this.product.pinterestPinData.pinResponse;
     this.initFetchVFiles();
+    this.initFileOptions();
   }
   
   override initFetchVFiles(): void {
@@ -52,6 +57,19 @@ export class ProductPinterestComponent extends ProductBasicComponent {
 
   override setEditingComponent(): void {
     this.data.isEditingComponent = 'pinterest';
+  }
+
+  initFileOptions() {
+    this.fileOptions = [];
+    this.product.fileLinks?.forEach((fileLink, index) => {
+      if(this.vFiles.some(e => e.originalLink === fileLink.link))
+        return;
+      let fileName = this.s3StorageService.extractPathFromViesLink(fileLink.link);
+      this.fileOptions.push({
+        value: fileLink.link,
+        valueLabel: `File ${index + 1}: ${UtilsService.getMaxString(fileName.split('/')[fileName.split('/').length - 1].trim(), 10)} - ${fileLink.mediaType}`
+      })
+    })
   }
 
   getMediaSourceBlankObject() {
@@ -164,6 +182,16 @@ export class ProductPinterestComponent extends ProductBasicComponent {
     this.removeMediaSource(index);
   }
 
+  onSelectFileOptions(link: string) {
+    this.s3StorageService.fetchFile(link).pipe(UtilsService.waitLoadingSnackBarDynamicString(this.snackBar, `Loading ${link}`)).subscribe({
+      next: res => {
+        this.pushVFile(res);
+        this.addMediaSource(res);
+        this.initFileOptions();
+      }
+    })
+  }
+
   override async onFetchFile(uri: string): Promise<VFile> {
     let vfile = await super.onFetchFile(uri);
     this.addMediaSource(vfile);
@@ -173,4 +201,6 @@ export class ProductPinterestComponent extends ProductBasicComponent {
   uploadProduct() {
 
   }
+
+
 }

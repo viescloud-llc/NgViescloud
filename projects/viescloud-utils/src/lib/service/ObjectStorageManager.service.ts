@@ -29,27 +29,6 @@ export abstract class ObjectStorage {
     return path;
   }
 
-  containViesLink(link: string) {
-    return link.startsWith(`${this.getURI()}${this.getPrefixPath()}/file`);
-  }
-
-  generateViesLinkFromPath(path: string) {
-    return `${this.getURI()}${this.getPrefixPath()}/file?path=${path}`
-  }
-
-  extractExtensionFromViesLink(link: string) {
-    let lastDotIndex = link.lastIndexOf('.');
-    if(lastDotIndex === -1) {
-      return '';
-    }
-    return link.slice(lastDotIndex + 1);
-  }
-
-  extractPathFromViesLink(link: string) {
-    let length = `${this.getURI()}${this.getPrefixPath()}/file?path=`.length;
-    return link.substring(length);
-  }
-
   getFileByPath(path: string, width?: number, height?: number): Observable<Blob> {
     if(width && height)
       return this.httpClient.get(`${this.getURI()}${this.getPrefixPath()}/file?path=${path}&width=${width}&height=${height}`, {responseType: 'blob'}).pipe(first());
@@ -149,6 +128,39 @@ export abstract class ObjectStorage {
 
   deleteFileByPath(path: string) {
     return this.httpClient.delete<Metadata>(`${this.getURI()}${this.getPrefixPath()}/file?path=${path}`).pipe(first());
+  }
+
+  //------------------------------CUSTOM METHODS-----------------------------
+
+  containViesLink(link: string) {
+    return link.startsWith(`${this.getURI()}${this.getPrefixPath()}/file`);
+  }
+
+  generateViesLinkFromPath(path: string) {
+    return `${this.getURI()}${this.getPrefixPath()}/file?path=${path}`
+  }
+
+  extractExtensionFromViesLink(link: string) {
+    let lastDotIndex = link.lastIndexOf('.');
+    if(lastDotIndex === -1) {
+      return '';
+    }
+    return link.slice(lastDotIndex + 1);
+  }
+
+  extractPathFromViesLink(link: string) {
+    let length = `${this.getURI()}${this.getPrefixPath()}/file?path=`.length;
+    return link.substring(length);
+  }
+
+  extractFileNameFromViesLink(link: string) {
+    let length = `${this.getURI()}${this.getPrefixPath()}/file?fileName=`.length;
+    return link.substring(length);
+  }
+
+  extractIdFromViesLink(link: string) {
+    let length = `${this.getURI()}${this.getPrefixPath()}/file?id=`.length;
+    return link.substring(length);
   }
 
   putOrPostFile(vFile: VFile, publicity?: boolean, matDialog?: MatDialog) {
