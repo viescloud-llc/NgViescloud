@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, forwardRef } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges, forwardRef } from '@angular/core';
 import { MatFormFieldComponent } from '../mat-form-field/mat-form-field.component';
 import { MatOption } from '../../model/Mat.model';
 import { MatSelectChange } from '@angular/material/select';
@@ -29,6 +29,13 @@ export class MatFormFieldInputOptionComponent<T> extends MatFormFieldComponent {
 
   constructor() {
     super();
+  }
+  
+  override ngOnChanges(changes: SimpleChanges): void {
+    super.ngOnChanges(changes);
+    if (changes['options'] && this.options || changes['value']) {
+      this.populateOptions();
+    }
   }
 
   override ngOnInit() {
