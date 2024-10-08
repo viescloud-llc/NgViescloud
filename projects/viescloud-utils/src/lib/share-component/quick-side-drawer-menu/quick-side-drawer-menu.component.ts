@@ -7,6 +7,7 @@ export class QuickSideDrawerMenu {
   routerLink?: string;
   routerLinkActive?: string;
   hideConditional?: () => boolean;
+  disableConditional?: () => boolean;
   hideChildren?: boolean;
   click?: () => void;
   children?: QuickSideDrawerMenu[];
@@ -37,6 +38,8 @@ export class QuickSideDrawerMenuComponent implements OnInit {
 
   @ViewChild('dynamicComponentContainer', { read: ViewContainerRef, static: true })
   container!: ViewContainerRef;
+
+  loadedComponent?: any;
 
   constructor(
     private router: Router,
@@ -81,6 +84,13 @@ export class QuickSideDrawerMenuComponent implements OnInit {
     return false;
   }
 
+  isDisable(item: QuickSideDrawerMenu) {
+    if (item.disableConditional) {
+      return item.disableConditional();
+    }
+    return false;
+  }
+
   routerLinkActive(item: QuickSideDrawerMenu) {
     if(this.router.isActive(item.routerLink!, {paths: 'exact', queryParams: 'exact', fragment: 'ignored', matrixParams: 'ignored'})) {
       if(item.routerLinkActive)
@@ -101,14 +111,16 @@ export class QuickSideDrawerMenuComponent implements OnInit {
     if (this.isRoot) {
       this.loadComponent = loadItem;
       this.container.clear();
-      if(loadItem)
-        this.container.createComponent(loadItem);
+      if(loadItem) {
+        this.loadedComponent = this.container.createComponent(loadItem);
+      }
     }
   }
 
   clearLoadComponent() {
     this.loadComponent = undefined;
     this.container.clear();
+    this.loadedComponent = undefined;
   }
 
   back() {

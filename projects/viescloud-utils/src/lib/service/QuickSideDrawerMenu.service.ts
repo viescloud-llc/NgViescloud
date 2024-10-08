@@ -20,4 +20,11 @@ export class QuickSideDrawerMenuService {
       this.menu.onLoadComponent(component);
   }
 
+  getLoadedComponent<T>(component: Type<T>): T | undefined {
+    if(this.menu && this.menu.loadComponent && this.menu.loadComponent instanceof component && this.menu.loadedComponent)
+      return this.menu.loadedComponent;
+
+    return undefined;
+  }
+
 }

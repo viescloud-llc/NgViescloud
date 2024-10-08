@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { UtilsService } from 'projects/viescloud-utils/src/lib/service/Utils.service';
 import { QuickSideDrawerMenu } from 'projects/viescloud-utils/src/lib/share-component/quick-side-drawer-menu/quick-side-drawer-menu.component';
+import { ProductData } from '../data/product-data.service';
 
 @Component({
   selector: 'app-product-menu',
@@ -9,7 +10,9 @@ import { QuickSideDrawerMenu } from 'projects/viescloud-utils/src/lib/share-comp
 })
 export class ProductMenuComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    private data: ProductData
+  ) { }
 
   ngOnInit() {
     
@@ -23,16 +26,19 @@ export class ProductMenuComponent implements OnInit {
       {
         title: 'Overall',
         routerLink: `/marketing/products/${productId}/overall`,
-        hideConditional: () => productId === '0'
+        hideConditional: () => productId === '0',
+        disableConditional: () => !(this.data.isEditingComponent === '' || this.data.isEditingComponent === 'overall')
       },
       {
         title: 'Basic',
-        routerLink: `/marketing/products/${productId}/basic`
+        routerLink: `/marketing/products/${productId}/basic`,
+        disableConditional: () => !(this.data.isEditingComponent === '' || this.data.isEditingComponent === 'basic')
       },
       {
         title: 'Pinterest',
         routerLink: `/marketing/products/${productId}/pinterest`,
-        hideConditional: () => productId === '0'
+        hideConditional: () => productId === '0',
+        disableConditional: () => !(this.data.isEditingComponent === '' || this.data.isEditingComponent === 'pinterest')
       }
     ];
 

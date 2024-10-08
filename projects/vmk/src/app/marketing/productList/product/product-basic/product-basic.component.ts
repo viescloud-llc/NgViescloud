@@ -38,7 +38,8 @@ export class ProductBasicComponent implements OnInit, OnChanges {
     protected s3StorageService: S3StorageServiceV1,
     protected route: Router,
     protected data: ProductData,
-    protected snackBar: MatSnackBar
+    protected snackBar: MatSnackBar,
+    protected quickSideDrawerMenuService: QuickSideDrawerMenuService
   ) { }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -74,7 +75,17 @@ export class ProductBasicComponent implements OnInit, OnChanges {
     let vf1 = structuredClone(this.vFiles).map((vf: VFile) => {vf.value = ''; return vf});
     let vf2 = structuredClone(this.vFilesCopy).map((vf: VFile) => {vf.value = ''; return vf});
 
-    return !UtilsService.isEqual(this.product, this.data.product) || !UtilsService.isEqual(vf1, vf2);
+    let change = !UtilsService.isEqual(this.product, this.data.product) || !UtilsService.isEqual(vf1, vf2);
+    change ? this.setEditingComponent() : this.clearEditingComponent();
+    return change;
+  }
+
+  setEditingComponent() {
+    this.data.isEditingComponent = 'basic';
+  }
+
+  clearEditingComponent() {
+    this.data.isEditingComponent = '';
   }
 
   async onUploadFile() {

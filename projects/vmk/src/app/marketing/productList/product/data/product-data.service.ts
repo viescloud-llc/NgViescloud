@@ -22,6 +22,9 @@ export class ProductData {
   categories: Category[] = [];
   productCategoriesOptions: MatOption<Category>[] = [];
 
+  //menu
+  isEditingComponent: 'overall' | 'basic' | 'pinterest' | '' = '';
+
   constructor(
     private matDialog: MatDialog,
     private productService: ProductService,

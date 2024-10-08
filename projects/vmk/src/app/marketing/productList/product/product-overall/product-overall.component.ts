@@ -25,9 +25,10 @@ export class ProductOverallComponent extends ProductBasicComponent {
     protected override s3StorageService: S3StorageServiceV1,
     protected override route: Router,
     protected override data: ProductData,
-    protected override snackBar: MatSnackBar
+    protected override snackBar: MatSnackBar,
+    protected override quickSideDrawerMenuService: QuickSideDrawerMenuService
   ) { 
-    super(matDialog, productService, s3StorageService, route, data, snackBar);
+    super(matDialog, productService, s3StorageService, route, data, snackBar, quickSideDrawerMenuService);
   }
 
   override ngOnChanges(changes: SimpleChanges): void {
@@ -36,6 +37,10 @@ export class ProductOverallComponent extends ProductBasicComponent {
 
   isThereAreData() {
     return this.product.pinterestPinData && this.product.pinterestPinData.pinResponse;
+  }
+
+  override setEditingComponent(): void {
+    this.data.isEditingComponent = 'overall';
   }
 
 }

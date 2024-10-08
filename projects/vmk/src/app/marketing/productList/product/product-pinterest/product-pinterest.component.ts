@@ -50,6 +50,10 @@ export class ProductPinterestComponent extends ProductBasicComponent {
     }
   }
 
+  override setEditingComponent(): void {
+    this.data.isEditingComponent = 'pinterest';
+  }
+
   getMediaSourceBlankObject() {
     let mediaSource = this.product.pinterestPinData!.pinRequest.media_source;
     if(mediaSource instanceof MediaSourceMultipleImage || (mediaSource && mediaSource.source_type == MediaSourceType.IMAGES))
