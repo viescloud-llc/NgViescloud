@@ -3,6 +3,7 @@ import { ProductBasicComponent } from '../product-basic/product-basic.component'
 import { Image, MediaSource, MediaSourceImageUrl, MediaSourceMultipleImage, MediaSourceType, MediaSourceVideo, PinRequest, PinResponse, PinterestPinData } from 'projects/viescloud-utils/src/lib/model/AffiliateMarketing.model';
 import { UtilsService, VFile } from 'projects/viescloud-utils/src/lib/service/Utils.service';
 import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-product-pinterest',
@@ -42,17 +43,38 @@ export class ProductPinterestComponent extends ProductBasicComponent {
   }
   
   override initFetchVFiles(): void {
-    if(this.pinRequest.media_source && this.pinRequest.media_source instanceof MediaSourceImageUrl) {
-      let url = this.pinRequest.media_source.url;
-      this.s3StorageService.fetchFile(url)
-      .pipe(UtilsService.waitLoadingSnackBarDynamicString(this.snackBar, `Loading ${url}`))
-      .subscribe({
-        next: (res) => {
-          this.pushVFile(res);
-          this.vFilesCopy = structuredClone(this.vFiles);
-        }
-      })
+    if(this.pinRequest.media_source) {
+      if(this.pinRequest.media_source.source_type == MediaSourceType.IMAGE) {
+        let ms = this.pinRequest.media_source as MediaSourceImageUrl;
+        let url = ms.url;
+        this.s3StorageService.fetchFile(url)
+        .pipe(UtilsService.waitLoadingSnackBarDynamicString(this.snackBar, `Loading ${url}`))
+        .subscribe({
+          next: (res) => {
+            this.pushVFile(res);
+            this.vFilesCopy = structuredClone(this.vFiles);
+          }
+        })
+      }
+      else if(this.pinRequest.media_source.source_type == MediaSourceType.IMAGES) {
+        let ms = this.pinRequest.media_source as MediaSourceMultipleImage;
+        ms.items.forEach(e => {
+          let url = e.url;
+          this.s3StorageService.fetchFile(url)
+          .pipe(UtilsService.waitLoadingSnackBarDynamicString(this.snackBar, `Loading ${url}`))
+          .subscribe({
+            next: (res) => {
+              this.pushVFile(res);
+              this.vFilesCopy = structuredClone(this.vFiles);
+            }
+          })
+        })
+      }
+      else if(this.pinRequest.media_source.source_type == MediaSourceType.VIDEO) {
+        //TODO: Handle video fetching
+      }
     }
+    
   }
 
   override setEditingComponent(): void {
@@ -93,7 +115,8 @@ export class ProductPinterestComponent extends ProductBasicComponent {
         this.pinRequest.media_source = this.handleUploadVideo(vfile);
       }
     }
-    else if(this.pinRequest.media_source instanceof MediaSourceImageUrl) {
+    else if(this.pinRequest.media_source.source_type == MediaSourceType.IMAGE) {
+      let ms = this.pinRequest.media_source as MediaSourceImageUrl;
       let mediaSource!: any;
 
       if(vfile.type.toLowerCase().includes('image')) {
@@ -101,10 +124,10 @@ export class ProductPinterestComponent extends ProductBasicComponent {
         mediaSource.items = [
           {
             id: 0,
-            title: this.pinRequest.media_source.url,
+            title: ms.url,
             description: '',
             link: this.product.marketingLink,
-            url: this.pinRequest.media_source.url
+            url: ms.url
           },
           {
             id: 0,
@@ -121,8 +144,9 @@ export class ProductPinterestComponent extends ProductBasicComponent {
 
       this.pinRequest.media_source = mediaSource;
     }
-    else if(this.pinRequest.media_source instanceof MediaSourceMultipleImage) {
-      this.pinRequest.media_source.items.push({
+    else if(this.pinRequest.media_source.source_type == MediaSourceType.IMAGES) {
+      let ms = this.pinRequest.media_source as MediaSourceMultipleImage;
+      ms.items.push({
         id: 0,
         title: vfile.originalLink ?? vfile.name,
         description: '',
@@ -137,30 +161,32 @@ export class ProductPinterestComponent extends ProductBasicComponent {
       return;
     }
   
-    if (this.pinRequest.media_source instanceof MediaSourceImageUrl) {
+    if (this.pinRequest.media_source.source_type == MediaSourceType.IMAGE) {
       // If the current source is a single image, we can remove it by setting the media source to undefined.
       this.pinRequest.media_source = undefined;
     } 
-    else if (this.pinRequest.media_source instanceof MediaSourceMultipleImage) {
+    else if (this.pinRequest.media_source.source_type == MediaSourceType.IMAGES) {
+      let ms = this.pinRequest.media_source as MediaSourceMultipleImage;
+
       // If the current source is a multiple image source, remove the item at the given index.
-      if (index < 0 || index >= this.pinRequest.media_source.items.length) {
+      if (index < 0 || index >= ms.items.length) {
         return; // Index out of bounds check
       }
   
       // Remove the image at the specified index
-      this.pinRequest.media_source.items.splice(index, 1);
+      ms.items.splice(index, 1);
   
       // Check how many items remain after the removal
-      if (this.pinRequest.media_source.items.length === 1) {
+      if (ms.items.length === 1) {
         // If only one item remains, convert it to a `MediaSourceImageUrl`
-        const remainingItem = this.pinRequest.media_source.items[0];
+        const remainingItem = ms.items[0];
         this.pinRequest.media_source = new MediaSourceImageUrl(0, MediaSourceType.IMAGE, remainingItem.url);
-      } else if (this.pinRequest.media_source.items.length === 0) {
+      } else if (ms.items.length === 0) {
         // If no items remain, set the media source to undefined
         this.pinRequest.media_source = undefined;
       }
     }
-    else if (this.pinRequest.media_source instanceof MediaSourceVideo) {
+    else if (this.pinRequest.media_source.source_type == MediaSourceType.VIDEO) {
       // For MediaSourceVideo, directly set the media source to undefined if it is being removed.
       this.pinRequest.media_source = undefined;
     }
@@ -183,12 +209,16 @@ export class ProductPinterestComponent extends ProductBasicComponent {
   }
 
   onSelectFileOptions(link: string) {
-    this.s3StorageService.fetchFile(link).pipe(UtilsService.waitLoadingSnackBarDynamicString(this.snackBar, `Loading ${link}`)).subscribe({
-      next: res => {
-        this.pushVFile(res);
-        this.addMediaSource(res);
-        this.initFileOptions();
-      }
+    return new Promise<VFile>((resolve, reject) => {
+      this.s3StorageService.fetchFile(link).pipe(UtilsService.waitLoadingSnackBarDynamicString(this.snackBar, `Loading ${link}`)).subscribe({
+        next: res => {
+          this.pushVFile(res);
+          this.addMediaSource(res);
+          this.initFileOptions();
+          resolve(res);
+        },
+        error: err => reject(err)
+      })
     })
   }
 
@@ -202,5 +232,74 @@ export class ProductPinterestComponent extends ProductBasicComponent {
 
   }
 
+  override async syncVFiles(): Promise<void> {
+    try {
+      // Post new file
+      await this.postNewVFile();
+      this.syncVFileData();
+    }
+    catch (error) {
+      console.error('Error during file synchronization:', error);
+      throw error;
+    }
+  }
 
+  protected syncVFileData() {
+    let mediaSource = this.pinRequest.media_source;
+
+    if(!mediaSource)
+      return;
+
+    if(mediaSource instanceof MediaSourceImageUrl || mediaSource.source_type == MediaSourceType.IMAGE) {
+      let ms = this.pinRequest.media_source as MediaSourceImageUrl;
+      if(this.vFiles.length > 0)
+        ms.url = this.vFiles[0].originalLink!;
+      else
+        throw Error('File link can not be null or empty');
+      this.pinRequest.media_source = ms;
+    }
+    else if(mediaSource instanceof MediaSourceMultipleImage || mediaSource.source_type == MediaSourceType.IMAGES) {
+      let ms = this.pinRequest.media_source as MediaSourceMultipleImage;
+      ms.items = ms.items.filter(e => this.vFiles.some(f => f.name === e.url || f.originalLink === e.url));
+      ms.items.forEach(e => {
+        let index = this.vFiles.findIndex(f => f.name === e.url || f.originalLink === e.url);
+        let vFile = this.vFiles[index];
+        if(vFile.originalLink)
+          e.url = vFile.originalLink;
+        else
+          throw Error('File link can not be null');
+      })
+
+      this.pinRequest.media_source = ms;
+    }
+    else if(mediaSource instanceof MediaSourceVideo || mediaSource.source_type == MediaSourceType.VIDEO) {
+      let ms = this.pinRequest.media_source as MediaSourceVideo;
+      //TODO: handle video sync later
+      this.pinRequest.media_source = ms;
+    }
+  }
+
+  protected async postNewVFile() {
+    for (const vFile of this.vFiles) {
+      //if this file is not in vfile copy
+      if (this.vFilesCopy.findIndex(e => e.name === vFile.name) < 0) {
+        //if this is a new file by checking for vies link
+        if (!this.s3StorageService.containViesLink(vFile.originalLink ?? '')) {
+          const metadata = await firstValueFrom(this.s3StorageService.postFile(vFile).pipe(UtilsService.waitLoadingDialog(this.matDialog)));
+          vFile.originalLink = this.s3StorageService.generateViesLinkFromPath(metadata.path!);
+          this.product.fileLinks!.push({
+            id: 0,
+            link: vFile.originalLink,
+            mediaType: vFile.type,
+            external: false
+          });
+        }
+      }
+    }
+  }
+
+  override async save(): Promise<void> {
+    await super.save();
+    await this.ngOnInit();
+  }
 }
