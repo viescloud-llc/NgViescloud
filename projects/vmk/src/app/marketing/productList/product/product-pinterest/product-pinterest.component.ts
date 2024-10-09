@@ -1,9 +1,11 @@
-import { Component, OnInit, SimpleChanges } from '@angular/core';
+import { Component, Inject, OnInit, SimpleChanges } from '@angular/core';
 import { ProductBasicComponent } from '../product-basic/product-basic.component';
 import { Image, MediaSource, MediaSourceImageUrl, MediaSourceMultipleImage, MediaSourceType, MediaSourceVideo, PinRequest, PinResponse, PinterestPinData } from 'projects/viescloud-utils/src/lib/model/AffiliateMarketing.model';
 import { UtilsService, VFile } from 'projects/viescloud-utils/src/lib/service/Utils.service';
 import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
 import { firstValueFrom } from 'rxjs';
+import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
+import { ViesPinterestService } from 'projects/viescloud-utils/src/lib/service/AffiliateMarketing.service';
 
 @Component({
   selector: 'app-product-pinterest',
@@ -11,6 +13,9 @@ import { firstValueFrom } from 'rxjs';
   styleUrls: ['./product-pinterest.component.scss']
 })
 export class ProductPinterestComponent extends ProductBasicComponent {
+
+  @Inject(ViesPinterestService)
+  private pinterestService!: ViesPinterestService;
 
   pinRequest!: PinRequest;
   pinResponse?: PinResponse;
@@ -23,6 +28,10 @@ export class ProductPinterestComponent extends ProductBasicComponent {
   blankMediaSourceMultipleImage: MediaSourceMultipleImage = new MediaSourceMultipleImage();
   blankMediaSourceImage: MediaSourceImageUrl = new MediaSourceImageUrl();
   blankMediaSourceVideo: MediaSourceVideo = new MediaSourceVideo();
+
+  //additional fields
+  width: number = 1080;
+  height: number = 1920;
 
   override async ngOnInit() {
     this.product = structuredClone(this.data.product);
@@ -220,7 +229,21 @@ export class ProductPinterestComponent extends ProductBasicComponent {
   }
 
   uploadProduct() {
-
+    let dialog = this.matDialog.open(ConfirmDialog, {data: {title: 'Upload product', message: 'You are about to upload your product to Pinterest. Do you want to continue?', no: 'cancel', yes: 'ok'}});
+    dialog.afterClosed().subscribe({
+      next: res => {
+        if(res) {
+          this.pinterestService.uploadPin(this.product.id, this.width, this.height).pipe(UtilsService.waitLoadingDialog(this.matDialog)).subscribe({
+            next: res => {
+              this.ngOnInit();
+            },
+            error: err => {
+              this.data.error = 'Error uploading product, please try again by refreshing the page';
+            }
+          })
+        }
+      }
+    })
   }
 
   override async syncVFiles(): Promise<void> {

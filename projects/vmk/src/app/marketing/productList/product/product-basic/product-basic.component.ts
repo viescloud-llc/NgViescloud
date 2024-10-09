@@ -177,7 +177,7 @@ export class ProductBasicComponent implements OnInit, OnChanges {
         this.productService.put(this.product.id, this.product).pipe(UtilsService.waitLoadingDialog(this.matDialog)).subscribe({
           next: res => {
             this.data.product = res;
-            this.product = structuredClone(this.data.product);
+            this.ngOnInit();
           },
           error: err => {
             this.data.error = 'Error saving product, please try again by refreshing the page';
