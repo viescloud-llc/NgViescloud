@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, SimpleChanges } from '@angular/core';
 import { ProductBasicComponent } from '../product-basic/product-basic.component';
 import { Image, MediaSource, MediaSourceImageUrl, MediaSourceMultipleImage, MediaSourceType, MediaSourceVideo, PinRequest, PinResponse, PinterestPinData } from 'projects/viescloud-utils/src/lib/model/AffiliateMarketing.model';
 import { UtilsService, VFile } from 'projects/viescloud-utils/src/lib/service/Utils.service';
@@ -24,7 +24,7 @@ export class ProductPinterestComponent extends ProductBasicComponent {
   blankMediaSourceImage: MediaSourceImageUrl = new MediaSourceImageUrl();
   blankMediaSourceVideo: MediaSourceVideo = new MediaSourceVideo();
 
-  override ngOnInit() {
+  override async ngOnInit() {
     this.product = structuredClone(this.data.product);
     this.vFiles = [];
     this.vFilesCopy = [];
@@ -38,37 +38,28 @@ export class ProductPinterestComponent extends ProductBasicComponent {
 
     this.pinRequest = this.product.pinterestPinData.pinRequest;
     this.pinResponse = this.product.pinterestPinData.pinResponse;
-    this.initFetchVFiles();
+    await this.initFetchVFiles();
     this.initFileOptions();
   }
   
-  override initFetchVFiles(): void {
+  override async initFetchVFiles() {
     if(this.pinRequest.media_source) {
       if(this.pinRequest.media_source.source_type == MediaSourceType.IMAGE) {
         let ms = this.pinRequest.media_source as MediaSourceImageUrl;
         let url = ms.url;
-        this.s3StorageService.fetchFile(url)
-        .pipe(UtilsService.waitLoadingSnackBarDynamicString(this.snackBar, `Loading ${url}`))
-        .subscribe({
-          next: (res) => {
-            this.pushVFile(res);
-            this.vFilesCopy = structuredClone(this.vFiles);
-          }
-        })
+        let res = await firstValueFrom(this.s3StorageService.fetchFile(url).pipe(UtilsService.waitLoadingSnackBarDynamicString(this.snackBar, `Loading ${url}`)))
+        this.pushVFile(res);
+        this.vFilesCopy = structuredClone(this.vFiles);
       }
       else if(this.pinRequest.media_source.source_type == MediaSourceType.IMAGES) {
         let ms = this.pinRequest.media_source as MediaSourceMultipleImage;
-        ms.items.forEach(e => {
-          let url = e.url;
-          this.s3StorageService.fetchFile(url)
-          .pipe(UtilsService.waitLoadingSnackBarDynamicString(this.snackBar, `Loading ${url}`))
-          .subscribe({
-            next: (res) => {
-              this.pushVFile(res);
-              this.vFilesCopy = structuredClone(this.vFiles);
-            }
-          })
-        })
+
+        for(let item of ms.items) {
+          let url = item.url;
+          let res = await firstValueFrom(this.s3StorageService.fetchFile(url).pipe(UtilsService.waitLoadingSnackBarDynamicString(this.snackBar, `Loading ${url}`)))
+          this.pushVFile(res);
+          this.vFilesCopy = structuredClone(this.vFiles);
+        }
       }
       else if(this.pinRequest.media_source.source_type == MediaSourceType.VIDEO) {
         //TODO: Handle video fetching
