@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, SimpleChanges } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnInit, SimpleChanges } from '@angular/core';
 import { ProductBasicComponent } from '../product-basic/product-basic.component';
 import { Image, MediaSource, MediaSourceImageUrl, MediaSourceMultipleImage, MediaSourceType, MediaSourceVideo, PinRequest, PinResponse, PinterestPinData } from 'projects/viescloud-utils/src/lib/model/AffiliateMarketing.model';
 import { UtilsService, VFile } from 'projects/viescloud-utils/src/lib/service/Utils.service';
@@ -65,6 +65,7 @@ export class ProductPinterestComponent extends ProductBasicComponent {
     this.pinResponse = this.product.pinterestPinData.pinResponse;
     await this.initFetchVFiles();
     this.initFileOptions();
+    this.initBoardNameOptions();
   }
   
   override async initFetchVFiles() {
@@ -107,6 +108,18 @@ export class ProductPinterestComponent extends ProductBasicComponent {
         value: fileLink.link,
         valueLabel: `File ${index + 1}: ${UtilsService.getMaxString(fileName.split('/')[fileName.split('/').length - 1].trim(), 10)} - ${fileLink.mediaType}`
       })
+    })
+  }
+
+  initBoardNameOptions(): void {
+    this.boardNameOptions = [];
+    this.data.categories.forEach(category => {
+      let option: MatOption<string> = {
+        value: category.name,
+        valueLabel: category.name
+      }
+
+      this.boardNameOptions.push(option);
     })
   }
 
@@ -333,5 +346,33 @@ export class ProductPinterestComponent extends ProductBasicComponent {
   override async save(): Promise<void> {
     await super.save();
     await this.ngOnInit();
+  }
+
+  autoFillInformation() {
+    let dialog = this.matDialog.open(ConfirmDialog, {data: {title: 'Auto fill information', message: 'You are about to auto fill and overwrite your pinterest Information with your product information. Do you want to continue?', no: 'cancel', yes: 'ok'}});
+    dialog.afterClosed().subscribe({
+      next: res => {
+        if(res) {
+          let pinRequest = new PinRequest();
+          pinRequest.title = this.product.title;
+          pinRequest.link = this.product.marketingLink;
+          pinRequest.alt_text = this.product.marketingLink;
+          pinRequest.description = this.product.description;
+          pinRequest.note = `Original Link: ${this.product.originalLink}\nPrice: ${this.product.price}`;
+          pinRequest.boardName = this.product.category.name;
+          pinRequest.media_source = undefined;
+          this.pinRequest = pinRequest;
+          this.vFiles = [];
+          if(this.product.fileLinks && this.product.fileLinks.length > 0) {
+            for(let file of this.product.fileLinks) {
+              if(file.mediaType.includes('image')) {
+                this.onSelectFileOptions(file.link);
+              }
+            }
+          }
+          this.product.pinterestPinData!.pinRequest = this.pinRequest;
+        }
+      }
+    })
   }
 }

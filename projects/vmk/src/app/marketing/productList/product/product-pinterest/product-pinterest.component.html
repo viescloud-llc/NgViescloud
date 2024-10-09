@@ -22,6 +22,21 @@
   </ng-container>
   <hr>
   <li>
+    <button mat-raised-button color="primary" style="width: 100%;" (click)="autoFillInformation()">Auto Fill Information</button>
+  </li>
+  <br>
+  <li>
+    <app-mat-form-field-input-option
+    label="Board Name (from categories)"
+    [(value)]="pinRequest.boardName"
+    [options]="boardNameOptions"
+    noneLabel="Please select a board name"
+    [required]="true"
+    styleWidth="100%"
+    blankObject="Please select a board name"
+    ></app-mat-form-field-input-option>
+  </li>
+  <li>
     <app-mat-form-field-input-dynamic
     [(value)]="pinRequest"
     [blankObject]="blankPinRequest"
