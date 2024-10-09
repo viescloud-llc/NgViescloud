@@ -43,7 +43,7 @@ export class PinterestProductComponent extends ProductBasicComponent {
     protected override snackBar: MatSnackBar,
     protected override quickSideDrawerMenuService: QuickSideDrawerMenuService
   ) { 
-    super(matDialog, productService, s3StorageService, route, data, snackBar, quickSideDrawerMenuService);
+    super(route, data, productService, s3StorageService, quickSideDrawerMenuService, matDialog, snackBar);
   }
   
   override ngOnChanges(changes?: SimpleChanges): void {

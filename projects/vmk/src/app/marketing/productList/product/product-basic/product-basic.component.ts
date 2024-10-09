@@ -33,13 +33,13 @@ export class ProductBasicComponent implements OnInit, OnChanges {
   validInput = false;
 
   constructor(
-    protected matDialog: MatDialog,
-    protected productService: ProductService,
-    protected s3StorageService: S3StorageServiceV1,
     protected route: Router,
     protected data: ProductData,
-    protected snackBar: MatSnackBar,
-    protected quickSideDrawerMenuService: QuickSideDrawerMenuService
+    protected productService: ProductService,
+    protected s3StorageService: S3StorageServiceV1,
+    protected quickSideDrawerMenuService: QuickSideDrawerMenuService,
+    protected matDialog: MatDialog,
+    protected snackBar: MatSnackBar
   ) { }
 
   ngOnChanges(changes: SimpleChanges): void {

@@ -19,18 +19,6 @@ export class ProductOverallComponent extends ProductBasicComponent {
 
   blankPinResponse: PinResponse = new PinResponse();
 
-  constructor(
-    protected override matDialog: MatDialog,
-    protected override productService: ProductService,
-    protected override s3StorageService: S3StorageServiceV1,
-    protected override route: Router,
-    protected override data: ProductData,
-    protected override snackBar: MatSnackBar,
-    protected override quickSideDrawerMenuService: QuickSideDrawerMenuService
-  ) { 
-    super(matDialog, productService, s3StorageService, route, data, snackBar, quickSideDrawerMenuService);
-  }
-
   override ngOnChanges(changes: SimpleChanges): void {
       
   }

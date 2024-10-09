@@ -5,7 +5,13 @@ import { UtilsService, VFile } from 'projects/viescloud-utils/src/lib/service/Ut
 import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
 import { firstValueFrom } from 'rxjs';
 import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
-import { ViesPinterestService } from 'projects/viescloud-utils/src/lib/service/AffiliateMarketing.service';
+import { ProductService, ViesPinterestService } from 'projects/viescloud-utils/src/lib/service/AffiliateMarketing.service';
+import { MatDialog } from '@angular/material/dialog';
+import { S3StorageServiceV1 } from 'projects/viescloud-utils/src/lib/service/ObjectStorageManager.service';
+import { Router } from '@angular/router';
+import { ProductData } from '../data/product-data.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { QuickSideDrawerMenuService } from 'projects/viescloud-utils/src/lib/service/QuickSideDrawerMenu.service';
 
 @Component({
   selector: 'app-product-pinterest',
@@ -13,9 +19,6 @@ import { ViesPinterestService } from 'projects/viescloud-utils/src/lib/service/A
   styleUrls: ['./product-pinterest.component.scss']
 })
 export class ProductPinterestComponent extends ProductBasicComponent {
-
-  @Inject(ViesPinterestService)
-  private pinterestService!: ViesPinterestService;
 
   pinRequest!: PinRequest;
   pinResponse?: PinResponse;
@@ -32,6 +35,19 @@ export class ProductPinterestComponent extends ProductBasicComponent {
   //additional fields
   width: number = 1080;
   height: number = 1920;
+
+  constructor(
+    protected override route: Router,
+    protected override data: ProductData,
+    protected override productService: ProductService,
+    protected override s3StorageService: S3StorageServiceV1,
+    protected override quickSideDrawerMenuService: QuickSideDrawerMenuService,
+    protected override matDialog: MatDialog,
+    protected override snackBar: MatSnackBar,
+    protected pinterestService?: ViesPinterestService,
+  ) { 
+    super(route, data, productService, s3StorageService, quickSideDrawerMenuService, matDialog, snackBar);
+  }
 
   override async ngOnInit() {
     this.product = structuredClone(this.data.product);
@@ -229,11 +245,12 @@ export class ProductPinterestComponent extends ProductBasicComponent {
   }
 
   uploadProduct() {
-    let dialog = this.matDialog.open(ConfirmDialog, {data: {title: 'Upload product', message: 'You are about to upload your product to Pinterest. Do you want to continue?', no: 'cancel', yes: 'ok'}});
+    let dialog = this.matDialog.open(ConfirmDialog, {data: {title: 'Upload product', message: 'You are about to upload your product to Pinterest. Do you want to continue?', no: 'cancel', yes: 'ok'}, width: '100%'});
+    
     dialog.afterClosed().subscribe({
       next: res => {
         if(res) {
-          this.pinterestService.uploadPin(this.product.id, this.width, this.height).pipe(UtilsService.waitLoadingDialog(this.matDialog)).subscribe({
+          this.pinterestService?.uploadPin(this.product.id, this.width, this.height).pipe(UtilsService.waitLoadingDialog(this.matDialog)).subscribe({
             next: res => {
               this.ngOnInit();
             },
