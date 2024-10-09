@@ -252,6 +252,7 @@ export class ProductPinterestComponent extends ProductBasicComponent {
         if(res) {
           this.pinterestService?.uploadPin(this.product.id, this.width, this.height).pipe(UtilsService.waitLoadingDialog(this.matDialog)).subscribe({
             next: res => {
+              this.data.product = res;
               this.ngOnInit();
             },
             error: err => {
