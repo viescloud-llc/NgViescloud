@@ -264,136 +264,168 @@ export class UtilsService {
   }
 
   static isNotEqual(obj1: any, obj2: any) {
-    return !UtilsService.areObjectsEqual(obj1, obj2);
+    return !UtilsService.isEqual(obj1, obj2);
   }
 
-  static isEqual(obj1: any, obj2: any) {
-    return JSON.stringify(obj1) === JSON.stringify(obj2) || UtilsService.areObjectsEqual(obj1, obj2);
-  }
+  static isEqual<T>(obj1: T, obj2: T): boolean {
+    // If both references are the same, return true
+    if (obj1 === obj2) return true;
 
-   /**
-   * Compares two objects and returns true if all their fields are the same, except for default values.
-   * The default value is auto-detected based on the field's data type.
-   * @param obj1 - The first object to compare.
-   * @param obj2 - The second object to compare.
-   * @returns True if the objects are equal (ignoring default values), false otherwise.
-   */
-   static areObjectsEqual(obj1: any, obj2: any): boolean {
-    // Check if both arguments are objects
-    if (typeof obj1 !== 'object' || typeof obj2 !== 'object' || obj1 === null || obj2 === null) {
-      return obj1 === obj2;
+    if(JSON.stringify(obj1) === JSON.stringify(obj2)) 
+      return true
+
+    // If the types are different, return false
+    if (typeof obj1 !== typeof obj2) return false;
+
+    // Handle null or undefined values
+    if (obj1 === null || obj2 === null || obj1 === undefined || obj2 === undefined) return false;
+
+    // Handle primitive type values directly
+    if (typeof obj1 !== 'object' || typeof obj2 !== 'object') return obj1 === obj2;
+
+    // For arrays, compare each element using a default empty array as a template
+    if (Array.isArray(obj1) && Array.isArray(obj2)) {
+        // If array lengths differ, return false
+        if (obj1.length !== obj2.length) return false;
+
+        // Compare each element recursively
+        return obj1.every((item, index) => UtilsService.isEqual(item, obj2[index]));
     }
 
-    // Get the keys of both objects
+    // For objects, collect keys from both obj1 and obj2
     const keys1 = Object.keys(obj1);
     const keys2 = Object.keys(obj2);
 
-    // Check if they have the same number of keys
-    if (keys1.length !== keys2.length) {
-      return false;
-    }
+    // Create a set to store all keys for comparison
+    const allKeys = new Set([...keys1, ...keys2]);
 
-    for (const key of keys1) {
-      const value1 = obj1[key];
-      const value2 = obj2[key];
+    for (const key of allKeys) {
+        const value1 = (obj1 as any)[key];
+        const value2 = (obj2 as any)[key];
 
-      // Detect default value based on type
-      const defaultValue1 = UtilsService.getDefaultValue(value1);
-      const defaultValue2 = UtilsService.getDefaultValue(value2);
+        // Handle missing fields
+        const isValue1Missing = value1 === undefined;
+        const isValue2Missing = value2 === undefined;
 
-      // Skip default values in both objects
-      const isDefaultValue1 = value1 === defaultValue1;
-      const isDefaultValue2 = value2 === defaultValue2;
-
-      if (isDefaultValue1 && isDefaultValue2) {
-        continue;
-      }
-
-      // Compare arrays recursively
-      const areArrays = Array.isArray(value1) && Array.isArray(value2);
-      if (areArrays && !UtilsService.areArraysEqual(value1, value2)) {
-        return false;
-      }
-
-      // Compare nested objects recursively
-      const areObjects = typeof value1 === 'object' && typeof value2 === 'object' && !areArrays;
-      if (
-        (areObjects && !UtilsService.areObjectsEqual(value1, value2)) ||
-        (!areObjects && value1 !== value2)
-      ) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  /**
-   * Compares two arrays and returns true if all their elements are the same, except for default values.
-   * The default value is auto-detected based on the element's data type.
-   * @param arr1 - The first array to compare.
-   * @param arr2 - The second array to compare.
-   * @returns True if the arrays are equal (ignoring default values), false otherwise.
-   */
-  static areArraysEqual(arr1: any[], arr2: any[]): boolean {
-    if (arr1.length !== arr2.length) {
-      return false;
-    }
-
-    for (let i = 0; i < arr1.length; i++) {
-      const value1 = arr1[i];
-      const value2 = arr2[i];
-
-      // Detect default value based on type
-      const defaultValue1 = UtilsService.getDefaultValue(value1);
-      const defaultValue2 = UtilsService.getDefaultValue(value2);
-
-      // Skip default values in both arrays
-      const isDefaultValue1 = value1 === defaultValue1;
-      const isDefaultValue2 = value2 === defaultValue2;
-
-      if (isDefaultValue1 && isDefaultValue2) {
-        continue;
-      }
-
-      // Compare nested arrays or objects recursively
-      const areObjects = typeof value1 === 'object' && typeof value2 === 'object';
-      if (
-        (areObjects && !UtilsService.areObjectsEqual(value1, value2)) ||
-        (!areObjects && value1 !== value2)
-      ) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  /**
-   * Gets the default value for a given value based on its type.
-   * @param value - The value to determine the default for.
-   * @returns The default value for the type of the given value.
-   */
-  static getDefaultValue(value: any): any {
-    if (value === null || value === undefined) {
-      return value;
-    }
-    const type = typeof value;
-    switch (type) {
-      case 'string':
-        return '';
-      case 'number':
-        return 0;
-      case 'boolean':
-        return false;
-      case 'object':
-        if (Array.isArray(value)) {
-          return [];
+        // Skip if both are missing or if one is missing and the other is a default value
+        if ((isValue1Missing && isValue2Missing) || 
+            (isValue1Missing && UtilsService.isDefaultValue(value2, undefined)) ||
+            (isValue2Missing && UtilsService.isDefaultValue(value1, undefined))) {
+            continue;
         }
-        return null;
-      default:
-        return undefined;
+
+        // If obj1 is missing but obj2 has a valid value, do not skip comparison
+        if (isValue1Missing && !UtilsService.isDefaultValue(value2, undefined)) {
+            return false; // They are not equal because obj2 has a valid value
+        }
+
+        // If obj2 is missing but obj1 has a valid value, do not skip comparison
+        if (isValue2Missing && !UtilsService.isDefaultValue(value1, undefined)) {
+            return false; // They are not equal because obj1 has a valid value
+        }
+
+        // Compare recursively if both values exist and are not default values
+        if (!UtilsService.isEqual(value1, value2)) return false;
     }
+
+    return true;
+  }
+
+  static isNotEqualWith<T>(obj1: T, obj2: T, blankObj: T): boolean {
+    return !UtilsService.isEqualWith(obj1, obj2, blankObj);
+  }
+
+  static isEqualWith<T>(obj1: T, obj2: T, blankObj: T): boolean {
+    // If both references are the same, return true
+    if (obj1 === obj2) return true;
+
+    if(JSON.stringify(obj1) === JSON.stringify(obj2)) 
+      return true
+
+    // If the types are different, return false
+    if (typeof obj1 !== typeof obj2) return false;
+
+    // Handle null or undefined values
+    if (obj1 === null || obj2 === null || obj1 === undefined || obj2 === undefined) return false;
+
+    // Handle primitive type values directly
+    if (typeof obj1 !== 'object' || typeof obj2 !== 'object') return obj1 === obj2;
+
+    // For arrays, compare each element using the first item in the blankObj array as a template
+    if (Array.isArray(blankObj)) {
+      if (!Array.isArray(obj1) || !Array.isArray(obj2)) return false;
+
+      // If array lengths differ, return false
+      if (obj1.length !== obj2.length) return false;
+
+      // Compare each element recursively
+      const blankItem = blankObj[0];
+      return obj1.every((item, index) => UtilsService.isEqualWith(item, obj2[index], blankItem));
+    }
+
+    // For objects, iterate through the keys of blankObj as the model
+    if (typeof blankObj === 'object' && blankObj !== null) {
+      const blankKeys = Object.keys(blankObj);
+
+      for (const key of blankKeys) {
+        const blankValue = (blankObj as any)[key];
+        const value1 = (obj1 as any)[key];
+        const value2 = (obj2 as any)[key];
+
+        // Handle missing fields differently based on your updated logic
+        const isValue1Missing = value1 === undefined;
+        const isValue2Missing = value2 === undefined;
+        const isValue1Default = UtilsService.isDefaultValue(value1, blankValue);
+        const isValue2Default = UtilsService.isDefaultValue(value2, blankValue);
+
+        // Skip if both are missing or if one is missing and the other is a default value
+        if ((isValue1Missing && isValue2Missing) || 
+            (isValue1Missing && isValue2Default) ||
+            (isValue2Missing && isValue1Default)) {
+          continue;
+        }
+
+        // If obj1 is missing but obj2 has a valid value, do not skip comparison
+        if (isValue1Missing && !isValue2Default) {
+          return false; // They are not equal because obj2 has a valid value
+        }
+
+        // If obj2 is missing but obj1 has a valid value, do not skip comparison
+        if (isValue2Missing && !isValue1Default) {
+          return false; // They are not equal because obj1 has a valid value
+        }
+
+        // Compare recursively if both values exist and are not default values
+        if (!UtilsService.isEqualWith(value1, value2, blankValue)) return false;
+      }
+      return true;
+    }
+
+    return false;
+  }
+
+  static isDefaultValue(value: any, blankValue: any): boolean {
+    // Check for strict equality with blankValue
+    if (value === blankValue) return true;
+
+    // Check for null or undefined values
+    if (value === null || value === undefined) return true;
+
+    // Check for empty strings specifically
+    if (typeof value === 'string' && value.trim() === '') return true;
+
+    // For arrays, check if empty or matches blank array
+    if (Array.isArray(value) && Array.isArray(blankValue)) {
+        return value.length === 0 || UtilsService.isEqualWith(value, blankValue, blankValue);
+    }
+
+    // For objects, check if all keys match the blank value
+    if (typeof value === 'object' && typeof blankValue === 'object') {
+        return UtilsService.isEqualWith(value, blankValue, blankValue);
+    }
+
+    // If none of the above, it's not a default value
+    return false;
   }
 
   static localStorageSetItem(key: string, value: any): void {

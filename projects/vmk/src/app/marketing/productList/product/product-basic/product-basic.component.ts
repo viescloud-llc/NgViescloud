@@ -75,7 +75,7 @@ export class ProductBasicComponent implements OnInit, OnChanges {
     let vf1 = structuredClone(this.vFiles).map((vf: VFile) => {vf.value = ''; return vf});
     let vf2 = structuredClone(this.vFilesCopy).map((vf: VFile) => {vf.value = ''; return vf});
 
-    let change = !UtilsService.isEqual(this.product, this.data.product) || !UtilsService.isEqual(vf1, vf2);
+    let change = UtilsService.isNotEqual(this.product, this.data.product) || UtilsService.isNotEqual(vf1, vf2);
     change ? this.setEditingComponent() : this.clearEditingComponent();
     return change;
   }
