@@ -41,11 +41,7 @@ export enum MatTableSettingType {
     HIDE = <any>'HideColumn'
 }
 
-export enum UserPermission {
-    READ = "READ",
-    WRITE = "WRITE",
-    DELETE = "DELETE"
-}
+
 
 export enum MatSnackBarHorizontalPosition {
     START = "start",
@@ -236,16 +232,6 @@ export class MatFromFieldInputDynamicItem {
         }
         
         return include;
-    }
-}
-
-export class SharedUser {
-    userId: number = 0;
-    permissions: UserPermission[] = [];
-
-    constructor(userId?: number, permissions?: UserPermission[]) {
-        this.userId = userId ?? 0;
-        this.permissions = permissions ?? [];
     }
 }
 

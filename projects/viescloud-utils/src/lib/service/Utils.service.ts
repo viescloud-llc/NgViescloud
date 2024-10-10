@@ -738,4 +738,21 @@ export class UtilsService {
     }
     return str;
   }
+
+  static purgeArray<T>(obj: T): T {
+    if (Array.isArray(obj)) {
+        // If it's an array, set it to an empty array and return
+        return [] as unknown as T;
+    } else if (obj && typeof obj === 'object') {
+        // If it's an object, recursively purge each field
+        for (const key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                obj[key] = this.purgeArray(obj[key]);
+            }
+        }
+        return obj;
+    }
+    // Return the original object if it's neither an array nor an object
+    return obj;
+  }
 }

@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { WrapDialog } from 'projects/viescloud-utils/src/lib/dialog/wrap-dialog/wrap-dialog.component';
 import { Wrap, WrapType } from 'projects/viescloud-utils/src/lib/model/Wrap.model';
+import { UtilsService } from 'projects/viescloud-utils/src/lib/service/Utils.service';
 
 @Component({
   selector: 'app-wrap-plus-button',
@@ -25,7 +26,7 @@ export class WrapPlusButtonComponent implements OnInit {
   }
 
   openDialog() {
-    let wrap = new Wrap();
+    let wrap = UtilsService.purgeArray(new Wrap());
     wrap.type = this.adviceWrapType;
     let dialog = this.matDialog.open(WrapDialog, {
       data: {

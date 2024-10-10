@@ -1,3 +1,4 @@
+import { SharedUser } from "./Authenticator.model";
 import { MatInputDisable, MatInputDisplayLabel, MatInputHide, MatInputIndex, MatInputRequire, MatInputTextArea, MatTableHide } from "./Mat.model";
 
 export class Product {
@@ -7,7 +8,7 @@ export class Product {
 
     @MatTableHide(true)
     @MatInputHide(true)
-    sharedUserIds: number[] = [0] as number[];
+    sharedUsers: SharedUser[] = [new SharedUser()] as SharedUser[];
 
     @MatInputHide(true)
     id:            number = 0;
@@ -48,7 +49,7 @@ export class Product {
     static of() {
         let product = new Product();
         product.fileLinks = [];
-        product.sharedUserIds = [];
+        product.sharedUsers = [];
 
         return product;
     }

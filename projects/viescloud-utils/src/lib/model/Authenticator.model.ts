@@ -1,5 +1,21 @@
 import { MatColumn, MatInputDisable, MatInputHide, MatTableHide, MatTableSetting, DateTime } from "./Mat.model";
 
+export enum UserPermission {
+    READ = "READ",
+    WRITE = "WRITE",
+    DELETE = "DELETE"
+}
+
+export class SharedUser {
+    userId: number = 0;
+    permissions: UserPermission[] = [UserPermission.READ] as UserPermission[];
+
+    constructor(userId?: number, permissions?: UserPermission[]) {
+        this.userId = userId ?? 0;
+        this.permissions = permissions ?? [UserPermission.READ] as UserPermission[];
+    }
+}
+
 export interface Jwt {
     jwt?: string;
 }

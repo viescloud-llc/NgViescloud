@@ -1,4 +1,4 @@
-import { SharedUser } from "./Mat.model";
+import { SharedUser } from "./Authenticator.model";
 
 export interface Metadata {
     ownerUserId?:      number;
