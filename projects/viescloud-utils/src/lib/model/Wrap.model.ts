@@ -1,4 +1,4 @@
-import { MatInputDisplayLabel, MatInputEnum, MatInputHide, MatInputListSetting, MatInputOptions, MatInputRequire, MatInputTextArea } from "./Mat.model";
+import { MatInputDisplayLabel, MatInputEnum, MatInputHide, MatInputItemSetting, MatInputListSetting, MatInputOptions, MatInputRequire, MatInputTextArea, MatItemSettingType } from "./Mat.model";
 import { RgbColor } from "./Rgb.model";
 
 export enum WrapType {
@@ -231,6 +231,7 @@ export class Wrap {
     tags: string[] = [''] as string[];
 
     @MatInputDisplayLabel("Icon url", "e.g https://image.png")
+    @MatInputItemSetting(MatItemSettingType.AUTO_FILL_HTTPS, true)
     icon: string = '';
     
     @MatInputEnum(WrapHotKey)
@@ -241,6 +242,7 @@ export class Wrap {
     color: RgbColor = new RgbColor();
 
     @MatInputDisplayLabel('Background picture url', 'e.g https://image.png')
+    @MatInputItemSetting(MatItemSettingType.AUTO_FILL_HTTPS, true)
     backgroundPicture: string = '';
 
     @MatInputHide(true)
@@ -252,10 +254,12 @@ export class Link {
     label: string = '';
 
     @MatInputDisplayLabel('Service Url', 'e.g https://service.com')
+    @MatInputItemSetting(MatItemSettingType.AUTO_FILL_HTTPS, true)
     serviceUrl: string = '';
 
     @MatInputHide(true)
     @MatInputDisplayLabel('Status Check Url', 'e.g https://service.com')
+    @MatInputItemSetting(MatItemSettingType.AUTO_FILL_HTTPS, true)
     statusCheckUrl: string = '';
 
     @MatInputHide(true)

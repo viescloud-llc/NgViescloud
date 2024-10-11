@@ -26,6 +26,8 @@ export enum MatItemSettingType {
     CUSTOM_PLACEHOLDER = <any>'CustomPlaceholderItem',
     INDEX = <any>'IndexItem',
     TEXT_AREA = <any>'TextAreaItem',
+    VALIDATE_EMAIL = <any>'ValidateEmailItem',
+    AUTO_FILL_HTTPS = <any>'AutoFillHttpsItem',
     EXPANSION_PANEL = <any>'ExpansionPanelItem',
     OPTIONS = <any>'OptionsItem',
     HIDE = <any>'HideItem',
@@ -418,6 +420,12 @@ export const MatInputListSetting = (showListSizeInput?: boolean, showAddItemButt
         addValue(object, key, MatItemSettingType.LIST_SHOW_LIST_SIZE_INPUT.toString(), showListSizeInput, true);
         addValue(object, key, MatItemSettingType.LIST_SHOW_ADD_ITEM_BUTTON.toString(), showAddItemButton, true);
         addValue(object, key, MatItemSettingType.LIST_SHOW_REMOVE_ITEM_BUTTON.toString(), showRemoveItemButton, true);
+    }
+}
+
+export const MatInputItemSetting = (type: MatItemSettingType, value: any) => {
+    return function MatInputItemSetting(object: any, key: any) {
+        addValue(object, key, type.toString(), value, value);
     }
 }
 

@@ -96,6 +96,10 @@ export class MatFormFieldInputComponent extends MatFormFieldComponent {
   @Input()
   validateEmail: boolean = false;
 
+  //auto fill
+  @Input()
+  autoFillHttps: boolean = false;
+
   constructor() {
     super();
   }
@@ -205,6 +209,10 @@ export class MatFormFieldInputComponent extends MatFormFieldComponent {
   }
 
   focusoutEmitValue() {
+    if(this.autoFillHttps) {
+      this.onAutoFillHttps();
+    }
+
     if (this.focusoutEmit)
       this.emitValue();
   }
@@ -300,5 +308,12 @@ export class MatFormFieldInputComponent extends MatFormFieldComponent {
     }
     else
       return {}
+  }
+
+  onAutoFillHttps() {
+    if(this.value && !this.value.startsWith('https://') && !this.value.startsWith('http://'))
+      this.value = 'https://' + this.value;
+
+    this.emitValue();
   }
 }

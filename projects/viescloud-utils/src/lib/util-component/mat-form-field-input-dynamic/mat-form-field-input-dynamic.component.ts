@@ -41,6 +41,9 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
   isOptions: boolean = false;
 
   @Input()
+  isHttps: boolean = false;
+
+  @Input()
   showListSizeInput: boolean = false;
 
   @Input()
@@ -244,6 +247,14 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
 
   public containTextArea(item: MatFromFieldInputDynamicItem) {
     return item.containSetting(MatItemSettingType.TEXT_AREA);
+  }
+
+  public containValidateEmail(item: MatFromFieldInputDynamicItem) {
+    return item.containSetting(MatItemSettingType.VALIDATE_EMAIL);
+  }
+
+  public containAutoFillHttps(item: MatFromFieldInputDynamicItem) {
+    return item.containSetting(MatItemSettingType.AUTO_FILL_HTTPS);
   }
 
   public containListShowInputSize(item: MatFromFieldInputDynamicItem) {
