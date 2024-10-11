@@ -24,6 +24,9 @@ export class HeaderComponent implements OnInit {
   @Input()
   imageSrc = '';
 
+  @Input()
+  useLogoutFlow = false;
+
   constructor(
     public openIdService: OpenIdService,
     public authenticatorService: AuthenticatorService, 
@@ -40,7 +43,9 @@ export class HeaderComponent implements OnInit {
 
   logout(): void {
     this.authenticatorService.logoutWithoutReroute();
-    this.openIdService.logoutFlow();
+
+    if(this.useLogoutFlow)
+      this.openIdService.logoutFlow();
   }
 
   getURL(): string {

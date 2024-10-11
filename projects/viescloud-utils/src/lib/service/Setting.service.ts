@@ -138,6 +138,7 @@ export class SettingService {
 
   saveSettingLocally(generalSetting: GeneralSetting): void {
     UtilsService.localStorageSetItem(this.GENERAL_SETTING_KEY, generalSetting);
+    this.generalSetting = generalSetting;
   }
 
   saveSettingToServer(prefix: string, generalSetting: GeneralSetting): void {
@@ -186,5 +187,12 @@ export class SettingService {
         }
       }
     })
+  }
+
+  getCurrentThemeTextColor(): string {
+    if(this.generalSetting.theme.toLowerCase().includes('light'))
+      return 'black';
+    else
+      return 'white';
   }
 }

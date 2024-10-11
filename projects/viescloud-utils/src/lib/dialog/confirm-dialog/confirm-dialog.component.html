@@ -1,5 +1,5 @@
 <h1 mat-dialog-title>{{data.title}}</h1>
-<div mat-dialog-content>
+<!-- <div mat-dialog-content>
   <app-mat-form-field-input
   *ngIf="!isMultipleLine()"
   [value]="data.message"
@@ -13,7 +13,18 @@
   [disable]="true"
   styleWidth="100%"
   ></app-mat-form-field-input-text-area>
+</div> -->
+
+<div class="dialog-container" [ngStyle]="getNgStyleTextColor()" class="text-center">
+  <pre class="ascii-border">
+    {{ borderTop }}
+    <ng-container *ngFor="let line of borderSides">
+    {{ line }}
+    </ng-container>
+    {{ borderBottom }}
+  </pre>
 </div>
+
 <div mat-dialog-actions>
   <button mat-raised-button color="primary" [mat-dialog-close]="yes.toLowerCase()">{{yes}}</button>
   <button *ngIf="no" mat-raised-button color="warn" mat-dialog-close>{{no}}</button>

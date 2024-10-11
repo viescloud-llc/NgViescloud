@@ -257,21 +257,68 @@ export class ProductPinterestComponent extends ProductBasicComponent {
     return vfile;
   }
 
-  uploadProduct() {
+  protected async checkValidVFilesBeforeUpload() {
+    let result = true;
+    let badVFiles: VFile[] = [];
+
+    for (const vf of this.vFiles) {
+      if (vf.originalLink && this.s3StorageService.containViesLink(vf.originalLink)) {
+        let path = this.s3StorageService.extractPathFromViesLink(vf.originalLink);
+        await firstValueFrom(this.s3StorageService.getFileByPath(path, this.width, this.height).pipe(UtilsService.waitLoadingDialog(this.matDialog))).catch(e => {
+          result = false;
+          badVFiles.push(vf);
+        });
+      }
+    }
+
+    if(badVFiles.length > 0) {
+      let dialog = this.matDialog.open(ConfirmDialog, {
+        data: {
+          title: 'Error', 
+          message: this.getBadVFilesMessage(badVFiles), 
+          no: '', 
+          yes: 'ok'
+        }, 
+        width: '100%'
+      });
+
+      dialog.afterClosed().subscribe({ next: res => { } })
+    }
+
+    return result;
+  }
+
+  private getBadVFilesMessage(badVFiles: VFile[]): string {
+    let message = 'Some of your files are not valid (might be corrupted) for resizing:\n';
+    for (const vf of badVFiles) {
+      message += `\t- File ${this.getFilesIndex(vf)}: ${vf.name}\n`;
+    }
+
+    return `${message}\nPlease remove those files and upload it again.`;
+  }
+
+  private getFilesIndex(vfile: VFile): number {
+    return this.vFiles.indexOf(vfile) + 1;
+  }
+
+  async uploadProduct() {
     let dialog = this.matDialog.open(ConfirmDialog, {data: {title: 'Upload product', message: 'You are about to upload your product to Pinterest. Do you want to continue?', no: 'cancel', yes: 'ok'}, width: '100%'});
     
     dialog.afterClosed().subscribe({
-      next: res => {
+      next: async res => {
         if(res) {
-          this.pinterestService?.uploadPin(this.product.id, this.width, this.height).pipe(UtilsService.waitLoadingDialog(this.matDialog)).subscribe({
-            next: res => {
-              this.data.product = res;
-              this.ngOnInit();
-            },
-            error: err => {
-              this.data.error = 'Error uploading product, please try again by refreshing the page';
-            }
-          })
+          let validFileCheck = await this.checkValidVFilesBeforeUpload();
+          if(validFileCheck) {
+            this.pinterestService?.uploadPin(this.product.id, this.width, this.height).pipe(UtilsService.waitLoadingDialog(this.matDialog)).subscribe({
+              next: res => {
+                this.data.product = res;
+                this.ngOnInit();
+              },
+              error: err => {
+                this.data.error = 'Error uploading product, please try again by refreshing the page';
+              }
+            })
+          }
         }
       }
     })

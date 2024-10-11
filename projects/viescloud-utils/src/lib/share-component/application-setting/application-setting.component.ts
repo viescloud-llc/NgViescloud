@@ -28,22 +28,8 @@ export class ApplicationSettingComponent implements OnInit {
   }
 
   saveLocally() {
-    let dialog = this.matDialog.open(ConfirmDialog, {
-      data: {
-        title: 'Save locally',
-        message: 'Do you want to save setting locally?\nNote: It will not be saved to server. Therefore, it will be lost if you close the window.',
-        yes: 'Save',
-        no: 'Cancel'
-      },
-      width: '100%'
-    })
-
-    dialog.afterClosed().subscribe(res => {
-      if (res) {
-        this.settingService.saveSettingLocally(this.generalSetting);
-        this.ngOnInit();
-      }
-    })
+    this.settingService.saveSettingLocally(this.generalSetting);
+    this.ngOnInit();
   }
 
   saveToServer() {
