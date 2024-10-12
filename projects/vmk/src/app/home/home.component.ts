@@ -12,7 +12,6 @@ export class HomeComponent implements OnInit {
   count = 0;
 
   constructor(
-    private popupUtils: PopupUtils
   ) { }
 
   ngOnInit() {
@@ -22,9 +21,4 @@ export class HomeComponent implements OnInit {
   getURL(): string {
     return document.URL;
   }
-
-  popup() {
-    this.popupUtils.openDynamicMessagePopup(`Count (${this.count++}): ${StringUtils.makeId(100)}`, 'ok', 40, "bottom", "right", 10000);
-  }
-
 }
