@@ -1,6 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_SNACK_BAR_DATA, MatSnackBarRef } from '@angular/material/snack-bar';
 import { UtilsService } from '../../service/Utils.service';
+import { StringUtils } from '../../util/String.utils';
 
 @Component({
   selector: 'app-string-snack-bar',
@@ -19,7 +20,7 @@ export class StringSnackBar {
     private snackBarRef: MatSnackBarRef<StringSnackBar>,
     @Inject(MAT_SNACK_BAR_DATA) public data: { message: string , maxLength?: number, dismissLabel?: string, viewFullOnHover?: boolean}) {
     this.fullMessage = data.message;
-    this.truncatedMessage = data.maxLength ? UtilsService.getMaxString(data.message, data.maxLength) : data.message;
+    this.truncatedMessage = data.maxLength ? StringUtils.getMaxString(data.message, data.maxLength) : data.message;
     this.dismissLabel = data.dismissLabel ?? '';
     this.viewFullOnHover = data.viewFullOnHover ?? false;
   }

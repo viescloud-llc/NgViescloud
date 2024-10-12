@@ -12,9 +12,12 @@ export class PopupUtils {
 
     constructor(private overlay: Overlay, private injector: Injector) { }
 
-    // Specific method for message popups
-    openMessagePopup(message: string, vertical: 'top' | 'bottom' = 'bottom', horizontal: 'left' | 'middle' | 'right' = 'right', ttl: number = 5000) {
-        this.open(MessagePopup, { message }, vertical, horizontal, ttl);
+    openMessagePopup(message: string, dismissLabel: string = '', vertical: 'top' | 'bottom' = 'bottom', horizontal: 'left' | 'middle' | 'right' = 'right', ttl: number = 5000) {
+        return this.open(MessagePopup, { message, dismissLabel }, vertical, horizontal, ttl);
+    }
+
+    openDynamicMessagePopup(message: string, dismissLabel: string = '', maxLength: number = 40, vertical: 'top' | 'bottom' = 'bottom', horizontal: 'left' | 'middle' | 'right' = 'right', ttl: number = 5000) {
+        return this.open(MessagePopup, { message, dismissLabel, maxLength, viewFullOnHover: true}, vertical, horizontal, ttl);
     }
 
     // Generic open method
@@ -42,6 +45,8 @@ export class PopupUtils {
         if (ttl > 0) {
             setTimeout(() => this.dismiss(overlayRef), ttl);
         }
+
+        return overlayRef;
     }
 
     dismiss(overlayRef: OverlayRef) {

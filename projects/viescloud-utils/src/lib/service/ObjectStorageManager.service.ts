@@ -6,6 +6,7 @@ import { UtilsService, VFile } from './Utils.service';
 import { Metadata } from '../model/ObjectStorageManager.model';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { RxJSUtils } from '../util/RxJS.utils';
 
 export abstract class ObjectStorage {
   objectUrlCache = new Map<string, string>();

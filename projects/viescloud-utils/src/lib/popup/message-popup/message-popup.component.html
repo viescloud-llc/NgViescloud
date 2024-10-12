@@ -1,6 +1,9 @@
-<mat-card appearance="outlined">
+<mat-card appearance="outlined" (mouseover)="isHovered = true" (mouseout)="isHovered = false">
   <mat-card-content [style.color]="textColor">
-    {{ data.message }}
-    <button mat-button (click)="dismiss()">Dismiss</button>
+    <!-- {{ data.message }} -->
+    <span>
+      {{ isHovered && viewFullOnHover ? fullMessage : truncatedMessage }}
+    </span>
+    <button *ngIf="dismissLabel" mat-button (click)="dismiss()">{{dismissLabel}}</button>
   </mat-card-content>
 </mat-card>
