@@ -12,6 +12,7 @@ import { QuickSideDrawerMenuService } from 'projects/viescloud-utils/src/lib/ser
 import { ProductMenuComponent } from '../product-menu/product-menu.component';
 import { S3StorageServiceV1 } from 'projects/viescloud-utils/src/lib/service/ObjectStorageManager.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 
 @Component({
   selector: 'app-product-basic',
@@ -39,7 +40,7 @@ export class ProductBasicComponent implements OnInit, OnChanges {
     protected s3StorageService: S3StorageServiceV1,
     protected quickSideDrawerMenuService: QuickSideDrawerMenuService,
     protected matDialog: MatDialog,
-    protected snackBar: MatSnackBar
+    protected rxjsUtils: RxJSUtils
   ) { }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -60,7 +61,7 @@ export class ProductBasicComponent implements OnInit, OnChanges {
       this.product.fileLinks = this.product.fileLinks.filter(e => e.link);
       this.product.fileLinks.forEach(fileLink => {
         this.s3StorageService.fetchFile(fileLink.link)
-          .pipe(UtilsService.waitLoadingSnackBarDynamicString(this.snackBar, `Loading ${fileLink.link}`))
+          .pipe(this.rxjsUtils.waitLoadingDynamicMessagePopup(`Loading ${fileLink.link}`, 'Dismiss'))
           .subscribe({
             next: res => {
               this.pushVFile(res);
@@ -97,7 +98,7 @@ export class ProductBasicComponent implements OnInit, OnChanges {
   onFetchFile(uri: string) {
     return new Promise<VFile>((resolve, reject) => {
       this.s3StorageService.fetchFile(uri)
-      .pipe(UtilsService.waitLoadingSnackBarDynamicString(this.snackBar))
+      .pipe(this.rxjsUtils.waitLoadingDynamicMessagePopup(`Loading ${uri}`, 'Dismiss'))
       .subscribe({
         next: res => {
           this.pushVFile(res);
@@ -127,7 +128,7 @@ export class ProductBasicComponent implements OnInit, OnChanges {
       // Post new file
       for (const vFile of this.vFiles) {
         if (this.vFilesCopy.findIndex(e => e.name === vFile.name) < 0) {
-          const metadata = await firstValueFrom(this.s3StorageService.postFile(vFile).pipe(UtilsService.waitLoadingDialog(this.matDialog)));
+          const metadata = await firstValueFrom(this.s3StorageService.postFile(vFile).pipe(this.rxjsUtils.waitLoadingDialog()));
           vFile.originalLink = this.s3StorageService.generateViesLinkFromPath(metadata.path!);
         }
       }
@@ -148,7 +149,7 @@ export class ProductBasicComponent implements OnInit, OnChanges {
       for (let i = 0; i < this.product.fileLinks!.length; i++) {
         if (this.vFiles.findIndex(e => e.originalLink === this.product.fileLinks![i].link) < 0) {
           const link = this.s3StorageService.extractPathFromViesLink(this.product.fileLinks![i].link);
-          await firstValueFrom(this.s3StorageService.deleteFileByPath(link).pipe(UtilsService.waitLoadingDialog(this.matDialog)));
+          await firstValueFrom(this.s3StorageService.deleteFileByPath(link).pipe(this.rxjsUtils.waitLoadingDialog()));
           this.product.fileLinks!.splice(i, 1);
           i--;
         }
@@ -164,7 +165,7 @@ export class ProductBasicComponent implements OnInit, OnChanges {
       await this.syncVFiles();
   
       if (!this.product.id) {
-        this.productService.post(this.product).pipe(UtilsService.waitLoadingDialog(this.matDialog)).subscribe({
+        this.productService.post(this.product).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
           next: res => {
             this.route.navigate(['/marketing/products/', res.id]);
           },
@@ -174,7 +175,7 @@ export class ProductBasicComponent implements OnInit, OnChanges {
           }
         });
       } else {
-        this.productService.put(this.product.id, this.product).pipe(UtilsService.waitLoadingDialog(this.matDialog)).subscribe({
+        this.productService.put(this.product.id, this.product).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
           next: res => {
             this.data.product = res;
             this.ngOnInit();

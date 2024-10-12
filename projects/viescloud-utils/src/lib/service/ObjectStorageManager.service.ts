@@ -155,18 +155,30 @@ export abstract class ObjectStorage {
   }
 
   extractPathFromViesLink(link: string) {
-    let length = `${this.getURI()}${this.getPrefixPath()}/file?path=`.length;
-    return link.substring(length);
+    if(this.containViesLink(link)) {
+      let length = `${this.getURI()}${this.getPrefixPath()}/file?path=`.length;
+      return link.substring(length);
+    }
+    else
+      return link;
   }
 
   extractFileNameFromViesLink(link: string) {
-    let length = `${this.getURI()}${this.getPrefixPath()}/file?fileName=`.length;
-    return link.substring(length);
+    if(this.containViesLink(link)) {
+      let length = `${this.getURI()}${this.getPrefixPath()}/file?fileName=`.length;
+      return link.substring(length);
+    }
+    else
+      return link;
   }
 
   extractIdFromViesLink(link: string) {
-    let length = `${this.getURI()}${this.getPrefixPath()}/file?id=`.length;
-    return link.substring(length);
+    if(this.containViesLink(link)) {
+      let length = `${this.getURI()}${this.getPrefixPath()}/file?id=`.length;
+      return link.substring(length);
+    }
+    else
+      return link;
   }
 
   private getLoadingPipe<T>(popupType: PopupType, message: string = '', dismissLabel: string = '') {

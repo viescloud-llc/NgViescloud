@@ -11,6 +11,7 @@ import { PinRequest, MediaSourceMultipleImage, MediaSourceImageUrl, MediaSourceV
 import { QuickSideDrawerMenuService } from 'projects/viescloud-utils/src/lib/service/QuickSideDrawerMenu.service';
 import { S3StorageServiceV1 } from 'projects/viescloud-utils/src/lib/service/ObjectStorageManager.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 
 @Component({
   selector: 'app-pinterest-product',
@@ -35,15 +36,15 @@ export class PinterestProductComponent extends ProductBasicComponent {
 
   constructor(
     protected pinterestService: ViesPinterestService,
-    protected override matDialog: MatDialog,
     protected override productService: ProductService,
     protected override s3StorageService: S3StorageServiceV1,
     protected override route: Router,
     protected override data: ProductData,
-    protected override snackBar: MatSnackBar,
+    protected override matDialog: MatDialog,
+    protected override rxjsUtils: RxJSUtils,
     protected override quickSideDrawerMenuService: QuickSideDrawerMenuService
   ) { 
-    super(route, data, productService, s3StorageService, quickSideDrawerMenuService, matDialog, snackBar);
+    super(route, data, productService, s3StorageService, quickSideDrawerMenuService, matDialog, rxjsUtils);
   }
   
   override ngOnChanges(changes?: SimpleChanges): void {

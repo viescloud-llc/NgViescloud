@@ -12,6 +12,7 @@ import { Router } from '@angular/router';
 import { ProductData } from '../data/product-data.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { QuickSideDrawerMenuService } from 'projects/viescloud-utils/src/lib/service/QuickSideDrawerMenu.service';
+import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 
 @Component({
   selector: 'app-product-pinterest',
@@ -43,10 +44,10 @@ export class ProductPinterestComponent extends ProductBasicComponent {
     protected override s3StorageService: S3StorageServiceV1,
     protected override quickSideDrawerMenuService: QuickSideDrawerMenuService,
     protected override matDialog: MatDialog,
-    protected override snackBar: MatSnackBar,
+    protected override rxjsUtils: RxJSUtils,
     protected pinterestService?: ViesPinterestService,
   ) { 
-    super(route, data, productService, s3StorageService, quickSideDrawerMenuService, matDialog, snackBar);
+    super(route, data, productService, s3StorageService, quickSideDrawerMenuService, matDialog, rxjsUtils);
   }
 
   override async ngOnInit() {
@@ -73,7 +74,7 @@ export class ProductPinterestComponent extends ProductBasicComponent {
       if(this.pinRequest.media_source.source_type == MediaSourceType.IMAGE) {
         let ms = this.pinRequest.media_source as MediaSourceImageUrl;
         let url = ms.url;
-        let res = await firstValueFrom(this.s3StorageService.fetchFile(url).pipe(UtilsService.waitLoadingSnackBarDynamicString(this.snackBar, `Loading ${url}`)))
+        let res = await firstValueFrom(this.s3StorageService.fetchFile(url).pipe(this.rxjsUtils.waitLoadingDynamicMessagePopup(`Loading ${url}`, 'Dismiss')))
         this.pushVFile(res);
         this.vFilesCopy = structuredClone(this.vFiles);
       }
@@ -82,7 +83,7 @@ export class ProductPinterestComponent extends ProductBasicComponent {
 
         for(let item of ms.items) {
           let url = item.url;
-          let res = await firstValueFrom(this.s3StorageService.fetchFile(url).pipe(UtilsService.waitLoadingSnackBarDynamicString(this.snackBar, `Loading ${url}`)))
+          let res = await firstValueFrom(this.s3StorageService.fetchFile(url).pipe(this.rxjsUtils.waitLoadingDynamicMessagePopup(`Loading ${url}`, 'Dismiss')))
           this.pushVFile(res);
           this.vFilesCopy = structuredClone(this.vFiles);
         }
@@ -91,7 +92,6 @@ export class ProductPinterestComponent extends ProductBasicComponent {
         //TODO: Handle video fetching
       }
     }
-    
   }
 
   override setEditingComponent(): void {
@@ -239,7 +239,7 @@ export class ProductPinterestComponent extends ProductBasicComponent {
 
   onSelectFileOptions(link: string) {
     return new Promise<VFile>((resolve, reject) => {
-      this.s3StorageService.fetchFile(link).pipe(UtilsService.waitLoadingSnackBarDynamicString(this.snackBar, `Loading ${link}`)).subscribe({
+      this.s3StorageService.fetchFile(link).pipe(this.rxjsUtils.waitLoadingDynamicMessagePopup(`Loading ${link}`, 'Dismiss')).subscribe({
         next: res => {
           this.pushVFile(res);
           this.addMediaSource(res);
