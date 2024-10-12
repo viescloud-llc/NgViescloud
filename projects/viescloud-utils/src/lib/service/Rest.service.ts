@@ -6,6 +6,7 @@ import { environment } from "projects/environments/environment.prod";
 import { PropertyMatcherEnum } from "../model/Mat.model";
 import { MatDialog } from "@angular/material/dialog";
 import { ObjectDialog, ObjectDialogData } from "../dialog/object-dialog/object-dialog.component";
+import { Injectable } from "@angular/core";
 
 export abstract class ViesService {
     protected getURI(): string {
@@ -24,6 +25,9 @@ export abstract class ViesService {
     }
 }
 
+@Injectable({
+    providedIn: 'root'
+})
 export abstract class ViesRestService<T extends Object> extends ViesService {
 
     constructor(protected httpClient: HttpClient) { 

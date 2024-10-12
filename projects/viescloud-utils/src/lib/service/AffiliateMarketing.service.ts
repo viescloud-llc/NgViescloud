@@ -11,10 +11,6 @@ export class ProductService extends ViesRestService<Product> {
   protected override getPrefixes(): string[] {
     return ['affiliate_marketing', 'api', 'v1', 'products'];
   }
-
-  constructor(httpClient: HttpClient) {
-    super(httpClient);
-  }
 }
 
 @Injectable({
@@ -23,10 +19,6 @@ export class ProductService extends ViesRestService<Product> {
 export class ProductCategoryService extends ViesRestService<Category> {
   protected override getPrefixes(): string[] {
     return ['affiliate_marketing', 'api', 'v1', 'categories'];
-  }
-
-  constructor(httpClient: HttpClient) {
-    super(httpClient);
   }
 }
 
