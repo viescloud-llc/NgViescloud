@@ -18,7 +18,7 @@ export class ProductData {
   error = '';
 
   //data
-  product!: Product;
+  product?: Product;
   categories: Category[] = [];
   productCategoriesOptions: MatOption<Category>[] = [];
 

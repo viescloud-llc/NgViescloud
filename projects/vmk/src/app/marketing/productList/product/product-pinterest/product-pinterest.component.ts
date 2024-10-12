@@ -51,7 +51,7 @@ export class ProductPinterestComponent extends ProductBasicComponent {
   }
 
   override async ngOnInit() {
-    this.product = structuredClone(this.data.product);
+    this.product = structuredClone(this.data.product!);
     this.vFiles = [];
     this.vFilesCopy = [];
 

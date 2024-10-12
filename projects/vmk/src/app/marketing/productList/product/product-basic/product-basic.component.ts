@@ -50,7 +50,7 @@ export class ProductBasicComponent implements OnInit, OnChanges {
   ngOnInit() {
     this.vFiles = [];
     this.vFilesCopy = [];
-    this.product = structuredClone(this.data.product);
+    this.product = structuredClone(this.data.product!);
     if(!this.product.fileLinks)
       this.product.fileLinks = [];
     this.initFetchVFiles();

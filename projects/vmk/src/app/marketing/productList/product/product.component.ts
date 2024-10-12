@@ -22,7 +22,7 @@ import { ProductMenuComponent } from './product-menu/product-menu.component';
   templateUrl: './product.component.html',
   styleUrls: ['./product.component.scss']
 })
-export class ProductComponent extends FixChangeDetection implements OnInit {
+export class ProductComponent extends FixChangeDetection implements OnInit, OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
@@ -44,5 +44,9 @@ export class ProductComponent extends FixChangeDetection implements OnInit {
     await this.data.loadProduct(id);
 
     loading.close();
+  }
+
+  ngOnDestroy(): void {
+    this.data.product = undefined;
   }
 }
