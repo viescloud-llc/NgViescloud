@@ -36,8 +36,8 @@ export class RxJSUtils {
         })
     }
 
-    waitLoadingSnackBar(message: string = 'Loading...', action?: string, duration: number = -1, matSnackBarHorizontalPosition: MatSnackBarHorizontalPosition = MatSnackBarHorizontalPosition.RIGHT, matSnackBarVerticalPosition: MatSnackBarVerticalPosition = MatSnackBarVerticalPosition.BOTTOM) {
-        return RxJSUtils.waitLoadingSnackBar(this.snackBar, message, action, duration, matSnackBarHorizontalPosition, matSnackBarVerticalPosition);
+    waitLoadingSnackBar<T>(message: string = 'Loading...', action?: string, duration: number = -1, matSnackBarHorizontalPosition: MatSnackBarHorizontalPosition = MatSnackBarHorizontalPosition.RIGHT, matSnackBarVerticalPosition: MatSnackBarVerticalPosition = MatSnackBarVerticalPosition.BOTTOM) {
+        return RxJSUtils.waitLoadingSnackBar<T>(this.snackBar, message, action, duration, matSnackBarHorizontalPosition, matSnackBarVerticalPosition);
     }
 
     static waitLoadingSnackBar<T>(snackBar?: MatSnackBar, message: string = 'Loading...', action?: string, duration: number = -1, matSnackBarHorizontalPosition: MatSnackBarHorizontalPosition = MatSnackBarHorizontalPosition.RIGHT, matSnackBarVerticalPosition: MatSnackBarVerticalPosition = MatSnackBarVerticalPosition.BOTTOM) {
@@ -78,8 +78,8 @@ export class RxJSUtils {
         }
     }
 
-    waitLoadingDialog(disableClose: boolean = true) {
-        return RxJSUtils.waitLoadingDialog(this.matDialog, disableClose);
+    waitLoadingDialog<T>(disableClose: boolean = true) {
+        return RxJSUtils.waitLoadingDialog<T>(this.matDialog, disableClose);
     }
 
     static waitLoadingDialog<T>(matDialog?: MatDialog, disableClose: boolean = true) {

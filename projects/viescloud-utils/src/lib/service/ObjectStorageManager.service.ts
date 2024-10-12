@@ -1,18 +1,23 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'projects/environments/environment.prod';
-import { first, Observable } from 'rxjs';
+import { first, Observable, pipe, UnaryFunction } from 'rxjs';
 import { UtilsService, VFile } from './Utils.service';
 import { Metadata } from '../model/ObjectStorageManager.model';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { RxJSUtils } from '../util/RxJS.utils';
+import { PopupType } from '../model/Popup.model';
 
+@Injectable({
+  providedIn: 'root'
+})
 export abstract class ObjectStorage {
   objectUrlCache = new Map<string, string>();
   vfileCache = new Map<string, VFile>();
   constructor(
-    private httpClient: HttpClient
+    private httpClient: HttpClient,
+    private rxjsUtils: RxJSUtils
   ) { }
 
   protected getURI(): string {
@@ -164,13 +169,30 @@ export abstract class ObjectStorage {
     return link.substring(length);
   }
 
-  putOrPostFile(vFile: VFile, publicity?: boolean, matDialog?: MatDialog) {
+  private getLoadingPipe<T>(popupType: PopupType, message: string = '', dismissLabel: string = '') {
+    switch(popupType) {
+      case PopupType.STRING_SNACKBAR:
+        return this.rxjsUtils.waitLoadingSnackBar<T>(message, dismissLabel);
+      case PopupType.DYNAMIC_STRING_SNACKBAR:
+        return this.rxjsUtils.waitLoadingDynamicStringSnackBar<T>(message, 40, dismissLabel);
+        case PopupType.LOADING_DIALOG:
+        return this.rxjsUtils.waitLoadingDialog<T>();
+      case PopupType.MESSAGE_POPUP:
+        return this.rxjsUtils.waitLoadingMessagePopup<T>(message, dismissLabel);
+      case PopupType.DYNAMIC_MESSAGE_POPUP:
+        return this.rxjsUtils.waitLoadingDynamicMessagePopup<T>(message, dismissLabel);
+      default:
+        return pipe();
+    }
+  }
+
+  putOrPostFile(vFile: VFile, publicity?: boolean, popupType: PopupType = PopupType.NONE) {
     return new Promise<Metadata>((resolve, reject) => {
       if(vFile.rawFile) {
-        this.getFileMetadataByFileName(vFile.name).pipe(UtilsService.waitLoadingDialog(matDialog)).subscribe({
+        this.getFileMetadataByFileName(vFile.name).pipe(this.getLoadingPipe(popupType, `Uploading ${vFile.name}...`, 'Dismiss')).subscribe({
           next: (data1) => {
             if(data1) {
-              this.putFileByFileName(vFile.name, vFile, publicity).pipe(UtilsService.waitLoadingDialog(matDialog)).subscribe({
+              this.putFileByFileName(vFile.name, vFile, publicity).pipe(this.getLoadingPipe(popupType, `Uploading ${vFile.name}...`, 'Dismiss')).subscribe({
                 next: (data2) => {
                   resolve(data2);
                 },
@@ -181,7 +203,7 @@ export abstract class ObjectStorage {
             }
           },
           error: (error) => {
-            this.postFile(vFile, publicity).pipe(UtilsService.waitLoadingDialog(matDialog)).subscribe({
+            this.postFile(vFile, publicity).pipe(this.getLoadingPipe(popupType, `Uploading ${vFile.name}...`, 'Dismiss')).subscribe({
               next: (data3) => {
                 resolve(data3);
               },
@@ -197,9 +219,9 @@ export abstract class ObjectStorage {
     })
   }
 
-  putOrPostFileAndGetViescloudUrl(vFile: VFile, publicity?: boolean, matDialog?: MatDialog) {
+  putOrPostFileAndGetViescloudUrl(vFile: VFile, publicity?: boolean, popupType: PopupType = PopupType.NONE) {
     return new Promise<string>((resolve, reject) => {
-      this.putOrPostFile(vFile, publicity, matDialog)
+      this.putOrPostFile(vFile, publicity, popupType)
       .then((data) => {
         resolve(this.generateViesLinkFromPath(data.path!))
       })
@@ -209,7 +231,7 @@ export abstract class ObjectStorage {
     })
   }
 
-  generateObjectUrlFromViescloudUrl(viescloudUrl: string, matDialog?: MatDialog, snackBar?: MatSnackBar) {
+  generateObjectUrlFromViescloudUrl(viescloudUrl: string, popupType: PopupType = PopupType.NONE) {
     return new Promise<string>((resolve, reject) => {
       if(this.objectUrlCache.has(viescloudUrl)) {
         UtilsService.isObjectUrlValid(this.objectUrlCache.get(viescloudUrl)!)
@@ -217,20 +239,19 @@ export abstract class ObjectStorage {
           resolve(this.objectUrlCache.get(viescloudUrl)!);
         })
         .catch((error) => {
-          this.generateObjectUrl(viescloudUrl, matDialog, snackBar, resolve, reject);
+          this.generateObjectUrl(viescloudUrl, popupType, resolve, reject);
         })
       } 
       else {
-        this.generateObjectUrl(viescloudUrl, matDialog, snackBar, resolve, reject);
+        this.generateObjectUrl(viescloudUrl, popupType, resolve, reject);
       }
     })
   }
 
-  private generateObjectUrl(viescloudUrl: string, matDialog: MatDialog | undefined, snackBar: MatSnackBar | undefined, resolve: (value: string | PromiseLike<string>) => void, reject: (reason?: any) => void) {
+  private generateObjectUrl(viescloudUrl: string, popupType: PopupType = PopupType.NONE, resolve: (value: string | PromiseLike<string>) => void, reject: (reason?: any) => void) {
     this.httpClient.get(viescloudUrl, { responseType: 'blob' })
     .pipe(first())
-    .pipe(UtilsService.waitLoadingDialog(matDialog))
-    .pipe(UtilsService.waitLoadingSnackBarDynamicString(snackBar, `Loading ${viescloudUrl}`, 40, 'Dismiss'))
+    .pipe(this.getLoadingPipe(popupType, `Loading ${viescloudUrl}`, 'Dismiss'))
     .subscribe({
       next: (data) => {
         let url = URL.createObjectURL(data);
@@ -302,43 +323,25 @@ export abstract class ObjectStorage {
   providedIn: 'root'
 })
 export class SmbStorageServiceV1 extends ObjectStorage {
-
-  constructor(httpClient: HttpClient) {
-    super(httpClient);
-  }
-
   protected override getPrefixes(): string[] {
     return ['osm', 'smb', 'v1'];
   }
-
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class S3StorageServiceV1 extends ObjectStorage {
-
-  constructor(httpClient: HttpClient) {
-    super(httpClient);
-  }
-
   protected override getPrefixes(): string[] {
     return ['osm', 's3', 'v1'];
   }
-
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class DatabaseStorageServiceV1 extends ObjectStorage {
-
-  constructor(httpClient: HttpClient) {
-    super(httpClient);
-  }
-
   protected override getPrefixes(): string[] {
     return ['osm', 'database', 'v1'];
   }
-
 }

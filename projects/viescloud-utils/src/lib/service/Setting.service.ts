@@ -10,6 +10,7 @@ import { AuthenticatorService } from './Authenticator.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConfirmDialog } from '../dialog/confirm-dialog/confirm-dialog.component';
 import { OpenIdService } from './OpenId.service';
+import { PopupType } from '../model/Popup.model';
 
 @Injectable({
   providedIn: 'root'
@@ -152,7 +153,7 @@ export class SettingService {
       value: JSON.stringify(generalSetting)
     }
 
-    this.s3StorageService.putOrPostFile(vFile, false, this.matDialog).then((data) => {}).catch((error) => {
+    this.s3StorageService.putOrPostFile(vFile, false, PopupType.LOADING_DIALOG).then((data) => {}).catch((error) => {
       window.alert(error);
     });
   }
