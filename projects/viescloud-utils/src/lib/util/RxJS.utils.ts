@@ -2,8 +2,8 @@ import { MatDialog } from "@angular/material/dialog";
 import { finalize, first, Observable, of, pipe, switchMap, tap } from "rxjs";
 import { LoadingDialog } from "../dialog/loading-dialog/loading-dialog.component";
 import { MatSnackBarHorizontalPosition, MatSnackBarVerticalPosition } from "../model/Mat.model";
-import { StringSnackBar } from "../snack/string-snack-bar/string-snack-bar.component";
 import { MatSnackBar, MatSnackBarRef } from "@angular/material/snack-bar";
+import { SnackBarUtils } from "./SnackBar.utils";
 
 export class RxJSUtils {
     private constructor() { }
@@ -31,7 +31,7 @@ export class RxJSUtils {
 
             return pipe(
                 RxJSUtils.startWithTap<T>(() => {
-                    bar = RxJSUtils.openSnackBar(snackBar, message, action, duration, matSnackBarHorizontalPosition, matSnackBarVerticalPosition);
+                    bar = SnackBarUtils.openSnackBar(snackBar, message, action, duration, matSnackBarHorizontalPosition, matSnackBarVerticalPosition);
                 }),
                 finalize<T>(() => bar.dismiss()),
                 first<T>()
@@ -48,7 +48,7 @@ export class RxJSUtils {
 
             return pipe(
                 RxJSUtils.startWithTap<T>(() => {
-                    bar = RxJSUtils.openSnackBarDynamicString(snackBar, message, maxLength, action, duration, matSnackBarHorizontalPosition, matSnackBarVerticalPosition);
+                    bar = SnackBarUtils.openSnackBarDynamicString(snackBar, message, maxLength, action, duration, matSnackBarHorizontalPosition, matSnackBarVerticalPosition);
                 }),
                 finalize<T>(() => bar.dismiss()),
                 first<T>()
@@ -59,10 +59,10 @@ export class RxJSUtils {
         }
     }
 
-    static waitLoadingDialog<T>(matDialog?: MatDialog) {
+    static waitLoadingDialog<T>(matDialog?: MatDialog, disableClose: boolean = true) {
         if (matDialog) {
             let dialog = matDialog.open(LoadingDialog, {
-                disableClose: true
+                disableClose: disableClose
             });
 
             return pipe(
@@ -80,48 +80,8 @@ export class RxJSUtils {
         }
     }
 
-    static openLoadingDialog(matDialog: MatDialog, timeout?: number) {
-        let dialog = matDialog.open(LoadingDialog, {
-            disableClose: true
-        })
-
-        dialog.afterClosed().subscribe({
-            next: () => { }
-        })
-
-        if (timeout) {
-            setTimeout(() => {
-                dialog.close();
-            }, timeout);
-        }
-
-        return dialog;
-    }
-
     static startWithTap<T>(callback: () => void) {
         return (source: Observable<T>) =>
             of({}).pipe(tap(callback), switchMap((o) => source));
-    }
-
-    static openSnackBar(snackBar: MatSnackBar, message: string, action?: string, duration: number = 2000, matSnackBarHorizontalPosition: MatSnackBarHorizontalPosition = MatSnackBarHorizontalPosition.CENTER, matSnackBarVerticalPosition: MatSnackBarVerticalPosition = MatSnackBarVerticalPosition.BOTTOM) {
-        return snackBar.open(message, action, {
-            duration: duration,
-            horizontalPosition: matSnackBarHorizontalPosition,
-            verticalPosition: matSnackBarVerticalPosition
-        });
-    }
-
-    static openSnackBarDynamicString(snackBar: MatSnackBar, message: string, maxLength: number = 40, action?: string, duration: number = 2000, matSnackBarHorizontalPosition: MatSnackBarHorizontalPosition = MatSnackBarHorizontalPosition.CENTER, matSnackBarVerticalPosition: MatSnackBarVerticalPosition = MatSnackBarVerticalPosition.BOTTOM) {
-        return snackBar.openFromComponent(StringSnackBar, {
-            data: {
-                message: message,
-                maxLength: maxLength,
-                dismissLabel: action,
-                viewFullOnHover: true
-            },
-            duration: duration,
-            horizontalPosition: matSnackBarHorizontalPosition,
-            verticalPosition: matSnackBarVerticalPosition
-        });
     }
 }
