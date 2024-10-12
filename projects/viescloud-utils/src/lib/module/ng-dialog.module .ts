@@ -15,6 +15,7 @@ import { ProductDialog } from '../dialog/marketing/product-dialog/product-dialog
 import { WrapDialog } from '../dialog/wrap-dialog/wrap-dialog.component';
 import { WrapLinkDialog } from '../dialog/wrap-link-dialog/wrap-link-dialog.component';
 import { StringSnackBar } from '../snack/string-snack-bar/string-snack-bar.component';
+import { MessagePopup } from '../popup/message-popup/message-popup.component';
 
 const DIALOG = [
   ConfirmDialog,
@@ -35,10 +36,15 @@ const SNACK = [
   StringSnackBar
 ]
 
+const POPUP = [
+  MessagePopup
+]
+
 @NgModule({
   declarations: [
     ...DIALOG,
-    ...SNACK
+    ...SNACK,
+    ...POPUP
   ],
   imports: [
     NgMaterialModule,

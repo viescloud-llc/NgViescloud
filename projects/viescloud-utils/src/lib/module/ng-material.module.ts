@@ -32,6 +32,7 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatChipsModule} from '@angular/material/chips';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { OverlayModule } from '@angular/cdk/overlay';
 
 const list = [
   MatButtonModule,
@@ -65,7 +66,8 @@ const list = [
   MatProgressSpinnerModule,
   MatTooltipModule,
   MatChipsModule,
-  DragDropModule
+  DragDropModule,
+  OverlayModule
 ]
 
 @NgModule({
