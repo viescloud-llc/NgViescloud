@@ -7,6 +7,7 @@ import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
 import { ProductService, ProductCategoryService } from 'projects/viescloud-utils/src/lib/service/AffiliateMarketing.service';
 import { SmbService } from 'projects/viescloud-utils/src/lib/service/Smb.service';
 import { VFile, UtilsService } from 'projects/viescloud-utils/src/lib/service/Utils.service';
+import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 import { firstValueFrom } from 'rxjs';
 
 
@@ -58,7 +59,7 @@ export class ProductData {
   }
 
   private loadNewProduct() {
-    this.product = new Product();
+    this.product = DataUtils.purgeArray(new Product());
     this.product.fileLinks = [];
     this.product.pinterestPinData = undefined;
   }
