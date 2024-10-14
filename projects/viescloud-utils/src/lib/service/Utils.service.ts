@@ -309,18 +309,18 @@ export class UtilsService {
 
         // Skip if both are missing or if one is missing and the other is a default value
         if ((isValue1Missing && isValue2Missing) || 
-            (isValue1Missing && UtilsService.isDefaultValue(value2, undefined)) ||
-            (isValue2Missing && UtilsService.isDefaultValue(value1, undefined))) {
+            (isValue1Missing && UtilsService.isDefaultValue(value2, [])) ||
+            (isValue2Missing && UtilsService.isDefaultValue(value1, []))) {
             continue;
         }
 
         // If obj1 is missing but obj2 has a valid value, do not skip comparison
-        if (isValue1Missing && !UtilsService.isDefaultValue(value2, undefined)) {
+        if (isValue1Missing && !UtilsService.isDefaultValue(value2, [])) {
             return false; // They are not equal because obj2 has a valid value
         }
 
         // If obj2 is missing but obj1 has a valid value, do not skip comparison
-        if (isValue2Missing && !UtilsService.isDefaultValue(value1, undefined)) {
+        if (isValue2Missing && !UtilsService.isDefaultValue(value1, [])) {
             return false; // They are not equal because obj1 has a valid value
         }
 
