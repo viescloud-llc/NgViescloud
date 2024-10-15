@@ -247,12 +247,24 @@ export class MediaSourceVideo extends MediaSource {
     @MatInputDisable(true)
     override source_type: MediaSourceType = MediaSourceType.VIDEO;
 
+    @MatInputDisable(true)
     cover_image_url: string = '';
+    
+    @MatInputDisable(true)
     cover_image_content_type: string = '';
-    constructor(id?: number, source_type?: MediaSourceType, cover_image_url?: string, cover_image_content_type?: string) {
+
+    @MatInputHide(true)
+    media_id: string = '';
+
+    @MatInputDisable(true)
+    video_url: string = '';
+
+    constructor(id?: number, source_type?: MediaSourceType, cover_image_url?: string, cover_image_content_type?: string, media_id?: string, video_url?: string) {
         super(id, source_type ?? MediaSourceType.VIDEO);
         this.cover_image_url = cover_image_url ?? '';
         this.cover_image_content_type = cover_image_content_type ?? '';
+        this.media_id = media_id ?? '';
+        this.video_url = video_url ?? '';
     }
 }
 

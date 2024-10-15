@@ -17,6 +17,7 @@ import { AuthInterceptor } from 'projects/viescloud-utils/src/lib/guards/auth.in
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ProductMenuComponent } from './marketing/productList/product/product-menu/product-menu.component';
 import { ProductPinterestComponent } from './marketing/productList/product/product-pinterest/product-pinterest.component';
+import { ProductDisplayVideoComponent } from './marketing/productList/product/product-display-video/product-display-video.component';
 
 const LIST = [
   AppComponent,
@@ -34,7 +35,8 @@ const MARKETING = [
   ProductDisplayComponent,
   ProductOverallComponent,
   ProductMenuComponent,
-  ProductPinterestComponent
+  ProductPinterestComponent,
+  ProductDisplayVideoComponent
 ]
 
 @NgModule({
