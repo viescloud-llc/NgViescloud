@@ -1,0 +1,27 @@
+<h1 mat-dialog-title>Swap Image</h1>
+<app-mat-form-field-input-option
+[options]="options"
+[value]="selectedOption"
+(valueChange)="onValueChange($event)"
+styleWidth="100%"
+></app-mat-form-field-input-option>
+
+<ng-container [ngSwitch]="selectedOption">
+  <ng-container *ngSwitchCase="ProductImageSwapType.IMPORT_URL">
+    <app-mat-form-field-input
+    
+    ></app-mat-form-field-input>
+  </ng-container>
+
+  <ng-container *ngSwitchCase="ProductImageSwapType.IMPORT_VFILES">
+    <app-mat-form-field-input-option
+    [options]="fileOptions"
+    (valueChange)="closeDialog(ProductImageSwapType.IMPORT_VFILES, $event)"
+    styleWidth="100%"
+    ></app-mat-form-field-input-option>
+  </ng-container>
+</ng-container>
+
+<div mat-dialog-actions>
+  <button mat-raised-button color="warn" mat-dialog-close>Close</button>
+</div>

@@ -11,7 +11,6 @@ import { ProductCategoryService, ProductService } from 'projects/viescloud-utils
 import { SmbService } from 'projects/viescloud-utils/src/lib/service/Smb.service';
 import { VFile, UtilsService } from 'projects/viescloud-utils/src/lib/service/Utils.service';
 import { ProductData } from './data/product-data.service';
-import { PinterestProductComponent } from './pinterest-product/pinterest-product.component';
 import { LoadingDialog } from 'projects/viescloud-utils/src/lib/dialog/loading-dialog/loading-dialog.component';
 import { QuickSideDrawerMenu } from 'projects/viescloud-utils/src/lib/share-component/quick-side-drawer-menu/quick-side-drawer-menu.component';
 import { QuickSideDrawerMenuService } from 'projects/viescloud-utils/src/lib/service/QuickSideDrawerMenu.service';

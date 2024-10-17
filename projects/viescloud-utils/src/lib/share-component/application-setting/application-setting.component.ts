@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { SettingService } from '../../service/Setting.service';
 import { GeneralSetting } from '../../model/Setting.model';
 import { AuthenticatorService } from '../../service/Authenticator.service';
@@ -11,7 +11,7 @@ import { UtilsService } from '../../service/Utils.service';
   templateUrl: './application-setting.component.html',
   styleUrls: ['./application-setting.component.scss']
 })
-export class ApplicationSettingComponent implements OnInit {
+export class ApplicationSettingComponent implements OnInit, OnDestroy {
 
   generalSetting!: GeneralSetting;
   generalSettingCopy!: GeneralSetting;
@@ -25,6 +25,10 @@ export class ApplicationSettingComponent implements OnInit {
   ngOnInit() {
     this.generalSetting = this.settingService.getCopyOfGeneralSetting();
     this.generalSettingCopy = this.settingService.getCopyOfGeneralSetting();
+  }
+
+  ngOnDestroy(): void {
+    this.revert();
   }
 
   saveLocally() {

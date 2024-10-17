@@ -5,7 +5,6 @@ import { AppComponent } from './app.component';
 import { ConnectedServiceComponent } from './connected-service/connected-service.component';
 import { HomeComponent } from './home/home.component';
 import { ProductCategoryComponent } from './marketing/product-category/product-category.component';
-import { PinterestProductComponent } from './marketing/productList/product/pinterest-product/pinterest-product.component';
 import { ProductBasicComponent } from './marketing/productList/product/product-basic/product-basic.component';
 import { ProductDisplayComponent } from './marketing/productList/product/product-display/product-display.component';
 import { ProductOverallComponent } from './marketing/productList/product/product-overall/product-overall.component';
@@ -31,7 +30,6 @@ const MARKETING = [
   ProductCategoryComponent,
   ProductComponent,
   ProductBasicComponent,
-  PinterestProductComponent,
   ProductDisplayComponent,
   ProductOverallComponent,
   ProductMenuComponent,

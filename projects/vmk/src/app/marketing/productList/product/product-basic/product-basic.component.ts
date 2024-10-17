@@ -2,17 +2,14 @@ import { AfterContentInit, Component, EventEmitter, Input, OnChanges, OnInit, Ou
 import { Category, FileLink, PinRequest, Product } from 'projects/viescloud-utils/src/lib/model/AffiliateMarketing.model';
 import { UtilsService, VFile } from 'projects/viescloud-utils/src/lib/service/Utils.service';
 import { ProductData } from '../data/product-data.service';
-import { MatDialog } from '@angular/material/dialog';
 import { firstValueFrom } from 'rxjs';
 import { ProductService, ProductCategoryService } from 'projects/viescloud-utils/src/lib/service/AffiliateMarketing.service';
-import { SmbService } from 'projects/viescloud-utils/src/lib/service/Smb.service';
 import { Router } from '@angular/router';
-import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
 import { QuickSideDrawerMenuService } from 'projects/viescloud-utils/src/lib/service/QuickSideDrawerMenu.service';
-import { ProductMenuComponent } from '../product-menu/product-menu.component';
 import { S3StorageServiceV1 } from 'projects/viescloud-utils/src/lib/service/ObjectStorageManager.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
+import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
+import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 
 @Component({
   selector: 'app-product-basic',
@@ -39,7 +36,7 @@ export class ProductBasicComponent implements OnInit, OnChanges {
     protected productService: ProductService,
     protected s3StorageService: S3StorageServiceV1,
     protected quickSideDrawerMenuService: QuickSideDrawerMenuService,
-    protected matDialog: MatDialog,
+    protected dialogUtils: DialogUtils,
     protected rxjsUtils: RxJSUtils
   ) { }
 
@@ -76,7 +73,7 @@ export class ProductBasicComponent implements OnInit, OnChanges {
     let vf1 = structuredClone(this.vFiles).map((vf: VFile) => {vf.value = ''; return vf});
     let vf2 = structuredClone(this.vFilesCopy).map((vf: VFile) => {vf.value = ''; return vf});
 
-    let change = UtilsService.isNotEqual(this.product, this.data.product) || UtilsService.isNotEqual(vf1, vf2);
+    let change = UtilsService.isNotEqual(this.product, this.data.product) || DataUtils.isNotEqual(vf1, vf2);
     change ? this.setEditingComponent() : this.clearEditingComponent();
     return change;
   }

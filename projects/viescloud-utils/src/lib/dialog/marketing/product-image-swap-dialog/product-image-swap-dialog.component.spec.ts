@@ -3,21 +3,21 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
 
-import { PinterestProductComponent } from './pinterest-product.component';
+import { ProductImageSwapDialogComponent } from './product-image-swap-dialog.component';
 
-describe('PinterestProductComponent', () => {
-  let component: PinterestProductComponent;
-  let fixture: ComponentFixture<PinterestProductComponent>;
+describe('ProductImageSwapDialogComponent', () => {
+  let component: ProductImageSwapDialogComponent;
+  let fixture: ComponentFixture<ProductImageSwapDialogComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ PinterestProductComponent ]
+      declarations: [ ProductImageSwapDialogComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(PinterestProductComponent);
+    fixture = TestBed.createComponent(ProductImageSwapDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

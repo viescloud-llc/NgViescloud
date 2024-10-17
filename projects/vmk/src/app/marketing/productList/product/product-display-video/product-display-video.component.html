@@ -1,3 +1,34 @@
-<p>
-  product-display-video works!
-</p>
+<div class="container">
+  <div *ngIf="files.length">
+    <mat-tab-group headerPosition="below" [(selectedIndex)]="selectedIndex">
+
+      <mat-tab label="Cover Image">
+        <img [src]="getCoverImageFile()?.value" [alt]="getCoverImageFile()?.name" *ngIf="selectedResolution === 'original'; else elseImage">
+        <ng-template #elseImage>
+          <img [src]="getCoverImageFile()?.value" [alt]="getCoverImageFile()?.name" [width]="getWidthResolution()" [height]="getHeightResolution()">
+        </ng-template>
+      </mat-tab>
+
+      <mat-tab label="Video">
+        <video [src]="getVideoFile()?.value" controls *ngIf="selectedResolution === 'original'; else elseVideo"></video>
+          <ng-template #elseVideo>
+            <video [src]="getVideoFile()?.value" controls [width]="getWidthResolution()" [height]="getHeightResolution()" ></video>
+          </ng-template>
+      </mat-tab>
+
+    </mat-tab-group>
+
+    <app-mat-form-field-input-option
+    label="View Image and video as (Original Resolution is unchanged)"
+    [(value)]="selectedResolution"
+    [options]="resolutionOptions"
+    styleWidth="100%"
+    noneLabel=""
+    (onValueChange)="populateAllFile(selectedResolution)"
+    ></app-mat-form-field-input-option>
+
+    <hr>
+    <button mat-raised-button color="primary" style="width: 50%;" (click)="switchCoverImage(selectedIndex)">Switch cover image</button>
+    <button mat-raised-button color="warn" style="width: 50%;" (click)="removeFile(selectedIndex)">Remove Video</button>
+  </div>
+</div>

@@ -14,7 +14,6 @@ import { LogoutComponent } from 'projects/viescloud-utils/src/lib/share-componen
 import { ApplicationSettingComponent } from 'projects/viescloud-utils/src/lib/share-component/application-setting/application-setting.component';
 import { ProductBasicComponent } from './marketing/productList/product/product-basic/product-basic.component';
 import { ProductOverallComponent } from './marketing/productList/product/product-overall/product-overall.component';
-import { PinterestProductComponent } from './marketing/productList/product/pinterest-product/pinterest-product.component';
 import { ProductPinterestComponent } from './marketing/productList/product/product-pinterest/product-pinterest.component';
 
 const routes: Routes = [

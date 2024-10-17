@@ -13,6 +13,8 @@ import { ProductData } from '../data/product-data.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { QuickSideDrawerMenuService } from 'projects/viescloud-utils/src/lib/service/QuickSideDrawerMenu.service';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
+import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
+import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 
 @Component({
   selector: 'app-product-pinterest',
@@ -43,11 +45,11 @@ export class ProductPinterestComponent extends ProductBasicComponent {
     protected override productService: ProductService,
     protected override s3StorageService: S3StorageServiceV1,
     protected override quickSideDrawerMenuService: QuickSideDrawerMenuService,
-    protected override matDialog: MatDialog,
+    protected override dialogUtils: DialogUtils,
     protected override rxjsUtils: RxJSUtils,
     protected pinterestService?: ViesPinterestService,
   ) { 
-    super(route, data, productService, s3StorageService, quickSideDrawerMenuService, matDialog, rxjsUtils);
+    super(route, data, productService, s3StorageService, quickSideDrawerMenuService, dialogUtils, rxjsUtils);
   }
 
   override async ngOnInit() {
@@ -89,7 +91,19 @@ export class ProductPinterestComponent extends ProductBasicComponent {
         }
       }
       else if(this.pinRequest.media_source.source_type == MediaSourceType.VIDEO) {
-        //TODO: Handle video fetching
+        let ms = this.pinRequest.media_source as MediaSourceVideo;
+
+        if(ms.cover_image_url) {
+          let res = await firstValueFrom(this.s3StorageService.fetchFile(ms.cover_image_url).pipe(this.rxjsUtils.waitLoadingDynamicMessagePopup(`Loading ${ms.cover_image_url}`, 'Dismiss')))
+          this.pushVFile(res);
+          this.vFilesCopy = structuredClone(this.vFiles);
+        }
+
+        if(ms.video_url) {
+          let res = await firstValueFrom(this.s3StorageService.fetchFile(ms.video_url).pipe(this.rxjsUtils.waitLoadingDynamicMessagePopup(`Loading ${ms.video_url}`, 'Dismiss')))
+          this.pushVFile(res);
+          this.vFilesCopy = structuredClone(this.vFiles);
+        }
       }
     }
   }
@@ -141,7 +155,9 @@ export class ProductPinterestComponent extends ProductBasicComponent {
         mediaSource.url = vfile.originalLink ?? vfile.name;
       }
       else if(vfile.type.toLowerCase().includes('video')) {
-        this.pinRequest.media_source = this.handleUploadVideo(vfile);
+        this.pinRequest.media_source = new MediaSourceVideo();
+        let mediaSource = this.pinRequest.media_source as MediaSourceVideo;
+        mediaSource.video_url = vfile.originalLink ?? vfile.name;
       }
     }
     else if(this.pinRequest.media_source.source_type == MediaSourceType.IMAGE) {
@@ -166,22 +182,34 @@ export class ProductPinterestComponent extends ProductBasicComponent {
             url: vfile.originalLink ?? vfile.name
           },
         ];
+
+        this.pinRequest.media_source = mediaSource;
       }
       else if(vfile.type.toLowerCase().includes('video')) {
-        mediaSource = this.handleUploadVideo(vfile);
-      }
+        firstValueFrom(this.s3StorageService.fetchFile(ms.url).pipe(this.rxjsUtils.waitLoadingDynamicMessagePopup(`Loading ${ms.url}`, 'Dismiss'))).then(tempFetch => {
+          mediaSource = new MediaSourceVideo();
+          mediaSource.video_url = vfile.originalLink ?? vfile.name;
+          mediaSource.cover_image_url = ms.url;
+          mediaSource.cover_image_content_type = tempFetch.type;
 
-      this.pinRequest.media_source = mediaSource;
+          this.pinRequest.media_source = mediaSource;
+        })
+      }
     }
     else if(this.pinRequest.media_source.source_type == MediaSourceType.IMAGES) {
-      let ms = this.pinRequest.media_source as MediaSourceMultipleImage;
-      ms.items.push({
-        id: 0,
-        title: vfile.originalLink ?? vfile.name,
-        description: '',
-        link: this.product.marketingLink,
-        url: vfile.originalLink ?? vfile.name
-      })
+      if(vfile.type.toLowerCase().includes('image')) {
+        let ms = this.pinRequest.media_source as MediaSourceMultipleImage;
+        ms.items.push({
+          id: 0,
+          title: vfile.originalLink ?? vfile.name,
+          description: '',
+          link: this.product.marketingLink,
+          url: vfile.originalLink ?? vfile.name
+        })
+      }
+      else {
+        this.dialogUtils.openConfirmDialog('Error', 'Only image file can be uploaded to multiple image source.', 'Ok', '');
+      }
     }
   }
 
@@ -221,11 +249,6 @@ export class ProductPinterestComponent extends ProductBasicComponent {
     }
   }
   
-  private handleUploadVideo(vfile: VFile): MediaSourceVideo {
-    //TODO: add handle upload video latter
-    return new MediaSourceVideo();
-  }
-
   override async onUploadFile(): Promise<VFile> {
     let vfile = await super.onUploadFile();
     this.addMediaSource(vfile);
@@ -257,6 +280,10 @@ export class ProductPinterestComponent extends ProductBasicComponent {
     return vfile;
   }
 
+  onSwitchFile(index: number) {
+
+  }
+
   protected async checkValidVFilesBeforeUpload() {
     let result = true;
     let badVFiles: VFile[] = [];
@@ -264,7 +291,7 @@ export class ProductPinterestComponent extends ProductBasicComponent {
     for (const vf of this.vFiles) {
       if (vf.originalLink && this.s3StorageService.containViesLink(vf.originalLink)) {
         let path = this.s3StorageService.extractPathFromViesLink(vf.originalLink);
-        await firstValueFrom(this.s3StorageService.getFileByPath(path, this.width, this.height).pipe(UtilsService.waitLoadingDialog(this.matDialog))).catch(e => {
+        await firstValueFrom(this.s3StorageService.getFileByPath(path, this.width, this.height).pipe(UtilsService.waitLoadingDialog(this.dialogUtils.matDialog))).catch(e => {
           result = false;
           badVFiles.push(vf);
         });
@@ -272,7 +299,7 @@ export class ProductPinterestComponent extends ProductBasicComponent {
     }
 
     if(badVFiles.length > 0) {
-      let dialog = this.matDialog.open(ConfirmDialog, {
+      let dialog = this.dialogUtils.matDialog.open(ConfirmDialog, {
         data: {
           title: 'Error', 
           message: this.getBadVFilesMessage(badVFiles), 
@@ -302,14 +329,14 @@ export class ProductPinterestComponent extends ProductBasicComponent {
   }
 
   async uploadProduct() {
-    let dialog = this.matDialog.open(ConfirmDialog, {data: {title: 'Upload product', message: 'You are about to upload your product to Pinterest. Do you want to continue?', no: 'cancel', yes: 'ok'}, width: '100%'});
+    let dialog = this.dialogUtils.matDialog.open(ConfirmDialog, {data: {title: 'Upload product', message: 'You are about to upload your product to Pinterest. Do you want to continue?', no: 'cancel', yes: 'ok'}, width: '100%'});
     
     dialog.afterClosed().subscribe({
       next: async res => {
         if(res) {
           let validFileCheck = await this.checkValidVFilesBeforeUpload();
           if(validFileCheck) {
-            this.pinterestService?.uploadPin(this.product.id, this.width, this.height).pipe(UtilsService.waitLoadingDialog(this.matDialog)).subscribe({
+            this.pinterestService?.uploadPin(this.product.id, this.width, this.height).pipe(UtilsService.waitLoadingDialog(this.dialogUtils.matDialog)).subscribe({
               next: res => {
                 this.data.product = res;
                 this.ngOnInit();
@@ -346,8 +373,11 @@ export class ProductPinterestComponent extends ProductBasicComponent {
       let ms = this.pinRequest.media_source as MediaSourceImageUrl;
       if(this.vFiles.length > 0)
         ms.url = this.vFiles[0].originalLink!;
-      else
-        throw Error('File link can not be null or empty');
+      else {
+        this.dialogUtils.openConfirmDialog('ERROR', 'File link can not be null', 'OK', '');
+        throw Error('File link can not be null');
+      }
+
       this.pinRequest.media_source = ms;
     }
     else if(mediaSource instanceof MediaSourceMultipleImage || mediaSource.source_type == MediaSourceType.IMAGES) {
@@ -358,15 +388,35 @@ export class ProductPinterestComponent extends ProductBasicComponent {
         let vFile = this.vFiles[index];
         if(vFile.originalLink)
           e.url = vFile.originalLink;
-        else
+        else {
+          this.dialogUtils.openConfirmDialog('ERROR', 'File link can not be null', 'OK', '');
           throw Error('File link can not be null');
+        }
       })
 
       this.pinRequest.media_source = ms;
     }
     else if(mediaSource instanceof MediaSourceVideo || mediaSource.source_type == MediaSourceType.VIDEO) {
       let ms = this.pinRequest.media_source as MediaSourceVideo;
-      //TODO: handle video sync later
+      
+      let coverImageVFile = this.vFiles.find(e => e.name === ms.cover_image_url || e.originalLink === ms.cover_image_url);
+      if(coverImageVFile && coverImageVFile.originalLink) {
+        ms.cover_image_url = coverImageVFile.originalLink;
+      }
+      else {
+        this.dialogUtils.openConfirmDialog('ERROR', 'File link can not be null', 'OK', '');
+        throw Error('File link can not be null');
+      }
+
+      let videoUrlVFile = this.vFiles.find(e => e.name === ms.video_url || e.originalLink === ms.video_url);
+      if(videoUrlVFile && videoUrlVFile.originalLink) {
+        ms.video_url = videoUrlVFile.originalLink;
+      }
+      else {
+        this.dialogUtils.openConfirmDialog('ERROR', 'File link can not be null', 'OK', '');
+        throw Error('File link can not be null');
+      }
+      
       this.pinRequest.media_source = ms;
     }
   }
@@ -377,7 +427,7 @@ export class ProductPinterestComponent extends ProductBasicComponent {
       if (this.vFilesCopy.findIndex(e => e.name === vFile.name) < 0) {
         //if this is a new file by checking for vies link
         if (!this.s3StorageService.containViesLink(vFile.originalLink ?? '')) {
-          const metadata = await firstValueFrom(this.s3StorageService.postFile(vFile).pipe(UtilsService.waitLoadingDialog(this.matDialog)));
+          const metadata = await firstValueFrom(this.s3StorageService.postFile(vFile).pipe(UtilsService.waitLoadingDialog(this.dialogUtils.matDialog)));
           vFile.originalLink = this.s3StorageService.generateViesLinkFromPath(metadata.path!);
           this.product.fileLinks!.push({
             id: 0,
@@ -396,7 +446,7 @@ export class ProductPinterestComponent extends ProductBasicComponent {
   }
 
   autoFillInformation() {
-    let dialog = this.matDialog.open(ConfirmDialog, {data: {title: 'Auto fill information', message: 'You are about to auto fill and overwrite your pinterest Information with your product information. Do you want to continue?', no: 'cancel', yes: 'ok'}});
+    let dialog = this.dialogUtils.matDialog.open(ConfirmDialog, {data: {title: 'Auto fill information', message: 'You are about to auto fill and overwrite your pinterest Information with your product information. Do you want to continue?', no: 'cancel', yes: 'ok'}});
     dialog.afterClosed().subscribe({
       next: res => {
         if(res) {
@@ -422,4 +472,10 @@ export class ProductPinterestComponent extends ProductBasicComponent {
       }
     })
   }
+
+  vFileContainVideo() {
+    return this.vFiles.some(e => e.type.toLowerCase().includes('video'));
+  }
+
+  
 }

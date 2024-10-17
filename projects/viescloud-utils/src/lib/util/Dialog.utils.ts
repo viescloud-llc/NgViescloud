@@ -8,7 +8,7 @@ import { Injectable } from "@angular/core";
 })
 export class DialogUtils {
 
-    constructor(private matDialog: MatDialog) {}
+    constructor(public matDialog: MatDialog) {}
 
     openLoadingDialog(timeout?: number, disableClose: boolean = true) {
         DialogUtils.openLoadingDialog(this.matDialog, timeout, disableClose);

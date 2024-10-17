@@ -1,5 +1,5 @@
 <ul class="margin-center" appMatFormFieldGroup (onAllInputCheck)="validInput = $event">
-  <li>
+  <li *ngIf="!vFileContainVideo()">
     <app-product-display
     [files]="vFiles"
     [(selectedIndex)]="selectedFileIndex"
@@ -9,6 +9,14 @@
     (onRemoveFile)="onRemoveFile($event)"
     (onSelectFileOption)="onSelectFileOptions($event)"
     ></app-product-display>
+  </li>
+  <li *ngIf="vFileContainVideo()">
+    <app-product-display-video
+    [files]="vFiles"
+    [fileOptions]="fileOptions"
+    (onRemoveFile)="onRemoveFile($event)"
+    (onSwitchCoverImage)="onSwitchFile($event)"
+    ></app-product-display-video>
   </li>
   <ng-container *ngIf="pinRequest.media_source">
     <hr>
