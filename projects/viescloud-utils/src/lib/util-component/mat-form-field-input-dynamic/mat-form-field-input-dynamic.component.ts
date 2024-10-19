@@ -78,10 +78,6 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
   DynamicMatInputType = DynamicMatInputType;
   inputType: DynamicMatInputType = DynamicMatInputType.UNKOWN;
 
-  constructor() {
-    super();
-  }
-
   override ngOnInit() {
     super.ngOnInit();
 

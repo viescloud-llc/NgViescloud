@@ -1,8 +1,9 @@
-import { AfterContentInit, Component, EventEmitter, Input, OnInit, Output, forwardRef } from '@angular/core';
+import { AfterContentInit, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, forwardRef } from '@angular/core';
 import { MatFormFieldComponent } from '../mat-form-field/mat-form-field.component';
 import { DateTime } from '../../model/Mat.model';
 import { AuthenticatorService } from '../../service/Authenticator.service';
 import { ThemePalette } from '@angular/material/core';
+import { DialogUtils } from '../../util/Dialog.utils';
 
 export const TYPE = {DATE: 'DATE', TIME: 'TIME', DATE_TIME: 'DATE_TIME'};
 
@@ -45,8 +46,12 @@ export class MatFormFieldInputTimeComponent extends MatFormFieldComponent {
   @Input()
   range: boolean = false;
 
-  constructor(private authenticatorSerice: AuthenticatorService) {
-    super()
+  constructor(
+    private authenticatorSerice: AuthenticatorService,
+    protected override cd: ChangeDetectorRef,
+    protected override dialogUtils: DialogUtils
+  ) {
+    super(cd, dialogUtils);
   }
 
   override ngOnInit() {

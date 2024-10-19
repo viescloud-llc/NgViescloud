@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, DoCheck, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
 import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
@@ -6,6 +6,7 @@ import { UtilsService, VFile } from 'projects/viescloud-utils/src/lib/service/Ut
 import { ProductData } from '../data/product-data.service';
 import { SmbService } from 'projects/viescloud-utils/src/lib/service/Smb.service';
 import { SmbStorageServiceV1 } from 'projects/viescloud-utils/src/lib/service/ObjectStorageManager.service';
+import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 
 @Component({
   selector: 'app-product-display',
@@ -75,7 +76,7 @@ export class ProductDisplayComponent implements OnInit, OnChanges {
   selectedResolution: '1080p' | '720p' | '480p' | '360p' | 'original' = '480p';
 
   constructor(
-    private matDialog: MatDialog
+    protected dialogUtils: DialogUtils,
   ) { }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -106,7 +107,7 @@ export class ProductDisplayComponent implements OnInit, OnChanges {
   }
   
   removeFile(index: number) {
-    let dialog = this.matDialog.open(ConfirmDialog, {data: {title: 'Delete file', message: 'Are you sure you want to remove this file?', no: 'cancel', yes: 'ok'}});
+    let dialog = this.dialogUtils.matDialog.open(ConfirmDialog, {data: {title: 'Delete file', message: 'Are you sure you want to remove this file?', no: 'cancel', yes: 'ok'}});
 
     dialog.afterClosed().subscribe({
       next: res => {

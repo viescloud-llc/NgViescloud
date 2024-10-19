@@ -1,16 +1,19 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { AfterContentChecked, ChangeDetectorRef, Component, DoCheck, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
 import { MatFormFieldAppearance } from '@angular/material/form-field';
 import { FixChangeDetection } from '../../directive/FixChangeDetection';
 import { UtilsService } from '../../service/Utils.service';
 import { RgbColor } from '../../model/Rgb.model';
+import { DialogUtils } from '../../util/Dialog.utils';
+import { StringUtils } from '../../util/String.utils';
+import { DataUtils } from '../../util/Data.utils';
 
 @Component({
   selector: 'app-mat-form-field',
   templateUrl: './mat-form-field.component.html',
   styleUrls: ['./mat-form-field.component.scss']
 })
-export class MatFormFieldComponent extends FixChangeDetection implements OnInit, OnChanges {
+export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChecked, DoCheck {
 
   @Input()
   value: string | number | any = '';
@@ -71,8 +74,21 @@ export class MatFormFieldComponent extends FixChangeDetection implements OnInit,
   @Input()
   blankObject?: any;
 
-  constructor() {
-    super();
+  constructor(
+    protected cd: ChangeDetectorRef,
+    protected dialogUtils: DialogUtils
+  ) { }
+
+  ngDoCheck(): void {
+    if(DataUtils.isSimpleNotEqual(this.value, this.valueCopy)) {
+      this.ngOnChanges({
+        value: this.value
+      })
+    }
+  }
+  
+  ngAfterContentChecked(): void {
+    this.cd.detectChanges();
   }
 
   ngOnInit() {

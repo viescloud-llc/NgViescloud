@@ -21,10 +21,6 @@ export class MatFormFieldInputRgbColorPickerComponent extends MatFormFieldCompon
 
   validForm: boolean = false;
 
-  constructor() {
-    super();
-  }
-
   override ngOnInit(): void {
     let matOption: MatOption<RgbColor> = {
       value: {

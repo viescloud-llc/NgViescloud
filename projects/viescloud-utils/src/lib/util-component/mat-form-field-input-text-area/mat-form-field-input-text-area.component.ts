@@ -57,10 +57,6 @@ export class MatFormFieldInputTextAreaComponent extends MatFormFieldComponent {
   @Input()
   copyDisplayMessage: string = this.value.toString();
 
-  constructor() {
-    super();
-  }
-
   override emitValue(): void {
     let value = this.value;
 

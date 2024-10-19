@@ -3,6 +3,14 @@ import { MatOption } from "../model/Mat.model";
 export class DataUtils {
     private constructor() { }
 
+    static isSimpleNotEqual(obj1: any, obj2: any) {
+        return !DataUtils.isSimpleEqual(obj1, obj2);
+    }
+
+    static isSimpleEqual(obj1: any, obj2: any) {
+        return JSON.stringify(obj1) === JSON.stringify(obj2);    
+    }
+
     static isNotEqual(obj1: any, obj2: any) {
         return !DataUtils.isEqual(obj1, obj2);
     }

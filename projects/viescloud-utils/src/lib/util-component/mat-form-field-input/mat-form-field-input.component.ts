@@ -100,10 +100,6 @@ export class MatFormFieldInputComponent extends MatFormFieldComponent {
   @Input()
   autoFillHttps: boolean = false;
 
-  constructor() {
-    super();
-  }
-
   override ngOnInit(): void {
     super.ngOnInit();
 

@@ -10,7 +10,10 @@ export class ProductDisplayVideoComponent extends ProductDisplayComponent {
 
   @Output()
   onSwitchCoverImage: EventEmitter<number> = new EventEmitter<number>();
-  
+
+  @Output()
+  onRemoveVideo: EventEmitter<number> = new EventEmitter<number>();
+
   getCoverImageFile() {
     return this.files.find(file => file.type.startsWith('image/'));
   }
@@ -19,7 +22,17 @@ export class ProductDisplayVideoComponent extends ProductDisplayComponent {
     return this.files.find(file => file.type.startsWith('video/'));
   }
 
-  switchCoverImage(selectedFileIndex: number) {
-    this.onSwitchCoverImage.emit(selectedFileIndex);
+  switchCoverImage() {
+    let coverImageIndex = this.files.findIndex(file => file.type.startsWith('image/'));
+    this.onSwitchCoverImage.emit(coverImageIndex);
+  }
+
+  async removeVideo() {
+    let res =await this.dialogUtils.openConfirmDialog('Delete video', 'Are you sure you want to remove this video?\nNote: this only remove from pinterest');
+    
+    if(res) {
+      let videoIndex = this.files.findIndex(file => file.type.startsWith('video/'));
+      this.onRemoveVideo.emit(videoIndex);
+    }
   }
 }

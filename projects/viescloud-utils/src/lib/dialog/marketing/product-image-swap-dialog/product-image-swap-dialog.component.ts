@@ -8,6 +8,11 @@ export enum ProductImageSwapType {
   IMPORT_VFILES = 'import_vfiles'
 }
 
+export interface ProductImageSwapDialogRespondData {
+  type: ProductImageSwapType;
+  url?: string;
+}
+
 @Component({
   selector: 'app-product-image-swap-dialog',
   templateUrl: './product-image-swap-dialog.component.html',
@@ -17,7 +22,7 @@ export class ProductImageSwapDialog implements OnInit {
 
   ProductImageSwapType = ProductImageSwapType;
 
-  selectedOption?: ProductImageSwapType;
+  selectedOption?: ProductImageSwapType = ProductImageSwapType.IMPORT_VFILES;
 
   options: MatOption<ProductImageSwapType>[] = [
     {
@@ -55,16 +60,11 @@ export class ProductImageSwapDialog implements OnInit {
   }
 
   closeDialog(value: ProductImageSwapType, url: string) {
-    switch (value) {
-      case ProductImageSwapType.UPLOAD:
-        this.dialogRef.close({type: ProductImageSwapType.UPLOAD});
-        break;
-      case ProductImageSwapType.IMPORT_URL:
-        this.dialogRef.close({type: ProductImageSwapType.IMPORT_URL, url: url});
-        break;
-      case ProductImageSwapType.IMPORT_VFILES:
-        this.dialogRef.close({type: ProductImageSwapType.IMPORT_VFILES, url: url});
-        break;
+    let respondData: ProductImageSwapDialogRespondData = {
+      type: value,
+      url: url
     }
+
+    this.dialogRef.close(respondData);
   }
 }

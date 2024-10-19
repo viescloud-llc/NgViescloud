@@ -14,7 +14,8 @@
     <app-product-display-video
     [files]="vFiles"
     [fileOptions]="fileOptions"
-    (onRemoveFile)="onRemoveFile($event)"
+    [(selectedIndex)]="selectedFileIndex"
+    (onRemoveVideo)="onRemoveFile($event)"
     (onSwitchCoverImage)="onSwitchFile($event)"
     ></app-product-display-video>
   </li>

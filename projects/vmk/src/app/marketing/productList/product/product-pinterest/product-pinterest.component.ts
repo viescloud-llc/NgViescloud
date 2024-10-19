@@ -15,6 +15,7 @@ import { QuickSideDrawerMenuService } from 'projects/viescloud-utils/src/lib/ser
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
+import { ProductImageSwapType } from 'projects/viescloud-utils/src/lib/dialog/marketing/product-image-swap-dialog/product-image-swap-dialog.component';
 
 @Component({
   selector: 'app-product-pinterest',
@@ -211,9 +212,19 @@ export class ProductPinterestComponent extends ProductBasicComponent {
         this.dialogUtils.openConfirmDialog('Error', 'Only image file can be uploaded to multiple image source.', 'Ok', '');
       }
     }
+    else if(this.pinRequest.media_source.source_type == MediaSourceType.VIDEO) {
+      if(vfile.type.toLowerCase().includes('image')) {
+        let ms = this.pinRequest.media_source as MediaSourceVideo;
+        ms.cover_image_url = vfile.originalLink ?? vfile.name;
+        ms.cover_image_content_type = vfile.type;
+      }
+      else if (vfile.type.toLowerCase().includes('video')) {
+        this.dialogUtils.openConfirmDialog('Error', 'Only 1 video file can be uploaded to video source.', 'Ok', '');
+      }
+    }
   }
 
-  removeMediaSource(index: number) {
+  removeMediaSource(index: number, fileType?: 'image' | 'video') {
     if (!this.pinRequest.media_source) {
       return;
     }
@@ -244,8 +255,27 @@ export class ProductPinterestComponent extends ProductBasicComponent {
       }
     }
     else if (this.pinRequest.media_source.source_type == MediaSourceType.VIDEO) {
-      // For MediaSourceVideo, directly set the media source to undefined if it is being removed.
-      this.pinRequest.media_source = undefined;
+      let ms = this.pinRequest.media_source as MediaSourceVideo;
+
+      if(fileType === 'image') {
+        ms.cover_image_url = '';
+        ms.cover_image_content_type = '';
+      }
+      else if(fileType === 'video') {
+        ms.video_url = '';
+
+        if(ms.video_url == '' && ms.cover_image_url == '') {
+          this.pinRequest.media_source = undefined;
+        }
+        else {
+          let mediaSource = new MediaSourceImageUrl();
+          mediaSource.url = ms.cover_image_url;
+          this.pinRequest.media_source = mediaSource;
+        }
+      }
+      else {
+        this.pinRequest.media_source = undefined;
+      }
     }
   }
   
@@ -256,8 +286,10 @@ export class ProductPinterestComponent extends ProductBasicComponent {
   }
 
   override onRemoveFile(index: number): void {
+    let fileType: 'video' | 'image' = this.vFiles[index].type.toLowerCase().includes('video') ? 'video' : 'image';
     super.onRemoveFile(index);
-    this.removeMediaSource(index);
+    this.removeMediaSource(index, fileType);
+    this.initFileOptions();
   }
 
   onSelectFileOptions(link: string) {
@@ -280,8 +312,33 @@ export class ProductPinterestComponent extends ProductBasicComponent {
     return vfile;
   }
 
-  onSwitchFile(index: number) {
+  async onSwitchFile(index: number) {
+    this.dialogUtils.openProductImageSwapDialog(this.fileOptions).then(async res => {
+      switch (res.type) {
+        case ProductImageSwapType.UPLOAD:
+          await this.onUploadFile();
+          break;
+        case ProductImageSwapType.IMPORT_URL:
+          if(res.url) {
+            await this.onFetchFile(res.url);
+          }
+          break;
+        case ProductImageSwapType.IMPORT_VFILES:
+          if(res.url) {
+            await this.onSelectFileOptions(res.url);
+          }
+          break;
+      }
 
+      this.onRemoveFile(index);
+      this.initFileOptions();
+
+      if(this.pinRequest.media_source?.source_type == MediaSourceType.VIDEO) {
+        let ms = this.pinRequest.media_source as MediaSourceVideo;
+        ms.cover_image_url = this.vFiles[this.vFiles.length - 1].originalLink ?? this.vFiles[this.vFiles.length - 1].name;
+        ms.cover_image_content_type = this.vFiles[this.vFiles.length - 1].type;
+      }
+    })
   }
 
   protected async checkValidVFilesBeforeUpload() {

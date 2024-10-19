@@ -27,10 +27,6 @@ export class MatFormFieldInputOptionComponent<T> extends MatFormFieldComponent {
   @Output()
   selectionChange: EventEmitter<T> = new EventEmitter();
 
-  constructor() {
-    super();
-  }
-  
   override ngOnChanges(changes: SimpleChanges): void {
     super.ngOnChanges(changes);
     if (changes['options'] && this.options || changes['value']) {

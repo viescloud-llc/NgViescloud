@@ -108,6 +108,8 @@ export class ProductBasicComponent implements OnInit, OnChanges {
 
   onRemoveFile(index: number) {
     this.vFiles.splice(index, 1);
+    this.vFiles = [...this.vFiles];
+    this.selectedFileIndex = this.selectedFileIndex > 0 ? this.selectedFileIndex - 1 : 0;
   }
 
   pushVFile(vFile: VFile) {
@@ -152,7 +154,7 @@ export class ProductBasicComponent implements OnInit, OnChanges {
         }
       }
     } catch (error) {
-      console.error('Error during file synchronization:', error);
+      this.dialogUtils.openConfirmDialog('Error', 'Error during file synchronization, please try again or refresh the page if the error persists', 'OK', '');
       throw error;
     }
   }
@@ -164,11 +166,12 @@ export class ProductBasicComponent implements OnInit, OnChanges {
       if (!this.product.id) {
         this.productService.post(this.product).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
           next: res => {
+            this.data.product = res;
+            this.ngOnInit();
             this.route.navigate(['/marketing/products/', res.id]);
           },
           error: err => {
-            this.data.error = 'Error saving product, please try again by refreshing the page';
-            console.error('Error posting product:', err);
+            this.dialogUtils.openConfirmDialog('Error', 'Error saving product, please try again or refresh the page if the error persists', 'OK', '');
           }
         });
       } else {
@@ -178,14 +181,12 @@ export class ProductBasicComponent implements OnInit, OnChanges {
             this.ngOnInit();
           },
           error: err => {
-            this.data.error = 'Error saving product, please try again by refreshing the page';
-            console.error('Error updating product:', err);
+            this.dialogUtils.openConfirmDialog('Error', 'Error saving product, please try again or refresh the page if the error persists', 'OK', '');
           }
         });
       }
     } catch (error) {
-      this.data.error = 'Error saving product, please try again by refreshing the page';
-      console.error('Error in save operation:', error);
+      this.dialogUtils.openConfirmDialog('Error', 'Error saving product, please try again or refresh the page if the error persists', 'OK', '');
     }
   }
 }

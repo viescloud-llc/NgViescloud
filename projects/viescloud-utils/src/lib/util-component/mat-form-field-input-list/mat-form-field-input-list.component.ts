@@ -38,10 +38,6 @@ export class MatFormFieldInputListComponent extends MatFormFieldComponent {
   @Input()
   blankObjectType!: string;
 
-  constructor(private matdialog: MatDialog) {
-    super();
-  }
-
   override ngOnInit() {
     super.ngOnInit();
     this.listLength = this.value.length;
@@ -93,7 +89,7 @@ export class MatFormFieldInputListComponent extends MatFormFieldComponent {
   }
 
   removeWithWarning(index: number): void {
-    let dialog = this.matdialog.open(ConfirmDialog, {
+    let dialog = this.dialogUtils.matDialog.open(ConfirmDialog, {
       data: {
         title: 'Confirm delete',
         message: 'Are you sure you want to delete this item?',
