@@ -8,6 +8,7 @@
     (onFetchFile)="onFetchFile($event)"
     (onRemoveFile)="onRemoveFile($event)"
     (onSelectFileOption)="onSelectFileOptions($event)"
+    [disabled]="disableProductDisplay"
     ></app-product-display>
   </li>
   <li *ngIf="vFileContainVideo()">
@@ -17,6 +18,7 @@
     [(selectedIndex)]="selectedFileIndex"
     (onRemoveVideo)="onRemoveFile($event)"
     (onSwitchCoverImage)="onSwitchFile($event)"
+    [disabled]="disableProductDisplay"
     ></app-product-display-video>
   </li>
   <ng-container *ngIf="pinRequest.media_source">
@@ -30,7 +32,7 @@
     </li>
   </ng-container>
   <hr>
-  <li>
+  <li *ngIf="!disableProductDisplay">
     <button mat-raised-button color="primary" style="width: 100%;" (click)="autoFillInformation()">Auto Fill Information</button>
   </li>
   <br>

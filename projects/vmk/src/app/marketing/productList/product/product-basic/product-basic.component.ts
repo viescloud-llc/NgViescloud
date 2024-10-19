@@ -30,6 +30,8 @@ export class ProductBasicComponent implements OnInit, OnChanges {
   swapFileIndexInput = 0;
   validInput = false;
 
+  disableProductDisplay = false;
+
   constructor(
     protected route: Router,
     protected data: ProductData,
@@ -45,12 +47,14 @@ export class ProductBasicComponent implements OnInit, OnChanges {
   }
 
   ngOnInit() {
+    this.setDisabledProductDisplay(true);
     this.vFiles = [];
     this.vFilesCopy = [];
     this.product = structuredClone(this.data.product!);
     if(!this.product.fileLinks)
       this.product.fileLinks = [];
     this.initFetchVFiles();
+    this.setDisabledProductDisplay(false);
   }
 
   initFetchVFiles() {
@@ -73,7 +77,7 @@ export class ProductBasicComponent implements OnInit, OnChanges {
     let vf1 = structuredClone(this.vFiles).map((vf: VFile) => {vf.value = ''; return vf});
     let vf2 = structuredClone(this.vFilesCopy).map((vf: VFile) => {vf.value = ''; return vf});
 
-    let change = UtilsService.isNotEqual(this.product, this.data.product) || DataUtils.isNotEqual(vf1, vf2);
+    let change = UtilsService.isNotEqualWith(this.product, this.data.product, this.blankProduct) || DataUtils.isNotEqual(vf1, vf2);
     change ? this.setEditingComponent() : this.clearEditingComponent();
     return change;
   }
@@ -188,5 +192,9 @@ export class ProductBasicComponent implements OnInit, OnChanges {
     } catch (error) {
       this.dialogUtils.openConfirmDialog('Error', 'Error saving product, please try again or refresh the page if the error persists', 'OK', '');
     }
+  }
+
+  setDisabledProductDisplay(disabled: boolean) {
+    this.disableProductDisplay = disabled;
   }
 }

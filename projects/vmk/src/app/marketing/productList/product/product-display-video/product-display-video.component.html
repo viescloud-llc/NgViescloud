@@ -19,6 +19,7 @@
     </mat-tab-group>
 
     <app-mat-form-field-input-option
+    [disable]="disabled"
     label="View Image and video as (Original Resolution is unchanged)"
     [(value)]="selectedResolution"
     [options]="resolutionOptions"
@@ -28,7 +29,7 @@
     ></app-mat-form-field-input-option>
 
     <hr>
-    <button mat-raised-button color="primary" style="width: 50%;" (click)="switchCoverImage()">Switch cover image</button>
-    <button mat-raised-button color="warn" style="width: 50%;" (click)="removeVideo()">Remove Video</button>
+    <button [disabled]="disabled" mat-raised-button color="primary" style="width: 50%;" (click)="switchCoverImage()">Switch cover image</button>
+    <button [disabled]="disabled" mat-raised-button color="warn" style="width: 50%;" (click)="removeVideo()">Remove Video</button>
   </div>
 </div>

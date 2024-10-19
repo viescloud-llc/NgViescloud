@@ -74,16 +74,24 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
   @Input()
   blankObject?: any;
 
+  isFocused: boolean = false;
+
   constructor(
     protected cd: ChangeDetectorRef,
     protected dialogUtils: DialogUtils
   ) { }
 
   ngDoCheck(): void {
-    if(DataUtils.isSimpleNotEqual(this.value, this.valueCopy)) {
-      this.ngOnChanges({
-        value: this.value
-      })
+    if(this.isFocused === false && DataUtils.isSimpleNotEqual(this.value, this.valueCopy)) {
+      // this.ngOnChanges({
+      //   value: {
+      //     currentValue: this.value, 
+      //     previousValue: this.valueCopy,
+      //     firstChange: false,
+      //     isFirstChange: () => false
+      //   }
+      // });
+      //TODO: fix change detection here
     }
   }
   
@@ -99,10 +107,12 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.valueCopy = structuredClone(this.value);
-    if(!this.value && this.blankObject) {
-      this.value = structuredClone(this.blankObject);
-      this.valueCopy = structuredClone(this.blankObject);
+    if(changes['value']) {
+      this.valueCopy = structuredClone(this.value);
+      if(!this.value && this.blankObject) {
+        this.value = structuredClone(this.blankObject);
+        this.valueCopy = structuredClone(this.blankObject);
+      }
     }
   }
 

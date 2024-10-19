@@ -37,8 +37,8 @@ export class ProductPinterestComponent extends ProductBasicComponent {
   blankMediaSourceVideo: MediaSourceVideo = new MediaSourceVideo();
 
   //additional fields
-  width: number = 1080;
-  height: number = 1920;
+  width: number = 1920;
+  height: number = 1080;
 
   constructor(
     protected override route: Router,
@@ -54,6 +54,7 @@ export class ProductPinterestComponent extends ProductBasicComponent {
   }
 
   override async ngOnInit() {
+    this.setDisabledProductDisplay(true);
     this.product = structuredClone(this.data.product!);
     this.vFiles = [];
     this.vFilesCopy = [];
@@ -70,6 +71,7 @@ export class ProductPinterestComponent extends ProductBasicComponent {
     await this.initFetchVFiles();
     this.initFileOptions();
     this.initBoardNameOptions();
+    this.setDisabledProductDisplay(false);
   }
   
   override async initFetchVFiles() {
@@ -111,6 +113,13 @@ export class ProductPinterestComponent extends ProductBasicComponent {
 
   override setEditingComponent(): void {
     this.data.isEditingComponent = 'pinterest';
+  }
+
+  override setDisabledProductDisplay(disabled: boolean): void {
+    if(this.pinResponse)
+      this.disableProductDisplay = true;
+    else
+      this.disableProductDisplay = disabled;
   }
 
   initFileOptions() {
@@ -348,10 +357,13 @@ export class ProductPinterestComponent extends ProductBasicComponent {
     for (const vf of this.vFiles) {
       if (vf.originalLink && this.s3StorageService.containViesLink(vf.originalLink)) {
         let path = this.s3StorageService.extractPathFromViesLink(vf.originalLink);
-        await firstValueFrom(this.s3StorageService.getFileByPath(path, this.width, this.height).pipe(UtilsService.waitLoadingDialog(this.dialogUtils.matDialog))).catch(e => {
-          result = false;
-          badVFiles.push(vf);
-        });
+        
+        if(vf.type.toLowerCase().includes('image')) {
+          await firstValueFrom(this.s3StorageService.getFileByPath(path, this.width, this.height).pipe(UtilsService.waitLoadingDialog(this.dialogUtils.matDialog))).catch(e => {
+            result = false;
+            badVFiles.push(vf);
+          });
+        }
       }
     }
 
@@ -395,11 +407,10 @@ export class ProductPinterestComponent extends ProductBasicComponent {
           if(validFileCheck) {
             this.pinterestService?.uploadPin(this.product.id, this.width, this.height).pipe(UtilsService.waitLoadingDialog(this.dialogUtils.matDialog)).subscribe({
               next: res => {
-                this.data.product = res;
-                this.ngOnInit();
+                this.route.navigate(['/marketing/products/', res.id, 'overall']);
               },
               error: err => {
-                this.data.error = 'Error uploading product, please try again by refreshing the page';
+                this.dialogUtils.openConfirmDialog('Error', 'Error uploading product, please try again or refresh the page if the error persists', 'OK', '');
               }
             })
           }

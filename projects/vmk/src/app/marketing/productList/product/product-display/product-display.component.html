@@ -20,6 +20,7 @@
       </mat-tab>
     </mat-tab-group>
     <app-mat-form-field-input-option
+    [disable]="disabled"
     label="View Image and video as (Original Resolution is unchanged)"
     [(value)]="selectedResolution"
     [options]="resolutionOptions"
@@ -28,17 +29,18 @@
     (onValueChange)="populateAllFile(selectedResolution)"
     ></app-mat-form-field-input-option>
     <hr>
-    <button mat-raised-button color="primary" style="width: 50%;" (click)="onUploadFile.emit()">Upload More</button>
-    <button mat-raised-button color="warn" style="width: 50%;" (click)="removeFile(selectedIndex)">Remove File {{selectedIndex + 1}}</button>
+    <button [disabled]="disabled" mat-raised-button color="primary" style="width: 50%;" (click)="onUploadFile.emit()">Upload More</button>
+    <button [disabled]="disabled" mat-raised-button color="warn" style="width: 50%;" (click)="removeFile(selectedIndex)">Remove File {{selectedIndex + 1}}</button>
   </div>
 
   <ng-template #uploadPrompt>
     <div class="upload-prompt">
-      <button mat-raised-button color="primary" style="width: 100%;" (click)="onUploadFile.emit()">Click here to upload videos or pictures</button>
+      <button [disabled]="disabled" mat-raised-button color="primary" style="width: 100%;" (click)="onUploadFile.emit()">Click here to upload videos or pictures</button>
     </div>
   </ng-template>
 
   <app-mat-form-field-input
+  [disable]="disabled"
   label="Import from URI"
   placeholder="Ex. https://example.com"
   [(value)]="inputUri"
@@ -48,11 +50,14 @@
   [customIconLabel]="'cloud_upload'"
   (onValueChange)="uploadError = ''"
   ></app-mat-form-field-input>
+
   <ng-container *ngIf="uploadError">
     <h2 style="color: red">{{uploadError}}</h2>
   </ng-container>
+
   <div *ngIf="fileOptions && fileOptions.length > 0">
     <app-mat-form-field-input-option
+    [disable]="disabled"
     label="Import File from Product information"
     [options]="fileOptions"
     (selectionChange)="onSelectFileOption.emit($event);"

@@ -46,6 +46,9 @@ export class ProductDisplayComponent implements OnInit, OnChanges {
   ];
 
   @Input()
+  disabled: boolean = false;
+
+  @Input()
   selectedIndex: number = 0;
 
   @Output()

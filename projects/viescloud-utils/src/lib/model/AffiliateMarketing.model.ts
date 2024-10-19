@@ -1,5 +1,5 @@
 import { SharedUser } from "./Authenticator.model";
-import { MatInputDisable, MatInputDisplayLabel, MatInputHide, MatInputIndex, MatInputRequire, MatInputTextArea, MatTableHide } from "./Mat.model";
+import { MatInputDisable, MatInputDisplayLabel, MatInputHide, MatInputIndex, MatInputItemSetting, MatInputRequire, MatInputTextArea, MatItemSettingType, MatTableHide } from "./Mat.model";
 
 export class Product {
     @MatTableHide(true)
@@ -28,10 +28,12 @@ export class Product {
     
     @MatInputRequire(true)
     @MatInputDisplayLabel('Product original link', 'Please enter product original link')
+    @MatInputItemSetting(MatItemSettingType.AUTO_FILL_HTTPS, true)
     originalLink:  string = '';
     
     @MatInputRequire(true)
     @MatInputDisplayLabel('Product marketing link', 'Please enter product marketing link')
+    @MatInputItemSetting(MatItemSettingType.AUTO_FILL_HTTPS, true)
     marketingLink: string = '';
 
     @MatTableHide(true)
