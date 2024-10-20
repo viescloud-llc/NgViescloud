@@ -104,10 +104,6 @@ export class MatFormFieldInputListComponent extends MatFormFieldComponent {
     })
   }
 
-  trackByIndex(index: number, obj: any): any {
-    return index;
-  }
-
   reachMaxSize(): boolean {
     return this.value.length >= this.maxSize;
   }

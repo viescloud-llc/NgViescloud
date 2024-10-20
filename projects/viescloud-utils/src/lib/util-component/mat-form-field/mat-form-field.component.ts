@@ -7,6 +7,7 @@ import { RgbColor } from '../../model/Rgb.model';
 import { DialogUtils } from '../../util/Dialog.utils';
 import { StringUtils } from '../../util/String.utils';
 import { DataUtils } from '../../util/Data.utils';
+import { MatFromFieldInputDynamicItem } from '../../model/Mat.model';
 
 @Component({
   selector: 'app-mat-form-field',
@@ -74,24 +75,14 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
   @Input()
   blankObject?: any;
 
-  isFocused: boolean = false;
-
   constructor(
     protected cd: ChangeDetectorRef,
     protected dialogUtils: DialogUtils
   ) { }
 
   ngDoCheck(): void {
-    if(this.isFocused === false && DataUtils.isSimpleNotEqual(this.value, this.valueCopy)) {
-      // this.ngOnChanges({
-      //   value: {
-      //     currentValue: this.value, 
-      //     previousValue: this.valueCopy,
-      //     firstChange: false,
-      //     isFirstChange: () => false
-      //   }
-      // });
-      //TODO: fix change detection here
+    if(DataUtils.isNotEqual(this.value, this.valueCopy)) {
+      this.ngOnChanges({});
     }
   }
   
@@ -246,5 +237,9 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
     }
     else  
      return {};
+  }
+
+  trackByIndex(index: number, obj: any): any {
+    return index;
   }
 }

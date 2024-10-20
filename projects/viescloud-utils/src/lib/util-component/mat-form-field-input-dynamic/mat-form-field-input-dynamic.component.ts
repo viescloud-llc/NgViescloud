@@ -2,6 +2,7 @@ import { Component, Input, SimpleChanges, forwardRef } from '@angular/core';
 import { MatFormFieldComponent } from '../mat-form-field/mat-form-field.component';
 import { MatFromFieldInputDynamicItem, MatItemSetting, MatItemSettingType, MatOption } from '../../model/Mat.model';
 import { UtilsService } from '../../service/Utils.service';
+import { DataUtils } from '../../util/Data.utils';
 
 export enum DynamicMatInputType {
   UNKOWN = 'unkown',
@@ -80,10 +81,8 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
 
   override ngOnInit() {
     super.ngOnInit();
-
     if(!this.blankObject)
       this.blankObject = this.value;
-
     this.init();
   }
 
@@ -279,5 +278,9 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
 
   override isValueNumber(): boolean {
     return super.isValueNumber() && !this.isOptions;
+  }
+
+  onValueChangeFn() {
+    this.onValueChange.emit();
   }
 }

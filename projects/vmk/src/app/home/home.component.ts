@@ -9,16 +9,10 @@ import { StringUtils } from 'projects/viescloud-utils/src/lib/util/String.utils'
 })
 export class HomeComponent implements OnInit {
 
-  count = 0;
-
   constructor(
   ) { }
 
   ngOnInit() {
 
-  }
-
-  getURL(): string {
-    return document.URL;
   }
 }

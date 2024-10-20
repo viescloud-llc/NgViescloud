@@ -133,7 +133,7 @@
       <li>
         <h2 class="text-center" *ngIf="objectLabel">{{objectLabel}}</h2>
       </li>
-      <li *ngFor="let item of items">
+      <li *ngFor="let item of items; let i = index; trackBy: trackByIndex">
         <app-mat-form-field-input-dynamic
           [label]="item.label"
           [placeholder]="item.placeholder"
@@ -151,6 +151,7 @@
           [showListAddItemButton]="containListShowAddItemButton(item)"
           [showListRemoveItemButton]="containListShowRemoveItemButton(item)"
           [matOptions]="item.matOptions"
+          (onValueChange)="onValueChangeFn()"
         ></app-mat-form-field-input-dynamic>
       </li>
     </ul>
