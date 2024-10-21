@@ -1,6 +1,19 @@
 import { SharedUser } from "./Authenticator.model";
 import { MatInputDisable, MatInputDisplayLabel, MatInputHide, MatInputIndex, MatInputItemSetting, MatInputRequire, MatInputTextArea, MatItemSettingType, MatTableHide } from "./Mat.model";
 
+export class MediaResponse {
+    media_id: string = '';
+    media_type: string = '';
+    status: string = '';
+}
+
+export class RegisterMediaResponse {
+    media_id: string = '';
+    media_type: string = '';
+    upload_url: string = '';
+    upload_parameters: Map<string, string> = new Map<string, string>();
+}
+
 export class Product {
     @MatTableHide(true)
     @MatInputHide(true)
@@ -255,7 +268,7 @@ export class MediaSourceVideo extends MediaSource {
     @MatInputDisable(true)
     cover_image_content_type: string = '';
 
-    @MatInputHide(true)
+    @MatInputDisable(true)
     media_id: string = '';
 
     @MatInputDisable(true)

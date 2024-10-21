@@ -1,11 +1,11 @@
 import { ChangeDetectorRef, Component, Inject, OnInit, SimpleChanges } from '@angular/core';
 import { ProductBasicComponent } from '../product-basic/product-basic.component';
-import { Image, MediaSource, MediaSourceImageUrl, MediaSourceMultipleImage, MediaSourceType, MediaSourceVideo, PinRequest, PinResponse, PinterestPinData } from 'projects/viescloud-utils/src/lib/model/AffiliateMarketing.model';
+import { Image, MediaSource, MediaSourceImageUrl, MediaSourceMultipleImage, MediaSourceType, MediaSourceVideo, PinRequest, PinResponse, PinterestPinData, RegisterMediaResponse } from 'projects/viescloud-utils/src/lib/model/AffiliateMarketing.model';
 import { UtilsService, VFile } from 'projects/viescloud-utils/src/lib/service/Utils.service';
 import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
 import { firstValueFrom } from 'rxjs';
 import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
-import { ProductService, ViesPinterestService } from 'projects/viescloud-utils/src/lib/service/AffiliateMarketing.service';
+import { PinterestOathTokenService, ProductService, ViesPinterestService } from 'projects/viescloud-utils/src/lib/service/AffiliateMarketing.service';
 import { MatDialog } from '@angular/material/dialog';
 import { S3StorageServiceV1 } from 'projects/viescloud-utils/src/lib/service/ObjectStorageManager.service';
 import { Router } from '@angular/router';
@@ -42,14 +42,15 @@ export class ProductPinterestComponent extends ProductBasicComponent {
   height: number = 1080;
 
   constructor(
-    protected override route: Router,
-    protected override data: ProductData,
-    protected override productService: ProductService,
-    protected override s3StorageService: S3StorageServiceV1,
-    protected override quickSideDrawerMenuService: QuickSideDrawerMenuService,
-    protected override dialogUtils: DialogUtils,
-    protected override rxjsUtils: RxJSUtils,
-    protected pinterestService?: ViesPinterestService,
+    route: Router,
+    data: ProductData,
+    productService: ProductService,
+    s3StorageService: S3StorageServiceV1,
+    quickSideDrawerMenuService: QuickSideDrawerMenuService,
+    dialogUtils: DialogUtils,
+    rxjsUtils: RxJSUtils,
+    private pinterestService: ViesPinterestService,
+    private pinterestOathTokenService: PinterestOathTokenService
   ) { 
     super(route, data, productService, s3StorageService, quickSideDrawerMenuService, dialogUtils, rxjsUtils);
   }
@@ -369,17 +370,7 @@ export class ProductPinterestComponent extends ProductBasicComponent {
     }
 
     if(badVFiles.length > 0) {
-      let dialog = this.dialogUtils.matDialog.open(ConfirmDialog, {
-        data: {
-          title: 'Error', 
-          message: this.getBadVFilesMessage(badVFiles), 
-          no: '', 
-          yes: 'ok'
-        }, 
-        width: '100%'
-      });
-
-      dialog.afterClosed().subscribe({ next: res => { } })
+      this.dialogUtils.openConfirmDialog('Error', this.getBadVFilesMessage(badVFiles), 'OK', '');
     }
 
     return result;
@@ -398,26 +389,57 @@ export class ProductPinterestComponent extends ProductBasicComponent {
     return this.vFiles.indexOf(vfile) + 1;
   }
 
-  async uploadProduct() {
-    let dialog = this.dialogUtils.matDialog.open(ConfirmDialog, {data: {title: 'Upload product', message: 'You are about to upload your product to Pinterest. Do you want to continue?', no: 'cancel', yes: 'ok'}, width: '100%'});
-    
-    dialog.afterClosed().subscribe({
-      next: async res => {
-        if(res) {
-          let validFileCheck = await this.checkValidVFilesBeforeUpload();
-          if(validFileCheck) {
-            this.pinterestService?.uploadPin(this.product.id, this.width, this.height).pipe(UtilsService.waitLoadingDialog(this.dialogUtils.matDialog)).subscribe({
-              next: res => {
-                this.route.navigate(['/marketing/products/', res.id, 'overall']);
-              },
-              error: err => {
-                this.dialogUtils.openConfirmDialog('Error', `Error ${this.pinResponse ? 'updating' : 'uploading'} product, please try again or refresh the page if the error persists`, 'OK', '');
-              }
-            })
+  private async uploadVideoMediaSource() {
+    if(this.pinRequest.media_source?.source_type == MediaSourceType.VIDEO) {
+      let ms = this.pinRequest.media_source as MediaSourceVideo;
+      let videoVFile = this.vFiles[this.vFiles.findIndex(e => e.type.toLowerCase().includes('video'))];
+      if(!ms.media_id && videoVFile) {
+        let registerMediaResponse = await firstValueFrom(this.pinterestOathTokenService.registerMedia().pipe(this.rxjsUtils.waitLoadingDialog())).catch(e => {
+          this.dialogUtils.openConfirmDialog('Error', `Error registering media, please try again or refresh the page if the error persists`, 'OK', '');
+        })
+
+        if(registerMediaResponse) {
+          await firstValueFrom(this.pinterestOathTokenService.uploadMedia(registerMediaResponse, videoVFile).pipe(this.rxjsUtils.waitLoadingDialog())).catch(e => {
+            this.dialogUtils.openConfirmDialog('Error', `Error uploading media, please try again or refresh the page if the error persists`, 'OK', '');
+          });
+        
+          let mediaResponse = await firstValueFrom(this.pinterestOathTokenService.getMedia(registerMediaResponse.media_id).pipe(this.rxjsUtils.waitLoadingDialog())).catch(e => {
+            this.dialogUtils.openConfirmDialog('Error', `Error getting media after uploading media, please try again or refresh the page if the error persists`, 'OK', '');
+          })
+
+          if(mediaResponse && mediaResponse.status !== 'succeeded') {
+            this.dialogUtils.openConfirmDialog('Error', `Media didn't upload, please try again or refresh the page if the error persists`, 'OK', '');
+            throw new Error('Media didn\'t upload');
           }
+
+          ms.media_id = registerMediaResponse.media_id;
+          this.pinRequest.media_source = ms;
+
+          await super.save();
         }
+        else
+          throw new Error('Cannot register media');
       }
-    })
+    }
+  }
+
+  async uploadProduct() {
+    let upload = await this.dialogUtils.openConfirmDialog('Upload product', 'You are about to upload your product to Pinterest. Do you want to continue?', 'ok', 'cancel');
+
+    if(upload) {
+      let validFileCheck = await this.checkValidVFilesBeforeUpload();
+      if(validFileCheck) {
+        this.pinterestService?.uploadPin(this.product.id, this.width, this.height).pipe(UtilsService.waitLoadingDialog(this.dialogUtils.matDialog)).subscribe({
+          next: res => {
+            this.route.navigate(['/marketing/products/', res.id, 'overall']);
+          },
+          error: err => {
+            this.dialogUtils.openConfirmDialog('Error', `Error ${this.pinResponse ? 'updating' : 'uploading'} product, please try again or refresh the page if the error persists`, 'OK', '');
+            this.ngOnInit();
+          }
+        })
+      }
+    }
   }
 
   override async syncVFiles(): Promise<void> {

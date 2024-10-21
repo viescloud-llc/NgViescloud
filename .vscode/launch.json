@@ -31,11 +31,20 @@
       "url": "http://localhost:4200/"
     },
     {
-      "name": "debug vmk",
+      "name": "Debug VMK (Chrome)",
       "type": "chrome",
       "request": "launch",
       "preLaunchTask": "npm: start_vmk",
-      "url": "http://localhost:4200/"
+      "url": "http://localhost:4200/",
+      "webRoot": "${workspaceFolder}"
+    },
+    {
+      "name": "Debug VMK (Firefox)",
+      "type": "firefox",
+      "request": "launch",
+      "preLaunchTask": "npm: start_vmk",
+      "url": "http://localhost:4200/",
+      "webRoot": "${workspaceFolder}"
     },
     {
       "name": "debug wrap",

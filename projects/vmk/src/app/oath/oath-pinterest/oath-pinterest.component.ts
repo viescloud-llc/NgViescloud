@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { PinterestOathTokenService } from 'projects/viescloud-utils/src/lib/service/AffiliateMarketing.service';
-import { PinterestService } from 'projects/viescloud-utils/src/lib/service/Pinterest.service';
 import { UtilsService } from 'projects/viescloud-utils/src/lib/service/Utils.service';
 
 @Component({
@@ -17,8 +16,7 @@ export class OathPinterestComponent implements OnInit {
   constructor(
     private matDialog: MatDialog,
     private router: Router, 
-    private pinterestOathTokenService: PinterestOathTokenService,
-    private pinterestService: PinterestService
+    private pinterestOathTokenService: PinterestOathTokenService
   ) { }
 
   ngOnInit() {
@@ -26,7 +24,7 @@ export class OathPinterestComponent implements OnInit {
     const urlParams = new URLSearchParams(queryString);
     let code = urlParams.get("code");
     let state = urlParams.get("state");
-    let redirectUri = this.pinterestService.getRedirectUri();
+    let redirectUri = this.pinterestOathTokenService.getRedirectUri();
 
     if(code && state) {
       this.pinterestOathTokenService.post({code: code, state: state, redirectUri: redirectUri}).pipe(UtilsService.waitLoadingDialog(this.matDialog)).subscribe({

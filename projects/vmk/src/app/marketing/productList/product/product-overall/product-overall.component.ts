@@ -17,14 +17,16 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class ProductOverallComponent extends ProductBasicComponent {
 
+  pinterestPinResponse?: PinResponse;
   blankPinResponse: PinResponse = new PinResponse();
 
-  override ngOnChanges(changes: SimpleChanges): void {
-      
+  override ngOnInit(): void {
+    super.ngOnInit();
+    this.pinterestPinResponse = this.product.pinterestPinData?.pinResponse;
   }
 
   isThereAreData() {
-    return this.product.pinterestPinData && this.product.pinterestPinData.pinResponse;
+    return this.pinterestPinResponse;
   }
 
   override setEditingComponent(): void {

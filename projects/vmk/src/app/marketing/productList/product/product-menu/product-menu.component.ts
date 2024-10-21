@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { UtilsService } from 'projects/viescloud-utils/src/lib/service/Utils.service';
 import { QuickSideDrawerMenu } from 'projects/viescloud-utils/src/lib/share-component/quick-side-drawer-menu/quick-side-drawer-menu.component';
 import { ProductData } from '../data/product-data.service';
+import { PinterestOathTokenService } from 'projects/viescloud-utils/src/lib/service/AffiliateMarketing.service';
 
 @Component({
   selector: 'app-product-menu',
@@ -11,7 +12,8 @@ import { ProductData } from '../data/product-data.service';
 export class ProductMenuComponent implements OnInit {
 
   constructor(
-    private data: ProductData
+    private data: ProductData,
+    private pinterestOathTokenService: PinterestOathTokenService
   ) { }
 
   ngOnInit() {
@@ -37,7 +39,7 @@ export class ProductMenuComponent implements OnInit {
       {
         title: 'Pinterest',
         routerLink: `/marketing/products/${productId}/pinterest`,
-        hideConditional: () => productId === '0',
+        hideConditional: () => productId === '0' || !this.pinterestOathTokenService.pinterestOathToken,
         disableConditional: () => !(this.data.isEditingComponent === '' || this.data.isEditingComponent === 'pinterest')
       }
     ];

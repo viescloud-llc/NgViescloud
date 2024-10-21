@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
 import { PinterestOathTokenService } from 'projects/viescloud-utils/src/lib/service/AffiliateMarketing.service';
-import { PinterestService } from 'projects/viescloud-utils/src/lib/service/Pinterest.service';
 
 @Component({
   selector: 'app-connected-service',
@@ -12,7 +11,6 @@ import { PinterestService } from 'projects/viescloud-utils/src/lib/service/Pinte
 export class ConnectedServiceComponent implements OnInit {
 
   constructor(
-    private pinterestService: PinterestService, 
     private printerestOathTokenService: PinterestOathTokenService,
     private matDialog: MatDialog) { }
 
@@ -21,7 +19,7 @@ export class ConnectedServiceComponent implements OnInit {
   }
 
   connectPinterest() {
-    this.pinterestService.authorizeFlow();
+    this.printerestOathTokenService.authorizeFlow();
   }
 
   reconnectPinterest() {
