@@ -16,6 +16,7 @@ import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 import { ProductImageSwapType } from 'projects/viescloud-utils/src/lib/dialog/marketing/product-image-swap-dialog/product-image-swap-dialog.component';
+import { RouteUtil } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 
 @Component({
   selector: 'app-product-pinterest',
@@ -410,7 +411,7 @@ export class ProductPinterestComponent extends ProductBasicComponent {
                 this.route.navigate(['/marketing/products/', res.id, 'overall']);
               },
               error: err => {
-                this.dialogUtils.openConfirmDialog('Error', 'Error uploading product, please try again or refresh the page if the error persists', 'OK', '');
+                this.dialogUtils.openConfirmDialog('Error', `Error ${this.pinResponse ? 'updating' : 'uploading'} product, please try again or refresh the page if the error persists`, 'OK', '');
               }
             })
           }
@@ -523,7 +524,7 @@ export class ProductPinterestComponent extends ProductBasicComponent {
           pinRequest.link = this.product.marketingLink;
           pinRequest.alt_text = this.product.marketingLink;
           pinRequest.description = this.product.description;
-          pinRequest.note = `Original Link: ${this.product.originalLink}\nPrice: ${this.product.price}`;
+          pinRequest.note = this.getNote();
           pinRequest.boardName = this.product.category.name;
           pinRequest.media_source = undefined;
           this.pinRequest = pinRequest;
@@ -541,9 +542,14 @@ export class ProductPinterestComponent extends ProductBasicComponent {
     })
   }
 
+  private getNote() {
+    return `Original Link: ${this.product.originalLink}
+Marketing Link: ${this.product.marketingLink}
+VMK link: ${RouteUtil.getCurrentUrl()}
+Price: ${this.product.price}`;
+  }
+
   vFileContainVideo() {
     return this.vFiles.some(e => e.type.toLowerCase().includes('video'));
   }
-
-  
 }

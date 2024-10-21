@@ -18,7 +18,7 @@ export class RouteUtil {
     }
 
     static getQueryParams(): { [key: string]: string } {
-        let url = window.location.href;
+        let url = RouteUtil.getCurrentUrl();
         let result: { [key: string]: string } = {};
         let query = url.split('?')[1];
         if (query) {
@@ -38,7 +38,7 @@ export class RouteUtil {
     }
 
     static setQueryParam(param: string, value: string | null) {
-        const currentUrl = window.location.href;
+        const currentUrl = RouteUtil.getCurrentUrl();
         const url = new URL(currentUrl);
         const params = new URLSearchParams(url.search);
 
@@ -60,7 +60,7 @@ export class RouteUtil {
      */
     static getPathVariable(variableName: string): string | null {
         // Get the current URL using window.location.href
-        const url = window.location.href;
+        const url = RouteUtil.getCurrentUrl();
 
         // Split the URL into segments
         const segments = url.split('/').filter(segment => segment); // Remove empty segments
@@ -74,5 +74,9 @@ export class RouteUtil {
         }
 
         return null; // Return null if the variable is not found
+    }
+
+    static getCurrentUrl(): string {
+        return window.location.href;
     }
 }

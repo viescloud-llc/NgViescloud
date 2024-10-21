@@ -3,9 +3,9 @@
     <mat-tab-group headerPosition="below" [(selectedIndex)]="selectedIndex">
 
       <mat-tab label="Cover Image">
-        <img [src]="getCoverImageFile()?.value" [alt]="getCoverImageFile()?.name" *ngIf="selectedResolution === 'original'; else elseImage">
+        <img [src]="getCoverImageFile()?.value" [alt]="getCoverImageFile()?.name ?? 'Empty cover image'" *ngIf="selectedResolution === 'original'; else elseImage">
         <ng-template #elseImage>
-          <img [src]="getCoverImageFile()?.value" [alt]="getCoverImageFile()?.name" [width]="getWidthResolution()" [height]="getHeightResolution()">
+          <img [src]="getCoverImageFile()?.value" [alt]="getCoverImageFile()?.name ?? 'Empty cover image'" [width]="getWidthResolution()" [height]="getHeightResolution()">
         </ng-template>
       </mat-tab>
 
