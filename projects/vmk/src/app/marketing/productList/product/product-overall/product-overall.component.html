@@ -7,10 +7,18 @@
           Pin data
         </mat-panel-description>
       </mat-expansion-panel-header>
+
+      <button 
+      [matTooltip]="getPinterestLink(product.pinterestPinData?.pinResponse!.id)"
+      mat-raised-button color="primary" 
+      (click)="openPinterestPinLink(product.pinterestPinData?.pinResponse!.id)"
+      >Go to pin</button>
+      <hr>
       <app-mat-form-field-input-dynamic
       [value]="product.pinterestPinData?.pinResponse"
       [blankObject]="blankPinResponse"
       ></app-mat-form-field-input-dynamic>
+
     </mat-expansion-panel>
   </li>
 </ul>

@@ -17,6 +17,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class ProductOverallComponent extends ProductBasicComponent {
 
+  private PINTEREST_PIN_LINK = 'https://www.pinterest.com/pin/'
+
   blankPinResponse: PinResponse = new PinResponse();
 
   override ngOnChanges(changes: SimpleChanges): void {
@@ -29,6 +31,14 @@ export class ProductOverallComponent extends ProductBasicComponent {
 
   override setEditingComponent(): void {
     this.data.isEditingComponent = 'overall';
+  }
+
+  getPinterestLink(id: string) {
+    return this.PINTEREST_PIN_LINK + id;
+  }
+
+  openPinterestPinLink(id: string) {
+    window.open(this.getPinterestLink(id), '_blank');
   }
 
 }
