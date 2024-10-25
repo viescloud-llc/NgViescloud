@@ -46,30 +46,25 @@ export class ProductBasicComponent implements OnInit, OnChanges {
     
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.setDisabledProductDisplay(true);
     this.vFiles = [];
     this.vFilesCopy = [];
     this.product = structuredClone(this.data.product!);
     if(!this.product.fileLinks)
       this.product.fileLinks = [];
-    this.initFetchVFiles();
+    await this.initFetchVFiles();
     this.setDisabledProductDisplay(false);
   }
 
-  initFetchVFiles() {
+  async initFetchVFiles() {
     if(this.product.fileLinks) {
       this.product.fileLinks = this.product.fileLinks.filter(e => e.link);
-      this.product.fileLinks.forEach(fileLink => {
-        this.s3StorageService.fetchFile(fileLink.link)
-          .pipe(this.rxjsUtils.waitLoadingDynamicMessagePopup(`Loading ${fileLink.link}`, 'Dismiss'))
-          .subscribe({
-            next: res => {
-              this.pushVFile(res);
-              this.vFilesCopy = structuredClone(this.vFiles);
-            }
-          });
-      });
+      for(let fileLink of this.product.fileLinks) {
+        let vfile = await firstValueFrom(this.s3StorageService.fetchFile(fileLink.link).pipe(this.rxjsUtils.waitLoadingDynamicMessagePopup(`Loading ${fileLink.link}`, 'Dismiss')));
+        this.pushVFile(vfile);
+        this.vFilesCopy = structuredClone(this.vFiles);
+      }
     }
   }
 

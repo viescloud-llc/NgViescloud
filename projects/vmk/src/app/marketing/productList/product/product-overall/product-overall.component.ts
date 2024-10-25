@@ -22,7 +22,7 @@ export class ProductOverallComponent extends ProductBasicComponent {
   pinterestPinResponse?: PinResponse;
   blankPinResponse: PinResponse = new PinResponse();
 
-  override ngOnInit(): void {
+  override async ngOnInit() {
     super.ngOnInit();
     this.pinterestPinResponse = this.product.pinterestPinData?.pinResponse;
   }

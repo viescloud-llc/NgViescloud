@@ -9,6 +9,8 @@
     (onRemoveFile)="onRemoveFile($event)"
     (onSelectFileOption)="onSelectFileOptions($event)"
     [disabled]="disableProductDisplay"
+    [maxNumImage]="maxNumImage"
+    [maxNumVideo]="0"
     ></app-product-display>
   </li>
   <li *ngIf="vFileContainVideo()">

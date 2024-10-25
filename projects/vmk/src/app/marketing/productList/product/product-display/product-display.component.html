@@ -29,7 +29,7 @@
     (onValueChange)="populateAllFile(selectedResolution)"
     ></app-mat-form-field-input-option>
     <hr>
-    <button [disabled]="disabled" mat-raised-button color="primary" style="width: 50%;" (click)="onUploadFile.emit()">Upload More</button>
+    <button [disabled]="isAddDisabled()" mat-raised-button color="primary" style="width: 50%;" (click)="onUploadFile.emit()">Upload More</button>
     <button [disabled]="disabled" mat-raised-button color="warn" style="width: 50%;" (click)="removeFile(selectedIndex)">Remove File {{selectedIndex + 1}}</button>
   </div>
 

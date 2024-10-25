@@ -41,6 +41,8 @@ export class ProductPinterestComponent extends ProductBasicComponent {
   width: number = 1920;
   height: number = 1080;
 
+  maxNumImage = 5;
+
   constructor(
     route: Router,
     data: ProductData,
@@ -181,15 +183,15 @@ export class ProductPinterestComponent extends ProductBasicComponent {
         mediaSource.items = [
           {
             id: 0,
-            title: ms.url,
-            description: '',
+            title: `${this.product.title} - picture 1`,
+            description: `Picture 1 of ${this.product.title}`,
             link: this.product.marketingLink,
             url: ms.url
           },
           {
             id: 0,
-            title: vfile.originalLink ?? vfile.name,
-            description: '',
+            title: `${this.product.title} - picture 2`,
+            description: `Picture 2 of ${this.product.title}`,
             link: this.product.marketingLink,
             url: vfile.originalLink ?? vfile.name
           },
@@ -213,8 +215,8 @@ export class ProductPinterestComponent extends ProductBasicComponent {
         let ms = this.pinRequest.media_source as MediaSourceMultipleImage;
         ms.items.push({
           id: 0,
-          title: vfile.originalLink ?? vfile.name,
-          description: '',
+          title: `${this.product.title} - picture ${ms.items.length + 1}`,
+          description: `Picture ${ms.items.length + 1} of ${this.product.title}`,
           link: this.product.marketingLink,
           url: vfile.originalLink ?? vfile.name
         })
@@ -552,9 +554,11 @@ export class ProductPinterestComponent extends ProductBasicComponent {
           this.pinRequest = pinRequest;
           this.vFiles = [];
           if(this.product.fileLinks && this.product.fileLinks.length > 0) {
+            let count = 0;
             for(let file of this.product.fileLinks) {
-              if(file.mediaType.includes('image')) {
+              if(file.mediaType.includes('image') && count < this.maxNumImage) {
                 this.onSelectFileOptions(file.link);
+                count++;
               }
             }
           }

@@ -62,6 +62,12 @@ export class ProductDisplayComponent implements OnInit, OnChanges {
 
   @Input()
   fileOptions: MatOption<string>[] = [];
+
+  @Input()
+  maxNumImage = Number.MAX_SAFE_INTEGER;
+
+  @Input()
+  maxNumVideo = Number.MAX_SAFE_INTEGER;
   
   @Output()
   onRemoveFile = new EventEmitter<number>();
@@ -77,6 +83,9 @@ export class ProductDisplayComponent implements OnInit, OnChanges {
 
   inputUri = '';
   selectedResolution: '1080p' | '720p' | '480p' | '360p' | 'original' = '480p';
+
+  currentNumImage = 0;
+  currentNumVideo = 0;
 
   constructor(
     protected dialogUtils: DialogUtils,
@@ -94,16 +103,20 @@ export class ProductDisplayComponent implements OnInit, OnChanges {
   }
 
   async populateAllFile(selectedResolution: '1080p' | '720p' | '480p' | '360p' | 'original') {
+    this.currentNumImage = 0;
+    this.currentNumVideo = 0;
     for(let file of this.files) {
       if(file.rawFile) {
         if(file.extension === 'mp4' || file.extension === 'webm') {
-            file.value = window.URL.createObjectURL(file.rawFile);
+          file.value = window.URL.createObjectURL(file.rawFile);
+          this.currentNumVideo++;
         }
         else {
           if(selectedResolution !== 'original')
             file.value = await UtilsService.resizeImage(file.rawFile, selectedResolution);
           else
             file.value = window.URL.createObjectURL(file.rawFile);
+          this.currentNumImage++;
         }
       }
     }
@@ -152,4 +165,7 @@ export class ProductDisplayComponent implements OnInit, OnChanges {
    }
   }
 
+  isAddDisabled() {
+    return this.disabled || this.currentNumImage >= this.maxNumImage && this.currentNumVideo >= this.maxNumVideo;
+  }
 }
