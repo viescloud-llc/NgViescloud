@@ -105,7 +105,10 @@ export class ProductBasicComponent implements OnInit, OnChanges {
           this.pushVFile(res);
           resolve(res);
         },
-        error: err => reject(err)
+        error: err => {
+          this.dialogUtils.openConfirmDialog('Error', `Error loading ${uri}\n${err.message}`, 'OK', '');
+          reject(err);
+        }
       });
     })
   }
