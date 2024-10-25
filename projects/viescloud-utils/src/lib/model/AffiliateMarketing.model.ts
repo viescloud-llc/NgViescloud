@@ -306,7 +306,6 @@ export class Image {
 }
 
 export class PinResponse {
-
     @MatInputDisable(true)
     id:                string = '';
     @MatInputDisable(true)

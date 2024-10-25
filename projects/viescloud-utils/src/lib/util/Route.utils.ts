@@ -79,4 +79,8 @@ export class RouteUtil {
     static getCurrentUrl(): string {
         return window.location.href;
     }
+
+    static openLinkInNewTab(link: string): void {
+        window.open(link, '_blank');
+    }
 }
