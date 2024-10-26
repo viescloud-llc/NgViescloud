@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { HomeComponent } from './home/home.component';
-import { RegisterComponent } from './register/register.component';
 import { RequestSenderComponent } from './request-sender/request-sender.component';
 import { RouteComponent } from './Authentication/route/route.component';
 import { UserRoleComponent } from './Authentication/user-role/user-role.component';
@@ -12,6 +11,8 @@ import { ConfigMapComponent } from './Venkins/config-map/config-map.component';
 import { AutoRouteComponent } from './Authentication/auto-route/auto-route.component';
 import { OpenIdComponent } from 'projects/viescloud-utils/src/lib/share-component/openId/openId.component';
 import { LoginComponent } from 'projects/viescloud-utils/src/lib/share-component/login/login.component';
+import { AuthGuard } from 'projects/viescloud-utils/src/lib/guards/auth.guard';
+import { ApplicationSettingComponent } from 'projects/viescloud-utils/src/lib/share-component/application-setting/application-setting.component';
 
 const routes: Routes = [
   {
@@ -25,10 +26,6 @@ const routes: Routes = [
   {
     path: 'login',
     component: LoginComponent
-  },
-  {
-    path: 'register',
-    component: RegisterComponent
   },
 
   // iframe
@@ -57,6 +54,8 @@ const routes: Routes = [
   // TOOL
   {
     path: 'venkins',
+    canActivate: [AuthGuard],
+    canActivateChild: [AuthGuard],
     children: [
       {
         path: 'home',
@@ -72,6 +71,8 @@ const routes: Routes = [
   // Authentication
   {
     path: 'authentication',
+    canActivate: [AuthGuard],
+    canActivateChild: [AuthGuard],
     children: [
       {
         path: 'route',
@@ -95,10 +96,24 @@ const routes: Routes = [
   // VGame
   {
     path: 'vgame',
+    canActivate: [AuthGuard],
+    canActivateChild: [AuthGuard],
     children: [
       {
         path: 'question',
         component: QuestionComponent
+      }
+    ]
+  },
+
+  //Setting
+
+  {
+    path: 'setting',
+    children: [
+      {
+        path: 'application-setting',
+        component: ApplicationSettingComponent
       }
     ]
   },

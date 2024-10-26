@@ -1,10 +1,8 @@
 import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
-import { HeaderComponent } from './header/header.component';
 import { HomeComponent } from './home/home.component';
 import { SideDrawerComponent } from './side-drawer/side-drawer.component';
-import { RegisterComponent } from './register/register.component';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestSenderComponent } from './request-sender/request-sender.component';
 import { RouteComponent } from './Authentication/route/route.component';
@@ -24,10 +22,8 @@ export const defaultTextColor = 'white';
 
 const LIST = [
   AppComponent,
-  HeaderComponent,
   HomeComponent,
   SideDrawerComponent,
-  RegisterComponent,
   RequestSenderComponent,
   RouteComponent,
   RoutePanelComponent,
