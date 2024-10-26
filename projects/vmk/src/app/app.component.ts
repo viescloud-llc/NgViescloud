@@ -5,7 +5,7 @@ import { KeyCaptureService } from 'projects/viescloud-utils/src/lib/service/KeyC
 import { OpenIdService } from 'projects/viescloud-utils/src/lib/service/OpenId.service';
 import { SettingService } from 'projects/viescloud-utils/src/lib/service/Setting.service';
 import { QuickSideDrawerMenu } from 'projects/viescloud-utils/src/lib/share-component/quick-side-drawer-menu/quick-side-drawer-menu.component';
-import { ViescloudApplication } from 'projects/viescloud-utils/src/lib/share-component/ViescloudApplication/ViescloudApplication.component';
+import { ViescloudApplication } from 'projects/viescloud-utils/src/lib/directive/ViescloudApplication.directive';
 import { ProductMenuComponent } from './marketing/productList/product/product-menu/product-menu.component';
 
 @Component({
@@ -14,7 +14,10 @@ import { ProductMenuComponent } from './marketing/productList/product/product-me
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent extends ViescloudApplication {
-  title = 'vmk';
+
+  override getTitle(): string {
+    return 'vmk';
+  }
 
   menu: QuickSideDrawerMenu[] = [
     {
@@ -76,15 +79,4 @@ export class AppComponent extends ViescloudApplication {
       ]
     }
   ]
-
-  constructor(
-    override matDialog: MatDialog,
-    override keyCaptureService: KeyCaptureService,
-    override settingService: SettingService,
-    private authenticatorService: AuthenticatorService,
-    private openIdService: OpenIdService
-  ) {
-    super(matDialog, keyCaptureService, settingService);
-    settingService.init(this.title, authenticatorService);
-  }
 }

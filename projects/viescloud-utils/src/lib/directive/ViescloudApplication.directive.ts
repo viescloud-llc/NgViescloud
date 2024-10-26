@@ -1,26 +1,31 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Directive, HostListener, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { KeyCaptureService } from '../../service/KeyCapture.service';
-import { SettingService } from '../../service/Setting.service';
+import { KeyCaptureService } from '../service/KeyCapture.service';
+import { SettingService } from '../service/Setting.service';
+import { AuthenticatorService } from '../service/Authenticator.service';
+import { OpenIdService } from '../service/OpenId.service';
 
-@Component({
-  selector: 'app-ViescloudApplication',
-  templateUrl: './ViescloudApplication.component.html',
-  styleUrls: ['./ViescloudApplication.component.scss']
+@Directive({
+  selector: '[appViescloudApplication]'
 })
-export class ViescloudApplication implements OnInit {
+export abstract class ViescloudApplication implements OnInit {
 
   constructor(
-    protected matDialog: MatDialog,
-    protected keyCaptureService: KeyCaptureService,
+    protected authenticatorService: AuthenticatorService,
+    protected openIdService: OpenIdService,
     protected settingService: SettingService,
+    protected keyCaptureService: KeyCaptureService,
+    protected matDialog: MatDialog
   ) { 
     this.listenToDialogEvents();
+    settingService.init(this.getTitle(), authenticatorService);
   }
 
   ngOnInit(): void {
     
   }
+
+  abstract getTitle(): string;
 
   // Subscribe to MatDialog open and close events
   listenToDialogEvents() {

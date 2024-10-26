@@ -6,7 +6,7 @@ import { KeyCaptureService } from 'projects/viescloud-utils/src/lib/service/KeyC
 import { OpenIdService } from 'projects/viescloud-utils/src/lib/service/OpenId.service';
 import { SettingService } from 'projects/viescloud-utils/src/lib/service/Setting.service';
 import { QuickSideDrawerMenu } from 'projects/viescloud-utils/src/lib/share-component/quick-side-drawer-menu/quick-side-drawer-menu.component';
-import { ViescloudApplication } from 'projects/viescloud-utils/src/lib/share-component/ViescloudApplication/ViescloudApplication.component';
+import { ViescloudApplication } from 'projects/viescloud-utils/src/lib/directive/ViescloudApplication.directive';
 
 @Component({
   selector: 'app-root',
@@ -14,6 +14,10 @@ import { ViescloudApplication } from 'projects/viescloud-utils/src/lib/share-com
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent extends ViescloudApplication {
+
+  override getTitle(): string {
+    return 'Wrap';
+  }
 
   menu: QuickSideDrawerMenu[] = [
     {
@@ -65,16 +69,4 @@ export class AppComponent extends ViescloudApplication {
       ]
     }
   ]
-
-  constructor(
-    public router: Router, 
-    private authenticatorService: AuthenticatorService,
-    private openIdService: OpenIdService,
-    override settingService: SettingService,
-    override keyCaptureService: KeyCaptureService,
-    override matDialog: MatDialog
-  ) { 
-    super(matDialog, keyCaptureService, settingService);
-    settingService.init('wrap', authenticatorService);
-  }
 }

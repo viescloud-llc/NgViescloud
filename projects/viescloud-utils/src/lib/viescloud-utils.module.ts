@@ -5,8 +5,6 @@ import { NgMaterialModule } from './module/ng-material.module';
 import { NgComponentModule } from './module/ng-component.module';
 import { NgDialogModule } from './module/ng-dialog.module ';
 
-
-
 @NgModule({
   declarations: [
     ViescloudUtilsComponent
