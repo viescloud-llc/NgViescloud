@@ -5,12 +5,14 @@ import { environment } from 'projects/environments/environment.prod';
 import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
 import { InputDialog } from 'projects/viescloud-utils/src/lib/dialog/input-dialog/input-dialog.component';
 import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
+import { PopupType } from 'projects/viescloud-utils/src/lib/model/Popup.model';
 import { WrapWorkspace } from 'projects/viescloud-utils/src/lib/model/Wrap.model';
 import { AuthenticatorService } from 'projects/viescloud-utils/src/lib/service/Authenticator.service';
 import { S3StorageServiceV1 } from 'projects/viescloud-utils/src/lib/service/ObjectStorageManager.service';
 import { SettingService } from 'projects/viescloud-utils/src/lib/service/Setting.service';
 import { UtilsService } from 'projects/viescloud-utils/src/lib/service/Utils.service';
 import { WrapService } from 'projects/viescloud-utils/src/lib/service/Wrap.service';
+import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 
 export enum WrapMode {
   VIEW = 'view',
@@ -42,12 +44,11 @@ export class WrapWorkspaceComponent implements OnInit, OnDestroy {
 
   constructor(
     public wrapService: WrapService,
-    private matDialog: MatDialog,
     public authenticatorService: AuthenticatorService,
     private settingService: SettingService,
     private utilService: UtilsService,
     private s3StorageService: S3StorageServiceV1,
-    private snackBar: MatSnackBar
+    private dialogUtils: DialogUtils
   ) { }
   ngOnDestroy(): void {
     this.loadBackgroundImage('');
@@ -84,7 +85,7 @@ export class WrapWorkspaceComponent implements OnInit, OnDestroy {
   }
 
   removeThisWorkspace() {
-    let dialog = this.matDialog.open(ConfirmDialog, {
+    let dialog = this.dialogUtils.matDialog.open(ConfirmDialog, {
       data: {
         message: 'Are you sure you want to delete this workspace?',
         title: 'Delete workspace',
@@ -137,7 +138,7 @@ export class WrapWorkspaceComponent implements OnInit, OnDestroy {
   }
 
   saveLocally() {
-    let dialog = this.matDialog.open(ConfirmDialog, {data: {title: 'Save locally?', message: 'Are you sure you want to save this workspace locally?\nThis will only save to your browser storage', yes: 'save', no: 'cancel'}, width: '100%'});
+    let dialog = this.dialogUtils.matDialog.open(ConfirmDialog, {data: {title: 'Save locally?', message: 'Are you sure you want to save this workspace locally?\nThis will only save to your browser storage', yes: 'save', no: 'cancel'}, width: '100%'});
   
     dialog.afterClosed().subscribe({
       next: res => {
@@ -157,7 +158,7 @@ export class WrapWorkspaceComponent implements OnInit, OnDestroy {
     this.mode = mode;
 
     if(mode === WrapMode.VIEW && this.wrapService.isValueChange()) {
-      let dialog = this.matDialog.open(ConfirmDialog, {data: {title: 'Save?', message: 'Are you sure you want to change mode to view?\nNote: It will not be saved to server. Therefore, it will be lost if you close the window.', yes: 'OK', no: 'Cancel'}, width: '100%'});
+      let dialog = this.dialogUtils.matDialog.open(ConfirmDialog, {data: {title: 'Save?', message: 'Are you sure you want to change mode to view?\nNote: It will not be saved to server. Therefore, it will be lost if you close the window.', yes: 'OK', no: 'Cancel'}, width: '100%'});
   
       dialog.afterClosed().subscribe({
         next: res => {
@@ -175,7 +176,7 @@ export class WrapWorkspaceComponent implements OnInit, OnDestroy {
   }
 
   changeBackgroundUrl() {
-    let dialog = this.matDialog.open(InputDialog, {
+    let dialog = this.dialogUtils.matDialog.open(InputDialog, {
       data: {
         title: 'Change Background Image URL',
         label: 'Background Image URL',
@@ -201,7 +202,7 @@ export class WrapWorkspaceComponent implements OnInit, OnDestroy {
 
     if(vfile) {
       vfile.name = this.DEFAULT_WRAP_PREFIX + this.currentWorkspace + '.' + vfile.extension;
-      let url = await this.s3StorageService.putOrPostFileAndGetViescloudUrl(vfile, false, this.matDialog);
+      let url = await this.s3StorageService.putOrPostFileAndGetViescloudUrl(vfile, false, PopupType.LOADING_DIALOG);
       this.wrapService.wrapWorkspaces[this.currentWorkSpaceIndex].backgroundPicture = url;
       this.s3StorageService.objectUrlCache.delete(url);
       this.loadBackgroundImage(url);
@@ -210,7 +211,7 @@ export class WrapWorkspaceComponent implements OnInit, OnDestroy {
 
   loadBackgroundImage(url: string) {
     if(url.includes(environment.gateway_api)) {
-      this.s3StorageService.generateObjectUrlFromViescloudUrl(url, undefined, this.snackBar).then(res => {
+      this.s3StorageService.generateObjectUrlFromViescloudUrl(url, PopupType.DYNAMIC_MESSAGE_POPUP).then(res => {
         this.settingService.backgroundImageUrl = res;
       })
     } 
@@ -220,7 +221,7 @@ export class WrapWorkspaceComponent implements OnInit, OnDestroy {
   }
 
   changeWorkspaceName() {
-    let dialog = this.matDialog.open(InputDialog, {
+    let dialog = this.dialogUtils.matDialog.open(InputDialog, {
       data: {
         title: 'Change Workspace Name',
         label: 'Workspace Name',
@@ -243,7 +244,7 @@ export class WrapWorkspaceComponent implements OnInit, OnDestroy {
   }
 
   reSync() {
-    let dialog = this.matDialog.open(ConfirmDialog, {
+    let dialog = this.dialogUtils.matDialog.open(ConfirmDialog, {
       data: {
         message: 'Are you sure you want to re-sync?\nNote: All your changes locally will be lost.',
         title: 'Re-sync',
@@ -263,7 +264,7 @@ export class WrapWorkspaceComponent implements OnInit, OnDestroy {
   }
 
   changeWorkspaceCorsProxyUrl() {
-    let dialog = this.matDialog.open(InputDialog, {
+    let dialog = this.dialogUtils.matDialog.open(InputDialog, {
       data: {
         title: 'Change Workspace CORS Proxy URL',
         label: 'CORS Proxy URL',
