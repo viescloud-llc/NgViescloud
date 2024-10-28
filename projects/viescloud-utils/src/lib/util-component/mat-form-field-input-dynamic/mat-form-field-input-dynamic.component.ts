@@ -79,15 +79,26 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
   DynamicMatInputType = DynamicMatInputType;
   inputType: DynamicMatInputType = DynamicMatInputType.UNKOWN;
 
+  initBlankObjectProvided: boolean = true;
+
   override ngOnInit() {
     super.ngOnInit();
-    if(!this.blankObject)
-      this.blankObject = this.value;
+
+    if(!this.blankObject) {
+      this.blankObject = structuredClone(this.value);
+      this.initBlankObjectProvided = false;
+    }
+
     this.init();
   }
 
   override ngOnChanges(changes: SimpleChanges): void {
     super.ngOnChanges(changes);
+
+    if(changes['value'] && !this.initBlankObjectProvided) {
+      this.blankObject = structuredClone(this.value);
+    }
+
     this.init();
   }
 
