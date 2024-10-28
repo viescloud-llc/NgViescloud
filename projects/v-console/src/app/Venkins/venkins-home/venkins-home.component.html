@@ -9,29 +9,6 @@
   </li>
   <hr>
   <li><h2 class="text-center">Possible replacement variable</h2></li>
-  <!-- <li>
-    <app-mat-form-field-input
-    label="Path"
-    placeholder="Give jenkins path here"
-    [(value)]="jobRequest.path"
-    styleWidth="100%"
-    ></app-mat-form-field-input>
-  </li>
-  <li>
-    <app-mat-form-field-input
-    label="Job Name"
-    placeholder="Give jenkins job a name here"
-    [(value)]="jobRequest.jobName"
-    styleWidth="100%"
-    ></app-mat-form-field-input>
-  </li>
-  <li *ngFor="let model of buildModelTemplate; let i = index; trackBy: trackByIndex;">
-    <app-mat-form-field-input
-    [label]="model[0]"
-    (valueChange)="model[1] = $event"
-    styleWidth="100%"
-    ></app-mat-form-field-input>
-  </li> -->
   <li>
     <app-mat-form-field-input-dynamic
     [(value)]="jobRequest"
