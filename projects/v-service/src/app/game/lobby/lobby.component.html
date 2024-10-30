@@ -7,8 +7,8 @@
     <li *ngIf="LobbyRows.length > 0">
       <app-mat-table
       [matRows]="LobbyRows"
-      [displayFilter]="true"
-      [displayPagination]="true"
+      [showFilter]="true"
+      [showPagination]="true"
       (onEditRow)="enterLobby($event)"
     ></app-mat-table>
     </li>

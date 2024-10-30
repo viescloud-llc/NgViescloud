@@ -13,6 +13,7 @@ import { OpenIdComponent } from 'projects/viescloud-utils/src/lib/share-componen
 import { LoginComponent } from 'projects/viescloud-utils/src/lib/share-component/login/login.component';
 import { AuthGuard } from 'projects/viescloud-utils/src/lib/guards/auth.guard';
 import { ApplicationSettingComponent } from 'projects/viescloud-utils/src/lib/share-component/application-setting/application-setting.component';
+import { DnsManagerComponent } from './dns-manager/dns-manager.component';
 
 const routes: Routes = [
   {
@@ -66,6 +67,13 @@ const routes: Routes = [
         component: ConfigMapComponent
       }
     ]
+  },
+
+  {
+    path: 'dns-manager',
+    component: DnsManagerComponent,
+    canActivate: [AuthGuard],
+    canActivateChild: [AuthGuard]
   },
 
   // Authentication

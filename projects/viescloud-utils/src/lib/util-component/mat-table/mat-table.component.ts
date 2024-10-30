@@ -23,10 +23,10 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges {
   pagination: number[] = [5, 10, 25, 100];
 
   @Input()
-  displayFilter: boolean = false;
+  showFilter: boolean = false;
 
   @Input()
-  displayPagination: boolean = false;
+  showPagination: boolean = false;
 
   @Output()
   onEditRow: EventEmitter<T> = new EventEmitter();

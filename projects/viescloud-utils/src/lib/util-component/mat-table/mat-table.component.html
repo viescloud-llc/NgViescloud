@@ -1,4 +1,4 @@
-<ng-container *ngIf="displayFilter">
+<ng-container *ngIf="showFilter">
     <mat-form-field style="width: 100%;">
         <mat-label>Filter</mat-label>
         <input matInput (keyup)="applyFilter($event)" placeholder="Ex. username" [(ngModel)]="filter">
@@ -33,6 +33,6 @@
         </tr>
     </table>
 </ng-container>
-<ng-container *ngIf="displayPagination">
+<ng-container *ngIf="showPagination">
     <mat-paginator  [pageSizeOptions]="pagination" aria-label="Select page of users"></mat-paginator>
 </ng-container>

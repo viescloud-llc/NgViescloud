@@ -58,6 +58,16 @@ export class AppComponent extends ViescloudApplication {
       ]
     },
     {
+      title: 'DNS',
+      hideConditional: () => !this.authenticatorService.isLoginB,
+      children: [
+        {
+          title: 'Manager',
+          routerLink: '/dns-manager',
+        }
+      ]
+    },
+    {
       title: 'Authentication',
       hideConditional: () => !this.authenticatorService.isLoginB,
       children: [

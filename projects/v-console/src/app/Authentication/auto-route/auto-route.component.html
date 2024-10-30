@@ -29,7 +29,7 @@
           <button mat-raised-button color="primary" style="width: fit-content;" (click)="editGlobalRule(swagger.prefix)">Change {{swagger.prefix}} global rule</button>
           <app-mat-table
           [matRows]="processPath(swagger.paths)"
-          [displayFilter]="true"
+          [showFilter]="true"
           [blankObject]="blankPath"
           (onEditRow)="editRuleFromSwaggerPath($event)"
           ></app-mat-table>

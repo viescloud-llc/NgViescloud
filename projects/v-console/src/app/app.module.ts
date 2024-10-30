@@ -17,6 +17,7 @@ import { RouteDialog } from './Authentication/auto-route/route-dialog/route-dial
 import { AppRoutingModule } from './app-routing.module';
 import { ViescloudUtilsModule } from 'projects/viescloud-utils/src/public-api';
 import { AuthInterceptor } from 'projects/viescloud-utils/src/lib/guards/auth.interceptor';
+import { DnsManagerComponent } from './dns-manager/dns-manager.component';
 
 export const defaultTextColor = 'white';
 
@@ -33,13 +34,15 @@ const LIST = [
   VenkinsHomeComponent,
   ConfigMapComponent,
   AutoRouteComponent,
-  RouteDialog
+  RouteDialog,
+  DnsManagerComponent
 ]
 
 @NgModule({
-  declarations: [
-    ... LIST
-  ],
+  declarations: [	
+    ... LIST,
+      DnsManagerComponent
+   ],
   imports: [
     AppRoutingModule,
     ViescloudUtilsModule
