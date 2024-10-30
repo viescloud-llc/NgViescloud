@@ -1,0 +1,39 @@
+<h1 mat-dialog-title>Dns Record</h1>
+
+<mat-tab-group>
+  <mat-tab label="Details">
+    <ul class="margin-center">
+      <li>
+        <app-mat-form-field-input-list
+        label="Viescloud domain names"
+        [(value)]="dnsRecord.publicNginxRecord.domain_names"
+        [showSizeInput]="false"
+        [blankObject]="blankDnsRecord.publicNginxRecord.domain_names"
+        styleWidth="50%"
+        ></app-mat-form-field-input-list>
+
+        <app-mat-form-field-input-list
+        label="Vieslocal domain names"
+        [(value)]="dnsRecord.localNginxRecord.domain_names"
+        [showSizeInput]="false"
+        styleWidth="50%"
+        [blankObject]="blankDnsRecord.publicNginxRecord.domain_names"
+        ></app-mat-form-field-input-list>
+      </li>
+    </ul>
+  </mat-tab>
+  <mat-tab label="Custom Location">
+
+  </mat-tab>
+  <mat-tab label="SSL">
+
+  </mat-tab>
+  <mat-tab label="Advanced">
+
+  </mat-tab>
+</mat-tab-group>
+
+<div mat-dialog-actions>
+  <button mat-raised-button color="primary" [mat-dialog-close]="dnsRecord" [disabled]="!isValueChange()">save</button>
+  <button mat-raised-button color="warn" mat-dialog-close>cancel</button>
+</div>

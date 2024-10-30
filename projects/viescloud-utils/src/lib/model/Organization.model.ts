@@ -1,4 +1,4 @@
-import { MatColumn, addGetPrototype, MatInputDisable, MatInputHide, MatInputRequire, MatInputSetting, MatTableHide, MatTableIndex, MatTableSetting, MatInputDisableAll } from "./Mat.model";
+import { MatColumn, addGetPrototype, MatInputDisable, MatInputHide, MatInputRequire, MatInputSetting, MatTableHide, MatTableIndex, MatTableDisplayLabel, MatInputDisableAll } from "./Mat.model";
 
 export class Organization {
     id?:                  string;
@@ -109,14 +109,14 @@ export interface SMTP {
 
 export class User {
     @MatInputDisable(true)
-    @MatTableSetting('User ID')
+    @MatTableDisplayLabel('User ID')
     id?:          number;
 
     @MatInputHide(true)
-    @MatTableSetting('Name', (user: User) => user.userProfile?.alias ?? user.userProfile?.firstName + ' ' + user.userProfile?.lastName)
+    @MatTableDisplayLabel('Name', (user: User) => user.userProfile?.alias ?? user.userProfile?.firstName + ' ' + user.userProfile?.lastName)
     userProfile?: UserProfile;
 
-    @MatTableSetting('Roles', (user: User) => user.defineRole?.reduce((a, c) => (a? a + ', ' : a) + c.title, ''))
+    @MatTableDisplayLabel('Roles', (user: User) => user.defineRole?.reduce((a, c) => (a? a + ', ' : a) + c.title, ''))
     defineRole?:  Role[];
 
     constructor(id?: number, userProfile?: UserProfile, defineRole?: Role[]) {

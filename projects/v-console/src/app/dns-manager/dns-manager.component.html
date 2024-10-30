@@ -4,6 +4,10 @@
     <app-mat-table
     [showFilter]="true"
     [showPagination]="true"
+    [showMatTooltip]="true"
+    [matRows]="dnsRecords"
+    [blankObject]="blankDnsRecord"
+    (onEditRow)="edit($event)"
     ></app-mat-table>
   </li>
 </ul>

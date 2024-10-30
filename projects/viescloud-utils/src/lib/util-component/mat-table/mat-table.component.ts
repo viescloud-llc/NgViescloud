@@ -43,6 +43,9 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges {
   @Input()
   blankObject?: any;
 
+  @Input()
+  showMatTooltip: boolean = false;
+
   constructor() { }
 
   ngOnInit() {

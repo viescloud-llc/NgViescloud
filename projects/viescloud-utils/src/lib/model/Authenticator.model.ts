@@ -1,4 +1,4 @@
-import { MatColumn, MatInputDisable, MatInputHide, MatTableHide, MatTableSetting, DateTime } from "./Mat.model";
+import { MatColumn, MatInputDisable, MatInputHide, MatTableHide, MatTableDisplayLabel, DateTime } from "./Mat.model";
 
 export enum UserPermission {
     READ = "READ",
@@ -170,7 +170,7 @@ export interface Swaggers {
 }
 
 export class SwaggerPath {
-    @MatTableSetting("Absolute Path (with Regrex)")
+    @MatTableDisplayLabel("Absolute Path (with Regrex)")
     path?: string;
 
     @MatTableHide(true)

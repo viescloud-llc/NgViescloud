@@ -15,7 +15,7 @@
             <th mat-header-cell *matHeaderCellDef mat-sort-header [sortActionDescription]="'Sort by ' + column">
             {{getLabel(column)}}
             </th>
-            <td mat-cell *matCellDef="let element"> 
+            <td mat-cell *matCellDef="let element" [matTooltip]="showMatTooltip ? getValue(element, column) : ''"> 
               <ng-container *ngIf="filterDisplay">
                 {{getValue(element, column | filterName: filterDisplay)}}
               </ng-container>

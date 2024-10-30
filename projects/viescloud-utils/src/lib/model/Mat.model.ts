@@ -458,8 +458,8 @@ export const MatTableHide = (hide?: boolean) => {
  * @param displayValueFn this function should be (obj: T) => string
  * @returns 
  */
-export const MatTableSetting = (label?: string, displayValueFn?: Function) => {
-    return function MatTableSetting(object: any, key: any) {
+export const MatTableDisplayLabel = (label?: string, displayValueFn?: Function) => {
+    return function MatTableDisplayLabel(object: any, key: any) {
         addValue(object, key, MatTableSettingType.DISPLAY_LABEL.toString(), label, null);
         addValue(object, key, MatTableSettingType.DISPLAY_VALUE_FN.toString(), displayValueFn, null);
     }
