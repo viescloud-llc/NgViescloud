@@ -110,12 +110,9 @@ export class NginxLocation {
 
 export class NginxCertificate {
     id:            number = 0;
-    created_on:    Date = new Date();
-    modified_on:   Date = new Date();
     owner_user_id: number = 0;
     provider:      string = '';
     nice_name:     string = '';
     domain_names:  string[] = [''] as string[];
-    expires_on:    Date = new Date();
     meta:          NginxMeta = new NginxMeta();
 }

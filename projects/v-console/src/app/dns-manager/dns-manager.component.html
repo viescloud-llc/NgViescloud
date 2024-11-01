@@ -24,6 +24,8 @@
     <li>
       <app-dns-record
       [dnsRecord]="selectedDnsRecord!"
+      [viescloudNginxCertificates]="viescloudNginxCertificates"
+      [vieslocalNginxCertificates]="vieslocalNginxCertificates"
       (onEdit)="edit($event)"
       ></app-dns-record>
     </li>

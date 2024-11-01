@@ -24,7 +24,7 @@ export class DnsManagerService extends ViesService {
     }
 
     public getAllCertificate(type: string): Observable<NginxCertificate[]> {
-        return this.httpClient.get<NginxCertificate[]>(`${this.getPrefixUri()}/nginx/certificates/${type}`);
+        return this.httpClient.get<NginxCertificate[]>(`${this.getPrefixUri()}/nginx/certificates?type=${type}`);
     }
 
     public putDnsRecord(record: DnsRecord): Observable<void> {

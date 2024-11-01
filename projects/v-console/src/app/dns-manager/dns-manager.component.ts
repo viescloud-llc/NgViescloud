@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { DnsRecord } from 'projects/viescloud-utils/src/lib/model/DnsManager.model';
+import { DnsRecord, NginxCertificate } from 'projects/viescloud-utils/src/lib/model/DnsManager.model';
 import { DnsManagerService } from 'projects/viescloud-utils/src/lib/service/DnsManager.service';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
@@ -19,6 +19,9 @@ export class DnsManagerComponent implements OnInit {
 
   selectedDnsRecord?: DnsRecord;
 
+  viescloudNginxCertificates: NginxCertificate[] = [];
+  vieslocalNginxCertificates: NginxCertificate[] = [];
+
   constructor(
     private dnsManagerService: DnsManagerService,
     private rxjsUtils: RxJSUtils,
@@ -29,6 +32,27 @@ export class DnsManagerComponent implements OnInit {
     this.dnsManagerService.getAllDnsRecords().pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
       next: res => {
         this.populateDnsRecords(res);
+      },
+      error: err => {
+        this.dialogUtils.openErrorMessage("Error", err.message)
+      }
+    })
+
+    this.dnsManagerService.getAllCertificate(this.VIESCLOUD_DNS).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+      next: res => {
+        this.viescloudNginxCertificates = res;
+      },
+      error: err => {
+        this.dialogUtils.openErrorMessage("Error", err.message)
+      }
+    })
+
+    this.dnsManagerService.getAllCertificate(this.VIESLOCAL_DNS).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+      next: res => {
+        this.vieslocalNginxCertificates = res;
+      },
+      error: err => {
+        this.dialogUtils.openErrorMessage("Error", err.message)
       }
     })
   }
