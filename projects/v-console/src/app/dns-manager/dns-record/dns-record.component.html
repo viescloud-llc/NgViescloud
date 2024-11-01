@@ -1,4 +1,4 @@
-<mat-tab-group style="width: 100%;" *ngIf="dnsRecord">
+<mat-tab-group style="width: 100%;" *ngIf="dnsRecord" appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
   <mat-tab label="Details">
     <ul class="margin-center">
       <li class="flex-row-container">
@@ -227,11 +227,12 @@
         <app-mat-form-field-input-option
         *ngFor="let item of CertificateOptions; let i = index; trackBy: trackByIndex;"
         [label]="getNameByIndex(i) + ' SSL Certificate'"
-        [value]="nginxRecords[i].certificate_id"
+        [(value)]="nginxRecords[i].certificate_id"
         [options]="item"
         noneLabel=""
         styleWidth="100%"
         style="width: 48%;"
+        [required]="nginxRecords[i].domain_names.length > 0"
         ></app-mat-form-field-input-option>
       </li>
       <li>
@@ -356,6 +357,6 @@
 </mat-tab-group>
 
 <div class="flex-row-container">
-  <button mat-raised-button color="primary" [disabled]="!isValueChange()" (click)="save()">Save</button>
+  <button mat-raised-button color="primary" [disabled]="!isValueChange() || !validForm" (click)="save()">Save</button>
   <button mat-raised-button color="warn" (click)="onEdit.emit(undefined)">Cancel</button>
 </div>

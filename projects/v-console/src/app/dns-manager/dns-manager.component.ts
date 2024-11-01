@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { DnsRecord, NginxCertificate } from 'projects/viescloud-utils/src/lib/model/DnsManager.model';
 import { DnsManagerService } from 'projects/viescloud-utils/src/lib/service/DnsManager.service';
+import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 
@@ -15,12 +16,15 @@ export class DnsManagerComponent implements OnInit {
   private VIESLOCAL_DNS = 'vieslocal.com';
 
   dnsRecords: DnsRecord[] = [];
+  allDomainNames: string[] = [];
   blankDnsRecord: DnsRecord = new DnsRecord();
 
   selectedDnsRecord?: DnsRecord;
 
   viescloudNginxCertificates: NginxCertificate[] = [];
   vieslocalNginxCertificates: NginxCertificate[] = [];
+
+  newRecord = false;
 
   constructor(
     private dnsManagerService: DnsManagerService,
@@ -58,6 +62,7 @@ export class DnsManagerComponent implements OnInit {
   }
 
   populateDnsRecords(dnsRecords: DnsRecord[]) {
+    this.allDomainNames = [];
     this.dnsRecords = dnsRecords;
     for(let e of this.dnsRecords) {
       let dns = e.cloudFlareDns ?? [];
@@ -75,12 +80,48 @@ export class DnsManagerComponent implements OnInit {
       }
 
       e.cloudFlareDns = [...dns];
+      e.publicNginxRecord?.domain_names.forEach(d => this.allDomainNames.push(d));
+      e.localNginxRecord?.domain_names.forEach(d => this.allDomainNames.push(d));
     }
   }
 
-  edit(dnsRecord?: DnsRecord) {
-    console.log(dnsRecord);
-    this.selectedDnsRecord = dnsRecord;
+  addNewRecord() {
+    let record = DataUtils.purgeArray(new DnsRecord());
+    this.selectedDnsRecord = record;
+    this.newRecord = true;
+  }
+
+  editRecord(dnsRecord?: DnsRecord) {
+    if(!dnsRecord) {
+      this.selectedDnsRecord = undefined;
+      return;
+    }
+
+    let count = this.newRecord ? 0 : 1;
+
+    if(DataUtils.hasValueWithMoreCountBy(this.dnsRecords, e => e.uri, dnsRecord?.uri, count)) {
+      this.dialogUtils.openErrorMessage("Error", "URI already exists");
+      return;
+    }
+
+    if(DataUtils.hasValueCompareWithMoreCountBy(this.allDomainNames, e => e, e => dnsRecord.localNginxRecord?.domain_names.includes(e) ?? false, count)) {
+      this.dialogUtils.openErrorMessage("Error", "Domain name already exists");
+      return;
+    }
+
+    if(DataUtils.hasValueCompareWithMoreCountBy(this.allDomainNames, e => e, e => dnsRecord.publicNginxRecord?.domain_names.includes(e) ?? false, count)) {
+      this.dialogUtils.openErrorMessage("Error", "Domain name already exists");
+      return;
+    }
+
+    if(dnsRecord.publicNginxRecord!.domain_names.length === 0)
+      dnsRecord.publicNginxRecord = undefined;
+
+    if(dnsRecord.localNginxRecord!.domain_names.length === 0)
+      dnsRecord.localNginxRecord = undefined;
+
+    this.newRecord = false;
+    this.selectedDnsRecord = undefined;
   }
 
   clearCache() {

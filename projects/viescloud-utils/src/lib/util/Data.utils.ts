@@ -8,7 +8,7 @@ export class DataUtils {
     }
 
     static isSimpleEqual(obj1: any, obj2: any) {
-        return JSON.stringify(obj1) === JSON.stringify(obj2);    
+        return JSON.stringify(obj1) === JSON.stringify(obj2);
     }
 
     static isNotEqual(obj1: any, obj2: any) {
@@ -176,6 +176,90 @@ export class DataUtils {
         return false;
     }
 
+    static areAllObjectsEqual<T>(objects: T[]): boolean {
+        if (objects.length <= 1) {
+            return true;
+        }
+        const firstObj = objects[0];
+        return objects.every(obj => DataUtils.isEqual(firstObj, obj));
+    }
+
+    static areAllObjectsEqualWith<T>(objects: T[], blankValue: T): boolean {
+        if (objects.length <= 1) {
+            return true;
+        }
+        const firstObj = objects[0];
+        return objects.every(obj => DataUtils.isEqualWith(firstObj, obj, blankValue));
+    }
+
+    static areAllObjectsEqualBy<T>(objects: T[], getCompareObj: (obj: T) => any): boolean {
+        if (objects.length <= 1) {
+            return true;
+        }
+
+        const firstObj = getCompareObj(objects[0]);
+        return objects.every(obj => DataUtils.isEqual(firstObj, getCompareObj(obj)));
+    }
+
+    static hasValueWithExactCountBy<T>(objects: T[], getCompareObj: (obj: T) => any, value: any, count: number): boolean {
+        const occurrences = DataUtils.getOccurrences(objects, getCompareObj, (obj: any) => DataUtils.isEqual(obj, value));
+        return occurrences === count;
+    }
+
+    static hasValueWithLessCountBy<T>(objects: T[], getCompareObj: (obj: T) => any, value: any, count: number): boolean {
+        const occurrences = DataUtils.getOccurrences(objects, getCompareObj, (obj: any) => DataUtils.isEqual(obj, value));
+        return occurrences < count;
+    }
+
+    static hasValueWithLessOrEqualCountBy<T>(objects: T[], getCompareObj: (obj: T) => any, value: any, count: number): boolean {
+        const occurrences = DataUtils.getOccurrences(objects, getCompareObj, (obj: any) => DataUtils.isEqual(obj, value));
+        return occurrences <= count;
+    }
+
+    static hasValueWithMoreCountBy<T>(objects: T[], getCompareObj: (obj: T) => any, value: any, count: number): boolean {
+        const occurrences = DataUtils.getOccurrences(objects, getCompareObj, (obj: any) => DataUtils.isEqual(obj, value));
+        return occurrences > count;
+    }
+
+    static hasValueWithMoreOrEqualCountBy<T>(objects: T[], getCompareObj: (obj: T) => any, value: any, count: number): boolean {
+        const occurrences = DataUtils.getOccurrences(objects, getCompareObj, (obj: any) => DataUtils.isEqual(obj, value));
+        return occurrences >= count;
+    }
+
+    static hasValueCompareWithExactCountBy<T, U>(objects: T[], getCompareObj: (obj: T) => U, compareFn: (obj: U) => boolean, count: number): boolean {
+        const occurrences = DataUtils.getOccurrences(objects, getCompareObj, compareFn);
+        return occurrences === count;
+    }
+
+    static hasValueCompareWithLessCountBy<T, U>(objects: T[], getCompareObj: (obj: T) => U, compareFn: (obj: U) => boolean, count: number): boolean {
+        const occurrences = DataUtils.getOccurrences(objects, getCompareObj, (obj: any) => DataUtils.isEqual(obj, compareFn));
+        return occurrences < count;
+    }
+
+    static hasValueCompareWithLessOrEqualCountBy<T, U>(objects: T[], getCompareObj: (obj: T) => U, compareFn: (obj: U) => boolean, count: number): boolean {
+        const occurrences = DataUtils.getOccurrences(objects, getCompareObj, (obj: any) => DataUtils.isEqual(obj, compareFn));
+        return occurrences <= count;
+    }
+
+    static hasValueCompareWithMoreCountBy<T, U>(objects: T[], getCompareObj: (obj: T) => U, compareFn: (obj: U) => boolean, count: number): boolean {
+        const occurrences = DataUtils.getOccurrences(objects, getCompareObj, (obj: any) => DataUtils.isEqual(obj, compareFn));
+        return occurrences > count;
+    }
+
+    static hasValueCompareWithMoreOrEqualCountBy<T, U>(objects: T[], getCompareObj: (obj: T) => U, compareFn: (obj: U) => boolean, count: number): boolean {
+        const occurrences = DataUtils.getOccurrences(objects, getCompareObj, (obj: any) => DataUtils.isEqual(obj, compareFn));
+        return occurrences >= count;
+    }
+
+    static getOccurrences<T, U>(objects: T[], getCompareObj: (obj: T) => U, compareFn: (obj: U) => boolean): number {
+        return objects.reduce((acc, obj) => {
+            if (compareFn(getCompareObj(obj))) {
+                return acc + 1;
+            }
+            return acc;
+        }, 0);
+    }
+
     static isEnum(obj: any): boolean {
         return typeof obj === "object" && Object.keys(obj).length > 0 && Object.values(obj).every(val => {
             return typeof val === 'string' || typeof val === 'number';
@@ -223,4 +307,6 @@ export class DataUtils {
         // Return the original object if it's neither an array nor an object
         return obj;
     }
+
+
 }

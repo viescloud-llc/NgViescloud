@@ -70,7 +70,7 @@ export class DnsRecordComponent extends FixChangeDetection implements OnInit {
   }
 
   //other
-
+  validForm = false;
   ForwardScheme = ForwardScheme;
 
   constructor() {
@@ -84,17 +84,10 @@ export class DnsRecordComponent extends FixChangeDetection implements OnInit {
   ngOnInit() {
     this.dnsRecord = structuredClone(this.dnsRecord);
     
-    if(!this.dnsRecord.localNginxRecord)
-      this.dnsRecord.localNginxRecord = DataUtils.purgeArray(new NginxRecord());
-
-    if(!this.dnsRecord.publicNginxRecord)
-      this.dnsRecord.publicNginxRecord = DataUtils.purgeArray(new NginxRecord());
+    this.initValue();
 
     //Note: array push must be in this specific order
-    this.nginxRecords.push(this.dnsRecord.publicNginxRecord);
-    this.nginxRecords.push(this.dnsRecord.localNginxRecord);
-    this.CertificateOptions.push(this.getCertificateOptions(this.viescloudNginxCertificates));
-    this.CertificateOptions.push(this.getCertificateOptions(this.vieslocalNginxCertificates));
+    this.initReference();
 
     if(this.dnsRecord.uri) {
       let url = new URL(this.dnsRecord.uri);
@@ -103,7 +96,55 @@ export class DnsRecordComponent extends FixChangeDetection implements OnInit {
       this.uriDetails.port = url.port ? parseInt(url.port) : this.uriDetails.port;
     }
 
+    this.initDuplicateValue();
+
     this.dnsRecordCopy = structuredClone(this.dnsRecord);
+  }
+
+  private initValue() {
+    if (!this.dnsRecord.localNginxRecord)
+      this.dnsRecord.localNginxRecord = DataUtils.purgeArray(new NginxRecord());
+
+    if (!this.dnsRecord.publicNginxRecord)
+      this.dnsRecord.publicNginxRecord = DataUtils.purgeArray(new NginxRecord());
+  }
+
+  private initReference() {
+    this.nginxRecords.push(this.dnsRecord.publicNginxRecord!);
+    this.nginxRecords.push(this.dnsRecord.localNginxRecord!);
+    this.CertificateOptions.push(this.getCertificateOptions(this.viescloudNginxCertificates));
+    this.CertificateOptions.push(this.getCertificateOptions(this.vieslocalNginxCertificates));
+  }
+
+  private initDuplicateValue() {
+    this.duplicateDetailsSetting = DataUtils.areAllObjectsEqualBy(this.nginxRecords, record => {
+      return {
+        caching_enabled: record.caching_enabled,
+        block_exploits: record.block_exploits,
+        allow_websocket_upgrade: record.allow_websocket_upgrade
+      };
+    });
+
+    this.duplicateAdvancedSetting = DataUtils.areAllObjectsEqualBy(this.nginxRecords, record => {
+      return {
+        advanced_config: record.advanced_config
+      };
+    });
+
+    this.duplicateCertificateSetting = DataUtils.areAllObjectsEqualBy(this.nginxRecords, record => {
+      return {
+        ssl_forced: record.ssl_forced,
+        http2_support: record.http2_support,
+        hsts_enabled: record.hsts_enabled,
+        hsts_subdomains: record.hsts_subdomains
+      };
+    });
+
+    this.duplicateCustomLocationSetting = DataUtils.areAllObjectsEqualBy(this.nginxRecords, record => {
+      return {
+        locations: record.locations
+      };
+    });
   }
 
   isValueChange() {
@@ -131,6 +172,7 @@ export class DnsRecordComponent extends FixChangeDetection implements OnInit {
       record.forward_host = this.uriDetails.host;
       record.forward_port = this.uriDetails.port;
     })
+    this.dnsRecord.uri = `${this.uriDetails.protocol}://${this.uriDetails.host}:${this.uriDetails.port}`;
   }
 
   syncDetailsSetting() {

@@ -15,10 +15,10 @@ export class DnsRecord {
     enabledLocalNginx:         boolean = false;
 
     @MatTableHide(true)
-    localNginxRecord:          NginxRecord = new NginxRecord();
+    localNginxRecord?:          NginxRecord = new NginxRecord();
 
     @MatTableHide(true)
-    publicNginxRecord:         NginxRecord = new NginxRecord();
+    publicNginxRecord?:         NginxRecord = new NginxRecord();
 
     @MatTableHide(true)
     cloudflareViescloudRecord: CloudflareRecord[] = [new CloudflareRecord()] as CloudflareRecord[];

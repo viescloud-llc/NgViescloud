@@ -3,6 +3,7 @@
   <li class="flex-row-container">
     <button mat-raised-button color="primary" (click)="ngOnInit()">Refresh</button>
     <button mat-raised-button color="primary" (click)="clearCache()">Clear Cache</button>
+    <button mat-raised-button color="primary" (click)="addNewRecord()">Add new record</button>
   </li>
   <li >
     <app-mat-table
@@ -26,7 +27,7 @@
       [dnsRecord]="selectedDnsRecord!"
       [viescloudNginxCertificates]="viescloudNginxCertificates"
       [vieslocalNginxCertificates]="vieslocalNginxCertificates"
-      (onEdit)="edit($event)"
+      (onEdit)="editRecord($event)"
       ></app-dns-record>
     </li>
   </ul>
