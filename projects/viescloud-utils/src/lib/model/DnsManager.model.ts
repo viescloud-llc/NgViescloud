@@ -63,11 +63,11 @@ export enum Type {
 }
 
 export class NginxRecord {
-    meta:                    NginxRecordMeta = new NginxRecordMeta();
+    meta:                    NginxMeta = new NginxMeta();
     locations:               NginxLocation[] = [new NginxLocation()] as NginxLocation[];
     id:                      number = 0;
     enabled:                 boolean = false;
-    certificate:             string = '';
+    certificate:             NginxCertificate = new NginxCertificate();
     domain_names:            string[] = [''] as string[];
     forward_scheme:          ForwardScheme = ForwardScheme.HTTPS;
     forward_host:            string = '';
@@ -90,7 +90,7 @@ export enum ForwardScheme {
     HTTPS = "https",
 }
 
-export class NginxRecordMeta {
+export class NginxMeta {
     letsencrypt_email:        string = '';
     dns_challenge:            boolean = false;
     dns_provider:             string = '';
@@ -106,4 +106,16 @@ export class NginxLocation {
     forwardScheme: string = '';
     forwardHost: string = '';
     forwardPort: number = 0;
+}
+
+export class NginxCertificate {
+    id:            number = 0;
+    created_on:    Date = new Date();
+    modified_on:   Date = new Date();
+    owner_user_id: number = 0;
+    provider:      string = '';
+    nice_name:     string = '';
+    domain_names:  string[] = [''] as string[];
+    expires_on:    Date = new Date();
+    meta:          NginxMeta = new NginxMeta();
 }

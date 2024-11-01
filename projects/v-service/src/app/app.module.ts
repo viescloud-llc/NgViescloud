@@ -5,7 +5,6 @@ import { AppComponent } from './app.component';
 import { ViescloudUtilsModule } from 'projects/viescloud-utils/src/public-api';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AuthInterceptor } from 'projects/viescloud-utils/src/lib/guards/auth.interceptor';
-import { HomeComponent } from 'projects/v-console/src/app/home/home.component';
 import { VincentComponent } from './about/vincent/vincent.component';
 import { AiReaderBodyComponent } from './ai_reader/ai-reader-body/ai-reader-body.component';
 import { SideDrawerAiReaderComponent } from './ai_reader/side-drawer-ai-reader/side-drawer-ai-reader.component';
@@ -21,6 +20,7 @@ import { SideDrawerMainMenuComponent } from './side-drawer/side-drawer-main-menu
 import { SideDrawerComponent } from './side-drawer/side-drawer.component';
 import { GeneralQuestionsComponent } from './trivia/general-questions/general-questions.component';
 import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
+import { HomeComponent } from './home/home.component';
 
 const GAMES = [
   BattleshipComponent,

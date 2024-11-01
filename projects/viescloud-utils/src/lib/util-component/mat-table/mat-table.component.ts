@@ -20,7 +20,13 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges {
   matColumns: MatColumn[] = [];
 
   @Input()
-  pagination: number[] = [5, 10, 25, 100];
+  pageSizeOptions: number[] = [5, 10, 25, 100];
+
+  @Input()
+  pageIndex = 0;
+
+  @Output()
+  pageIndexChange: EventEmitter<number> = new EventEmitter<number>();
 
   @Input()
   showFilter: boolean = false;
@@ -62,7 +68,7 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges {
     this.populateMatColumn();
     this.filterColumns();
 
-    this.pagination = this.pagination.sort((a, b) => a - b);
+    this.pageSizeOptions = this.pageSizeOptions.sort((a, b) => a - b);
     this.dataSource.data = this.matRows;
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;

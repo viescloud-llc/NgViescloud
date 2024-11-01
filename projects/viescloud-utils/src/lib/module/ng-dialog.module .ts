@@ -17,7 +17,6 @@ import { WrapLinkDialog } from '../dialog/wrap-link-dialog/wrap-link-dialog.comp
 import { StringSnackBar } from '../snack/string-snack-bar/string-snack-bar.component';
 import { MessagePopup } from '../popup/message-popup/message-popup.component';
 import { ProductImageSwapDialog } from '../dialog/marketing/product-image-swap-dialog/product-image-swap-dialog.component';
-import { DnsRecordDialog } from '../dialog/dns-record-dialog/dns-record-dialog.component';
 
 const DIALOG = [
   ConfirmDialog,
@@ -33,7 +32,6 @@ const DIALOG = [
   WrapDialog,
   WrapLinkDialog,
   ProductImageSwapDialog,
-  DnsRecordDialog
 ]
 
 const SNACK = [

@@ -1,13 +1,31 @@
-<ul class="margin-center">
+<ul class="margin-center" *ngIf="!selectedDnsRecord; else Else">
   <li><h1 class="text-center">DNS Manager</h1></li>
-  <li>
+  <li class="flex-row-container">
+    <button mat-raised-button color="primary" (click)="ngOnInit()">Refresh</button>
+    <button mat-raised-button color="primary" (click)="clearCache()">Clear Cache</button>
+  </li>
+  <li >
     <app-mat-table
     [showFilter]="true"
     [showPagination]="true"
     [showMatTooltip]="true"
     [matRows]="dnsRecords"
     [blankObject]="blankDnsRecord"
-    (onEditRow)="edit($event)"
+    (onEditRow)="selectedDnsRecord = $event"
+    [pageSizeOptions]="[20, 50, 100, 500]"
     ></app-mat-table>
   </li>
+
+  
 </ul>
+
+<ng-template #Else>
+  <ul class="margin-center">
+    <li>
+      <app-dns-record
+      [dnsRecord]="selectedDnsRecord!"
+      (onEdit)="edit($event)"
+      ></app-dns-record>
+    </li>
+  </ul>
+</ng-template>

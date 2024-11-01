@@ -34,6 +34,10 @@ export class DialogUtils {
         return dialog;
     }
 
+    openErrorMessage(title: string, message: string) {
+        return this.openConfirmDialog(title, message, 'Ok', '', '100%');
+    }
+
     openConfirmDialog(title: string, message: string, yes: string = 'Yes', no: string = 'No', width: string = '100%', disableClose: boolean = false) {
         return DialogUtils.openConfirmDialog(this.matDialog, title, message, yes, no, width, disableClose);
     }

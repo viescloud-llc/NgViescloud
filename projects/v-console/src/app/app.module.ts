@@ -18,6 +18,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { ViescloudUtilsModule } from 'projects/viescloud-utils/src/public-api';
 import { AuthInterceptor } from 'projects/viescloud-utils/src/lib/guards/auth.interceptor';
 import { DnsManagerComponent } from './dns-manager/dns-manager.component';
+import { DnsRecordComponent } from './dns-manager/dns-record/dns-record.component';
 
 export const defaultTextColor = 'white';
 
@@ -35,7 +36,8 @@ const LIST = [
   ConfigMapComponent,
   AutoRouteComponent,
   RouteDialog,
-  DnsManagerComponent
+  DnsManagerComponent,
+  DnsRecordComponent
 ]
 
 @NgModule({

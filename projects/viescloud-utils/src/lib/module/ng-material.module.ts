@@ -33,6 +33,7 @@ import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatChipsModule} from '@angular/material/chips';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { OverlayModule } from '@angular/cdk/overlay';
+import {MatGridListModule} from '@angular/material/grid-list';
 
 const list = [
   MatButtonModule,
@@ -67,7 +68,8 @@ const list = [
   MatTooltipModule,
   MatChipsModule,
   DragDropModule,
-  OverlayModule
+  OverlayModule,
+  MatGridListModule
 ]
 
 @NgModule({

@@ -3,21 +3,21 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
 
-import { DnsRecordDialog } from './dns-record-dialog.component';
+import { DnsRecordComponent } from './dns-record.component';
 
-describe('DnsRecordDialog', () => {
-  let component: DnsRecordDialog;
-  let fixture: ComponentFixture<DnsRecordDialog>;
+describe('DnsRecordComponent', () => {
+  let component: DnsRecordComponent;
+  let fixture: ComponentFixture<DnsRecordComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ DnsRecordDialog ]
+      declarations: [ DnsRecordComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(DnsRecordDialog);
+    fixture = TestBed.createComponent(DnsRecordComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

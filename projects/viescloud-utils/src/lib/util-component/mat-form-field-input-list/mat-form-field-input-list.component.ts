@@ -29,7 +29,7 @@ export class MatFormFieldInputListComponent extends MatFormFieldComponent {
   showAddItemButton: boolean = true;
   
   @Input()
-  maxSize: number = 10;
+  maxSize: number = 100;
 
   listLength!: number;
 
