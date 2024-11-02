@@ -137,8 +137,20 @@ export class DnsManagerComponent implements OnInit {
     if(dnsRecord.localNginxRecord!.domain_names.length === 0)
       dnsRecord.localNginxRecord = undefined;
 
+    if(!this.newRecord)
+      dnsRecord.uri = this.selectedDnsRecord!.uri;
+
     this.newRecord = false;
-    this.selectedDnsRecord = undefined;
+  
+    this.dnsManagerService.putDnsRecord(dnsRecord).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+      next: res => {
+        this.ngOnInit();
+        this.selectedDnsRecord = undefined;
+      },
+      error: err => {
+        this.dialogUtils.openErrorMessage("Error", err.message)
+      }
+    })
   }
 
   clearCache() {

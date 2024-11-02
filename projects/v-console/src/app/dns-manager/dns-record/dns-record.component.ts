@@ -125,11 +125,21 @@ export class DnsRecordComponent extends FixChangeDetection implements OnInit {
       };
     });
 
+    if(this.duplicateDetailsSetting) {
+      this.duplicateDetails.allow_websocket_upgrade = this.nginxRecords[0].allow_websocket_upgrade;
+      this.duplicateDetails.block_exploits = this.nginxRecords[0].block_exploits;
+      this.duplicateDetails.caching_enabled = this.nginxRecords[0].caching_enabled;
+    }
+
     this.duplicateAdvancedSetting = DataUtils.areAllObjectsEqualBy(this.nginxRecords, record => {
       return {
         advanced_config: record.advanced_config
       };
     });
+
+    if(this.duplicateAdvancedSetting && this.nginxRecords[0].advanced_config) {
+      this.duplicateAdvanced.advanced_config = this.nginxRecords[0].advanced_config;
+    }
 
     this.duplicateCertificateSetting = DataUtils.areAllObjectsEqualBy(this.nginxRecords, record => {
       return {
@@ -140,11 +150,22 @@ export class DnsRecordComponent extends FixChangeDetection implements OnInit {
       };
     });
 
+    if(this.duplicateCertificateSetting) {
+      this.duplicateCertificate.ssl_forced = this.nginxRecords[0].ssl_forced;
+      this.duplicateCertificate.http2_support = this.nginxRecords[0].http2_support;
+      this.duplicateCertificate.hsts_enabled = this.nginxRecords[0].hsts_enabled;
+      this.duplicateCertificate.hsts_subdomains = this.nginxRecords[0].hsts_subdomains;
+    }
+
     this.duplicateCustomLocationSetting = DataUtils.areAllObjectsEqualBy(this.nginxRecords, record => {
       return {
         locations: record.locations
       };
     });
+
+    if(this.duplicateCustomLocationSetting && this.nginxRecords[0].locations) {
+      this.duplicateCustomLocations = this.nginxRecords[0].locations;
+    }
   }
 
   isValueChange() {

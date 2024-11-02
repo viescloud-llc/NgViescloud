@@ -75,7 +75,7 @@ export class NginxRecord {
     caching_enabled:         boolean = false;
     block_exploits:          boolean = false;
     allow_websocket_upgrade: boolean = false;
-    access_list_id:          string = '';
+    access_list_id:          number = 0;
     certificate_id:          number = 0;
     ssl_forced:              boolean = false;
     http2_support:           boolean = false;
