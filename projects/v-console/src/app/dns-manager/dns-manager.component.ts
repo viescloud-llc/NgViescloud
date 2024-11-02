@@ -93,24 +93,41 @@ export class DnsManagerComponent implements OnInit {
 
   editRecord(dnsRecord?: DnsRecord) {
     if(!dnsRecord) {
+      this.newRecord = false;
       this.selectedDnsRecord = undefined;
       return;
     }
 
-    let count = this.newRecord ? 0 : 1;
+    let count = 0;
+    let allDomainNamesCopy = [...this.allDomainNames];
+    allDomainNamesCopy = allDomainNamesCopy.filter(e => !(this.selectedDnsRecord?.publicNginxRecord?.domain_names.includes(e) ?? false));
+    allDomainNamesCopy = allDomainNamesCopy.filter(e => !(this.selectedDnsRecord?.localNginxRecord?.domain_names.includes(e) ?? false));
+    let allUri = [...this.dnsRecords.map(e => e.uri)];
+    allUri = allUri.filter(e => e !== this.selectedDnsRecord?.uri);
 
-    if(DataUtils.hasValueWithMoreCountBy(this.dnsRecords, e => e.uri, dnsRecord?.uri, count)) {
+    if(!this.newRecord) {
+      count = 1;
+      allDomainNamesCopy = [...allDomainNamesCopy, ...dnsRecord?.localNginxRecord?.domain_names ?? '', ...dnsRecord?.publicNginxRecord?.domain_names ?? ''];
+      allUri = [...allUri, dnsRecord?.uri ?? ''];
+    }
+
+    if(DataUtils.hasValueWithMoreCountBy(allUri, e => e, dnsRecord?.uri, count)) {
       this.dialogUtils.openErrorMessage("Error", "URI already exists");
       return;
     }
 
-    if(DataUtils.hasValueCompareWithMoreCountBy(this.allDomainNames, e => e, e => dnsRecord.localNginxRecord?.domain_names.includes(e) ?? false, count)) {
+    if(DataUtils.hasValueCompareWithMoreCountBy(allDomainNamesCopy, e => e, e => dnsRecord.localNginxRecord?.domain_names.includes(e) ?? false, count)) {
       this.dialogUtils.openErrorMessage("Error", "Domain name already exists");
       return;
     }
 
-    if(DataUtils.hasValueCompareWithMoreCountBy(this.allDomainNames, e => e, e => dnsRecord.publicNginxRecord?.domain_names.includes(e) ?? false, count)) {
+    if(DataUtils.hasValueCompareWithMoreCountBy(allDomainNamesCopy, e => e, e => dnsRecord.publicNginxRecord?.domain_names.includes(e) ?? false, count)) {
       this.dialogUtils.openErrorMessage("Error", "Domain name already exists");
+      return;
+    }
+
+    if(!allDomainNamesCopy.every(e => e.includes(this.VIESCLOUD_DNS) || e.includes(this.VIESLOCAL_DNS))) {
+      this.dialogUtils.openErrorMessage("Error", "Domain name must include viescloud.com or vieslocal.com");
       return;
     }
 

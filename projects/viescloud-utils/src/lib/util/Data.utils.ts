@@ -232,22 +232,22 @@ export class DataUtils {
     }
 
     static hasValueCompareWithLessCountBy<T, U>(objects: T[], getCompareObj: (obj: T) => U, compareFn: (obj: U) => boolean, count: number): boolean {
-        const occurrences = DataUtils.getOccurrences(objects, getCompareObj, (obj: any) => DataUtils.isEqual(obj, compareFn));
+        const occurrences = DataUtils.getOccurrences(objects, getCompareObj, compareFn);
         return occurrences < count;
     }
 
     static hasValueCompareWithLessOrEqualCountBy<T, U>(objects: T[], getCompareObj: (obj: T) => U, compareFn: (obj: U) => boolean, count: number): boolean {
-        const occurrences = DataUtils.getOccurrences(objects, getCompareObj, (obj: any) => DataUtils.isEqual(obj, compareFn));
+        const occurrences = DataUtils.getOccurrences(objects, getCompareObj, compareFn);
         return occurrences <= count;
     }
 
     static hasValueCompareWithMoreCountBy<T, U>(objects: T[], getCompareObj: (obj: T) => U, compareFn: (obj: U) => boolean, count: number): boolean {
-        const occurrences = DataUtils.getOccurrences(objects, getCompareObj, (obj: any) => DataUtils.isEqual(obj, compareFn));
+        const occurrences = DataUtils.getOccurrences(objects, getCompareObj, compareFn);
         return occurrences > count;
     }
 
     static hasValueCompareWithMoreOrEqualCountBy<T, U>(objects: T[], getCompareObj: (obj: T) => U, compareFn: (obj: U) => boolean, count: number): boolean {
-        const occurrences = DataUtils.getOccurrences(objects, getCompareObj, (obj: any) => DataUtils.isEqual(obj, compareFn));
+        const occurrences = DataUtils.getOccurrences(objects, getCompareObj, compareFn);
         return occurrences >= count;
     }
 

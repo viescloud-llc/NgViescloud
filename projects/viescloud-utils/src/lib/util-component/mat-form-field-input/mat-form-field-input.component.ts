@@ -166,7 +166,7 @@ export class MatFormFieldInputComponent extends MatFormFieldComponent {
       return `${this.label} can not be shorter than ${this.minlength} length`;
 
     if(errors?.['required'])
-      return `${this.label} can not be be empty`;
+      return `${this.label} can not be empty`;
     
     return '';
   }

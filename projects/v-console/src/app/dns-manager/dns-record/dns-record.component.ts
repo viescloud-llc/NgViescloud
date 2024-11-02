@@ -148,7 +148,7 @@ export class DnsRecordComponent extends FixChangeDetection implements OnInit {
   }
 
   isValueChange() {
-    return DataUtils.isNotEqual(this.dnsRecord, this.dnsRecordCopy);
+    return DataUtils.isNotEqualWith(this.dnsRecord, this.dnsRecordCopy, this.blankDnsRecord);
   }
 
   save() {
