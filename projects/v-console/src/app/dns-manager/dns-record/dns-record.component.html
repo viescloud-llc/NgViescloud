@@ -17,7 +17,7 @@
 
       <li>
         <app-mat-form-field-input-option
-        [value]="uriDetails.protocol"
+        [(value)]="uriDetails.protocol"
         label="Scheme"
         noneLabel=""
         [options]="[{value: ForwardScheme.HTTP, valueLabel: 'http'}, {value: ForwardScheme.HTTPS, valueLabel: 'https'}]"
@@ -357,7 +357,15 @@
 
 </mat-tab-group>
 
+<hr>
 <div class="flex-row-container">
   <button mat-raised-button color="primary" [disabled]="!isValueChange() || !validForm" (click)="save()">Save</button>
   <button mat-raised-button color="warn" (click)="onEdit.emit(undefined)">Cancel</button>
+  <button mat-raised-button color="primary" (click)="gotoUri(this.dnsRecord.uri)">Go to {{this.dnsRecord.uri}}</button>
+
+  <button mat-raised-button color="primary" 
+  *ngFor="let item of getAllDomainNames()"
+  (click)="gotoUri(item)">
+    Go to {{item}}
+  </button>
 </div>

@@ -179,9 +179,9 @@ export class DnsRecordComponent extends FixChangeDetection implements OnInit {
   getNameByIndex(index: number) {
     switch(index) {
       case 0:
-        return 'Viescloud';
+        return 'Viescloud.com';
       case 1:
-        return 'Vieslocal';
+        return 'Vieslocal.com';
       default:
         return 'Unknown';
     }
@@ -266,5 +266,23 @@ export class DnsRecordComponent extends FixChangeDetection implements OnInit {
 
   getFirstValidLocations() {
     return this.nginxRecords.find(e => e.locations);
+  }
+
+  gotoUri(uri: string) {
+    if(!(uri.startsWith('http://') || uri.startsWith('https://'))) {
+      uri = 'https://' + uri;
+    }
+
+    window.open(uri, '_blank');
+  }
+
+  getAllDomainNames() {
+    let domainNames = new Set<string>();
+    this.nginxRecords.forEach(record => {
+      if(record.domain_names) {
+        record.domain_names.forEach(d => domainNames.add(d));
+      }
+    })
+    return Array.from(domainNames);
   }
 }
