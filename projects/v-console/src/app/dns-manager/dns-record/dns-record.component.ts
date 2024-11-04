@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FixChangeDetection } from 'projects/viescloud-utils/src/lib/directive/FixChangeDetection';
 import { TrackByIndex } from 'projects/viescloud-utils/src/lib/directive/TrackByIndex';
-import { DnsRecord, ForwardScheme, NginxCertificate, NginxLocation, NginxRecord } from 'projects/viescloud-utils/src/lib/model/DnsManager.model';
+import { AuthentikConfig, DnsRecord, ForwardScheme, NginxCertificate, NginxLocation, NginxRecord } from 'projects/viescloud-utils/src/lib/model/DnsManager.model';
 import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
@@ -303,5 +303,14 @@ export class DnsRecordComponent extends FixChangeDetection implements OnInit {
     if(confirm) {
       this.onRemove.emit();
     }
+  }
+
+  autoFillAuthentikSetting() {
+    this.duplicateAdvancedSetting = true;
+    this.nginxRecords.forEach(record => {
+      record.advanced_config = AuthentikConfig;
+    })
+    this.duplicateAdvanced.advanced_config = AuthentikConfig;
+    this.syncAdvancedSetting();
   }
 }
