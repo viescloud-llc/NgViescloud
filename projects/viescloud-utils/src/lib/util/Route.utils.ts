@@ -83,4 +83,18 @@ export class RouteUtil {
     static openLinkInNewTab(link: string): void {
         window.open(link, '_blank');
     }
+
+    static parseUrl(url: string): { protocol: string; host: string; port: string } | null {
+        // Regular expression to match protocol, host, and port
+        const urlPattern = /^(https?):\/\/([\d.]+):(\d+)/;
+        const match = url.match(urlPattern);
+    
+        if (match) {
+            const [, protocol, host, port] = match;
+            return { protocol, host, port };
+        } else {
+            console.error("Invalid URL format");
+            return null;
+        }
+    }
 }

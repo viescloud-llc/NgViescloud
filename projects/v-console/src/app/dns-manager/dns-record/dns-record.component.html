@@ -358,14 +358,20 @@
 </mat-tab-group>
 
 <hr>
-<div class="flex-row-container">
-  <button mat-raised-button color="primary" [disabled]="!isValueChange() || !validForm" (click)="save()">Save</button>
-  <button mat-raised-button color="warn" (click)="onEdit.emit(undefined)">Cancel</button>
-  <button mat-raised-button color="primary" (click)="gotoUri(this.dnsRecord.uri)">Go to {{this.dnsRecord.uri}}</button>
-
-  <button mat-raised-button color="primary" 
-  *ngFor="let item of getAllDomainNames()"
-  (click)="gotoUri(item)">
-    Go to {{item}}
-  </button>
-</div>
+<ul>
+  <li class="flex-row-container">
+    <button mat-raised-button color="primary" [disabled]="!isValueChange() || !validForm" (click)="save()">Save</button>
+    <button mat-raised-button color="warn" (click)="onEdit.emit(undefined)">Cancel</button>
+    <button mat-raised-button color="warn" (click)="remove()">Delete</button>
+  </li>
+  <br>
+  <li class="flex-row-container">
+    <button mat-raised-button color="primary" (click)="gotoUri(this.dnsRecord.uri)">Go to {{this.dnsRecord.uri}}</button>
+  
+    <button mat-raised-button color="primary" 
+    *ngFor="let item of getAllDomainNames()"
+    (click)="gotoUri(item)">
+      Go to {{item}}
+    </button>
+  </li>
+</ul>

@@ -25,6 +25,7 @@ export class DnsManagerComponent implements OnInit {
   vieslocalNginxCertificates: NginxCertificate[] = [];
 
   newRecord = false;
+  autoCleanUnusedDnsRecords = true;
 
   constructor(
     private dnsManagerService: DnsManagerService,
@@ -116,12 +117,12 @@ export class DnsManagerComponent implements OnInit {
       return;
     }
 
-    if(DataUtils.hasValueCompareWithMoreCountBy(allDomainNamesCopy, e => e, e => dnsRecord.localNginxRecord?.domain_names.includes(e) ?? false, count)) {
+    if(dnsRecord.localNginxRecord?.domain_names.some(domainName => DataUtils.hasValueWithMoreCountBy(allDomainNamesCopy, e => e, domainName, count))) {
       this.dialogUtils.openErrorMessage("Error", "Domain name already exists");
       return;
     }
 
-    if(DataUtils.hasValueCompareWithMoreCountBy(allDomainNamesCopy, e => e, e => dnsRecord.publicNginxRecord?.domain_names.includes(e) ?? false, count)) {
+    if(dnsRecord.publicNginxRecord?.domain_names.some(domainName => DataUtils.hasValueWithMoreCountBy(allDomainNamesCopy, e => e, domainName, count))) {
       this.dialogUtils.openErrorMessage("Error", "Domain name already exists");
       return;
     }
@@ -142,7 +143,7 @@ export class DnsManagerComponent implements OnInit {
 
     this.newRecord = false;
   
-    this.dnsManagerService.putDnsRecord(dnsRecord).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+    this.dnsManagerService.putDnsRecord(dnsRecord, this.autoCleanUnusedDnsRecords).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
       next: res => {
         this.ngOnInit();
         this.selectedDnsRecord = undefined;
@@ -162,5 +163,30 @@ export class DnsManagerComponent implements OnInit {
         this.dialogUtils.openErrorMessage("Error", err.message)
       }
     })
+  }
+
+  cleanUnusedCloudflareCnameDns() {
+    this.dnsManagerService.cleanUnusedDnsRecords().pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+      next: res => {
+        this.ngOnInit();
+      },
+      error: err => {
+        this.dialogUtils.openErrorMessage("Error", err.message)
+      }
+    })
+  }
+
+  removeRecord() {
+    if(this.selectedDnsRecord) {
+      this.dnsManagerService.deleteDnsRecord(this.selectedDnsRecord.uri, this.autoCleanUnusedDnsRecords).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+        next: res => {
+          this.selectedDnsRecord = undefined;
+          this.ngOnInit();
+        },
+        error: err => {
+          this.dialogUtils.openErrorMessage("Error", err.message)
+        }
+      })
+    }
   }
 }

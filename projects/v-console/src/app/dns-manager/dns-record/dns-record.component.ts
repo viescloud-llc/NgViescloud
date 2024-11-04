@@ -4,6 +4,8 @@ import { TrackByIndex } from 'projects/viescloud-utils/src/lib/directive/TrackBy
 import { DnsRecord, ForwardScheme, NginxCertificate, NginxLocation, NginxRecord } from 'projects/viescloud-utils/src/lib/model/DnsManager.model';
 import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
+import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
+import { RouteUtil } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 
 @Component({
   selector: 'app-dns-record',
@@ -23,6 +25,9 @@ export class DnsRecordComponent extends FixChangeDetection implements OnInit {
 
   @Output()
   onEdit: EventEmitter<DnsRecord | undefined> = new EventEmitter<DnsRecord | undefined>();
+
+  @Output()
+  onRemove: EventEmitter<void> = new EventEmitter<void>();
 
   dnsRecordCopy!: DnsRecord;
   blankDnsRecord: DnsRecord = new DnsRecord();
@@ -73,7 +78,9 @@ export class DnsRecordComponent extends FixChangeDetection implements OnInit {
   validForm = false;
   ForwardScheme = ForwardScheme;
 
-  constructor() {
+  constructor(
+    private dialogUtils: DialogUtils
+  ) {
     super();
   }
 
@@ -90,9 +97,14 @@ export class DnsRecordComponent extends FixChangeDetection implements OnInit {
     this.initReference();
 
     if(this.dnsRecord.uri) {
-      let url = new URL(this.dnsRecord.uri);
+      let url = RouteUtil.parseUrl(this.dnsRecord.uri);
+      if(!url) {
+        this.dialogUtils.openErrorMessage("Error", "Invalid URI");
+        this.onEdit.emit(undefined);
+        return;
+      }
       this.uriDetails.protocol = url.protocol.replace(":", '') === 'http' ? ForwardScheme.HTTP : ForwardScheme.HTTPS;
-      this.uriDetails.host = url.hostname;
+      this.uriDetails.host = url.host;
       this.uriDetails.port = url.port ? parseInt(url.port) : this.uriDetails.port;
     }
 
@@ -284,5 +296,12 @@ export class DnsRecordComponent extends FixChangeDetection implements OnInit {
       }
     })
     return Array.from(domainNames);
+  }
+
+  async remove() {
+    let confirm = await this.dialogUtils.openConfirmDialog("Remove", "Are you sure you want to remove this record?\nThis cannot be undone", "Yes", "No");
+    if(confirm) {
+      this.onRemove.emit();
+    }
   }
 }

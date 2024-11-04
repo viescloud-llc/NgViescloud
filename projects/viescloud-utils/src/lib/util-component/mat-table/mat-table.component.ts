@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -9,7 +9,7 @@ import { MatColumn, MatTableSettingType } from '../../model/Mat.model';
   templateUrl: './mat-table.component.html',
   styleUrls: ['./mat-table.component.scss']
 })
-export class MatTableComponent<T extends object> implements OnInit, OnChanges {
+export class MatTableComponent<T extends object> implements OnInit, OnChanges, AfterViewInit {
 
   @Input()
   filterDisplay: number = 0;
@@ -21,9 +21,6 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges {
 
   @Input()
   pageSizeOptions: number[] = [5, 10, 25, 100];
-
-  @Input()
-  pageIndex = 0;
 
   @Output()
   pageIndexChange: EventEmitter<number> = new EventEmitter<number>();
@@ -43,8 +40,11 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges {
 
   filter?: string;
 
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild(MatPaginator) 
+  paginator!: MatPaginator;
+  
+  @ViewChild(MatSort) 
+  sort!: MatSort;
 
   @Input()
   blankObject?: any;
@@ -52,17 +52,16 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges {
   @Input()
   showMatTooltip: boolean = false;
 
-  constructor() { }
+  constructor(
+    private cd: ChangeDetectorRef
+  ) { }
+
+  ngAfterViewInit(): void {
+    this.ngOnInit();
+    this.cd.detectChanges();
+  }
 
   ngOnInit() {
-    this.init();
-  }
-
-  ngOnChanges() {
-    this.init();
-  }
-
-  init() {
     this.matColumns = [];
     this.displayedColumns = [];
     this.populateMatColumn();
@@ -72,6 +71,12 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges {
     this.dataSource.data = this.matRows;
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if(changes['matRows']) {
+      this.ngOnInit();
+    }
   }
 
   private populateMatColumn(): void {

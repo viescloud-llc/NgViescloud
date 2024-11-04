@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { ViesRestService, ViesService } from "./Rest.service";
 import { DnsRecord, NginxCertificate } from "../model/DnsManager.model";
 import { Observable } from "rxjs";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 
 @Injectable({
     providedIn: 'root',
@@ -24,18 +24,27 @@ export class DnsManagerService extends ViesService {
     }
 
     public getAllCertificate(type: string): Observable<NginxCertificate[]> {
-        return this.httpClient.get<NginxCertificate[]>(`${this.getPrefixUri()}/nginx/certificates?type=${type}`);
+        let params = new HttpParams().set('type', type);
+        return this.httpClient.get<NginxCertificate[]>(`${this.getPrefixUri()}/nginx/certificates`, { params: params });
     }
 
-    public putDnsRecord(record: DnsRecord): Observable<void> {
-        return this.httpClient.put<void>(`${this.getPrefixUri()}`, record);
+    public putDnsRecord(record: DnsRecord, cleanUnusedCloudflareCnameDns: boolean = false): Observable<void> {
+        let params = new HttpParams().set('cleanUnusedCloudflareCnameDns', cleanUnusedCloudflareCnameDns.toString());
+        return this.httpClient.put<void>(`${this.getPrefixUri()}`, record, { params: params });
     }
 
     public clearCache(): Observable<void> {
         return this.httpClient.delete<void>(`${this.getPrefixUri()}/clear-cache`);
     }
 
-    public deleteDnsRecord(uri: string): Observable<void> {
-        return this.httpClient.delete<void>(`${this.getPrefixUri()}?uri=${uri}`);
+    public cleanUnusedDnsRecords(): Observable<void> {
+        return this.httpClient.delete<void>(`${this.getPrefixUri()}/clear-unused-dns}`);
+    }
+
+    public deleteDnsRecord(uri: string, cleanUnusedCloudflareCnameDns: boolean = false): Observable<void> {
+        let params = new HttpParams()
+                        .set('cleanUnusedCloudflareCnameDns', cleanUnusedCloudflareCnameDns.toString())
+                        .set('uri', uri);
+        return this.httpClient.delete<void>(`${this.getPrefixUri()}`, { params: params });
     }
 }
