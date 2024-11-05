@@ -4,6 +4,7 @@ import { ConfirmDialog } from "../dialog/confirm-dialog/confirm-dialog.component
 import { Injectable } from "@angular/core";
 import { ProductImageSwapDialog, ProductImageSwapDialogRespondData } from "../dialog/marketing/product-image-swap-dialog/product-image-swap-dialog.component";
 import { MatOption } from "../model/Mat.model";
+import { NotAuthenticatedError } from "../model/Error.model";
 
 @Injectable({
     providedIn: 'root'
@@ -32,6 +33,11 @@ export class DialogUtils {
         }
 
         return dialog;
+    }
+
+    openErrorMessageFromError(error: any) {
+        if(!(error instanceof NotAuthenticatedError))
+            this.openErrorMessage("Error!", error.getMessage);
     }
 
     openErrorMessage(title: string, message: string) {

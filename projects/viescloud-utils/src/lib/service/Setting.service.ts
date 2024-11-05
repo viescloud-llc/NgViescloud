@@ -2,7 +2,7 @@ import { Injectable, Renderer2 } from '@angular/core';
 import { environment } from 'projects/environments/environment.prod';
 import { DRAWER_STATE, HeaderComponent } from '../share-component/header/header.component';
 import { S3StorageServiceV1 } from './ObjectStorageManager.service';
-import { UtilsService, VFile } from './Utils.service';
+import { VFile } from './Utils.service';
 import { GeneralSetting } from '../model/Setting.model';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTheme } from '../model/theme.model';
@@ -11,6 +11,10 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConfirmDialog } from '../dialog/confirm-dialog/confirm-dialog.component';
 import { OpenIdService } from './OpenId.service';
 import { PopupType } from '../model/Popup.model';
+import { RxJSUtils } from '../util/RxJS.utils';
+import { DataUtils } from '../util/Data.utils';
+import { FileUtils } from '../util/File.utils';
+import { StringUtils } from '../util/String.utils';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +22,7 @@ import { PopupType } from '../model/Popup.model';
 export class SettingService {
   private GENERAL_SETTING_KEY = 'generalSetting.json';
   private generalSetting: GeneralSetting = new GeneralSetting();
-  private matThemes = UtilsService.getEnumValues(MatTheme) as string[];
+  private matThemes = DataUtils.getEnumValues(MatTheme) as string[];
   private onLoginSubscription: any = null;
   private onTimeoutLogoutSubscription: any = null;
   private authenticatorService: AuthenticatorService | undefined;
@@ -28,7 +32,7 @@ export class SettingService {
   apiGatewayUrl: string = environment.gateway_api;
   backgroundImageUrl: string = '';
   header?: HeaderComponent;
-  matThemeOptions = UtilsService.getEnumMatOptions(MatTheme);
+  matThemeOptions = DataUtils.getEnumMatOptions(MatTheme);
 
   constructor(
     private s3StorageService: S3StorageServiceV1,
@@ -43,7 +47,7 @@ export class SettingService {
 
     this.prefix = prefix;
 
-    let setting = UtilsService.localStorageGetItem<GeneralSetting>(this.GENERAL_SETTING_KEY);
+    let setting = FileUtils.localStorageGetItem<GeneralSetting>(this.GENERAL_SETTING_KEY);
     
     if (!setting) {
       this.syncFromServer(prefix);
@@ -79,9 +83,9 @@ export class SettingService {
   }
 
   syncFromServer(prefix: string) {
-    this.s3StorageService.getFileByFileName(`${prefix}/${this.GENERAL_SETTING_KEY}`).pipe(UtilsService.waitLoadingSnackBarDynamicString(this.snackBar, `Loading ${prefix}/${this.GENERAL_SETTING_KEY}`, 40, 'Dismiss')).subscribe({
+    this.s3StorageService.getFileByFileName(`${prefix}/${this.GENERAL_SETTING_KEY}`).pipe(RxJSUtils.abortIfNotLogin(this.authenticatorService)).pipe(RxJSUtils.waitLoadingDynamicStringSnackBar(this.snackBar, `Loading ${prefix}/${this.GENERAL_SETTING_KEY}`, 40, 'Dismiss')).subscribe({
       next: (blob) => {
-        UtilsService.readBlobAsText(blob).then((data) => {
+        StringUtils.readBlobAsText(blob).then((data) => {
           this.generalSetting = JSON.parse(data);
           this.saveSettingLocally(this.generalSetting);
           this.applySetting();
@@ -138,7 +142,7 @@ export class SettingService {
   }
 
   saveSettingLocally(generalSetting: GeneralSetting): void {
-    UtilsService.localStorageSetItem(this.GENERAL_SETTING_KEY, generalSetting);
+    FileUtils.localStorageSetItem(this.GENERAL_SETTING_KEY, generalSetting);
     this.generalSetting = generalSetting;
   }
 

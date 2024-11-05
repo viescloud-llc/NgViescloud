@@ -7,6 +7,8 @@ import { SnackBarUtils } from "./SnackBar.utils";
 import { Injectable } from "@angular/core";
 import { PopupUtils } from "./Popup.utils";
 import { OverlayRef } from "@angular/cdk/overlay";
+import { AuthenticatorService } from "../service/Authenticator.service";
+import { NotAuthenticatedError } from "../model/Error.model";
 
 @Injectable({
     providedIn: 'root'
@@ -16,7 +18,8 @@ export class RxJSUtils {
     constructor(
         private snackBar: MatSnackBar,
         private matDialog: MatDialog,
-        private popupUtils: PopupUtils
+        private popupUtils: PopupUtils,
+        private authenticatorService: AuthenticatorService
     ) { }
 
     static async ObservableToPromise<T>(observable: Observable<T>, nextFn?: (value: T) => void, errorFn?: (error: any) => void): Promise<T> {
@@ -129,4 +132,26 @@ export class RxJSUtils {
             first<T>()
         );
     }
+
+    abortIfNotLogin() {
+        return RxJSUtils.abortIfNotLogin(this.authenticatorService);
+    }
+
+    static abortIfNotLogin(authenticatorService?: AuthenticatorService) {
+        return <T>(source: Observable<T>) => {
+          return new Observable<T>((observer) => {
+            // Check if the user is logged in (replace with your actual condition)
+            const isLoggedIn = authenticatorService?.isLoginB ?? false;
+      
+            if (!isLoggedIn) {
+              // Throw custom error if not logged in
+              observer.error(new NotAuthenticatedError());
+              return;
+            }
+      
+            // If logged in, proceed with the HTTP request
+            return source.subscribe(observer);
+          });
+        };
+      }
 }
