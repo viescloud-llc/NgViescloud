@@ -92,8 +92,7 @@ export class DnsRecordComponent extends FixChangeDetection implements OnInit {
     this.dnsRecord = structuredClone(this.dnsRecord);
     
     this.initValue();
-
-    //Note: array push must be in this specific order
+    
     this.initReference();
 
     if(this.dnsRecord.uri) {
@@ -103,9 +102,11 @@ export class DnsRecordComponent extends FixChangeDetection implements OnInit {
         this.onEdit.emit(undefined);
         return;
       }
+
       this.uriDetails.protocol = url.protocol.replace(":", '') === 'http' ? ForwardScheme.HTTP : ForwardScheme.HTTPS;
       this.uriDetails.host = url.host;
       this.uriDetails.port = url.port ? parseInt(url.port) : this.uriDetails.port;
+      this.syncUriDetails();
     }
 
     this.initDuplicateValue();
@@ -122,6 +123,7 @@ export class DnsRecordComponent extends FixChangeDetection implements OnInit {
   }
 
   private initReference() {
+    //Note: array push must be in this specific order
     this.nginxRecords.push(this.dnsRecord.publicNginxRecord!);
     this.nginxRecords.push(this.dnsRecord.localNginxRecord!);
     this.CertificateOptions.push(this.getCertificateOptions(this.viescloudNginxCertificates));
@@ -252,9 +254,11 @@ export class DnsRecordComponent extends FixChangeDetection implements OnInit {
     })
   }
 
-  addLocation(nginxLocations: NginxLocation[]) {
-    if(!nginxLocations)
-      nginxLocations = [];
+  addLocation(nginxLocations: NginxLocation[], record?: NginxRecord) {
+    if(!nginxLocations && record) {
+      record.locations = [];
+      nginxLocations = record.locations;
+    }
 
     nginxLocations.push(DataUtils.purgeArray(new NginxLocation()));
   }

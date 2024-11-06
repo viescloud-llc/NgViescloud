@@ -4,7 +4,7 @@ import { LoadingDialog } from "../dialog/loading-dialog/loading-dialog.component
 import { MatSnackBarHorizontalPosition, MatSnackBarVerticalPosition } from "../model/Mat.model";
 import { MatSnackBar, MatSnackBarRef } from "@angular/material/snack-bar";
 import { SnackBarUtils } from "./SnackBar.utils";
-import { Injectable } from "@angular/core";
+import { forwardRef, Inject, Injectable } from "@angular/core";
 import { PopupUtils } from "./Popup.utils";
 import { OverlayRef } from "@angular/cdk/overlay";
 import { AuthenticatorService } from "../service/Authenticator.service";
@@ -19,7 +19,6 @@ export class RxJSUtils {
         private snackBar: MatSnackBar,
         private matDialog: MatDialog,
         private popupUtils: PopupUtils,
-        private authenticatorService: AuthenticatorService
     ) { }
 
     static async ObservableToPromise<T>(observable: Observable<T>, nextFn?: (value: T) => void, errorFn?: (error: any) => void): Promise<T> {
@@ -131,10 +130,6 @@ export class RxJSUtils {
             finalize<T>(() => this.popupUtils.dismiss(ref)),
             first<T>()
         );
-    }
-
-    abortIfNotLogin() {
-        return RxJSUtils.abortIfNotLogin(this.authenticatorService);
     }
 
     static abortIfNotLogin(authenticatorService?: AuthenticatorService) {
