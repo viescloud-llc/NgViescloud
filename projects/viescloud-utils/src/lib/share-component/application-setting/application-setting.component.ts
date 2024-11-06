@@ -15,6 +15,7 @@ export class ApplicationSettingComponent implements OnInit, OnDestroy {
 
   generalSetting!: GeneralSetting;
   generalSettingCopy!: GeneralSetting;
+  blankGeneralSetting: GeneralSetting = new GeneralSetting();
 
   constructor(
     public settingService: SettingService,

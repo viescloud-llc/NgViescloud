@@ -3,24 +3,10 @@
   <li><h4>Display Setting</h4></li>
   <li>
     <app-mat-form-field-input-dynamic
-    label="Initial Display Header (this setting usually should not be changed)"
-    [(value)]="generalSetting.initDisplayHeader"
-    [isSlideToggle]="true"
-    ></app-mat-form-field-input-dynamic>
-  </li>
-  <li>
-    <app-mat-form-field-input-dynamic
-    label="Initial Display Drawer"
-    [(value)]="generalSetting.initDisplayDrawer"
-    [isSlideToggle]="true"
-    ></app-mat-form-field-input-dynamic>
-  </li>
-  <li>
-    <app-mat-form-field-input-dynamic
-    label="Prompt Login when timeout logout"
-    [(value)]="generalSetting.promptLoginWhenTimeoutLogout"
-    [isSlideToggle]="true"
-    ></app-mat-form-field-input-dynamic>
+    [(value)]="generalSetting"
+    [blankObject]="blankGeneralSetting"
+    >
+  </app-mat-form-field-input-dynamic>
   </li>
   <li>
     <app-mat-form-field-input-option

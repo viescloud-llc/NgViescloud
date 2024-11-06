@@ -81,6 +81,8 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
 
   initBlankObjectProvided: boolean = true;
 
+  MatItemSettingType = MatItemSettingType;
+
   override ngOnInit() {
     super.ngOnInit();
 
@@ -277,6 +279,10 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
 
   public containOptions(item: MatFromFieldInputDynamicItem) {
     return item.containSetting(MatItemSettingType.OPTIONS);
+  }
+
+  public containSetting(item: MatFromFieldInputDynamicItem, matItemSettingType: MatItemSettingType) {
+    return item.containSetting(matItemSettingType);
   }
 
   override isValueMultipleStringLine(): boolean {

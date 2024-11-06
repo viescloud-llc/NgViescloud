@@ -26,6 +26,7 @@ export enum MatItemSettingType {
     CUSTOM_PLACEHOLDER = <any>'CustomPlaceholderItem',
     INDEX = <any>'IndexItem',
     TEXT_AREA = <any>'TextAreaItem',
+    SLIDE_TOGGLE = <any>'SlideToggleItem',
     VALIDATE_EMAIL = <any>'ValidateEmailItem',
     AUTO_FILL_HTTPS = <any>'AutoFillHttpsItem',
     EXPANSION_PANEL = <any>'ExpansionPanelItem',

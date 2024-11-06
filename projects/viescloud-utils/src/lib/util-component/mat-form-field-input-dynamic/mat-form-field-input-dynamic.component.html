@@ -139,6 +139,7 @@
           [placeholder]="item.placeholder"
           [value]="item.value" (valueChange)="item.setValueFn($event)"
           [styleWidth]="styleWidth"
+          [isSlideToggle]="containSetting(item, MatItemSettingType.SLIDE_TOGGLE)"
           [disable]="containDisable(item)"
           [required]="containRequire(item)"
           [isTextArea]="containTextArea(item)"
