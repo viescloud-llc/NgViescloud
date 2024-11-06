@@ -260,12 +260,22 @@ export class DnsRecordComponent extends FixChangeDetection implements OnInit {
       nginxLocations = record.locations;
     }
 
-    nginxLocations.push(DataUtils.purgeArray(new NginxLocation()));
+    let location = DataUtils.purgeArray(new NginxLocation());
+    location.forward_host = this.uriDetails.host;
+    location.forward_port = this.uriDetails.port;
+    location.forward_scheme = this.uriDetails.protocol;
+    nginxLocations.push(location);
+
+    if(this.duplicateCustomLocationSetting)
+      this.syncLocationSetting();
   }
 
   removeLocation(nginxLocations: NginxLocation[], index: number) {
     if(nginxLocations)
       nginxLocations.splice(index, 1);
+
+    if(this.duplicateCustomLocationSetting)
+      this.syncLocationSetting();
   }
 
   syncLocationSetting() {

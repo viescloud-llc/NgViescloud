@@ -150,6 +150,9 @@ export class DnsManagerComponent implements OnInit {
       },
       error: err => {
         this.dialogUtils.openErrorMessage("Error", err.message)
+        let temp = this.selectedDnsRecord;
+        this.selectedDnsRecord = undefined;
+        this.selectedDnsRecord = temp;
       }
     })
   }

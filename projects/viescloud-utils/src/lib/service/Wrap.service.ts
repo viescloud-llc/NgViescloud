@@ -6,6 +6,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Tuple } from '../model/Mat.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { RxJSUtils } from '../util/RxJS.utils';
+import { AuthenticatorService } from './Authenticator.service';
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +24,7 @@ export class WrapService {
   constructor(
     private s3StorageServiceV1: S3StorageServiceV1,
     private matDialog: MatDialog,
-    private rxjsUtils: RxJSUtils
+    private authenticatorService: AuthenticatorService
   ) {}
 
   init(): Promise<void> {
@@ -40,7 +41,7 @@ export class WrapService {
   }
 
   private syncToServer(resolve: (value: void | PromiseLike<void>) => void, reject: (reason?: any) => void) {
-    this.s3StorageServiceV1.getFileByFileName(this.WRAP_WORKSPACE).pipe(this.rxjsUtils.abortIfNotLogin()).pipe(UtilsService.waitLoadingDialog(this.matDialog)).subscribe({
+    this.s3StorageServiceV1.getFileByFileName(this.WRAP_WORKSPACE).pipe(RxJSUtils.abortIfNotLogin(this.authenticatorService)).pipe(UtilsService.waitLoadingDialog(this.matDialog)).subscribe({
       next: (data) => {
         UtilsService.readBlobAsText(data).then((data) => {
           this.setWorkspaces(JSON.parse(data));

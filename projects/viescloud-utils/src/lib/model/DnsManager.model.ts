@@ -102,10 +102,10 @@ export class NginxMeta {
 
 export class NginxLocation {
     path: string = '';
-    advancedConfig: string = '';
-    forwardScheme: string = '';
-    forwardHost: string = '';
-    forwardPort: number = 0;
+    advanced_config: string = '';
+    forward_scheme: string = '';
+    forward_host: string = '';
+    forward_port: number = 0;
 }
 
 export class NginxCertificate {

@@ -120,40 +120,46 @@
             placeholder="/path"
             [(value)]="location.path"
             styleWidth="100%"
+            [required]="true"
+            (onValueChange)="syncLocationSetting()"
             ></app-mat-form-field-input-dynamic>
           </li>
           <li class="flex-row-container">
             <app-mat-form-field-input-option
             label="Scheme"
             noneLabel=""
-            [(value)]="location.forwardScheme"
+            [(value)]="location.forward_scheme"
             [options]="[{value: ForwardScheme.HTTP, valueLabel: 'http'}, {value: ForwardScheme.HTTPS, valueLabel: 'https'}]"
             [required]="true"
             styleWidth="100%"
             style="width: 20%;"
+            (onValueChange)="syncLocationSetting()"
             ></app-mat-form-field-input-option>
 
             <app-mat-form-field-input-dynamic
             label="Host"
-            [(value)]="location.forwardHost"
+            [(value)]="location.forward_host"
             [required]="true"
             styleWidth="100%"
             style="width: 50%;"
+            (onValueChange)="syncLocationSetting()"
             ></app-mat-form-field-input-dynamic>
 
             <app-mat-form-field-input-dynamic
             label="Port"
-            [(value)]="location.forwardPort"
+            [(value)]="location.forward_port"
             [required]="true"
             styleWidth="100%"
             style="width: 20%;"
+            (onValueChange)="syncLocationSetting()"
             ></app-mat-form-field-input-dynamic>
           </li>
           <li>
             <app-mat-form-field-input-text-area
             label="Custom Nginx Configuration"
-            [(value)]="location.advancedConfig"
+            [(value)]="location.advanced_config"
             styleWidth="100%"
+            (onValueChange)="syncLocationSetting()"
             ></app-mat-form-field-input-text-area>
           </li>
           <li>
@@ -167,6 +173,7 @@
       <ng-template #ElseLocation>
         <li class="flex-row-container">
           <div *ngFor="let record of nginxRecords; let i = index; trackBy: trackByIndex" style="width: 48%;">
+            <h4 class="text-center">{{getNameByIndex(i)}}</h4>
             <ul *ngFor="let location of record.locations; let e = index; trackBy: trackByIndex">
               <li>
                 <app-mat-form-field-input-dynamic
@@ -174,13 +181,14 @@
                 placeholder="/path"
                 [(value)]="location.path"
                 styleWidth="100%"
+                [required]="true"
                 ></app-mat-form-field-input-dynamic>
               </li>
               <li class="flex-row-container">
                 <app-mat-form-field-input-option
                 label="Scheme"
                 noneLabel=""
-                [(value)]="location.forwardScheme"
+                [(value)]="location.forward_scheme"
                 [options]="[{value: ForwardScheme.HTTP, valueLabel: 'http'}, {value: ForwardScheme.HTTPS, valueLabel: 'https'}]"
                 [required]="true"
                 styleWidth="100%"
@@ -189,7 +197,7 @@
   
                 <app-mat-form-field-input-dynamic
                 label="Host"
-                [(value)]="location.forwardHost"
+                [(value)]="location.forward_host"
                 [required]="true"
                 styleWidth="100%"
                 style="width: 50%;"
@@ -197,7 +205,7 @@
   
                 <app-mat-form-field-input-dynamic
                 label="Port"
-                [(value)]="location.forwardPort"
+                [(value)]="location.forward_port"
                 [required]="true"
                 styleWidth="100%"
                 style="width: 20%;"
@@ -206,7 +214,7 @@
               <li>
                 <app-mat-form-field-input-text-area
                 label="Custom Nginx Configuration"
-                [(value)]="location.advancedConfig"
+                [(value)]="location.advanced_config"
                 styleWidth="100%"
                 ></app-mat-form-field-input-text-area>
               </li>
@@ -352,8 +360,6 @@
         </li>
       </ng-template>
     </ul>
-    
-
   </mat-tab>
 
 </mat-tab-group>
