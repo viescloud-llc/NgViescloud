@@ -54,11 +54,11 @@ export class WrapItemComponent extends TrackByIndex implements OnInit, OnDestroy
 
   constructor(
     private matDialog: MatDialog,
-    private keyCaptureService: KeyCaptureService,
-    private httpClient: HttpClient
+    private keyCaptureService: KeyCaptureService
   ) { 
     super();
   }
+  
   ngOnDestroy(): void {
     if(this.keyCaptureEvent)
       this.keyCaptureEvent.unsubscribe();
