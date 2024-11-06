@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { Wrap, WrapWorkspace } from 'projects/viescloud-utils/src/lib/model/Wrap.model';
 import { WrapMode } from '../wrap-workspace.component';
 import { TrackByIndex } from 'projects/viescloud-utils/src/lib/directive/TrackByIndex';
@@ -12,7 +12,7 @@ import { SettingService } from 'projects/viescloud-utils/src/lib/service/Setting
   templateUrl: './wrap.component.html',
   styleUrls: ['./wrap.component.scss']
 })
-export class WrapComponent extends TrackByIndex implements OnInit {
+export class WrapComponent extends TrackByIndex implements OnInit, OnChanges {
 
   @Input()
   wrapWorkspace!: WrapWorkspace;
@@ -37,6 +37,11 @@ export class WrapComponent extends TrackByIndex implements OnInit {
     private settingService: SettingService
   ) {
     super();
+  }
+  ngOnChanges(changes: SimpleChanges): void {
+    if(changes['wrapWorkspace']) {
+      this.searchOptions = this.wrapService.getSuggestions(this.wrapWorkspace)
+    }
   }
 
   ngOnInit() {
