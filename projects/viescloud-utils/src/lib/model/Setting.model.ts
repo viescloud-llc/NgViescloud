@@ -1,29 +1,41 @@
-import { MatInputDisplayLabel, MatInputHide, MatInputItemSetting, MatItemSettingType } from "./Mat.model";
+import { ReflectionUtils } from "../util/Reflection.utils";
+import { MatInputDisplayLabel, MatInputEnum, MatInputHide, MatInputIndex, MatInputItemSetting, MatInputOptions, MatItemSettingType } from "./Mat.model";
 import { MatTheme } from "./theme.model";
 
 export class GeneralSetting {
 
     @MatInputItemSetting(MatItemSettingType.SLIDE_TOGGLE, true)
-    @MatInputDisplayLabel('Initial Display Header (this setting usually should not be changed)')
+    @MatInputDisplayLabel('Initial display header (this setting usually should not be changed)')
+    @MatInputIndex(10)
     initDisplayHeader: boolean = true;
 
     @MatInputItemSetting(MatItemSettingType.SLIDE_TOGGLE, true)
-    @MatInputDisplayLabel('Initial Display Drawer')
+    @MatInputDisplayLabel('Initial display drawer')
+    @MatInputIndex(11)
     initDisplayDrawer: boolean = true;
 
     @MatInputItemSetting(MatItemSettingType.SLIDE_TOGGLE, true)
-    @MatInputDisplayLabel('Prompt Login when timeout logout')
+    @MatInputDisplayLabel('Prompt login when timeout logout')
+    @MatInputIndex(12)
     promptLoginWhenTimeoutLogout: boolean = true;
 
     @MatInputHide(true)
     backgroundImageUrl: string = '';
 
-    @MatInputHide(true)
+    @MatInputEnum(MatTheme)
+    @MatInputIndex(100)
     theme: MatTheme = MatTheme.CyanDeepPurpleDark;
 }
 
-export class D {
-    da: string = 'da';
-    db: number = 0;
-    dc: boolean = true;
+export class WrapSetting extends GeneralSetting {
+
+    @MatInputItemSetting(MatItemSettingType.SLIDE_TOGGLE, true)
+    @MatInputDisplayLabel('Initial auto refetch workspace')
+    @MatInputIndex(13)
+    initAutoRefetchWorkspace: boolean = true;
+
+    constructor() {
+        super();
+        ReflectionUtils.copyAllParentPrototype(this);        
+    }
 }

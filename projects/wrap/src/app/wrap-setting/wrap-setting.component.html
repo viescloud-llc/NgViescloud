@@ -5,10 +5,10 @@
     <app-mat-form-field-input-dynamic
     [(value)]="generalSetting"
     [blankObject]="blankGeneralSetting"
-    (valueChange)="settingService.changeTheme(generalSetting.theme)"
-    ></app-mat-form-field-input-dynamic>
+    (onValueChange)="settingService.changeTheme(generalSetting.theme)">
+    </app-mat-form-field-input-dynamic>
   </li>
-  <li>
+  <li class="flex-row-container">
     <button mat-raised-button color="warn" (click)="revert()" [disabled]="!isValueChange()">Revert</button>
     <button mat-raised-button color="primary" (click)="saveLocally()" [disabled]="!isValueChange()">Save Locally</button>
     <button mat-raised-button color="warn" (click)="reSync()" [disabled]="!authenticatorService.isLoginB">Re Sync</button>

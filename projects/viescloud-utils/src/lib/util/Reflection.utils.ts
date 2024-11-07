@@ -36,4 +36,13 @@ export class ReflectionUtils {
             configurable: true
         });
     }
+
+    static copyAllParentPrototype<T>(obj: T): T {
+        let prototype = Object.getPrototypeOf(obj);
+        let parentPrototype = Object.getPrototypeOf(prototype);
+        for(const [key, value] of Object.entries(parentPrototype)) {
+            prototype[key] = value;
+        }
+        return obj;
+    }
 }

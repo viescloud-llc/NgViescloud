@@ -6,6 +6,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
 import { WrapService } from 'projects/viescloud-utils/src/lib/service/Wrap.service';
 import { SettingService } from 'projects/viescloud-utils/src/lib/service/Setting.service';
+import { WrapSetting } from 'projects/viescloud-utils/src/lib/model/Setting.model';
 
 @Component({
   selector: 'app-wrap',
@@ -33,8 +34,7 @@ export class WrapComponent extends TrackByIndex implements OnInit, OnChanges {
 
   constructor(
     private matDialog: MatDialog, 
-    private wrapService: WrapService,
-    private settingService: SettingService
+    private wrapService: WrapService
   ) {
     super();
   }

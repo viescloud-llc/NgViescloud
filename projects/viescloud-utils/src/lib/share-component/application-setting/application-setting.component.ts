@@ -5,6 +5,7 @@ import { AuthenticatorService } from '../../service/Authenticator.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialog } from '../../dialog/confirm-dialog/confirm-dialog.component';
 import { UtilsService } from '../../service/Utils.service';
+import { DataUtils } from '../../util/Data.utils';
 
 @Component({
   selector: 'app-application-setting',
@@ -25,7 +26,7 @@ export class ApplicationSettingComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.generalSetting = this.settingService.getCopyOfGeneralSetting();
-    this.generalSettingCopy = this.settingService.getCopyOfGeneralSetting();
+    this.generalSettingCopy = structuredClone(this.settingService.getCopyOfGeneralSetting());
   }
 
   ngOnDestroy(): void {
@@ -45,7 +46,7 @@ export class ApplicationSettingComponent implements OnInit, OnDestroy {
   }
 
   isValueChange(): boolean {
-    return !UtilsService.isEqual(this.generalSetting, this.generalSettingCopy);
+    return !DataUtils.isEqualWith(this.generalSetting, this.generalSettingCopy, this.blankGeneralSetting);
   }
 
   revert() {

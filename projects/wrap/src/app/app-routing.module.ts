@@ -7,6 +7,7 @@ import { LogoutComponent } from 'projects/viescloud-utils/src/lib/share-componen
 import { WrapWorkspaceComponent } from './wrap-workspace/wrap-workspace.component';
 import { PolicyComponent } from './policy/policy.component';
 import { ApplicationSettingComponent } from 'projects/viescloud-utils/src/lib/share-component/application-setting/application-setting.component';
+import { WrapSettingComponent } from './wrap-setting/wrap-setting.component';
 
 const routes: Routes = [
   {
@@ -30,7 +31,7 @@ const routes: Routes = [
     children: [
       {
         path: 'application-setting',
-        component: ApplicationSettingComponent
+        component: WrapSettingComponent
       }
     ]
   },

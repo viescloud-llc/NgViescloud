@@ -86,7 +86,7 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
   override ngOnInit() {
     super.ngOnInit();
 
-    if(!this.blankObject) {
+    if(this.blankObject === undefined || this.blankObject === null) {
       this.blankObject = structuredClone(this.value);
       this.initBlankObjectProvided = false;
     }
@@ -182,10 +182,13 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
   private getValue(key: string) {
     let value = this.value[key];
 
-    if(value)
+    if(typeof value === 'boolean')
       return value;
 
-    else return this.getKeyBlankObject(key);
+    if(value)
+      return value;
+    else 
+      return this.getKeyBlankObject(key);
   }
 
   private getSettingValue(key: string, type: MatItemSettingType, defaultValue?: any): any {

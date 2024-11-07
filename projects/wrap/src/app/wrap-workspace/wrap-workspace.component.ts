@@ -6,6 +6,7 @@ import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-d
 import { InputDialog } from 'projects/viescloud-utils/src/lib/dialog/input-dialog/input-dialog.component';
 import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
 import { PopupType } from 'projects/viescloud-utils/src/lib/model/Popup.model';
+import { WrapSetting } from 'projects/viescloud-utils/src/lib/model/Setting.model';
 import { WrapWorkspace } from 'projects/viescloud-utils/src/lib/model/Wrap.model';
 import { AuthenticatorService } from 'projects/viescloud-utils/src/lib/service/Authenticator.service';
 import { S3StorageServiceV1 } from 'projects/viescloud-utils/src/lib/service/ObjectStorageManager.service';
@@ -56,6 +57,9 @@ export class WrapWorkspaceComponent implements OnInit, OnDestroy {
 
   async ngOnInit() {
     await this.wrapService.init().catch(e => {});
+    let autoFetch = this.settingService.getCopyOfGeneralSetting<WrapSetting>().initAutoRefetchWorkspace ?? false;
+    if(autoFetch)
+      await this.wrapService.reSync().catch(e => {});
 
     this.initOptions();
     if(this.wrapService.wrapWorkspaces.length > 0) {

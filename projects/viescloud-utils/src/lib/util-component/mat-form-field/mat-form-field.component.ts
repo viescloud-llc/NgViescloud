@@ -91,7 +91,7 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
   }
 
   ngOnInit() {
-    if((this.value === undefined || this.value === null) && this.blankObject) {
+    if((this.value === undefined || this.value === null) && this.blankObject !== undefined && this.blankObject !== null) {
       this.value = structuredClone(this.blankObject);
       this.valueCopy = structuredClone(this.blankObject);
     }
@@ -100,10 +100,7 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
   ngOnChanges(changes: SimpleChanges): void {
     if(changes['value']) {
       this.valueCopy = structuredClone(this.value);
-      if(!this.value && this.blankObject) {
-        this.value = structuredClone(this.blankObject);
-        this.valueCopy = structuredClone(this.blankObject);
-      }
+      this.ngOnInit();
     }
   }
 

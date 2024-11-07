@@ -37,6 +37,7 @@
       [color]="matColor"
       [(ngModel)]="value" 
       (ngModelChange)="emitValue()"
+      (toggleChange)="emitValue()"
       [disabled]="disable"
       [required]="required">
       {{label}}
