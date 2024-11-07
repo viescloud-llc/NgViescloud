@@ -64,18 +64,18 @@ export class WrapWorkspaceComponent implements OnInit, OnDestroy {
   async ngOnInit() {
     if(this.onLoginSubscription == null) {
       //TODO: fix this on login logic
-    this.onLoginSubscription = this.authenticatorService.onLogin$.subscribe({
-      next: () => {
-        let autoFetch = this.settingService.getCopyOfGeneralSetting<WrapSetting>().initAutoRefetchWorkspace ?? false;
-        if(autoFetch) {
-          this.wrapService.reSync()
-          .then(() => {
-            this.ngOnInit();
-          })
-          .catch(e => {});
+      this.onLoginSubscription = this.authenticatorService.onLogin$.subscribe({
+        next: () => {
+          let autoFetch = this.settingService.getCopyOfGeneralSetting<WrapSetting>().initAutoRefetchWorkspace ?? false;
+          if(autoFetch) {
+            this.wrapService.reSync()
+            .then(() => {
+              this.ngOnInit();
+            })
+            .catch(e => {});
+          }
         }
-      }
-    });
+      });
     }
 
     await this.wrapService.init().catch(e => {});
