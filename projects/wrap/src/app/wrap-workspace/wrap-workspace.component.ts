@@ -43,8 +43,6 @@ export class WrapWorkspaceComponent implements OnInit, OnDestroy {
 
   expandAllTree: boolean | null = null;
 
-  onLoginSubscription: any = null;
-
   constructor(
     public wrapService: WrapService,
     public authenticatorService: AuthenticatorService,
@@ -57,26 +55,12 @@ export class WrapWorkspaceComponent implements OnInit, OnDestroy {
   }
   ngOnDestroy(): void {
     this.loadBackgroundImage('');
-    this.onLoginSubscription?.unsubscribe();
-    this.onLoginSubscription = null;
   }
 
   async ngOnInit() {
-    if(this.onLoginSubscription == null) {
-      //TODO: fix this on login logic
-      this.onLoginSubscription = this.authenticatorService.onLogin$.subscribe({
-        next: () => {
-          let autoFetch = this.settingService.getCopyOfGeneralSetting<WrapSetting>().initAutoRefetchWorkspace ?? false;
-          if(autoFetch) {
-            this.wrapService.reSync()
-            .then(() => {
-              this.ngOnInit();
-            })
-            .catch(e => {});
-          }
-        }
-      });
-    }
+    let autoFetch = this.settingService.getCopyOfGeneralSetting<WrapSetting>().initAutoRefetchWorkspace ?? false;
+    if(autoFetch)
+      await this.wrapService.reSync().catch(e => {});
 
     await this.wrapService.init().catch(e => {});
     

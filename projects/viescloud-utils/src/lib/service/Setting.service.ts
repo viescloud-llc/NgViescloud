@@ -83,7 +83,7 @@ export class SettingService {
   }
 
   syncFromServer(prefix: string) {
-    this.s3StorageService.getFileByFileName(`${prefix}/${this.GENERAL_SETTING_KEY}`).pipe(RxJSUtils.abortIfNotLogin(this.authenticatorService)).pipe(RxJSUtils.waitLoadingDynamicStringSnackBar(this.snackBar, `Loading ${prefix}/${this.GENERAL_SETTING_KEY}`, 40, 'Dismiss')).subscribe({
+    this.s3StorageService.getFileByFileName(`${prefix}/${this.GENERAL_SETTING_KEY}`).pipe(RxJSUtils.waitLoadingDynamicStringSnackBar(this.snackBar, `Loading ${prefix}/${this.GENERAL_SETTING_KEY}`, 40, 'Dismiss')).subscribe({
       next: (blob) => {
         StringUtils.readBlobAsText(blob).then((data) => {
           this.generalSetting = JSON.parse(data);

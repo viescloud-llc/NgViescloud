@@ -132,6 +132,7 @@ export class RxJSUtils {
         );
     }
 
+    //TODO: fix this function (not working at the moment)
     static abortIfNotLogin(authenticatorService?: AuthenticatorService) {
         return <T>(source: Observable<T>) => {
           return new Observable<T>((observer) => {
@@ -148,5 +149,5 @@ export class RxJSUtils {
             return source.subscribe(observer);
           });
         };
-      }
+    }
 }
