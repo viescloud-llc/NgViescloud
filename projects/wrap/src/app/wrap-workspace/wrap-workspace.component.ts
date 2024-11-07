@@ -43,6 +43,8 @@ export class WrapWorkspaceComponent implements OnInit, OnDestroy {
 
   expandAllTree: boolean | null = null;
 
+  onLoginSubscription: any = null;
+
   constructor(
     public wrapService: WrapService,
     public authenticatorService: AuthenticatorService,
@@ -50,17 +52,34 @@ export class WrapWorkspaceComponent implements OnInit, OnDestroy {
     private utilService: UtilsService,
     private s3StorageService: S3StorageServiceV1,
     private dialogUtils: DialogUtils
-  ) { }
+  ) { 
+    
+  }
   ngOnDestroy(): void {
     this.loadBackgroundImage('');
+    this.onLoginSubscription?.unsubscribe();
+    this.onLoginSubscription = null;
   }
 
   async ngOnInit() {
-    await this.wrapService.init().catch(e => {});
-    let autoFetch = this.settingService.getCopyOfGeneralSetting<WrapSetting>().initAutoRefetchWorkspace ?? false;
-    if(autoFetch)
-      await this.wrapService.reSync().catch(e => {});
+    if(this.onLoginSubscription == null) {
+      //TODO: fix this on login logic
+    this.onLoginSubscription = this.authenticatorService.onLogin$.subscribe({
+      next: () => {
+        let autoFetch = this.settingService.getCopyOfGeneralSetting<WrapSetting>().initAutoRefetchWorkspace ?? false;
+        if(autoFetch) {
+          this.wrapService.reSync()
+          .then(() => {
+            this.ngOnInit();
+          })
+          .catch(e => {});
+        }
+      }
+    });
+    }
 
+    await this.wrapService.init().catch(e => {});
+    
     this.initOptions();
     if(this.wrapService.wrapWorkspaces.length > 0) {
       let index = Number.parseInt(UtilsService.getQueryParam(this.WORKSPACE_QUERY_PARAM) || '0');
