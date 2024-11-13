@@ -1,4 +1,4 @@
-import { Directive, HostListener, OnInit } from '@angular/core';
+import { AfterContentInit, AfterViewInit, Directive, HostListener, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { KeyCaptureService } from '../service/KeyCapture.service';
 import { SettingService } from '../service/Setting.service';
@@ -18,7 +18,7 @@ export abstract class ViescloudApplication implements OnInit {
     protected matDialog: MatDialog
   ) { 
     this.listenToDialogEvents();
-    settingService.init(this.getTitle(), authenticatorService);
+    this.settingService.init(this.getTitle(), this.authenticatorService);
   }
 
   ngOnInit(): void {

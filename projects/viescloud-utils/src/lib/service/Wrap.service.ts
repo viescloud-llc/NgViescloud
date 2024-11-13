@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { Wrap, WrapWorkspace } from '../model/Wrap.model';
 import { S3StorageServiceV1 } from './ObjectStorageManager.service';
 import { UtilsService, VFile } from './Utils.service';
@@ -7,6 +7,8 @@ import { Tuple } from '../model/Mat.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { RxJSUtils } from '../util/RxJS.utils';
 import { AuthenticatorService } from './Authenticator.service';
+import { SettingService } from './Setting.service';
+import { WrapSetting } from '../model/Setting.model';
 
 @Injectable({
   providedIn: 'root'
@@ -23,9 +25,10 @@ export class WrapService {
 
   constructor(
     private s3StorageServiceV1: S3StorageServiceV1,
-    private matDialog: MatDialog,
-    private authenticatorService: AuthenticatorService
-  ) {}
+    private matDialog: MatDialog
+  ) { }
+  
+
 
   init(): Promise<void> {
     return new Promise((resolve, reject) => {

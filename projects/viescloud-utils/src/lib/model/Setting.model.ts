@@ -15,8 +15,13 @@ export class GeneralSetting {
     initDisplayDrawer: boolean = true;
 
     @MatInputItemSetting(MatItemSettingType.SLIDE_TOGGLE, true)
-    @MatInputDisplayLabel('Prompt login when timeout logout')
+    @MatInputDisplayLabel('Initial auto fetch general setting')
     @MatInputIndex(12)
+    initAutoFetchGeneralSetting: boolean = true;
+
+    @MatInputItemSetting(MatItemSettingType.SLIDE_TOGGLE, true)
+    @MatInputDisplayLabel('Prompt login when timeout logout')
+    @MatInputIndex(13)
     promptLoginWhenTimeoutLogout: boolean = true;
 
     @MatInputHide(true)
@@ -31,7 +36,7 @@ export class WrapSetting extends GeneralSetting {
 
     @MatInputItemSetting(MatItemSettingType.SLIDE_TOGGLE, true)
     @MatInputDisplayLabel('Initial auto refetch workspace')
-    @MatInputIndex(13)
+    @MatInputIndex(14)
     initAutoRefetchWorkspace: boolean = true;
 
     constructor() {

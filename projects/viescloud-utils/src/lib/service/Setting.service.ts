@@ -1,7 +1,7 @@
-import { Injectable, Renderer2 } from '@angular/core';
+import { AfterContentInit, AfterViewInit, Injectable, OnInit, Renderer2 } from '@angular/core';
 import { environment } from 'projects/environments/environment.prod';
 import { DRAWER_STATE, HeaderComponent } from '../share-component/header/header.component';
-import { S3StorageServiceV1 } from './ObjectStorageManager.service';
+import { ObjectStorage, S3StorageServiceV1 } from './ObjectStorageManager.service';
 import { VFile } from './Utils.service';
 import { GeneralSetting } from '../model/Setting.model';
 import { MatDialog } from '@angular/material/dialog';
@@ -15,6 +15,8 @@ import { RxJSUtils } from '../util/RxJS.utils';
 import { DataUtils } from '../util/Data.utils';
 import { FileUtils } from '../util/File.utils';
 import { StringUtils } from '../util/String.utils';
+import { Subject } from 'rxjs';
+import { RouteUtil } from '../util/Route.utils';
 
 @Injectable({
   providedIn: 'root'
@@ -26,7 +28,10 @@ export class SettingService {
   private onLoginSubscription: any = null;
   private onTimeoutLogoutSubscription: any = null;
   private authenticatorService: AuthenticatorService | undefined;
-  
+
+  private onGeneralSettingChangeSubject = new Subject<void>();
+  onGeneralSettingChange = this.onGeneralSettingChangeSubject.asObservable();
+
   prefix = '';
   currentMenu = "main";
   apiGatewayUrl: string = environment.gateway_api;
@@ -42,14 +47,13 @@ export class SettingService {
   ) { }
 
   init(prefix: string, authenticatorService?: AuthenticatorService) {
-    
     this.subscribeToSubject(prefix, authenticatorService);
 
     this.prefix = prefix;
 
     let setting = FileUtils.localStorageGetItem<GeneralSetting>(this.GENERAL_SETTING_KEY);
     
-    if (!setting) {
+    if (!setting || setting.initAutoFetchGeneralSetting) {
       this.syncFromServer(prefix);
     }
     else {
@@ -57,6 +61,7 @@ export class SettingService {
       this.applySetting();
     }
 
+    this.onGeneralSettingChangeSubject.next();
   }
 
   private subscribeToSubject(prefix: string, authenticatorService: AuthenticatorService | undefined) {
@@ -66,7 +71,7 @@ export class SettingService {
       if(this.onLoginSubscription == null) {
         this.onLoginSubscription = authenticatorService.onLogin$.subscribe({
           next: () => {
-            this.init(prefix);
+            this.syncFromServer(prefix);
           }
         });
       }
@@ -87,6 +92,7 @@ export class SettingService {
       next: (blob) => {
         StringUtils.readBlobAsText(blob).then((data) => {
           this.generalSetting = JSON.parse(data);
+          this.onGeneralSettingChangeSubject.next();
           this.saveSettingLocally(this.generalSetting);
           this.applySetting();
         });
@@ -199,5 +205,18 @@ export class SettingService {
       return 'black';
     else
       return 'white';
+  }
+
+  loadBackgroundImage(url: string, objectStorage?: ObjectStorage, popupType: PopupType = PopupType.DYNAMIC_MESSAGE_POPUP, rememberInitialUrl: boolean = true) {
+    let currentRoute = RouteUtil.getCurrentUrl();
+    if(url.includes(environment.gateway_api) && objectStorage) {
+      objectStorage.generateObjectUrlFromViescloudUrl(url, popupType).then(res => {
+        if(rememberInitialUrl && RouteUtil.getCurrentUrl() === currentRoute)
+          this.backgroundImageUrl = res;
+      })
+    } 
+    else {
+      this.backgroundImageUrl = url;
+    }
   }
 }

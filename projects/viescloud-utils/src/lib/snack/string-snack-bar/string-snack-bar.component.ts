@@ -2,6 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_SNACK_BAR_DATA, MatSnackBarRef } from '@angular/material/snack-bar';
 import { UtilsService } from '../../service/Utils.service';
 import { StringUtils } from '../../util/String.utils';
+import { SettingService } from '../../service/Setting.service';
 
 @Component({
   selector: 'app-string-snack-bar',
@@ -17,8 +18,9 @@ export class StringSnackBar {
   isHovered: boolean = false;
 
   constructor(
+    private settingService: SettingService,
     private snackBarRef: MatSnackBarRef<StringSnackBar>,
-    @Inject(MAT_SNACK_BAR_DATA) public data: { message: string , maxLength?: number, dismissLabel?: string, viewFullOnHover?: boolean}) {
+    @Inject(MAT_SNACK_BAR_DATA) public data: { message: string , maxLength?: number, dismissLabel?: string, viewFullOnHover?: boolean},) {
     this.fullMessage = data.message;
     this.truncatedMessage = data.maxLength ? StringUtils.getMaxString(data.message, data.maxLength) : data.message;
     this.dismissLabel = data.dismissLabel ?? '';
@@ -27,5 +29,11 @@ export class StringSnackBar {
 
   onDismiss(): void {
     this.snackBarRef.dismiss();
+  }
+
+  getNgStyleTextColor() {
+    return {
+      color: this.settingService.getCurrentThemeTextColor()
+    }
   }
 }

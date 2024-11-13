@@ -34,6 +34,7 @@
   <!-- Boolean Input (slide toggle) -->
   <ng-container *ngSwitchCase="DynamicMatInputType.BOOLEAN_SLIDE_TOGGLE">
     <mat-slide-toggle 
+      style="margin: 0.05rem;"
       [color]="matColor"
       [(ngModel)]="value" 
       (ngModelChange)="emitValue()"

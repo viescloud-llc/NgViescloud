@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterContentChecked, AfterContentInit, AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { SettingService } from '../../service/Setting.service';
 import { GeneralSetting } from '../../model/Setting.model';
 import { AuthenticatorService } from '../../service/Authenticator.service';
@@ -22,7 +22,13 @@ export class ApplicationSettingComponent implements OnInit, OnDestroy {
     public settingService: SettingService,
     public authenticatorService: AuthenticatorService,
     private matDialog: MatDialog
-  ) { }
+  ) { 
+    settingService.onGeneralSettingChange.subscribe({
+      next: () => {
+        this.ngOnInit();
+      }
+    });
+  }
 
   ngOnInit() {
     this.generalSetting = this.settingService.getCopyOfGeneralSetting();

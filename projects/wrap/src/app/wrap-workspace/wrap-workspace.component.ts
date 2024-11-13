@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { environment } from 'projects/environments/environment.prod';
@@ -14,6 +14,7 @@ import { SettingService } from 'projects/viescloud-utils/src/lib/service/Setting
 import { UtilsService } from 'projects/viescloud-utils/src/lib/service/Utils.service';
 import { WrapService } from 'projects/viescloud-utils/src/lib/service/Wrap.service';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
+import { RouteUtil } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 
 export enum WrapMode {
   VIEW = 'view',
@@ -30,7 +31,7 @@ export enum WrapMode {
 export class WrapWorkspaceComponent implements OnInit, OnDestroy {
 
   Mode = WrapMode;
-  DEFAULT_WRAP_PREFIX = 'wrap/';
+  DEFAULT_WRAP_PREFIX = 'Wrap/';
   ADD_NEW_WORKSPACE = 'Add new workspace ...';
   WORKSPACE_QUERY_PARAM = 'workspace';
 
@@ -51,18 +52,18 @@ export class WrapWorkspaceComponent implements OnInit, OnDestroy {
     private s3StorageService: S3StorageServiceV1,
     private dialogUtils: DialogUtils
   ) { 
-    
+
   }
+
   ngOnDestroy(): void {
     this.loadBackgroundImage('');
   }
 
   async ngOnInit() {
-    let autoFetch = this.settingService.getCopyOfGeneralSetting<WrapSetting>().initAutoRefetchWorkspace ?? false;
-    if(autoFetch)
-      await this.wrapService.reSync().catch(e => {});
-
-    await this.wrapService.init().catch(e => {});
+    if(this.settingService.getCopyOfGeneralSetting<WrapSetting>().initAutoRefetchWorkspace)
+      await this.wrapService.reSync();
+    else
+      await this.wrapService.init().catch(e => {});
     
     this.initOptions();
     if(this.wrapService.wrapWorkspaces.length > 0) {
@@ -217,14 +218,7 @@ export class WrapWorkspaceComponent implements OnInit, OnDestroy {
   }
 
   loadBackgroundImage(url: string) {
-    if(url.includes(environment.gateway_api)) {
-      this.s3StorageService.generateObjectUrlFromViescloudUrl(url, PopupType.DYNAMIC_MESSAGE_POPUP).then(res => {
-        this.settingService.backgroundImageUrl = res;
-      })
-    } 
-    else {
-      this.settingService.backgroundImageUrl = url;
-    }
+    this.settingService.loadBackgroundImage(url, this.s3StorageService);
   }
 
   changeWorkspaceName() {
