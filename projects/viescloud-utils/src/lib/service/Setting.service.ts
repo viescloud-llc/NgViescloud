@@ -17,6 +17,7 @@ import { FileUtils } from '../util/File.utils';
 import { StringUtils } from '../util/String.utils';
 import { Subject } from 'rxjs';
 import { RouteUtil } from '../util/Route.utils';
+import { HeaderMinimalComponent } from '../share-component/header-minimal/header-minimal.component';
 
 @Injectable({
   providedIn: 'root'
@@ -36,7 +37,7 @@ export class SettingService {
   currentMenu = "main";
   apiGatewayUrl: string = environment.gateway_api;
   backgroundImageUrl: string = '';
-  header?: HeaderComponent;
+  header?: HeaderComponent | HeaderMinimalComponent;
   matThemeOptions = DataUtils.getEnumMatOptions(MatTheme);
 
   constructor(
@@ -45,6 +46,12 @@ export class SettingService {
     private snackBar: MatSnackBar,
     private openIdService: OpenIdService
   ) { }
+
+  initMinimal(prefix: string) {
+    let setting = FileUtils.localStorageGetItem<GeneralSetting>(this.GENERAL_SETTING_KEY) ?? new GeneralSetting();
+    this.generalSetting = setting;
+    this.applySetting();
+  }
 
   init(prefix: string, authenticatorService?: AuthenticatorService) {
     this.subscribeToSubject(prefix, authenticatorService);

@@ -30,8 +30,7 @@ const LIST = [
 
 @NgModule({
   declarations: [				
-      ...LIST,
-      WrapSettingComponent
+    ...LIST
    ],
   imports: [
     ViescloudUtilsModule,

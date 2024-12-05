@@ -97,4 +97,12 @@ export class RouteUtil {
             return null;
         }
     }
+
+    static buildUrl(uri: string, params: { [key: string]: string }): string {
+        let url = new URL(uri);
+        for (let key in params) {
+            url.searchParams.set(key, params[key]);
+        }
+        return url.toString();
+    }
 }

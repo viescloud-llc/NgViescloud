@@ -1,4 +1,4 @@
-import { UtilsService } from "../service/Utils.service";
+import { DataUtils } from "../util/Data.utils";
 
 export enum PropertyMatcherEnum {
     CASE_SENSITIVE = "CASE_SENSITIVE",
@@ -369,7 +369,7 @@ export const MatInputOptions = (options: (string | number)[], noneLabel?: string
 export const MatInputEnum = (Enum: any, noneLabel?: string | number, noneValue?: string | number) => {
     return function MatInputEnum(object: any, key: any) {
         let matOptions: MatOption<any>[] = [];
-        let enumArray = UtilsService.getEnumValues(Enum);
+        let enumArray = DataUtils.getEnumValues(Enum);
         if(noneLabel) {
             matOptions.push({
                 value: noneValue,

@@ -1,0 +1,22 @@
+<ul class="margin-center-li-center" appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
+  <li>
+    <app-mat-form-field-input
+    label="Username"
+    [(value)]="username"
+    [required]="true"
+    styleWidth="50%"
+    ></app-mat-form-field-input>
+  </li>
+  <li>
+    <app-mat-form-field-input
+    label="Password"
+    [(value)]="password"
+    [required]="true"
+    styleWidth="50%"
+    [showVisibleSwitch]="true"
+    ></app-mat-form-field-input>
+  </li>
+  <li>
+    <button [style.width]="'50%'" mat-raised-button color="primary" (click)="login()" [disabled]="!validForm">Login</button>
+  </li>
+</ul>

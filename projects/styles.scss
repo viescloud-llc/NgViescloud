@@ -104,6 +104,16 @@ a {
     margin-bottom: 2%;
 }
 
+.margin-center-li-center {
+    width: 98%;
+    margin: auto;
+    margin-top: 2%;
+    margin-bottom: 2%;
+    li {
+        text-align: center;
+    }
+}
+
 .greenHightLight {
     background-color: green;
 }

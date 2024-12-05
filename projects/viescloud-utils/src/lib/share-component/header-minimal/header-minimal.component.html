@@ -1,0 +1,16 @@
+<mat-toolbar color="primary" *ngIf="getDisplayHeader()">
+  <button mat-icon-button (click)="drawer?.toggle()">
+    <mat-icon>menu</mat-icon>
+  </button>
+
+  <span *ngIf="getAlias()">Hello: {{getAlias()}}</span>
+
+  <span class="spacer"></span>
+  <img *ngIf="imageSrc" class="cursor-hover" mat-card-avatar [src]="imageSrc" alt="!?"/>
+  <app-copy-to-clipboard-util
+  [copyValue]="getURL()"
+  matIcon="share"
+  ></app-copy-to-clipboard-util>
+  <span *ngIf="!isLogin()" style="cursor: pointer;" (click)="login()">Login</span>
+  <span *ngIf="isLogin()" style="cursor: pointer;" (click)="logout()">Logout</span>
+</mat-toolbar>
