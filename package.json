@@ -11,6 +11,8 @@
     "build_vmk": "ng build --project vmk",
     "start_wrap": "ng serve --project wrap",
     "build_wrap": "ng build --project wrap",
+    "start_ensible": "ng serve --project ensible",
+    "build_ensible": "ng build --project ensible",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
