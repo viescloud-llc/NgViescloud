@@ -64,3 +64,15 @@ export class FSNode {
     return this.metadata.path.split('/').pop() || '';
   }
 }
+
+export enum FsWriteMode {
+  OVERRIDEN,
+  APPEND_START,
+  APPEND_END,
+  SKIP
+}
+
+export class EnsibleFsStatusResponse {
+  status: string = '';
+  path: string = '';
+}

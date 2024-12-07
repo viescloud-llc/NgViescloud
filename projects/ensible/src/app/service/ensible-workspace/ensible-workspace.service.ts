@@ -11,12 +11,6 @@ import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 })
 export class EnsibleWorkspaceService extends EnsibleService {
 
-  constructor(
-    private httpClient: HttpClient
-  ) {
-    super();
-  }
-
   protected override getPrefixes(): string[] {
     return ['api', 'v1', 'ensibles', 'workspaces'];
   }

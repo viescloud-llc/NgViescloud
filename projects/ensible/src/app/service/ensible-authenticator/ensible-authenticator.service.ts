@@ -22,10 +22,10 @@ export class EnsibleAuthenticatorService extends EnsibleService {
   onLogout$ = this.onLogOutSubject.asObservable();
 
   constructor(
-    private httpClient: HttpClient,
+    httpClient: HttpClient,
     private dialogUtils: DialogUtils
   ) {
-    super();
+    super(httpClient);
   }
 
   ngOnInit(): void {
