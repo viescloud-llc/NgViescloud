@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { EnsibleSettingComponent } from './ensible-setting/ensible-setting.component';
+import { EnsibleRoleComponent } from './ensible-role/ensible-role.component';
 
 const routes: Routes = [
   {
@@ -12,6 +13,16 @@ const routes: Routes = [
   {
     path: "login",
     component: LoginComponent
+  },
+
+  {
+    path: 'roles',
+    children: [
+      {
+        path: '**',
+        component: EnsibleRoleComponent
+      }
+    ]
   },
 
   {

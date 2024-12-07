@@ -9,12 +9,14 @@ import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { EnsibleAuthInterceptor } from './guard/ensible-auth.interceptor';
 import { EnsibleSettingComponent } from './ensible-setting/ensible-setting.component';
+import { EnsibleRoleComponent } from './ensible-role/ensible-role.component';
 
 const LIST = [
   AppComponent,
   HomeComponent,
   LoginComponent,
-  EnsibleSettingComponent
+  EnsibleSettingComponent,
+  EnsibleRoleComponent
 ]
 
 @NgModule({
