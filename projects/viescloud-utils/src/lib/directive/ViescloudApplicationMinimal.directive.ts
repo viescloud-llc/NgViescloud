@@ -14,13 +14,13 @@ export abstract class ViescloudApplicationMinimal implements OnInit {
     protected settingService: SettingService,
     protected keyCaptureService: KeyCaptureService,
     protected matDialog: MatDialog
-  ) { 
+  ) {
     this.listenToDialogEvents();
     this.settingService.initMinimal(this.getTitle());
   }
 
-  ngOnInit(): void {
-    
+  async ngOnInit() {
+
   }
 
   abstract getTitle(): string;
@@ -50,7 +50,7 @@ export abstract class ViescloudApplicationMinimal implements OnInit {
       }
       return style;
     }
-    else 
+    else
       return '';
   }
 

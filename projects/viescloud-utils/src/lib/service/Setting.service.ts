@@ -59,7 +59,7 @@ export class SettingService {
     this.prefix = prefix;
 
     let setting = FileUtils.localStorageGetItem<GeneralSetting>(this.GENERAL_SETTING_KEY);
-    
+
     if (!setting || setting.initAutoFetchGeneralSetting) {
       this.syncFromServer(prefix);
     }
@@ -178,7 +178,7 @@ export class SettingService {
   changeTheme(matTheme: MatTheme) {
     // Remove any previous theme class from the body
     document.body.classList.remove(... this.matThemes);
-    
+
     // Add the selected theme class
     document.body.classList.add(matTheme);
   }
@@ -221,7 +221,7 @@ export class SettingService {
         if(rememberInitialUrl && RouteUtil.getCurrentUrl() === currentRoute)
           this.backgroundImageUrl = res;
       })
-    } 
+    }
     else {
       this.backgroundImageUrl = url;
     }

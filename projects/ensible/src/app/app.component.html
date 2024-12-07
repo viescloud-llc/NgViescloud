@@ -5,7 +5,14 @@
     ></viescloud-quick-side-drawer-menu>
   </mat-drawer>
   <mat-drawer-content [ngStyle]="getBackgroundImageNgStyle()">
-    <viescloud-header-minimal [drawer]="drawer" [imageSrc]="'assets/images/logo-no-background.png'"></viescloud-header-minimal>
+    <viescloud-header-minimal
+    [drawer]="drawer"
+    [imageSrc]="'assets/images/logo-no-background.png'"
+    [alias]="getUserAlias()"
+    [isLogin]="isLogin()"
+    (onLogout)="ensibleAuthenticatorService.logout()"
+    (onLogin)="router.navigate(['login'])"
+    ></viescloud-header-minimal>
     <router-outlet></router-outlet>
   </mat-drawer-content>
 </mat-drawer-container>

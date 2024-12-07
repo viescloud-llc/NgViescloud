@@ -1,19 +1,25 @@
+import { Jwt } from './../../../../../viescloud-utils/src/lib/model/Authenticator.model';
 import { Injectable, OnInit } from '@angular/core';
 import { EnsibleService } from '../ensible/ensible.service';
 import { HttpClient } from '@angular/common/http';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 import { EnsibleUser } from '../../model/ensible.model';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Subject } from 'rxjs';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 import { FileUtils } from 'projects/viescloud-utils/src/lib/util/File.utils';
 
 @Injectable({
   providedIn: 'root'
 })
-export class EnsibleAuthenticatorService extends EnsibleService implements OnInit {
+export class EnsibleAuthenticatorService extends EnsibleService {
 
   user?: EnsibleUser;
   private token: string = '';
+
+  onLoginSubject = new Subject<void>();
+  onLogOutSubject = new Subject<void>();
+  onLogin$ = this.onLoginSubject.asObservable();
+  onLogout$ = this.onLogOutSubject.asObservable();
 
   constructor(
     private httpClient: HttpClient,
@@ -25,13 +31,33 @@ export class EnsibleAuthenticatorService extends EnsibleService implements OnIni
   ngOnInit(): void {
     let token = FileUtils.localStorageGetItem<string>('jwt');
     if(token) {
+      this.token = token;
       this.getUser().pipe(RxJSUtils.waitLoadingDialog()).subscribe({
         next: res2 => {
           this.user = res2;
-          this.token = token!;
+          this.onLoginSubject.next();
+        },
+        error: err => {
+          this.logout();
         }
       })
     }
+  }
+
+  private fetchUserInterval() {
+    setInterval(() => {
+      if(!this.token)
+        return;
+
+      this.getUser().pipe(RxJSUtils.waitLoadingDialog()).subscribe({
+        next: res2 => {
+          this.user = res2;
+        },
+        error: err => {
+          this.logout();
+        }
+      })
+    }, 120000) //2 mins
   }
 
   protected override getPrefixes(): string[] {
@@ -51,7 +77,7 @@ export class EnsibleAuthenticatorService extends EnsibleService implements OnIni
       this.login(username, password).pipe(RxJSUtils.waitLoadingDialog()).subscribe({
         next: res => {
           this.setToken(res.jwt);
-  
+
           this.getUser().pipe(RxJSUtils.waitLoadingDialog()).subscribe({
             next: res2 => {
               this.user = res2;
@@ -78,5 +104,16 @@ export class EnsibleAuthenticatorService extends EnsibleService implements OnIni
 
   setToken(jwt: string) {
     this.token = jwt;
+  }
+
+  isLogin() {
+    return !!this.token && !!this.user;
+  }
+
+  logout() {
+    this.token = '';
+    this.user = undefined;
+    FileUtils.localStorageRemoveItem('jwt');
+    this.onLogOutSubject.next();
   }
 }

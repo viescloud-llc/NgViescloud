@@ -1,4 +1,4 @@
-<ul class="margin-center-li-center" appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
+<ul class="margin-center-li-center" appMatFormFieldGroup (onAllInputCheck)="validForm = $event" [formSummitClick]="loginButton">
   <li>
     <app-mat-form-field-input
     label="Username"
@@ -17,6 +17,6 @@
     ></app-mat-form-field-input>
   </li>
   <li>
-    <button [style.width]="'50%'" mat-raised-button color="primary" (click)="login()" [disabled]="!validForm">Login</button>
+    <button #loginButton [style.width]="'50%'" mat-raised-button color="primary" (click)="login()" [disabled]="!validForm">Login</button>
   </li>
 </ul>

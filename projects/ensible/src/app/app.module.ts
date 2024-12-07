@@ -8,15 +8,17 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { EnsibleAuthInterceptor } from './guard/ensible-auth.interceptor';
+import { EnsibleSettingComponent } from './ensible-setting/ensible-setting.component';
 
 const LIST = [
   AppComponent,
   HomeComponent,
-  LoginComponent
+  LoginComponent,
+  EnsibleSettingComponent
 ]
 
 @NgModule({
-  declarations: [				
+  declarations: [
     ...LIST
   ],
   imports: [

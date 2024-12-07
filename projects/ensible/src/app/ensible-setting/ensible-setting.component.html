@@ -1,0 +1,17 @@
+<ul class="margin-center" *ngIf="generalSetting">
+  <li><h1 class="text-center">Application Setting</h1></li>
+  <li><h4>Display Setting</h4></li>
+  <li>
+    <app-mat-form-field-input-dynamic
+    [(value)]="generalSetting"
+    [blankObject]="blankGeneralSetting"
+    (onValueChange)="changeTheme()"
+    ></app-mat-form-field-input-dynamic>
+  </li>
+  <li>
+    <button mat-raised-button color="warn" (click)="revert()" [disabled]="!isValueChange()">Revert</button>
+    <button mat-raised-button color="primary" (click)="saveLocally()" [disabled]="!isValueChange()">Save Locally</button>
+    <!-- <button mat-raised-button color="warn" (click)="reSync()" [disabled]="!authenticatorService.isLoginB">Re Sync</button>
+    <button mat-raised-button color="primary" (click)="saveToServer()" [disabled]="!authenticatorService.isLoginB">Save to Server</button> -->
+  </li>
+</ul>

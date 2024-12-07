@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatDrawer } from '@angular/material/sidenav';
 import { SettingService } from '../../service/Setting.service';
 import { Router } from '@angular/router';
@@ -19,22 +19,22 @@ export class HeaderMinimalComponent {
   @Input()
   useLogoutFlow = false;
 
-  @Input()
-  loginFn?: () => void;
+  @Output()
+  onLogin: EventEmitter<void> = new EventEmitter();
+
+  @Output()
+  onLogout: EventEmitter<void> = new EventEmitter();
 
   @Input()
-  logoutFn?: () => void;
+  alias: string = '';
 
   @Input()
-  getAliasFn?: () => string;
-
-  @Input()
-  isLoginFn?: () => boolean;
+  isLogin: boolean = false;
 
   constructor(
     private router: Router,
     private settingService: SettingService
-    ) { 
+    ) {
       settingService.header = this;
     }
 
@@ -43,31 +43,19 @@ export class HeaderMinimalComponent {
   }
 
   login(): void {
-    if(this.loginFn)
-      this.loginFn();
+    this.onLogin.emit();
   }
 
   logout(): void {
-    if(this.logoutFn)
-      this.logoutFn();
+    this.onLogout.emit();
   }
 
   getURL(): string {
     return document.URL;
   }
 
-  isLogin(): boolean {
-    if(this.isLoginFn)
-      return this.isLoginFn();
-    else
-      return false;
-  }
-
   getAlias(): string {
-    if(this.getAliasFn)
-      return this.getAliasFn();
-    else
-      return ""
+    return this.alias;
   }
 
   getDisplayHeader(): boolean {

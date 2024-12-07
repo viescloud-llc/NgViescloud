@@ -54,6 +54,14 @@
       "url": "http://localhost:4200/"
     },
     {
+      "name": "Debug ensible (Chrome)",
+      "type": "chrome",
+      "request": "launch",
+      "preLaunchTask": "npm: start_ensible",
+      "url": "http://localhost:4200/",
+      "webRoot": "${workspaceFolder}"
+    },
+    {
       "name": "ng test",
       "type": "chrome",
       "request": "launch",

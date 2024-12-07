@@ -1,6 +1,7 @@
-import { AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit, ChangeDetectorRef, ContentChild, ContentChildren, Directive, DoCheck, EventEmitter, OnDestroy, Output, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
+import { AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit, ChangeDetectorRef, ContentChild, ContentChildren, Directive, DoCheck, EventEmitter, Input, OnDestroy, Output, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { MatFormFieldComponent } from '../util-component/mat-form-field/mat-form-field.component';
+import { MatButton } from '@angular/material/button';
 
 @Directive({
   selector: '[appMatFormFieldGroup]'
@@ -12,6 +13,9 @@ export class MatFormFieldGroupDirective implements AfterContentInit, AfterConten
 
   @Output()
   onFormSummit: EventEmitter<void> = new EventEmitter();
+
+  @Input()
+  formSummitClick?: HTMLButtonElement | MatButton;
 
   @ContentChildren(MatFormFieldComponent, { descendants: true })
   matFormFields!: QueryList<MatFormFieldComponent>;
@@ -37,7 +41,15 @@ export class MatFormFieldGroupDirective implements AfterContentInit, AfterConten
     this.matFormFields.forEach(e => {
       this.subscriptions.push(
         e.onEnter.subscribe(
-          res => {this.onFormSummit.emit()}
+          res => {
+            this.onFormSummit.emit()
+            if(this.formSummitClick && !this.formSummitClick.disabled) {
+              if(this.formSummitClick instanceof HTMLButtonElement)
+                this.formSummitClick.click();
+              else
+                this.formSummitClick._elementRef.nativeElement.click();
+            }
+          }
         )
       )
     })
@@ -50,7 +62,7 @@ export class MatFormFieldGroupDirective implements AfterContentInit, AfterConten
       this.matFormFields.forEach(e => {
         if (!valid)
           return;
-  
+
         valid = e.isValidInput();
       });
     }

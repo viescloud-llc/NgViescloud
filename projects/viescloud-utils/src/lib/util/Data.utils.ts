@@ -308,5 +308,12 @@ export class DataUtils {
         return obj;
     }
 
-
-}
+    static purgeObject<T extends Object>(obj: T): T {
+      for (const key in obj) {
+        if (obj.hasOwnProperty(key)) {
+          delete obj[key];
+        }
+      }
+      return obj;
+    }
+ }

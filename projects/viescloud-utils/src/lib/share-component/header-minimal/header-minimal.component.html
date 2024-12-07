@@ -11,6 +11,6 @@
   [copyValue]="getURL()"
   matIcon="share"
   ></app-copy-to-clipboard-util>
-  <span *ngIf="!isLogin()" style="cursor: pointer;" (click)="login()">Login</span>
-  <span *ngIf="isLogin()" style="cursor: pointer;" (click)="logout()">Logout</span>
+  <span *ngIf="!isLogin" style="cursor: pointer;" (click)="login()">Login</span>
+  <span *ngIf="isLogin" style="cursor: pointer;" (click)="logout()">Logout</span>
 </mat-toolbar>

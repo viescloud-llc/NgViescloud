@@ -13,7 +13,7 @@ export class EnsibleAuthInterceptor implements HttpInterceptor
 {
   constructor(private ensibleAuthenticator: EnsibleAuthenticatorService) { }
 
-  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> 
+  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>>
   {
     if(!req.url.includes(ensibleEnvironment.api))
       return next.handle(req);
