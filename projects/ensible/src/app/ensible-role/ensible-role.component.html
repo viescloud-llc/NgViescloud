@@ -4,9 +4,16 @@
 
 <ul *ngIf="!error" class="margin-center">
   <li>
-    <app-mat-form-field-input-text-area
-    label="content"
-    [(value)]="fileContent"
-    ></app-mat-form-field-input-text-area>
+    <app-code-editor
+    [language]="'yaml'"
+    [value]="fileContent"
+    ></app-code-editor>
   </li>
+
+  <!-- <li>
+    <ngx-monaco-editor
+    [options]="{theme: 'vs-dark', language: 'yaml'}"
+    [ngModel]="fileContent"
+    ></ngx-monaco-editor>
+  </li> -->
 </ul>

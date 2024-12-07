@@ -5,6 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
 
 const list = [
   CommonModule,
@@ -13,7 +14,8 @@ const list = [
   BrowserAnimationsModule,
   HttpClientModule,
   ReactiveFormsModule,
-  MatNativeDateModule
+  MatNativeDateModule,
+  MonacoEditorModule
 ]
 
 @NgModule({

@@ -27,6 +27,7 @@ import { ApplicationSettingComponent } from '../share-component/application-sett
 import { MatFormFieldInputRgbColorPickerComponent } from '../util-component/mat-form-field-input-rgb-color-picker/mat-form-field-input-rgb-color-picker.component';
 import { DisableKeyCaptureOnInputDirective } from '../directive/DisableKeyCaptureOnInput.directive';
 import { HeaderMinimalComponent } from '../share-component/header-minimal/header-minimal.component';
+import { CodeEditorComponent } from '../util-component/code-editor/code-editor.component';
 
 const UTILS = [
   CopyToClipboardUtilComponent,
@@ -49,6 +50,7 @@ const UTILS = [
   TooltipDirective,
   ApplicationSettingComponent,
   DisableKeyCaptureOnInputDirective,
+  CodeEditorComponent
 ]
 
 const COMPONENTS = [

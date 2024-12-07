@@ -10,6 +10,7 @@ import { LoginComponent } from './login/login.component';
 import { EnsibleAuthInterceptor } from './guard/ensible-auth.interceptor';
 import { EnsibleSettingComponent } from './ensible-setting/ensible-setting.component';
 import { EnsibleRoleComponent } from './ensible-role/ensible-role.component';
+import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
 
 const LIST = [
   AppComponent,
@@ -25,7 +26,7 @@ const LIST = [
   ],
   imports: [
     ViescloudUtilsModule,
-    AppRoutingModule
+    AppRoutingModule,
   ],
   providers: [
     {

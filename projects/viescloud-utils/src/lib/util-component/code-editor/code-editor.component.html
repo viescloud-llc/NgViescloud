@@ -1,0 +1,5 @@
+<ngx-monaco-editor 
+[options]="{theme: 'vs-dark', language: language}" 
+[ngModel]="value"
+(ngModelChange)="valueChange.emit($event)"
+></ngx-monaco-editor> 
