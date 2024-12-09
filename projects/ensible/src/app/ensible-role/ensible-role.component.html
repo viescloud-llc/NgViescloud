@@ -3,11 +3,41 @@
 </p>
 
 <ul *ngIf="!error" class="margin-center">
-  <li class="editor-container">
+  <li>
+    <app-mat-form-field-input-dynamic
+    label="Easy Mode"
+    [isSlideToggle]="true"
+    [(value)]="easyMode"
+    ></app-mat-form-field-input-dynamic>
+  </li>
+  <li>
+    <p>
+      <b>File Metadata</b>
+      <br>
+      <span>File name: {{fileName}}</span>
+      <br>
+      <span>File path: {{fullSortedPath}}</span>
+      <br>
+      <span>Parent Role name: {{roleCategoryName}}</span>
+    </p>
+  </li>
+  <li>
+    <app-mat-form-field-input
+    label="File Name"
+    [(value)]="fileName"
+    ></app-mat-form-field-input>
+  </li>
+  <hr>
+  <li *ngIf="!easyMode">
     <app-code-editor
-    [language]="'yaml'"
-    [value]="fileContent"
+    [language]="fileContent.includes('{') ? 'json' : 'yaml'"
+    [(value)]="fileContent"
     styleWidth="100%"
     ></app-code-editor>
+  </li>
+  <li>
+    <br>
+    <button mat-raised-button color="primary" style="width: 50%;" (click)="save()" [disabled]="!isValueChange()">Save</button>
+    <button mat-raised-button color="warn" style="width: 50%;" (click)="revert()" [disabled]="!isValueChange()">Revert</button>
   </li>
 </ul>

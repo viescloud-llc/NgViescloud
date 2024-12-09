@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { EnsibleService } from '../ensible/ensible.service';
 import { HttpClient } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Observable, Subject } from 'rxjs';
 import { FSNode, FSTree } from '../../model/ensible.model';
 import { EnsibleFS, EnsibleRole, EnsibleRoleDir, EnsibleWorkSpace } from '../../model/ensible.parser.model';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
@@ -25,6 +25,15 @@ export class EnsibleWorkspaceService extends EnsibleService {
   providedIn: 'root'
 })
 export class EnsibleWorkspaceParserService extends EnsibleWorkspaceService {
+
+  private onFetchWorkspaceSubject = new Subject<EnsibleWorkSpace>();
+  onFetchWorkspace$ = this.onFetchWorkspaceSubject.asObservable();
+
+  triggerFetchWorkspace() {
+    this.parseWorkspace().then(ws => {
+      this.onFetchWorkspaceSubject.next(ws);
+    })
+  }
 
   async parseWorkspace() {
     return new Promise<EnsibleWorkSpace>((resolve, reject) => {

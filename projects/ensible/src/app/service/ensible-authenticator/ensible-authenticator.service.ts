@@ -16,8 +16,8 @@ export class EnsibleAuthenticatorService extends EnsibleService {
   user?: EnsibleUser;
   private token: string = '';
 
-  onLoginSubject = new Subject<void>();
-  onLogOutSubject = new Subject<void>();
+  private onLoginSubject = new Subject<void>();
+  private onLogOutSubject = new Subject<void>();
   onLogin$ = this.onLoginSubject.asObservable();
   onLogout$ = this.onLogOutSubject.asObservable();
 

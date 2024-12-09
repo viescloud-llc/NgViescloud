@@ -66,10 +66,10 @@ export class FSNode {
 }
 
 export enum FsWriteMode {
-  OVERRIDEN,
-  APPEND_START,
-  APPEND_END,
-  SKIP
+  OVERRIDEN = 'OVERRIDEN',
+  APPEND_START = 'APPEND_START',
+  APPEND_END = 'APPEND_END',
+  SKIP = 'SKIP'
 }
 
 export class EnsibleFsStatusResponse {

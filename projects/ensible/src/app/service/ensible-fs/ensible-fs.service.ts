@@ -45,18 +45,20 @@ export class EnsibleFsService extends EnsibleService {
     return this.httpClient.post<EnsibleFsStatusResponse>(`${this.getPrefixUri()}/write/bytes`, content, {params: params});
   }
 
-  copyFile(sourcePath: string, targetPath: string, writeMode: FsWriteMode = FsWriteMode.OVERRIDEN) {
+  copyFile(sourcePath: string, targetPath: string, writeMode: FsWriteMode = FsWriteMode.OVERRIDEN, absolutePath: boolean = false) {
     let params = new HttpParams().set('sourcePath', sourcePath)
                                  .set('targetPath', targetPath)
-                                 .set('mode', writeMode);
+                                 .set('mode', writeMode)
+                                 .set('isAbsolutePath', absolutePath);
 
     return this.httpClient.put<EnsibleFsStatusResponse>(`${this.getPrefixUri()}/copy`, null, {params: params});
   }
 
-  moveFile(sourcePath: string, targetPath: string, writeMode: FsWriteMode = FsWriteMode.OVERRIDEN) {
+  moveFile(sourcePath: string, targetPath: string, writeMode: FsWriteMode = FsWriteMode.OVERRIDEN, absolutePath: boolean = false) {
     let params = new HttpParams().set('sourcePath', sourcePath)
                                  .set('targetPath', targetPath)
-                                 .set('mode', writeMode);
+                                 .set('mode', writeMode)
+                                 .set('isAbsolutePath', absolutePath);
 
     return this.httpClient.put<EnsibleFsStatusResponse>(`${this.getPrefixUri()}/move`, null, {params: params});
   }
