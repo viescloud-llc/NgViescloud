@@ -26,6 +26,34 @@
     ></app-mat-form-field-input>
   </li>
   <hr>
+  <ul *ngIf="parentName === 'secrets' && !vaultDectypted">
+    <li>
+      <app-mat-form-field-input-dynamic
+      label="Decrtypt with password?"
+      [(value)]="vaultDectyptWithPassword"
+      [isSlideToggle]="true"
+      ></app-mat-form-field-input-dynamic>
+    </li>
+    <li class="flex-row-container">
+      <ng-container *ngIf="vaultDectyptWithPassword">
+        <app-mat-form-field-input
+        label="Decrtypt with password"
+        [(value)]='vaultDectypt'
+        ></app-mat-form-field-input>
+      </ng-container>
+      
+      <ng-container *ngIf="!vaultDectyptWithPassword">
+        <app-mat-form-field-input-option
+        label="Decrtypt with password file"
+        (selectionChange)="vaultDectypt = $event.path"
+        [options]="ensibleWorkspaceParserService.passwordFileOptions"
+        ></app-mat-form-field-input-option>
+      </ng-container>
+      <button mat-raised-button color="primary" (click)="decryptFileContent()">Decrypt</button>
+    </li>
+  </ul>
+  
+  <hr>
   <li *ngIf="!easyMode">
     <app-code-editor
     [language]="getLanguageType()"

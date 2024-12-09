@@ -5,6 +5,7 @@ import { firstValueFrom, Observable, Subject } from 'rxjs';
 import { FSNode, FSTree } from '../../model/ensible.model';
 import { EnsibleFs, EnsibleRole, EnsibleFsDir, EnsibleWorkSpace } from '../../model/ensible.parser.model';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
+import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
 
 @Injectable({
   providedIn: 'root'
@@ -28,11 +29,10 @@ export class EnsibleWorkspaceParserService extends EnsibleWorkspaceService {
 
   private onFetchWorkspaceSubject = new Subject<EnsibleWorkSpace>();
   onFetchWorkspace$ = this.onFetchWorkspaceSubject.asObservable();
+  passwordFileOptions: MatOption<EnsibleFs>[] = [];
 
   triggerFetchWorkspace() {
-    this.parseWorkspace().then(ws => {
-      this.onFetchWorkspaceSubject.next(ws);
-    })
+    this.parseWorkspace().then(ws => {})
   }
 
   async parseWorkspace() {
@@ -90,6 +90,8 @@ export class EnsibleWorkspaceParserService extends EnsibleWorkspaceService {
             this.putWorkspaceFS(parent, node, '/secrets', () => ws.secrets, s => ws.isSecretExist(s));
           });
 
+          this.onFetchWorkspaceSubject.next(ws);
+          this.cachePasswordFilesOption(ws).then();
           resolve(ws);
         },
         error: err => {
@@ -168,5 +170,15 @@ export class EnsibleWorkspaceParserService extends EnsibleWorkspaceService {
         producer().child.push(fs);
       }
     }
+  }
+
+  private async cachePasswordFilesOption(ws: EnsibleWorkSpace) {
+    return new Promise<void>((resolve, reject) => {
+      this.passwordFileOptions = [];
+      for (const password of ws.passwords.child) {
+        this.passwordFileOptions.push({ value: password, valueLabel: password.name });
+      }
+      resolve();
+    })
   }
 }

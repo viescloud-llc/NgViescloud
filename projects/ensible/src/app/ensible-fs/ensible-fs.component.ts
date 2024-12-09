@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { RouteChangeSubcribe } from 'projects/viescloud-utils/src/lib/directive/RouteChangeSubcribe.directive';
 import { MonacoLanguage } from 'projects/viescloud-utils/src/lib/model/MonacoEditor.model';
@@ -9,6 +9,8 @@ import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 import { FsWriteMode } from '../model/ensible.model';
 import { EnsibleFsService } from '../service/ensible-fs/ensible-fs.service';
 import { EnsibleWorkspaceParserService } from '../service/ensible-workspace/ensible-workspace.service';
+import { EnsibleVaultService } from '../service/ensible-vault/ensible-vault.service';
+import { EnsibleWorkSpace } from '../model/ensible.parser.model';
 
 @Component({
   selector: 'app-ensible-fs',
@@ -28,9 +30,18 @@ export class EnsibleFsComponent extends RouteChangeSubcribe {
   easyMode: boolean = false;
   newFile: boolean = false;
 
+  //secrets
+  vaultDectypt = '';
+  vaultDectyptWithPassword = true;
+  vaultDectypted = false;
+
+  //Data
+  ws?: EnsibleWorkSpace;
+
   constructor(
     private ensibleFsService: EnsibleFsService,
-    private ensibleWorkspaceParserService: EnsibleWorkspaceParserService,
+    public ensibleWorkspaceParserService: EnsibleWorkspaceParserService,
+    private ensibleVaultService: EnsibleVaultService,
     private rxJSUtils: RxJSUtils,
     private dialogUtils: DialogUtils,
     private router: Router,
@@ -135,5 +146,18 @@ export class EnsibleFsComponent extends RouteChangeSubcribe {
   getLanguageType() {
     let extension = this.fileName.substring(this.fileName.lastIndexOf('.') + 1);
     return MonacoLanguage.from(extension);
+  }
+
+  decryptFileContent() {
+    this.ensibleVaultService.viewVault(this.fullSortedPath, !this.vaultDectyptWithPassword ? this.vaultDectypt : undefined, this.vaultDectyptWithPassword ? this.vaultDectypt : undefined).pipe(this.rxJSUtils.waitLoadingDialog()).subscribe({
+      next: data => {
+        this.fileContent = data;
+        this.fileContentCopy = structuredClone(data);
+        this.vaultDectypted = true;
+      },
+      error: (err) => {
+        this.dialogUtils.openErrorMessage("Error", "can't decrypt file");
+      }
+    })
   }
 }

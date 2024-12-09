@@ -73,6 +73,12 @@ export class MatFormFieldInputComponent extends MatFormFieldComponent {
   @Input()
   offIcon: string = 'visibility_off';
 
+  @Input()
+  manuallyEmitValueHint: string = 'Press apply icon or enter to apply input';
+
+  @Input()
+  customIconHint: string = '';
+
   //case of number
 
   @Input()

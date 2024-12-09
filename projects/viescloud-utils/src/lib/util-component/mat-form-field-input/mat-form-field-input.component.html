@@ -18,13 +18,14 @@
   [matAutocomplete]="auto">
   <mat-error>{{getFormControlError()}}</mat-error>
   <mat-hint *ngIf="error" style="color: red;" align="start">{{error}}</mat-hint>
-  <mat-hint *ngIf="manuallyEmitValue && isValueChange()" style="color: goldenrod;" align="start">Press apply icon or enter to apply input</mat-hint>
+  <mat-hint *ngIf="manuallyEmitValue && isValueChange()" style="color: goldenrod;" align="start">{{manuallyEmitValueHint}}</mat-hint>
   <mat-hint *ngIf="isValueString() && maxlength" align="end">{{value.toString().length}} / {{maxlength}}</mat-hint>
   <mat-hint *ngIf="showMinMaxHint && isValueNumber() && value" align="end">
     <ng-container *ngIf="min">{{min + '\<'}}</ng-container>
     <span [ngStyle]="getInputHintColorNgStyle()">{{value}}</span>
     <ng-container *ngIf="max">{{'\<' + max}}</ng-container>
   </mat-hint>
+  <mat-hint *ngIf="customIconLabel && customIconHint && value" style="color: goldenrod;" align="start">{{customIconHint}}</mat-hint>
 
   <button *ngIf="customIconLabel" matSuffix mat-icon-button (click)="emitCustomIcon()">
     <mat-icon>{{customIconLabel}}</mat-icon>
