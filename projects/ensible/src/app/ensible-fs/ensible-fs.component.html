@@ -2,7 +2,7 @@
   {{error}}
 </p>
 
-<ul *ngIf="!error" class="margin-center">
+<ul *ngIf="!error" class="margin-center" appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
   <li>
     <app-mat-form-field-input-dynamic
     label="Easy Mode"
@@ -23,33 +23,36 @@
     <app-mat-form-field-input
     label="File Name"
     [(value)]="fileName"
+    [required]="true"
     ></app-mat-form-field-input>
   </li>
-  <hr>
-  <ul *ngIf="parentName === 'secrets' && !vaultDectypted">
+  <ul *ngIf="isSecretFile() && (newFile || !vaultDectypted)">
+    <hr>
     <li>
       <app-mat-form-field-input-dynamic
-      label="Decrtypt with password?"
-      [(value)]="vaultDectyptWithPassword"
+      [label]="getVaultTypeLabel() + ' with password?'"
+      [(value)]="vaultCrtyptionWithPassword"
       [isSlideToggle]="true"
+      (onValueChange)="vaultSecret = ''"
       ></app-mat-form-field-input-dynamic>
     </li>
     <li class="flex-row-container">
-      <ng-container *ngIf="vaultDectyptWithPassword">
-        <app-mat-form-field-input
-        label="Decrtypt with password"
-        [(value)]='vaultDectypt'
-        ></app-mat-form-field-input>
-      </ng-container>
+      <app-mat-form-field-input
+      *ngIf="vaultCrtyptionWithPassword"
+      [label]="getVaultTypeLabel() + ' with password'"
+      [(value)]='vaultSecret'
+      [required]="true"
+      ></app-mat-form-field-input>
       
-      <ng-container *ngIf="!vaultDectyptWithPassword">
-        <app-mat-form-field-input-option
-        label="Decrtypt with password file"
-        (selectionChange)="vaultDectypt = $event.path"
-        [options]="ensibleWorkspaceParserService.passwordFileOptions"
-        ></app-mat-form-field-input-option>
-      </ng-container>
-      <button mat-raised-button color="primary" (click)="decryptFileContent()">Decrypt</button>
+      <app-mat-form-field-input-option
+      *ngIf="!vaultCrtyptionWithPassword"
+      [label]="getVaultTypeLabel() + ' with password file'"
+      (selectionChange)="vaultSecret = $event.path"
+      [options]="ensibleWorkspaceParserService.passwordFileOptions"
+      [required]="true"
+      ></app-mat-form-field-input-option>
+
+      <button mat-raised-button color="primary" (click)="decryptFileContent()">{{getVaultTypeLabel()}}</button>
     </li>
   </ul>
   
@@ -61,9 +64,15 @@
     styleWidth="100%"
     ></app-code-editor>
   </li>
-  <li>
+  <li *ngIf="!isSecretFile()">
     <br>
-    <button mat-raised-button color="primary" style="width: 50%;" (click)="save()" [disabled]="!isValueChange()">Save</button>
-    <button mat-raised-button color="warn" style="width: 50%;" (click)="revert()" [disabled]="!isValueChange()">Revert</button>
+    <button mat-raised-button color="primary" style="width: 50%;" (click)="save()" [disabled]="!isValueChange() || !validForm">Save</button>
+    <button mat-raised-button color="warn" style="width: 50%;" (click)="revert()" [disabled]="!isValueChange() || !validForm">Revert</button>
+  </li>
+
+  <li *ngIf="isSecretFile() && vaultDectypted">
+    <br>
+    <button mat-raised-button color="primary" style="width: 50%;" (click)="saveSecrets()" [disabled]="!isValueChange() || !validForm">Save secret</button>
+    <button mat-raised-button color="warn" style="width: 50%;" (click)="revert()" [disabled]="!isValueChange() || !validForm">Revert</button>
   </li>
 </ul>

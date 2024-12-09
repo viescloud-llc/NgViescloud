@@ -152,6 +152,6 @@ export class MonacoLanguage {
         if(found2) {
             return found2;
         }
-        return 'txt';
+        return str.replaceAll('.', '');
     }
 }

@@ -31,12 +31,13 @@ export class EnsibleFsComponent extends RouteChangeSubcribe {
   newFile: boolean = false;
 
   //secrets
-  vaultDectypt = '';
-  vaultDectyptWithPassword = true;
+  vaultSecret = '';
+  vaultCrtyptionWithPassword = false;
   vaultDectypted = false;
 
   //Data
   ws?: EnsibleWorkSpace;
+  validForm: boolean = false;
 
   constructor(
     private ensibleFsService: EnsibleFsService,
@@ -59,6 +60,8 @@ export class EnsibleFsComponent extends RouteChangeSubcribe {
     this.fileContentCopy = '';
     this.error = '';
     this.newFile = false;
+    this.vaultSecret = '';
+    this.vaultDectypted = false;
   }
 
   override onRouteChange(): void {
@@ -72,6 +75,8 @@ export class EnsibleFsComponent extends RouteChangeSubcribe {
 
       if(this.fileName === 'new') {
         this.newFile = true;
+        this.vaultDectypted = true;
+        this.fileName = '';
         this.fileContent = `---\n`;
         return;
       }
@@ -95,7 +100,7 @@ export class EnsibleFsComponent extends RouteChangeSubcribe {
   }
 
   save() {
-    if(this.fileName === 'new') {
+    if(this.fileName === 'new' || !this.fileName) {
       this.dialogUtils.openErrorMessage('File name Error', 'File name cannot be "new"');
       return;
     }
@@ -112,7 +117,6 @@ export class EnsibleFsComponent extends RouteChangeSubcribe {
 
           if(this.newFile) {
             this.ensibleWorkspaceParserService.triggerFetchWorkspace();
-            this.newFile = false;
             this.router.navigate([this.parentName, this.fileName]);
           }
 
@@ -123,7 +127,11 @@ export class EnsibleFsComponent extends RouteChangeSubcribe {
       })
     }
 
-    if(DataUtils.isNotEqual(this.fileName, this.fileNameCopy)) {
+    this.saveNameChange();
+  }
+
+  private saveNameChange() {
+    if (DataUtils.isNotEqual(this.fileName, this.fileNameCopy)) {
       this.ensibleFsService.moveFile(this.fullSortedPath, `/${this.parentName}/${this.fileName}`, FsWriteMode.OVERRIDEN).pipe(this.rxJSUtils.waitLoadingDialog()).subscribe({
         next: () => {
           this.fileNameCopy = structuredClone(this.fileName);
@@ -133,9 +141,8 @@ export class EnsibleFsComponent extends RouteChangeSubcribe {
         error: (err) => {
           this.dialogUtils.openErrorMessageFromError(err);
         }
-      })
+      });
     }
-
   }
 
   revert() {
@@ -148,8 +155,18 @@ export class EnsibleFsComponent extends RouteChangeSubcribe {
     return MonacoLanguage.from(extension);
   }
 
+  //-----------------------------secrets--------------------------------------
+  
+  getVaultTypeLabel() {
+    return this.newFile ? 'Encrypt' : 'Decrypt';
+  }
+
+  isSecretFile() {
+    return this.parentName === 'secrets';
+  }
+
   decryptFileContent() {
-    this.ensibleVaultService.viewVault(this.fullSortedPath, !this.vaultDectyptWithPassword ? this.vaultDectypt : undefined, this.vaultDectyptWithPassword ? this.vaultDectypt : undefined).pipe(this.rxJSUtils.waitLoadingDialog()).subscribe({
+    this.ensibleVaultService.viewVault(this.fullSortedPath, !this.vaultCrtyptionWithPassword ? this.vaultSecret : undefined, this.vaultCrtyptionWithPassword ? this.vaultSecret : undefined).pipe(this.rxJSUtils.waitLoadingDialog()).subscribe({
       next: data => {
         this.fileContent = data;
         this.fileContentCopy = structuredClone(data);
@@ -159,5 +176,44 @@ export class EnsibleFsComponent extends RouteChangeSubcribe {
         this.dialogUtils.openErrorMessage("Error", "can't decrypt file");
       }
     })
+  }
+
+  saveSecrets() {
+    if(this.fileName === 'new' || !this.fileName) {
+      this.dialogUtils.openErrorMessage('File name Error', 'File name cannot be "new"');
+      return;
+    }
+
+    if(this.newFile) {
+      this.fullSortedPath = `/${this.parentName}/${this.fileName}`;
+      this.fileNameCopy = structuredClone(this.fileName);
+    }
+
+    if(DataUtils.isNotEqual(this.fileContent, this.fileContentCopy)) {
+      if(this.newFile) {
+        this.ensibleVaultService.createVault(this.fileContent, this.fullSortedPath, !this.vaultCrtyptionWithPassword ? this.vaultSecret : undefined, this.vaultCrtyptionWithPassword ? this.vaultSecret : undefined).pipe(this.rxJSUtils.waitLoadingDialog()).subscribe({
+          next: res => {
+            this.ensibleWorkspaceParserService.triggerFetchWorkspace();
+            this.router.navigate([this.parentName, this.fileName]);
+            this.onRouteChange();
+          },
+          error: (err) => {
+            this.dialogUtils.openErrorMessage("Error", "Error when creating new vault");
+          }
+        });
+      }
+      else {
+        this.ensibleVaultService.modifyVault(this.fileContent, this.fullSortedPath, !this.vaultCrtyptionWithPassword ? this.vaultSecret : undefined, this.vaultCrtyptionWithPassword ? this.vaultSecret : undefined).pipe(this.rxJSUtils.waitLoadingDialog()).subscribe({
+          next: res => {
+            this.onRouteChange();
+          },
+          error: (err) => {
+            this.dialogUtils.openErrorMessage("Error", "Error when modifying vault");
+          }
+        });
+      }
+    }
+
+    this.saveNameChange();
   }
 }
