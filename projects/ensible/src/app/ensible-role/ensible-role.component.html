@@ -3,17 +3,11 @@
 </p>
 
 <ul *ngIf="!error" class="margin-center">
-  <li>
+  <li class="editor-container">
     <app-code-editor
     [language]="'yaml'"
     [value]="fileContent"
+    styleWidth="100%"
     ></app-code-editor>
   </li>
-
-  <!-- <li>
-    <ngx-monaco-editor
-    [options]="{theme: 'vs-dark', language: 'yaml'}"
-    [ngModel]="fileContent"
-    ></ngx-monaco-editor>
-  </li> -->
 </ul>

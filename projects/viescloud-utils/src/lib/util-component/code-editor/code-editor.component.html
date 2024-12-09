@@ -1,5 +1,12 @@
-<ngx-monaco-editor 
-[options]="{theme: 'vs-dark', language: language}" 
-[ngModel]="value"
-(ngModelChange)="valueChange.emit($event)"
-></ngx-monaco-editor> 
+<div
+class="resizable-container"
+[style.width]="styleWidth"
+[style.width.ch]="'auto'"
+[style.height]="styleHeight"
+>
+  <ngx-monaco-editor
+  [options]="{theme: getTextColor(), language: language}"
+  [ngModel]="value"
+  (ngModelChange)="emitValue($event)"
+  ></ngx-monaco-editor>
+</div>

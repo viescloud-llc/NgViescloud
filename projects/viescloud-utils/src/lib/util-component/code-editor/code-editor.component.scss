@@ -1,0 +1,11 @@
+ngx-monaco-editor {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.resizable-container {
+  // resize: both; /* Enable resizing horizontally and vertically */
+  overflow: auto; /* Ensure content remains scrollable */
+  border: 1px solid #ddd; /* Optional: visual border for resizing */
+  position: relative;
+}
