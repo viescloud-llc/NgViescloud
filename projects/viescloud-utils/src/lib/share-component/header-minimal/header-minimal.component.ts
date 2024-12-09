@@ -71,5 +71,11 @@ export class HeaderMinimalComponent {
     }
     else
       this.drawer?.toggle();
+
+    this.drawer?._animationEnd.subscribe({
+      next: () => {
+        this.settingService.onToggleDisplayDrawerSubject.next(this.drawer?.opened ? DRAWER_STATE.OPEN : DRAWER_STATE.CLOSE);
+      }
+    });
   }
 }

@@ -9,10 +9,10 @@ import { SettingService } from '../../service/Setting.service';
 })
 export class CodeEditorComponent implements AfterViewInit {
   @Input()
-  language = 'javascript'; // Default language
+  language = 'javascript';
 
   @Input()
-  value = ''; // Default content
+  value = '';
 
   @Output()
   valueChange = new EventEmitter<string>();
@@ -33,23 +33,35 @@ export class CodeEditorComponent implements AfterViewInit {
     private cd: ChangeDetectorRef,
     private settingService: SettingService
   ) {
-
+    settingService.onToggleDisplayDrawer$.subscribe({
+      next: state => {
+        this.resizeEditor();
+      }
+    });
   }
   ngAfterViewInit(): void {
     this.resizeEditor();
   }
 
-  private resizeEditor(): void {
-    //TODO: fix this resizeable
+  resizeEditor(): void {
+    // const containerWidth = (document.querySelector('.resizable-container') as HTMLElement).offsetWidth;
     if (this.editorComponent) {
-      // this.editorComponent._editorContainer.nativeElement.style.width = 100 + '%';
+      // this.editorComponent._editorContainer.nativeElement.style.width.ch = containerWidth + 'px';
       // this.editorComponent.insideNg = true;
       // this.cd.detectChanges();
+
+      //this work
+      this.editorComponent.insideNg = !this.editorComponent.insideNg;
+      this.editorComponent.insideNg = !this.editorComponent.insideNg;
     }
   }
 
-  getTextColor(): string {
+  getVsCodeThemeColor(): string {
     return this.settingService.getCurrentThemeTextColor() === 'black' ? 'vs-light' : 'vs-dark';
+  }
+
+  getThemeTextColor() {
+    return this.settingService.getCurrentThemeTextColor();
   }
 
   emitValue(value: string) {

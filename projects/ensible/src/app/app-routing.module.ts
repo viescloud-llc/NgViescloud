@@ -4,6 +4,7 @@ import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { EnsibleSettingComponent } from './ensible-setting/ensible-setting.component';
 import { EnsibleRoleComponent } from './ensible-role/ensible-role.component';
+import { EnsibleFsComponent } from './ensible-fs/ensible-fs.component';
 
 const routes: Routes = [
   {
@@ -14,7 +15,6 @@ const routes: Routes = [
     path: "login",
     component: LoginComponent
   },
-
   {
     path: 'roles',
     children: [
@@ -24,7 +24,42 @@ const routes: Routes = [
       }
     ]
   },
-
+  {
+    path: 'inventories',
+    children: [
+      {
+        path: '**',
+        component: EnsibleFsComponent
+      }
+    ]
+  },
+  {
+    path: 'playbooks',
+    children: [
+      {
+        path: '**',
+        component: EnsibleFsComponent
+      }
+    ]
+  },
+  {
+    path: 'secrets',
+    children: [
+      {
+        path: '**',
+        component: EnsibleFsComponent
+      }
+    ]
+  },
+  {
+    path: 'passwords',
+    children: [
+      {
+        path: '**',
+        component: EnsibleFsComponent
+      }
+    ]
+  },
   {
     path: 'setting',
     children: [
@@ -34,7 +69,6 @@ const routes: Routes = [
       }
     ]
   },
-
   {
     path: "**",
     component: HomeComponent

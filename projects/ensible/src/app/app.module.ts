@@ -11,13 +11,15 @@ import { EnsibleAuthInterceptor } from './guard/ensible-auth.interceptor';
 import { EnsibleSettingComponent } from './ensible-setting/ensible-setting.component';
 import { EnsibleRoleComponent } from './ensible-role/ensible-role.component';
 import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
+import { EnsibleFsComponent } from './ensible-fs/ensible-fs.component';
 
 const LIST = [
   AppComponent,
   HomeComponent,
   LoginComponent,
   EnsibleSettingComponent,
-  EnsibleRoleComponent
+  EnsibleRoleComponent,
+  EnsibleFsComponent,
 ]
 
 @NgModule({

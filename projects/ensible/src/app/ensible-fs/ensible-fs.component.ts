@@ -1,30 +1,27 @@
-import { EnsibleWorkspaceParserService } from './../service/ensible-workspace/ensible-workspace.service';
-import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
-import { RxJSUtils } from './../../../../viescloud-utils/src/lib/util/RxJS.utils';
-import { Component, OnInit } from '@angular/core';
-import { RouteUtil } from 'projects/viescloud-utils/src/lib/util/Route.utils';
-import { EnsibleFsService } from '../service/ensible-fs/ensible-fs.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
 import { RouteChangeSubcribe } from 'projects/viescloud-utils/src/lib/directive/RouteChangeSubcribe.directive';
-import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
-import { FsWriteMode } from '../model/ensible.model';
 import { MonacoLanguage } from 'projects/viescloud-utils/src/lib/model/MonacoEditor.model';
+import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
+import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
+import { RouteUtil } from 'projects/viescloud-utils/src/lib/util/Route.utils';
+import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
+import { FsWriteMode } from '../model/ensible.model';
+import { EnsibleFsService } from '../service/ensible-fs/ensible-fs.service';
+import { EnsibleWorkspaceParserService } from '../service/ensible-workspace/ensible-workspace.service';
 
 @Component({
-  selector: 'app-ensible-role',
-  templateUrl: './ensible-role.component.html',
-  styleUrls: ['./ensible-role.component.scss']
+  selector: 'app-ensible-fs',
+  templateUrl: './ensible-fs.component.html',
+  styleUrls: ['./ensible-fs.component.scss']
 })
-export class EnsibleRoleComponent extends RouteChangeSubcribe {
-
+export class EnsibleFsComponent extends RouteChangeSubcribe {
   fullSortedPath: string = '';
-  roleName: string = '';
-  roleCategoryName: string = '';
-  fileName: string = '';
-  fileNameCopy: string = '';
-
+  parentName: string = '';
   error: string = '';
 
+  fileName: string = '';
+  fileNameCopy: string = '';
   fileContent: string = '';
   fileContentCopy: string = '';
 
@@ -44,8 +41,7 @@ export class EnsibleRoleComponent extends RouteChangeSubcribe {
 
   cleanAllValue() {
     this.fullSortedPath = '';
-    this.roleName = '';
-    this.roleCategoryName = '';
+    this.parentName = '';
     this.fileName = '';
     this.fileNameCopy = '';
     this.fileContent = '';
@@ -57,12 +53,11 @@ export class EnsibleRoleComponent extends RouteChangeSubcribe {
   override onRouteChange(): void {
     this.cleanAllValue();
     let pathSplits = RouteUtil.getCurrentUrl().split('/');
-    if(pathSplits.length == 7) {
-      this.roleName = pathSplits[pathSplits.length - 3];
-      this.roleCategoryName = pathSplits[pathSplits.length - 2];
+    if(pathSplits.length == 5) {
+      this.parentName = pathSplits[pathSplits.length - 2];
       this.fileName = pathSplits[pathSplits.length - 1];
       this.fileNameCopy = structuredClone(this.fileName);
-      this.fullSortedPath = `/roles/${this.roleName}/${this.roleCategoryName}/${this.fileName}`;
+      this.fullSortedPath = `/${this.parentName}/${this.fileName}`;
 
       if(this.fileName === 'new') {
         this.newFile = true;
@@ -95,7 +90,7 @@ export class EnsibleRoleComponent extends RouteChangeSubcribe {
     }
 
     if(this.newFile) {
-      this.fullSortedPath = `/roles/${this.roleName}/${this.roleCategoryName}/${this.fileName}`;
+      this.fullSortedPath = `/${this.parentName}/${this.fileName}`;
       this.fileNameCopy = structuredClone(this.fileName);
     }
 
@@ -107,7 +102,7 @@ export class EnsibleRoleComponent extends RouteChangeSubcribe {
           if(this.newFile) {
             this.ensibleWorkspaceParserService.triggerFetchWorkspace();
             this.newFile = false;
-            this.router.navigate(['roles', this.roleName, this.roleCategoryName, this.fileName]);
+            this.router.navigate([this.parentName, this.fileName]);
           }
 
         },
@@ -118,11 +113,11 @@ export class EnsibleRoleComponent extends RouteChangeSubcribe {
     }
 
     if(DataUtils.isNotEqual(this.fileName, this.fileNameCopy)) {
-      this.ensibleFsService.moveFile(this.fullSortedPath, `/roles/${this.roleName}/${this.roleCategoryName}/${this.fileName}`, FsWriteMode.OVERRIDEN).pipe(this.rxJSUtils.waitLoadingDialog()).subscribe({
+      this.ensibleFsService.moveFile(this.fullSortedPath, `/${this.parentName}/${this.fileName}`, FsWriteMode.OVERRIDEN).pipe(this.rxJSUtils.waitLoadingDialog()).subscribe({
         next: () => {
           this.fileNameCopy = structuredClone(this.fileName);
           this.ensibleWorkspaceParserService.triggerFetchWorkspace();
-          this.router.navigate(['roles', this.roleName, this.roleCategoryName, this.fileName]);
+          this.router.navigate([this.parentName, this.fileName]);
         },
         error: (err) => {
           this.dialogUtils.openErrorMessageFromError(err);

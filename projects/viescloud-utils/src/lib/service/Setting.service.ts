@@ -33,6 +33,9 @@ export class SettingService {
   private onGeneralSettingChangeSubject = new Subject<void>();
   onGeneralSettingChange = this.onGeneralSettingChangeSubject.asObservable();
 
+  onToggleDisplayDrawerSubject = new Subject<DRAWER_STATE>();
+  onToggleDisplayDrawer$ = this.onToggleDisplayDrawerSubject.asObservable();
+
   prefix = '';
   currentMenu = "main";
   apiGatewayUrl: string = environment.gateway_api;
@@ -139,6 +142,7 @@ export class SettingService {
   setDisplayDrawer(value: boolean): void {
     this.generalSetting.initDisplayDrawer = value;
     if(this.header) {
+      let state = this.generalSetting.initDisplayDrawer ? DRAWER_STATE.OPEN : DRAWER_STATE.CLOSE;
       this.header.toggleDrawer(this.generalSetting.initDisplayDrawer ? DRAWER_STATE.OPEN : DRAWER_STATE.CLOSE);
     }
   }
@@ -149,9 +153,7 @@ export class SettingService {
 
   toggleDisplayDrawer(): void {
     this.generalSetting.initDisplayDrawer = !this.generalSetting.initDisplayDrawer;
-    if(this.header) {
-      this.header.toggleDrawer(this.generalSetting.initDisplayDrawer ? DRAWER_STATE.OPEN : DRAWER_STATE.CLOSE);
-    }
+    this.setDisplayDrawer(this.generalSetting.initDisplayDrawer);
   }
 
   saveSettingLocally(generalSetting: GeneralSetting): void {
