@@ -5,6 +5,7 @@ import { LoginComponent } from './login/login.component';
 import { EnsibleSettingComponent } from './ensible-setting/ensible-setting.component';
 import { EnsibleRoleComponent } from './ensible-role/ensible-role.component';
 import { EnsibleFsComponent } from './ensible-fs/ensible-fs.component';
+import { EnsibleUserComponent } from './ensible-user/ensible-user.component';
 
 const routes: Routes = [
   {
@@ -66,6 +67,10 @@ const routes: Routes = [
       {
         path: 'application-setting',
         component: EnsibleSettingComponent
+      },
+      {
+        path: 'users',
+        component: EnsibleUserComponent
       }
     ]
   },

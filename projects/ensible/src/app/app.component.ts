@@ -71,6 +71,10 @@ export class AppComponent extends ViescloudApplicationMinimal {
         {
           title: 'Application Setting',
           routerLink: '/setting/application-setting'
+        },
+        {
+          title: 'Users',
+          routerLink: '/setting/users'
         }
       ]
     },

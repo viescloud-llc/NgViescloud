@@ -1,0 +1,28 @@
+<ul class="margin-center" *ngIf="!selectedUser">
+  <li>
+    <app-mat-table
+    [matRows]="users"
+    [blankObject]="blankUser"
+    [showMatTooltip]="true"
+    [showPagination]="true"
+    [showFilter]="true"
+    ></app-mat-table>
+  </li>
+  <li>
+    <br>
+    <button mat-raised-button color="primary" (click)="addUser()">Add user</button>
+  </li>
+</ul>
+
+<ul class="margin-center" *ngIf="selectedUser">
+  <li>
+    <button mat-raised-button color="primary" (click)="selectedUser = undefined">Back</button>
+    <br>
+  </li>
+  <li>
+    <app-mat-form-field-input-dynamic
+    [(value)]="selectedUser"
+    [blankObject]="blankUser"
+    ></app-mat-form-field-input-dynamic>
+  </li>
+</ul>

@@ -1,8 +1,12 @@
+import { MatTableDisplayLabel } from "projects/viescloud-utils/src/lib/model/Mat.model";
+
 export class EnsibleUser {
   id: number = 0;
   sub: string = '';
   username: string = '';
   email: string = '';
+
+  @MatTableDisplayLabel('Groups', (user: EnsibleUser) => user.userGroups.reduce((a, c) => (a? a + ', ' : a) + c.name, ''))
   userGroups: EnsibleUserGroup[] = [
     new EnsibleUserGroup(),
   ] as EnsibleUserGroup[];
