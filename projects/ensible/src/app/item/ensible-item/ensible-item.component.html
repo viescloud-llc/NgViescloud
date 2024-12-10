@@ -1,3 +1,97 @@
-<p>
-  ensible-item works!
-</p>
+<ul class="margin-center" appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
+  <li>
+    <app-mat-form-field-input
+    label="ID"
+    [(value)]="item.id"
+    [styleWidth]="'100%'"
+    [disable]="true"
+    ></app-mat-form-field-input>
+  </li>
+  <li>
+    <app-mat-form-field-input
+    label="Item Name"
+    [(value)]="item.name"
+    styleWidth="100%"
+    [required]="true"
+    ></app-mat-form-field-input>
+  </li>
+  <li>
+    <details>
+      <summary>Trigger</summary>
+      <ul>
+        <li>
+          <app-mat-form-field-input-dynamic
+          label="Trigger on github webhook"
+          [(value)]="item.triggerOnGithubWebhook"
+          styleWidth="100%"
+          [isSlideToggle]="true"
+          ></app-mat-form-field-input-dynamic>
+        </li>
+        <li *ngIf="item.triggerOnGithubWebhook">
+          <app-mat-form-field-input
+          label="Github url"
+          [(value)]="item.githubUrl"
+          styleWidth="100%"
+          [required]="true"
+          ></app-mat-form-field-input>
+        </li>
+        <li>
+          <app-mat-form-field-input-dynamic
+          label="Trigger on gitlab webhook"
+          [(value)]="item.triggerOnGitlabWebhook"
+          styleWidth="100%"
+          [isSlideToggle]="true"
+          ></app-mat-form-field-input-dynamic>
+        </li>
+        <li *ngIf="item.triggerOnGitlabWebhook">
+          <app-mat-form-field-input
+          label="gitlab url"
+          [(value)]="item.githubUrl"
+          styleWidth="100%"
+          [required]="true"
+          ></app-mat-form-field-input>
+        </li>
+      </ul>
+    </details>
+    <br>
+  </li>
+
+  <li>
+    <details>
+      <summary>Inventory</summary>
+      <ul>
+        <li>
+          <app-mat-form-field-input
+          label="Inventory"
+          [(value)]="item.inventoryPath"
+          styleWidth="100%"
+          [required]="true"
+          ></app-mat-form-field-input>
+        </li>
+      </ul>
+    </details>
+    <br>
+  </li>
+
+  <li>
+    <details>
+      <summary>Playbook</summary>
+      <ul>
+        <li>
+          <app-mat-form-field-input
+          label="Playbook"
+          [(value)]="item.playBookPath"
+          styleWidth="100%"
+          [required]="true"
+          ></app-mat-form-field-input>
+        </li>
+      </ul>
+    </details>
+    <br>
+  </li>
+
+  <li class="flex-row-container">
+    <button mat-raised-button color="primary" (click)="save()" [disabled]="!validForm || !isValueChange()">Save</button>
+    <button mat-raised-button color="warn" (click)="revert()" [disabled]="!validForm || !isValueChange()">Revert</button>
+  </li>
+</ul>
