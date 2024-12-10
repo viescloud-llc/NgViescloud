@@ -2,7 +2,7 @@ import { EnsibleWorkspaceParserService } from './../service/ensible-workspace/en
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 import { RxJSUtils } from './../../../../viescloud-utils/src/lib/util/RxJS.utils';
 import { Component, OnInit } from '@angular/core';
-import { RouteUtil } from 'projects/viescloud-utils/src/lib/util/Route.utils';
+import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 import { EnsibleFsService } from '../service/ensible-fs/ensible-fs.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RouteChangeSubcribe } from 'projects/viescloud-utils/src/lib/directive/RouteChangeSubcribe.directive';
@@ -56,7 +56,7 @@ export class EnsibleRoleComponent extends RouteChangeSubcribe {
 
   override onRouteChange(): void {
     this.cleanAllValue();
-    let pathSplits = RouteUtil.getCurrentUrl().split('/');
+    let pathSplits = RouteUtils.getCurrentUrl().split('/');
     if(pathSplits.length == 7) {
       this.roleName = pathSplits[pathSplits.length - 3];
       this.roleCategoryName = pathSplits[pathSplits.length - 2];

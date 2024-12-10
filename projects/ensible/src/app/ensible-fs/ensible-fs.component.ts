@@ -4,7 +4,7 @@ import { RouteChangeSubcribe } from 'projects/viescloud-utils/src/lib/directive/
 import { MonacoLanguage } from 'projects/viescloud-utils/src/lib/model/MonacoEditor.model';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
-import { RouteUtil } from 'projects/viescloud-utils/src/lib/util/Route.utils';
+import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 import { FsWriteMode } from '../model/ensible.model';
 import { EnsibleFsService } from '../service/ensible-fs/ensible-fs.service';
@@ -66,7 +66,7 @@ export class EnsibleFsComponent extends RouteChangeSubcribe {
 
   override onRouteChange(): void {
     this.cleanAllValue();
-    let pathSplits = RouteUtil.getCurrentUrl().split('/');
+    let pathSplits = RouteUtils.getCurrentUrl().split('/');
     if(pathSplits.length == 5) {
       this.parentName = pathSplits[pathSplits.length - 2];
       this.fileName = pathSplits[pathSplits.length - 1];

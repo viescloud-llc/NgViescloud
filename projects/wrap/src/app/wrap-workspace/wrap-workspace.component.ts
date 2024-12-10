@@ -14,7 +14,7 @@ import { SettingService } from 'projects/viescloud-utils/src/lib/service/Setting
 import { UtilsService } from 'projects/viescloud-utils/src/lib/service/Utils.service';
 import { WrapService } from 'projects/viescloud-utils/src/lib/service/Wrap.service';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
-import { RouteUtil } from 'projects/viescloud-utils/src/lib/util/Route.utils';
+import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 
 export enum WrapMode {
   VIEW = 'view',

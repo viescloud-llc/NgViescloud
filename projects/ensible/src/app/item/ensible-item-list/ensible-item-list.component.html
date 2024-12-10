@@ -1,3 +1,15 @@
-<p>
-  ensible-item-list works!
-</p>
+<ul class="margin-center">
+  <li>
+    <app-mat-table
+    [matRows]="items"
+    [blankObject]="blankItem"
+    [showFilter]="true"
+    [showPagination]="true"
+    (onEditRow)="selectItem($event)"
+    ></app-mat-table>
+  </li>
+  <li>
+    <br>
+    <button style="width: 100%;" mat-raised-button color="primary" (click)="addItem()">Add Item</button>
+  </li>
+</ul>

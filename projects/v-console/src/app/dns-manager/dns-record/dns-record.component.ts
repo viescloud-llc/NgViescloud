@@ -5,7 +5,7 @@ import { AuthentikConfig, DnsRecord, ForwardScheme, NginxCertificate, NginxLocat
 import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
-import { RouteUtil } from 'projects/viescloud-utils/src/lib/util/Route.utils';
+import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 
 @Component({
   selector: 'app-dns-record',
@@ -96,7 +96,7 @@ export class DnsRecordComponent extends FixChangeDetection implements OnInit {
     this.initReference();
 
     if(this.dnsRecord.uri) {
-      let url = RouteUtil.parseUrl(this.dnsRecord.uri);
+      let url = RouteUtils.parseUrl(this.dnsRecord.uri);
       if(!url) {
         this.dialogUtils.openErrorMessage("Error", "Invalid URI");
         this.onEdit.emit(undefined);

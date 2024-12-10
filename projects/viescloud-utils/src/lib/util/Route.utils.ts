@@ -1,7 +1,7 @@
 import { ActivatedRoute } from "@angular/router";
 import { first } from "rxjs";
 
-export class RouteUtil {
+export class RouteUtils {
 
     private constructor() { }
 
@@ -18,7 +18,7 @@ export class RouteUtil {
     }
 
     static getQueryParams(): { [key: string]: string } {
-        let url = RouteUtil.getCurrentUrl();
+        let url = RouteUtils.getCurrentUrl();
         let result: { [key: string]: string } = {};
         let query = url.split('?')[1];
         if (query) {
@@ -33,12 +33,12 @@ export class RouteUtil {
     }
 
     static getQueryParam(key: string): string | null {
-        let queryParams = RouteUtil.getQueryParams();
+        let queryParams = RouteUtils.getQueryParams();
         return queryParams[key] ?? null;
     }
 
     static setQueryParam(param: string, value: string | null) {
-        const currentUrl = RouteUtil.getCurrentUrl();
+        const currentUrl = RouteUtils.getCurrentUrl();
         const url = new URL(currentUrl);
         const params = new URLSearchParams(url.search);
 
@@ -60,7 +60,7 @@ export class RouteUtil {
      */
     static getPathVariable(variableName: string): string | null {
         // Get the current URL using window.location.href
-        const url = RouteUtil.getCurrentUrl();
+        const url = RouteUtils.getCurrentUrl();
 
         // Split the URL into segments
         const segments = url.split('/').filter(segment => segment); // Remove empty segments

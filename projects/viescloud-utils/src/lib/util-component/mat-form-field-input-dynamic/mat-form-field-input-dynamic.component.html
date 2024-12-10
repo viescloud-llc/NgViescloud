@@ -131,11 +131,11 @@
 
   <!-- Object Input -->
   <ng-container *ngSwitchCase="DynamicMatInputType.OBJECT">
-    <ul>
-      <li>
+    <ul [class]="indent ? '' : 'no-indented-ul'">
+      <li [class]="indent ? '' : 'no-indented-li'">
         <h2 class="text-center" *ngIf="objectLabel">{{objectLabel}}</h2>
       </li>
-      <li *ngFor="let item of items; let i = index; trackBy: trackByIndex">
+      <li *ngFor="let item of items; let i = index; trackBy: trackByIndex" [class]="indent ? '' : 'no-indented-li'">
         <app-mat-form-field-input-dynamic
           [label]="item.label"
           [placeholder]="item.placeholder"
@@ -155,6 +155,7 @@
           [showListRemoveItemButton]="containListShowRemoveItemButton(item)"
           [matOptions]="item.matOptions"
           (onValueChange)="onValueChangeFn()"
+          [indent]="indent"
         ></app-mat-form-field-input-dynamic>
       </li>
     </ul>

@@ -16,7 +16,7 @@ import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 import { ProductImageSwapType } from 'projects/viescloud-utils/src/lib/dialog/marketing/product-image-swap-dialog/product-image-swap-dialog.component';
-import { RouteUtil } from 'projects/viescloud-utils/src/lib/util/Route.utils';
+import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 
 @Component({
   selector: 'app-product-pinterest',
@@ -571,7 +571,7 @@ export class ProductPinterestComponent extends ProductBasicComponent {
   private getNote() {
     return `Original Link: ${this.product.originalLink}
 Marketing Link: ${this.product.marketingLink}
-VMK link: ${RouteUtil.getCurrentUrl()}
+VMK link: ${RouteUtils.getCurrentUrl()}
 Price: ${this.product.price}`;
   }
 

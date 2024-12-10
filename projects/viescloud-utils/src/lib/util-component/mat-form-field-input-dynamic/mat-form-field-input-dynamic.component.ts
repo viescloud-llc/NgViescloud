@@ -54,6 +54,9 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
   showListAddItemButton: boolean = true;
 
   @Input()
+  indent: boolean = true;
+
+  @Input()
   matOptions?: MatOption<any>[];
 
   // mat option

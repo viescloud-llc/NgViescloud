@@ -41,8 +41,17 @@ export class AppComponent extends ViescloudApplicationMinimal {
       ]
     },
     {
-      title: 'item',
-      children: []
+      title: 'Item',
+      children: [
+        {
+          title: 'all',
+          routerLink: '/item/all'
+        },
+        {
+          title: 'setting',
+          routerLink: '/item/setting'
+        }
+      ]
     },
     {
       title: 'Inventories',

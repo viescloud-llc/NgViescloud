@@ -6,6 +6,8 @@ import { EnsibleSettingComponent } from './ensible-setting/ensible-setting.compo
 import { EnsibleRoleComponent } from './ensible-role/ensible-role.component';
 import { EnsibleFsComponent } from './ensible-fs/ensible-fs.component';
 import { EnsibleUserComponent } from './ensible-user/ensible-user.component';
+import { EnsibleItemListComponent } from './item/ensible-item-list/ensible-item-list.component';
+import { EnsibleItemComponent } from './item/ensible-item/ensible-item.component';
 
 const routes: Routes = [
   {
@@ -15,6 +17,19 @@ const routes: Routes = [
   {
     path: "login",
     component: LoginComponent
+  },
+  {
+    path: "item",
+    children: [
+      {
+        path: 'all',
+        component: EnsibleItemListComponent
+      },
+      {
+        path: ':id',
+        component: EnsibleItemComponent
+      }
+    ]
   },
   {
     path: 'roles',

@@ -16,7 +16,7 @@ import { DataUtils } from '../util/Data.utils';
 import { FileUtils } from '../util/File.utils';
 import { StringUtils } from '../util/String.utils';
 import { Subject } from 'rxjs';
-import { RouteUtil } from '../util/Route.utils';
+import { RouteUtils } from '../util/Route.utils';
 import { HeaderMinimalComponent } from '../share-component/header-minimal/header-minimal.component';
 
 @Injectable({
@@ -217,10 +217,10 @@ export class SettingService {
   }
 
   loadBackgroundImage(url: string, objectStorage?: ObjectStorage, popupType: PopupType = PopupType.DYNAMIC_MESSAGE_POPUP, rememberInitialUrl: boolean = true) {
-    let currentRoute = RouteUtil.getCurrentUrl();
+    let currentRoute = RouteUtils.getCurrentUrl();
     if(url.includes(environment.gateway_api) && objectStorage) {
       objectStorage.generateObjectUrlFromViescloudUrl(url, popupType).then(res => {
-        if(rememberInitialUrl && RouteUtil.getCurrentUrl() === currentRoute)
+        if(rememberInitialUrl && RouteUtils.getCurrentUrl() === currentRoute)
           this.backgroundImageUrl = res;
       })
     }

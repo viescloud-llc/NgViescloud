@@ -102,22 +102,13 @@ export class EnsibleItem {
   id: number = 0;
   name: string = '';
   githubUrl: string = '';
-
   triggerOnGithubWebhook: boolean = false;
-
   gitlabUrl: string = '';
-
   triggerOnGitlabWebhook: boolean = false;
-
   playBookPath: string = '';
-
   inventoryPath: string = '';
-
   vaultSecretsFilePath: string = '';
-
   vaultPasswordFilePath: string = '';
-
   useUserAsPassword: boolean = false;
-
   path: string = '';
 }
