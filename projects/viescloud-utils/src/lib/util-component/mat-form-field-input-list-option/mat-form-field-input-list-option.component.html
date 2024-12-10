@@ -4,7 +4,7 @@
       List of {{label}}
     </mat-panel-title>
     <mat-panel-description>
-      Size: {{value.length}}
+      Size: {{value.length}} {{minSize > 0 ? '*' : ''}}
     </mat-panel-description>
   </mat-expansion-panel-header>
   <br>
@@ -32,13 +32,12 @@
         [label]="label"
         [value]="value[i]" (valueChange)="value[i] = $event"
         [options]="options"
-        styleWidth="95%"
+        styleWidth="100%"
         noneLabel=""
         [required]="required"
+        [customOptionLabel]="'Remove'"
+        (onCustomOptionSelected)="remove(i)"
         ></app-mat-form-field-input-option>
-        <button mat-icon-button color="primary" (click)="remove(i)" style="width: 5%;">
-          <mat-icon>delete</mat-icon>
-        </button>
         <hr>
       </ng-container>
     </ng-container>

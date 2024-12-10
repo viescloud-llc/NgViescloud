@@ -7,12 +7,13 @@ import { PropertyMatcherEnum } from "../model/Mat.model";
 import { MatDialog } from "@angular/material/dialog";
 import { ObjectDialog, ObjectDialogData } from "../dialog/object-dialog/object-dialog.component";
 import { Injectable } from "@angular/core";
+import { RxJSUtils } from "../util/RxJS.utils";
 
 export abstract class ViesService {
     protected getURI(): string {
         return environment.gateway_api;
     }
-    
+
     protected abstract getPrefixes(): string[];
 
     protected getPrefixPath(): string {
@@ -24,7 +25,7 @@ export abstract class ViesService {
         return path;
     }
 
-    public getPrefixUri(): string { 
+    public getPrefixUri(): string {
         return `${this.getURI()}${this.getPrefixPath()}`;
     }
 }
@@ -34,7 +35,7 @@ export abstract class ViesService {
 })
 export abstract class ViesRestService<T extends Object> extends ViesService {
 
-    constructor(protected httpClient: HttpClient) { 
+    constructor(protected httpClient: HttpClient) {
         super();
     }
 
@@ -101,10 +102,14 @@ export abstract class ViesRestService<T extends Object> extends ViesService {
             blankObject: blankObject
         }
 
-        return matDialog.open(ObjectDialog, { data: objectDialogData , width: '100%'});
+        return matDialog.open(ObjectDialog, { data: objectDialogData , width: '100%'}).afterClosed();
     }
 
     private getFirstValueFrom(observable: Observable<T>, matDialog: MatDialog, waitLoadingDialog: boolean): Promise<T> {
-        return waitLoadingDialog ? UtilsService.ObservableToPromise(observable.pipe(UtilsService.waitLoadingDialog(matDialog))) : firstValueFrom(observable);
+        return waitLoadingDialog ? firstValueFrom(observable.pipe(RxJSUtils.waitLoadingDialog(matDialog))) : firstValueFrom(observable);
+    }
+
+    public postOrPut(id: any, object: T): Observable<T> {
+      return id ? this.put(id, object) : this.post(object);
     }
 }

@@ -233,7 +233,7 @@ export class MatFromFieldInputDynamicItem {
                 })
             }
         }
-        
+
         return include;
     }
 }
@@ -248,7 +248,7 @@ export interface Tuple<T, U> {
 /**
  * this function set a field dynamic input to disable
  * @param disable input is disable
- * @returns 
+ * @returns
  */
 export const MatInputDisable = (disable?: boolean) => {
     return function MatInputDisable(object: any, key: any) {
@@ -259,7 +259,7 @@ export const MatInputDisable = (disable?: boolean) => {
 /**
  * this function set all field in object to be disable in dynamic input
  * @param disable input is disable
- * @returns 
+ * @returns
  */
 export const MatInputDisableAll = (disable: boolean, keys: string[]) => {
     return function MatInputDisableAll(object: any) {
@@ -273,7 +273,7 @@ export const MatInputDisableAll = (disable: boolean, keys: string[]) => {
 /**
  * this function set a field dynamic input to require
  * @param require input is require
- * @returns 
+ * @returns
  */
 export const MatInputRequire = (require?: boolean) => {
     return function MatInputRequire(object: any, key: any) {
@@ -284,7 +284,7 @@ export const MatInputRequire = (require?: boolean) => {
 /**
  * this function set all field in object to be require in dynamic input
  * @param require input is require
- * @returns 
+ * @returns
  */
 export const MatInputRequireAll = (require: boolean, keys: string[]) => {
     return function MatInputRequireAll(object: any) {
@@ -297,7 +297,7 @@ export const MatInputRequireAll = (require: boolean, keys: string[]) => {
 /**
  * this function set a field dynamic input to hidden
  * @param hide hidden this input
- * @returns 
+ * @returns
  */
 export const MatInputHide = (hide?: boolean) => {
     return function MatInputHide(object: any, key: any) {
@@ -308,7 +308,7 @@ export const MatInputHide = (hide?: boolean) => {
 /**
  * this function set all field in object to be hidden in dynamic input
  * @param hide hidden this input
- * @returns 
+ * @returns
  */
 export const MatInputHideAll = (hide: boolean, keys: string[]) => {
     return function MatInputHideAll(object: any) {
@@ -321,7 +321,7 @@ export const MatInputHideAll = (hide: boolean, keys: string[]) => {
 /**
  * this function set a field dynamic input to be text area
  * @param disable input is text area
- * @returns 
+ * @returns
  */
 export const MatInputTextArea = (disable?: boolean) => {
     return function MatInputTextArea(object: any, key: any) {
@@ -332,7 +332,7 @@ export const MatInputTextArea = (disable?: boolean) => {
 /**
  * this function set a field dynamic input to have expansion panel
  * @param disable input have expansion panel
- * @returns 
+ * @returns
  */
 export const MatInputExpansionPanel = (disable?: boolean) => {
     return function MatInputExpansionPanel(object: any, key: any) {
@@ -392,7 +392,7 @@ export const MatInputEnum = (Enum: any, noneLabel?: string | number, noneValue?:
  * @param require input is require
  * @param disable input is disable
  * @param hide hidden this input
- * @returns 
+ * @returns
  */
 export const MatInputSetting = (index: number, require?: boolean, disable?: boolean, hide?: boolean) => {
     return function MatInputSetting(object: any, key: any) {
@@ -432,9 +432,9 @@ export const MatInputItemSetting = (type: MatItemSettingType, value: any) => {
 
 // Mat table
 /**
- * 
+ *
  * @param index indexing this column
- * @returns 
+ * @returns
  */
 export const MatTableIndex = (index: number) => {
     return function MatTableIndex(object: any, key: any) {
@@ -443,21 +443,21 @@ export const MatTableIndex = (index: number) => {
 }
 
 /**
- * 
+ *
  * @param hide hidden column
- * @returns 
+ * @returns
  */
 export const MatTableHide = (hide?: boolean) => {
     return function MatTableHide(object: any, key: any) {
-        addValue(object, key, MatTableSettingType.HIDE.toString(), hide, false);
+        addValue(object, key, MatTableSettingType.HIDE.toString(), hide, true);
     }
 }
 
 /**
- * 
+ *
  * @param label label of column
  * @param displayValueFn this function should be (obj: T) => string
- * @returns 
+ * @returns
  */
 export const MatTableDisplayLabel = (label?: string, displayValueFn?: Function) => {
     return function MatTableDisplayLabel(object: any, key: any) {

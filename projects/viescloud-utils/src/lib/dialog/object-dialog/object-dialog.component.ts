@@ -1,12 +1,13 @@
 import { AfterViewChecked, ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { DataUtils } from '../../util/Data.utils';
 
 export interface ObjectDialogData<T = object, S = object> {
-  id: any, 
+  id: any,
   service: S,
-  title?: string, 
-  getFn: (service: S, id: any) => Promise<T> | T, 
-  createFn?: (service: S, value: T) => Promise<T>, 
+  title?: string,
+  getFn: (service: S, id: any) => Promise<T> | T,
+  createFn?: (service: S, value: T) => Promise<T>,
   modifyFn?: (service: S, value: T) => Promise<T>,
   blankObject?: T;
 }
@@ -71,11 +72,11 @@ export class ObjectDialog<T = object, S = object> implements OnInit, AfterViewCh
       .catch(e => this.error = e.error.reason ?? "An unexpected error has occurred");
     }
     else
-      throw new Error("no modify or create function is available");
+      this.closeDialog(this.value);
   }
 
   isValueChange() {
-    return JSON.stringify(this.value) !== JSON.stringify(this.valueCopy);
+    return DataUtils.isNotEqual(this.value, this.valueCopy);
   }
 
   revert() {

@@ -82,26 +82,32 @@ export class DialogUtils {
     }
 
     static openProductImageSwapDialog(matDialog: MatDialog, fileOptions: MatOption<string>[], width: string = '100%', disableClose: boolean = false) {
-        return new Promise<ProductImageSwapDialogRespondData>((resolve, reject) => {
-            let dialog = matDialog.open(ProductImageSwapDialog, {
-                disableClose: disableClose,
-                data: {
-                    fileOptions: fileOptions
-                },
-                width: width
-            })
-
-            dialog.afterClosed().subscribe({
-                next: (result) => {
-                    if(result)
-                        resolve(result);
-                    else
-                        reject(result);
-                },
-                error: (error) => {
-                    reject(error);
-                }
-            })
+      return new Promise<ProductImageSwapDialogRespondData>((resolve, reject) => {
+        let dialog = matDialog.open(ProductImageSwapDialog, {
+            disableClose: disableClose,
+            data: {
+                fileOptions: fileOptions
+            },
+            width: width
         })
+
+        dialog.afterClosed().subscribe({
+            next: (result) => {
+                if(result)
+                    resolve(result);
+                else
+                    reject(result);
+            },
+            error: (error) => {
+                reject(error);
+            }
+        })
+      })
+    }
+
+    // -------------------------Dyanmic Object Dialog-------------------------
+
+    static openDynamicObjectDialog(matDialog: MatDialog, object: any, width: string = '100%', disableClose: boolean = false) {
+      //TODO
     }
 }

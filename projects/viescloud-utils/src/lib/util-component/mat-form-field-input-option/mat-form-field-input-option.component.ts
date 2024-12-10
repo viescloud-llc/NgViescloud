@@ -18,6 +18,9 @@ export class MatFormFieldInputOptionComponent<T> extends MatFormFieldComponent {
   @Input()
   noneLabel = 'None';
 
+  @Input()
+  customOptionLabel = '';
+
   @Output()
   opened: EventEmitter<void> = new EventEmitter();
 
@@ -26,6 +29,9 @@ export class MatFormFieldInputOptionComponent<T> extends MatFormFieldComponent {
 
   @Output()
   selectionChange: EventEmitter<T> = new EventEmitter();
+
+  @Output()
+  onCustomOptionSelected: EventEmitter<void> = new EventEmitter();
 
   override ngOnChanges(changes: SimpleChanges): void {
     super.ngOnChanges(changes);

@@ -1,20 +1,37 @@
-import { MatTableDisplayLabel } from "projects/viescloud-utils/src/lib/model/Mat.model";
+import { MatInputDisable, MatInputHide, MatInputRequire, MatTableDisplayLabel, MatTableHide } from "projects/viescloud-utils/src/lib/model/Mat.model";
 
 export class EnsibleUser {
+  @MatInputDisable()
   id: number = 0;
+
+  @MatInputDisable()
   sub: string = '';
+
+  @MatInputRequire()
   username: string = '';
+
+  @MatInputRequire()
   email: string = '';
 
+  @MatTableHide()
+  @MatInputHide()
+  password: string = '';
+
   @MatTableDisplayLabel('Groups', (user: EnsibleUser) => user.userGroups.reduce((a, c) => (a? a + ', ' : a) + c.name, ''))
+  @MatInputHide()
   userGroups: EnsibleUserGroup[] = [
     new EnsibleUserGroup(),
   ] as EnsibleUserGroup[];
 }
 
 export class EnsibleUserGroup {
+
+  @MatInputDisable()
   id: number = 0;
+
+  @MatInputRequire()
   name: string = '';
+
   description: string = '';
 }
 

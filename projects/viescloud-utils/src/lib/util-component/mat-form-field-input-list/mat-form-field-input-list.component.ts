@@ -18,7 +18,7 @@ export class MatFormFieldInputListComponent extends MatFormFieldComponent {
 
   @Output()
   override valueChange: EventEmitter<any[]> = new EventEmitter();
-  
+
   @Input()
   showSizeInput: boolean = true;
 
@@ -27,9 +27,12 @@ export class MatFormFieldInputListComponent extends MatFormFieldComponent {
 
   @Input()
   showAddItemButton: boolean = true;
-  
+
   @Input()
   maxSize: number = 100;
+
+  @Input()
+  minSize: number = 0;
 
   listLength!: number;
 
@@ -48,6 +51,8 @@ export class MatFormFieldInputListComponent extends MatFormFieldComponent {
     let superCheck = super.isValidInput();
     if(!superCheck)
       return superCheck;
+    else if(this.value.length < this.minSize)
+      return false;
     else
       return this.validForm;
   }
@@ -56,14 +61,14 @@ export class MatFormFieldInputListComponent extends MatFormFieldComponent {
     if(this.reachMaxSize())
       this.listLength = this.maxSize;
 
-    while(this.value.length < this.listLength) 
+    while(this.value.length < this.listLength)
       this.value.push(this.cloneBlankObject());
 
     if(this.value.length > this.listLength) {
       let deleteSize = this.value.length - this.listLength
       this.value.splice(this.listLength - 1, deleteSize);
     }
-    
+
     this.listLength = this.value.length;
   }
 
@@ -129,5 +134,5 @@ export class MatFormFieldInputListComponent extends MatFormFieldComponent {
       this.blankObjectType = typeof this.blankObject;
   }
 }
-  
+
 
