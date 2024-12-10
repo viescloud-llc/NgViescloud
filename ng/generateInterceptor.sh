@@ -7,6 +7,14 @@ function display_header() {
     echo "===================================================="
 }
 
+# Function to remove dashes and capitalize each character after a dash and the first character
+function toCamelCase() {
+    local input_string="$1"
+    # Remove dashes and capitalize the next character
+    local output_string=$(echo "$input_string" | sed 's/[-]\([a-z]\)/\U\1/g' | sed 's/^\([a-z]\)/\U\1/')
+    echo "$output_string"
+}
+
 # Default values for path and name
 interceptor_name=""
 interceptor_path=""
@@ -50,7 +58,7 @@ fi
 mkdir -p "$interceptor_path/$interceptor_name"
 
 # Remove all dashes and capitalize the first letter of each word (camelCase)
-name_no_dash=$(echo "$interceptor_name" | tr -d '-' | sed -r 's/(^|\w)(\w*)/\U\1\L\2/g')
+name_no_dash=$(toCamelCase $interceptor_name)
 
 # Create the interceptor TypeScript file
 cat > "$interceptor_path/$interceptor_name/$interceptor_name.interceptor.ts" <<EOL

@@ -7,6 +7,14 @@ function display_header() {
     echo "===================================================="
 }
 
+# Function to remove dashes and capitalize each character after a dash and the first character
+function toCamelCase() {
+    local input_string="$1"
+    # Remove dashes and capitalize the next character
+    local output_string=$(echo "$input_string" | sed 's/[-]\([a-z]\)/\U\1/g' | sed 's/^\([a-z]\)/\U\1/')
+    echo "$output_string"
+}
+
 # Default values for path, name, and style
 component_name=""
 component_path=""
@@ -89,7 +97,7 @@ esac
 mkdir -p "$component_path/$component_name"
 
 # Remove all dashes and capitalize the first letter of each word (camelCase)
-name_no_dash=$(echo "$component_name" | tr -d '-' | sed -r 's/(^|\w)(\w*)/\U\1\L\2/g')
+name_no_dash=$(toCamelCase $component_name)
 
 # Create the component TypeScript file
 cat > "$component_path/$component_name/$component_name.component.ts" <<EOL

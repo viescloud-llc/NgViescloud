@@ -13,6 +13,8 @@ import { EnsibleRoleComponent } from './ensible-role/ensible-role.component';
 import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
 import { EnsibleFsComponent } from './ensible-fs/ensible-fs.component';
 import { EnsibleUserComponent } from './ensible-user/ensible-user.component';
+import { EnsibleItemListComponent } from './item/ensible-item-list/ensible-item-list.component';
+import { EnsibleItemComponent } from './item/ensible-item/ensible-item.component';
 
 const LIST = [
   AppComponent,
@@ -21,7 +23,9 @@ const LIST = [
   EnsibleSettingComponent,
   EnsibleRoleComponent,
   EnsibleFsComponent,
-  EnsibleUserComponent
+  EnsibleUserComponent,
+  EnsibleItemListComponent,
+  EnsibleItemComponent
 ]
 
 @NgModule({

@@ -7,6 +7,14 @@ function display_header() {
     echo "===================================================="
 }
 
+# Function to remove dashes and capitalize each character after a dash and the first character
+function toCamelCase() {
+    local input_string="$1"
+    # Remove dashes and capitalize the next character
+    local output_string=$(echo "$input_string" | sed 's/[-]\([a-z]\)/\U\1/g' | sed 's/^\([a-z]\)/\U\1/')
+    echo "$output_string"
+}
+
 # Default values for path and name
 directive_name=""
 directive_path=""
@@ -50,7 +58,7 @@ fi
 mkdir -p "$directive_path/$directive_name"
 
 # Remove all dashes and capitalize the first letter of each word (camelCase)
-name_no_dash=$(echo "$directive_name" | tr -d '-' | sed -r 's/(^|\w)(\w*)/\U\1\L\2/g')
+name_no_dash=$(toCamelCase $directive_name)
 
 # Create the directive TypeScript file
 cat > "$directive_path/$directive_name/$directive_name.directive.ts" <<EOL

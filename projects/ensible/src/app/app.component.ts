@@ -41,6 +41,10 @@ export class AppComponent extends ViescloudApplicationMinimal {
       ]
     },
     {
+      title: 'item',
+      children: []
+    },
+    {
       title: 'Inventories',
       children: [],
       hideConditional: () => !this.ensibleAuthenticatorService.isLogin(),
@@ -67,6 +71,7 @@ export class AppComponent extends ViescloudApplicationMinimal {
     },
     {
       title: 'Settings',
+      hideChildren: true,
       children: [
         {
           title: 'Application Setting',
@@ -81,6 +86,7 @@ export class AppComponent extends ViescloudApplicationMinimal {
     },
     {
       title: 'About',
+      hideChildren: true,
       children: [
         {
           title: 'Policy',
