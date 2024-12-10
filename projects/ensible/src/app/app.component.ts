@@ -30,12 +30,12 @@ export class AppComponent extends ViescloudApplicationMinimal {
         {
           title: 'Login',
           routerLink: '/login',
-          hideConditional: () => this.isLogin(),
+          hideConditional: () => this.ensibleAuthenticatorService.isLogin(),
         },
         {
           title: 'logout',
           routerLink: '/logout',
-          hideConditional: () => !this.isLogin(),
+          hideConditional: () => !this.ensibleAuthenticatorService.isLogin(),
           click: () => this.ensibleAuthenticatorService.logout()
         }
       ]
@@ -43,27 +43,27 @@ export class AppComponent extends ViescloudApplicationMinimal {
     {
       title: 'Inventories',
       children: [],
-      hideConditional: () => !this.isLogin(),
+      hideConditional: () => !this.ensibleAuthenticatorService.isLogin(),
     },
     {
       title: 'Playbooks',
       children: [],
-      hideConditional: () => !this.isLogin(),
+      hideConditional: () => !this.ensibleAuthenticatorService.isLogin(),
     },
     {
       title: 'Roles',
       children: [],
-      hideConditional: () => !this.isLogin(),
+      hideConditional: () => !this.ensibleAuthenticatorService.isLogin(),
     },
     {
       title: 'Secrets',
       children: [],
-      hideConditional: () => !this.isLogin(),
+      hideConditional: () => !this.ensibleAuthenticatorService.isLogin(),
     },
     {
       title: 'Passwords',
       children: [],
-      hideConditional: () => !this.isLogin(),
+      hideConditional: () => !this.ensibleAuthenticatorService.isLogin(),
     },
     {
       title: 'Settings',
@@ -74,7 +74,8 @@ export class AppComponent extends ViescloudApplicationMinimal {
         },
         {
           title: 'Users',
-          routerLink: '/setting/users'
+          routerLink: '/setting/users',
+          hideConditional: () => !this.ensibleAuthenticatorService.userHaveRole('ADMIN')
         }
       ]
     },
@@ -190,12 +191,8 @@ export class AppComponent extends ViescloudApplicationMinimal {
     })
   }
 
-  isLogin() {
-    return this.ensibleAuthenticatorService.isLogin();
-  }
-
   getUserAlias(): string {
-    if(this.isLogin())
+    if(this.ensibleAuthenticatorService.isLogin())
       return this.ensibleAuthenticatorService.user!.username;
     else
       return '';

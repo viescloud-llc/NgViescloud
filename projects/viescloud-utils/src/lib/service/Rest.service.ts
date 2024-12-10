@@ -110,6 +110,10 @@ export abstract class ViesRestService<T extends Object> extends ViesService {
     }
 
     public postOrPut(id: any, object: T): Observable<T> {
-      return id ? this.put(id, object) : this.post(object);
+        return id ? this.put(id, object) : this.post(object);
+    }
+
+    public postOrPatch(id: any, object: T): Observable<T> {
+        return id ? this.patch(id, object) : this.post(object);
     }
 }

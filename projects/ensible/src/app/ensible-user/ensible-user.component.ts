@@ -67,7 +67,7 @@ export class EnsibleUserComponent implements OnInit {
 
   selectUser(user: EnsibleUser) {
     this.selectedUser = user;
-    this.selectedUserCopy = structuredClone(this.selectedUser);
+    this.selectedUserCopy = structuredClone(user);
   }
 
   isValueChange() {
@@ -80,7 +80,7 @@ export class EnsibleUserComponent implements OnInit {
 
   save() {
     if(this.selectedUser) {
-      this.ensibleUserService.postOrPut(this.selectedUser?.id, this.selectedUser).subscribe({
+      this.ensibleUserService.postOrPatch(this.selectedUser?.id, this.selectedUser).subscribe({
         next: res => {
           this.ngOnInit();
         }

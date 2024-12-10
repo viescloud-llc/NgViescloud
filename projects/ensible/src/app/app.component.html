@@ -9,7 +9,7 @@
     [drawer]="drawer"
     [imageSrc]="'assets/images/logo-no-background.png'"
     [alias]="getUserAlias()"
-    [isLogin]="isLogin()"
+    [isLogin]="ensibleAuthenticatorService.isLogin()"
     (onLogout)="ensibleAuthenticatorService.logout()"
     (onLogin)="router.navigate(['login'])"
     ></viescloud-header-minimal>

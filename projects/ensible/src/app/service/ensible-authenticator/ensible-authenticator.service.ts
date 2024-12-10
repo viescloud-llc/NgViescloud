@@ -116,4 +116,11 @@ export class EnsibleAuthenticatorService extends EnsibleService {
     FileUtils.localStorageRemoveItem('jwt');
     this.onLogOutSubject.next();
   }
+
+  userHaveRole(name: string) {
+    if(!this.isLogin())
+      return false;
+
+    return this.user?.userGroups.some(e => e.name === name);
+  }
 }

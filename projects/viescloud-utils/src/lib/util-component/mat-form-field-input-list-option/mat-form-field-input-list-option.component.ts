@@ -3,6 +3,8 @@ import { MatFormFieldInputListComponent } from '../mat-form-field-input-list/mat
 import { MatFormFieldComponent } from '../mat-form-field/mat-form-field.component';
 import { MatOption } from '../../model/Mat.model';
 import { UtilsService } from '../../service/Utils.service';
+import { DataUtils } from '../../util/Data.utils';
+import { NumberUtils } from '../../util/Number.utils';
 
 @Component({
   selector: 'app-mat-form-field-input-list-option',
@@ -18,7 +20,33 @@ export class MatFormFieldInputListOptionComponent<T> extends MatFormFieldInputLi
   @Input()
   uniqueValue: boolean = false;
 
+  override ngOnInit(): void {
+    super.ngOnInit();
+    
+    if(this.uniqueValue)
+      this.maxSize = this.options.length;
+  }
+
   override cloneBlankObject() {
-    return structuredClone(this.options[UtilsService.getRandomInt(this.options.length)].value);
+    if(this.uniqueValue) {
+      let index = this.options.findIndex(e => !e.disable);
+      if(index !== -1)
+        return structuredClone(this.options[index].value);
+      else
+        return structuredClone(this.options[0].value);
+    }
+    else 
+      return structuredClone(this.options[NumberUtils.getRandomInteger(0, this.options.length - 1)].value);
+  }
+
+  getOptons() {
+
+    if(this.uniqueValue) {
+      this.options.forEach(e => {
+        e.disable = this.value.some(f => DataUtils.isEqual(f, e.value));
+      })
+    }
+
+    return this.options;
   }
 }

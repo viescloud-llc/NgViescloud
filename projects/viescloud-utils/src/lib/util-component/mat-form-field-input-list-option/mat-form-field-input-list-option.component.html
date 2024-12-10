@@ -31,7 +31,7 @@
         <app-mat-form-field-input-option
         [label]="label"
         [value]="value[i]" (valueChange)="value[i] = $event"
-        [options]="options"
+        [options]="getOptons()"
         styleWidth="100%"
         noneLabel=""
         [required]="required"
