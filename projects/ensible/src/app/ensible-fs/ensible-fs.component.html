@@ -43,11 +43,11 @@
       [(value)]='vaultSecret'
       [required]="true"
       ></app-mat-form-field-input>
-      
+
       <app-mat-form-field-input-option
       *ngIf="!vaultCrtyptionWithPassword"
       [label]="getVaultTypeLabel() + ' with password file'"
-      (selectionChange)="vaultSecret = $event.path"
+      (selectionChange)="vaultSecret = $event"
       [options]="ensibleWorkspaceParserService.passwordFileOptions"
       [required]="true"
       ></app-mat-form-field-input-option>
@@ -55,7 +55,7 @@
       <button mat-raised-button color="primary" (click)="decryptFileContent()">{{getVaultTypeLabel()}}</button>
     </li>
   </ul>
-  
+
   <hr>
   <li *ngIf="!easyMode">
     <app-code-editor

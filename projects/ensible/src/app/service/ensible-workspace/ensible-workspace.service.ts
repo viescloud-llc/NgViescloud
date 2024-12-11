@@ -29,7 +29,11 @@ export class EnsibleWorkspaceParserService extends EnsibleWorkspaceService {
 
   private onFetchWorkspaceSubject = new Subject<EnsibleWorkSpace>();
   onFetchWorkspace$ = this.onFetchWorkspaceSubject.asObservable();
-  passwordFileOptions: MatOption<EnsibleFs>[] = [];
+  inventoriesFileOptions: MatOption<string>[] = [];
+  playbooksFileOptions: MatOption<string>[] = [];
+  secretsFileOptions: MatOption<string>[] = [];
+  passwordFileOptions: MatOption<string>[] = [];
+  taskFileOptions: MatOption<string>[] = [];
 
   triggerFetchWorkspace() {
     this.parseWorkspace().then(ws => {})
@@ -43,46 +47,26 @@ export class EnsibleWorkspaceParserService extends EnsibleWorkspaceService {
           let ws = DataUtils.purgeArray(new EnsibleWorkSpace());
           let workspace = new FSTree();
           workspace.root = res.root;
+          this.taskFileOptions.length = 0;
           workspace.forEach((e, p) => {
             let node = this.newFSNode(e);
             let parent = p ? this.newFSNode(p) : undefined;
 
             this.putRole(parent, ws, node);
 
-            this.putRoleChildNode(parent, ws, '/defaults', (role: EnsibleRole) => {
-              role.defaults = role.defaults ?? this.newEnsibleRoleDir(parent!);
-              role.defaults.child.push(this.newEnsibleFS(node));
-            });
+            this.putRoleChildNode(parent, ws, '/defaults', 'defaults', node);
 
-            this.putRoleChildNode(parent, ws, '/files', (role: EnsibleRole) => {
-              role.files = role.files ?? this.newEnsibleRoleDir(parent!);
-              role.files.child.push(this.newEnsibleFS(node));
-            });
+            this.putRoleChildNode(parent, ws, '/files', 'files', node);
 
-            this.putRoleChildNode(parent, ws, '/handlers', (role: EnsibleRole) => {
-              role.handlers = role.handlers ?? this.newEnsibleRoleDir(parent!);
-              role.handlers.child.push(this.newEnsibleFS(node));
-            });
+            this.putRoleChildNode(parent, ws, '/handlers', 'handlers', node);
 
-            this.putRoleChildNode(parent, ws, '/meta', (role: EnsibleRole) => {
-              role.meta = role.meta ?? this.newEnsibleRoleDir(parent!);
-              role.meta.child.push(this.newEnsibleFS(node));
-            });
+            this.putRoleChildNode(parent, ws, '/meta', 'meta', node);
 
-            this.putRoleChildNode(parent, ws, '/tasks', (role: EnsibleRole) => {
-              role.tasks = role.tasks ?? this.newEnsibleRoleDir(parent!);
-              role.tasks.child.push(this.newEnsibleFS(node));
-            });
+            this.putRoleChildNode(parent, ws, '/tasks', 'tasks', node);
 
-            this.putRoleChildNode(parent, ws, '/templates', (role: EnsibleRole) => {
-              role.templates = role.templates ?? this.newEnsibleRoleDir(parent!);
-              role.templates.child.push(this.newEnsibleFS(node));
-            });
+            this.putRoleChildNode(parent, ws, '/templates', 'templates', node);
 
-            this.putRoleChildNode(parent, ws, '/vars', (role: EnsibleRole) => {
-              role.vars = role.vars ?? this.newEnsibleRoleDir(parent!);
-              role.vars.child.push(this.newEnsibleFS(node));
-            });
+            this.putRoleChildNode(parent, ws, '/vars', 'vars', node);
 
             this.putWorkspaceFS(parent, node, '/playbooks', () => ws.playbooks, s => ws.isPlaybookExist(s));
             this.putWorkspaceFS(parent, node, '/inventories', () => ws.inventories, s => ws.isInventoryExist(s));
@@ -90,8 +74,11 @@ export class EnsibleWorkspaceParserService extends EnsibleWorkspaceService {
             this.putWorkspaceFS(parent, node, '/secrets', () => ws.secrets, s => ws.isSecretExist(s));
           });
 
+          this.cacheFilesOption(() => ws.inventories, this.inventoriesFileOptions).then();
+          this.cacheFilesOption(() => ws.playbooks, this.playbooksFileOptions).then();
+          this.cacheFilesOption(() => ws.secrets, this.secretsFileOptions).then();
+          this.cacheFilesOption(() => ws.passwords, this.passwordFileOptions).then();
           this.onFetchWorkspaceSubject.next(ws);
-          this.cachePasswordFilesOption(ws).then();
           resolve(ws);
         },
         error: err => {
@@ -101,17 +88,22 @@ export class EnsibleWorkspaceParserService extends EnsibleWorkspaceService {
     })
   }
 
-  private putRoleChildNode(parent: FSNode | undefined, ws: EnsibleWorkSpace, parentFolderPath: string, consumer: (role: EnsibleRole) => void) {
+  private putRoleChildNode(parent: FSNode | undefined, ws: EnsibleWorkSpace, parentFolderPath: string, property: keyof EnsibleRole, node: FSNode) {
     if (parent?.metadata.directory && parent.metadata.path.endsWith(parentFolderPath)) {
       let grandParent = this.newFSNode(parent.parent!);
       let role = ws.getRole(grandParent.getName());
       if (role) {
-        consumer(role);
+        if(!role[property] && property !== 'self') {
+          role[property] = this.newEnsibleRoleDir(parent!);
+        }
+
+        const dir = role[property] as EnsibleFsDir;
+        let task = this.newEnsibleFS(node);
+        dir.child.push(task);
+        this.taskFileOptions.push({ value: task.path, valueLabel: task.name });
       }
     }
   }
-
- 
 
   private newFSNode(e: FSNode) {
     let fsNode = new FSNode();
@@ -172,11 +164,11 @@ export class EnsibleWorkspaceParserService extends EnsibleWorkspaceService {
     }
   }
 
-  private async cachePasswordFilesOption(ws: EnsibleWorkSpace) {
+  private async cacheFilesOption(producer: () => EnsibleFsDir, opions: MatOption<string>[]) {
     return new Promise<void>((resolve, reject) => {
-      this.passwordFileOptions = [];
-      for (const password of ws.passwords.child) {
-        this.passwordFileOptions.push({ value: password, valueLabel: password.name });
+      opions.length = 0;
+      for (const value of producer().child) {
+        opions.push({ value: value.path, valueLabel: value.name });
       }
       resolve();
     })

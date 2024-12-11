@@ -92,28 +92,35 @@ export abstract class ViesRestService<T extends Object> extends ViesService {
     }
 
     public openDialog(matDialog: MatDialog, id: any, blankObject: T, waitLoadingDialog?: boolean, title?: string) {
-        let objectDialogData: ObjectDialogData<T, ViesRestService<T>> = {
-            id: id,
-            service: this,
-            title: title ? title : id ? "Edit Data" : "Create New",
-            getFn: (service: ViesRestService<T>, id: any) => id ? this.getFirstValueFrom(service.get(id), matDialog, waitLoadingDialog ?? false) : structuredClone(blankObject),
-            createFn: id ? undefined : (service: ViesRestService<T>, value: T) => this.getFirstValueFrom(service.post(value), matDialog, waitLoadingDialog ?? false),
-            modifyFn: id ? (service: ViesRestService<T>, value: T) => this.getFirstValueFrom(service.put(id, value), matDialog, waitLoadingDialog ?? false) : undefined,
-            blankObject: blankObject
-        }
+      let objectDialogData: ObjectDialogData<T, ViesRestService<T>> = {
+          id: id,
+          service: this,
+          title: title ? title : id ? "Edit Data" : "Create New",
+          getFn: (service: ViesRestService<T>, id: any) => id ? this.getFirstValueFrom(service.get(id), matDialog, waitLoadingDialog ?? false) : structuredClone(blankObject),
+          createFn: id ? undefined : (service: ViesRestService<T>, value: T) => this.getFirstValueFrom(service.post(value), matDialog, waitLoadingDialog ?? false),
+          modifyFn: id ? (service: ViesRestService<T>, value: T) => this.getFirstValueFrom(service.put(id, value), matDialog, waitLoadingDialog ?? false) : undefined,
+          blankObject: blankObject
+      }
 
-        return matDialog.open(ObjectDialog, { data: objectDialogData , width: '100%'}).afterClosed();
+      return matDialog.open(ObjectDialog, { data: objectDialogData , width: '100%'}).afterClosed();
     }
 
     private getFirstValueFrom(observable: Observable<T>, matDialog: MatDialog, waitLoadingDialog: boolean): Promise<T> {
-        return waitLoadingDialog ? firstValueFrom(observable.pipe(RxJSUtils.waitLoadingDialog(matDialog))) : firstValueFrom(observable);
+      return waitLoadingDialog ? firstValueFrom(observable.pipe(RxJSUtils.waitLoadingDialog(matDialog))) : firstValueFrom(observable);
     }
 
     public postOrPut(id: any, object: T): Observable<T> {
-        return id ? this.put(id, object) : this.post(object);
+      return this.parseId(id) ? this.put(id, object) : this.post(object);
     }
 
     public postOrPatch(id: any, object: T): Observable<T> {
-        return id ? this.patch(id, object) : this.post(object);
+      return this.parseId(id) ? this.patch(id, object) : this.post(object);
+    }
+
+    private parseId(id: any) {
+      if(typeof id === 'string')
+          return parseInt(id);
+      else
+          return id;
     }
 }

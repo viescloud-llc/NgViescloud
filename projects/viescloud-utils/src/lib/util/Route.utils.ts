@@ -58,6 +58,20 @@ export class RouteUtils {
      * @returns The value of the path variable, or null if it is not found.
      * @example path = '/users/123' and variableName = 'users' => returns '123'
      */
+    static getPathVariableAsInteger(variableName: string): number | null {
+      let pathVariable = RouteUtils.getPathVariable(variableName);
+      if (pathVariable) {
+        return parseInt(pathVariable);
+      }
+      return null;
+    }
+
+    /**
+     * Retrieves the value of a URL path variable.
+     * @param variableName - The name of the path variable to retrieve.
+     * @returns The value of the path variable, or null if it is not found.
+     * @example path = '/users/123' and variableName = 'users' => returns '123'
+     */
     static getPathVariable(variableName: string): string | null {
         // Get the current URL using window.location.href
         const url = RouteUtils.getCurrentUrl();
@@ -88,7 +102,7 @@ export class RouteUtils {
         // Regular expression to match protocol, host, and port
         const urlPattern = /^(https?):\/\/([\d.]+):(\d+)/;
         const match = url.match(urlPattern);
-    
+
         if (match) {
             const [, protocol, host, port] = match;
             return { protocol, host, port };

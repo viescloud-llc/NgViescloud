@@ -16,6 +16,14 @@
     ></app-mat-form-field-input>
   </li>
   <li>
+    <app-mat-form-field-input
+    label="Item Path"
+    [(value)]="item.path"
+    styleWidth="100%"
+    [required]="true"
+    ></app-mat-form-field-input>
+  </li>
+  <li>
     <details>
       <summary>Trigger</summary>
       <ul>
@@ -25,6 +33,7 @@
           [(value)]="item.triggerOnGithubWebhook"
           styleWidth="100%"
           [isSlideToggle]="true"
+          [blankObject]="false"
           ></app-mat-form-field-input-dynamic>
         </li>
         <li *ngIf="item.triggerOnGithubWebhook">
@@ -41,6 +50,7 @@
           [(value)]="item.triggerOnGitlabWebhook"
           styleWidth="100%"
           [isSlideToggle]="true"
+          [blankObject]="false"
           ></app-mat-form-field-input-dynamic>
         </li>
         <li *ngIf="item.triggerOnGitlabWebhook">
@@ -57,16 +67,35 @@
   </li>
 
   <li>
-    <details>
+    <details open>
       <summary>Inventory</summary>
       <ul>
         <li>
-          <app-mat-form-field-input
+          <app-mat-form-field-input-option
           label="Inventory"
           [(value)]="item.inventoryPath"
-          styleWidth="100%"
+          [options]="ensibleWorkspaceParserService.inventoriesFileOptions"
           [required]="true"
-          ></app-mat-form-field-input>
+          styleWidth="100%"
+          ></app-mat-form-field-input-option>
+        </li>
+      </ul>
+    </details>
+    <br>
+  </li>
+
+  <li>
+    <details open>
+      <summary>Playbook</summary>
+      <ul>
+        <li>
+          <app-mat-form-field-input-option
+          label="Playbook"
+          [(value)]="item.playBookPath"
+          [options]="ensibleWorkspaceParserService.playbooksFileOptions"
+          [required]="true"
+          styleWidth="100%"
+          ></app-mat-form-field-input-option>
         </li>
       </ul>
     </details>
@@ -75,15 +104,35 @@
 
   <li>
     <details>
-      <summary>Playbook</summary>
+      <summary>Secret</summary>
       <ul>
         <li>
-          <app-mat-form-field-input
-          label="Playbook"
-          [(value)]="item.playBookPath"
+          <app-mat-form-field-input-option
+          label="Secret File"
+          [(value)]="item.vaultSecretsFilePath"
+          [options]="ensibleWorkspaceParserService.secretsFileOptions"
+          styleWidth="100%"
+          ></app-mat-form-field-input-option>
+        </li>
+        <li>
+          <app-mat-form-field-input-dynamic
+          *ngIf="item.vaultSecretsFilePath"
+          label="Use user password as vault password (not recommended)"
+          [(value)]="item.useUserAsPassword"
+          styleWidth="100%"
+          [isSlideToggle]="true"
+          [blankObject]="false"
+          ></app-mat-form-field-input-dynamic>
+        </li>
+        <li>
+          <app-mat-form-field-input-option
+          *ngIf="item.vaultSecretsFilePath && !item.useUserAsPassword"
+          label="Secret password file"
+          [(value)]="item.vaultPasswordFilePath"
+          [options]="ensibleWorkspaceParserService.passwordFileOptions"
           styleWidth="100%"
           [required]="true"
-          ></app-mat-form-field-input>
+          ></app-mat-form-field-input-option>
         </li>
       </ul>
     </details>
@@ -93,5 +142,6 @@
   <li class="flex-row-container">
     <button mat-raised-button color="primary" (click)="save()" [disabled]="!validForm || !isValueChange()">Save</button>
     <button mat-raised-button color="warn" (click)="revert()" [disabled]="!validForm || !isValueChange()">Revert</button>
+    <button *ngIf="item.id" mat-raised-button color="warn" (click)="deleteItem()">Delete</button>
   </li>
 </ul>
