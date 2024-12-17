@@ -1,0 +1,25 @@
+<ul class="margin-center">
+  <li>
+    <mat-toolbar>
+      <span>{{item.name}}</span>
+      <span class="spacer"></span>
+      <span *ngIf="runNumber">Run Count: {{runNumber}} </span>
+      <span>Elapsed Time: |not supported yet|</span>
+      <button mat-icon-button [matTooltip]="'run'" (click)="run()" [disabled]="isRunning">
+        <mat-icon>play_arrow</mat-icon>
+      </button>
+      <button mat-icon-button [matTooltip]="'stop'" (click)="stop()" [disabled]="!isRunning">
+        <mat-icon>stop</mat-icon>
+      </button>
+    </mat-toolbar>
+  </li>
+  <hr>
+  <li>
+    <app-mat-form-field-input-text-area
+    [showClearIcon]="false"
+    [value]="runOutput"
+    [styleWidth]="'100%'"
+    [readonly]="true"
+    ></app-mat-form-field-input-text-area>
+  </li>
+</ul>

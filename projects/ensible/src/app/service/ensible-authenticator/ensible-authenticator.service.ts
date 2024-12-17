@@ -7,6 +7,7 @@ import { EnsibleUser } from '../../model/ensible.model';
 import { firstValueFrom, Subject } from 'rxjs';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 import { FileUtils } from 'projects/viescloud-utils/src/lib/util/File.utils';
+import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 
 @Injectable({
   providedIn: 'root'
@@ -26,6 +27,7 @@ export class EnsibleAuthenticatorService extends EnsibleService {
     private dialogUtils: DialogUtils
   ) {
     super(httpClient);
+    this.fetchUserInterval();
   }
 
   ngOnInit(): void {
@@ -34,8 +36,7 @@ export class EnsibleAuthenticatorService extends EnsibleService {
       this.token = token;
       this.getUser().pipe(RxJSUtils.waitLoadingDialog()).subscribe({
         next: res2 => {
-          this.user = res2;
-          this.onLoginSubject.next();
+          this.setLoginUser(res2);
         },
         error: err => {
           this.logout();
@@ -51,7 +52,7 @@ export class EnsibleAuthenticatorService extends EnsibleService {
 
       this.getUser().pipe(RxJSUtils.waitLoadingDialog()).subscribe({
         next: res2 => {
-          this.user = res2;
+          this.setLoginUser(res2);
         },
         error: err => {
           this.logout();
@@ -80,7 +81,7 @@ export class EnsibleAuthenticatorService extends EnsibleService {
 
           this.getUser().pipe(RxJSUtils.waitLoadingDialog()).subscribe({
             next: res2 => {
-              this.user = res2;
+              this.setLoginUser(res2);
               FileUtils.localStorageSetItem('jwt', this.token);
               resolve();
             },
@@ -122,5 +123,13 @@ export class EnsibleAuthenticatorService extends EnsibleService {
       return false;
 
     return this.user?.userGroups.some(e => e.name === name);
+  }
+
+  private setLoginUser(user: EnsibleUser) {
+    if(!this.user || this.user.id !== user.id) {
+      this.onLoginSubject.next();
+    }
+
+    this.user = user;
   }
 }

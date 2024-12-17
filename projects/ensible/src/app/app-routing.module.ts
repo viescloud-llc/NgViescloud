@@ -8,6 +8,7 @@ import { EnsibleFsComponent } from './ensible-fs/ensible-fs.component';
 import { EnsibleUserComponent } from './ensible-user/ensible-user.component';
 import { EnsibleItemListComponent } from './item/ensible-item-list/ensible-item-list.component';
 import { EnsibleItemComponent } from './item/ensible-item/ensible-item.component';
+import { EnsibleItemTabComponent } from './item/ensible-item-tab/ensible-item-tab.component';
 
 const routes: Routes = [
   {
@@ -27,7 +28,7 @@ const routes: Routes = [
       },
       {
         path: ':id',
-        component: EnsibleItemComponent
+        component: EnsibleItemTabComponent
       }
     ]
   },

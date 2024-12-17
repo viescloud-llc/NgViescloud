@@ -1,21 +1,22 @@
 <mat-form-field [appearance]="getAppearance()" [color]="matColor"  [style.width.ch]="getSize(value ? value.toString() : '')" [style.width]="styleWidth">
   <mat-label>{{label}}</mat-label>
-  <textarea 
-  #input 
-  matInput 
-  [ngStyle]="getInputColorNgStyle()" 
-  [(ngModel)]="value" 
-  (ngModelChange)="emitValueWithCondition();" 
-  (keyup.enter)="emitEnter()" 
-  (paste)="emitValueWithCondition()" 
-  [placeholder]="placeholder" 
-  [required]="required" 
-  [disabled]="disable" 
-  [maxlength]="maxlength" 
-  [rows]="rows" 
-  [cols]="cols" 
+  <textarea
+  #input
+  matInput
+  [ngStyle]="getInputColorNgStyle()"
+  [(ngModel)]="value"
+  (ngModelChange)="emitValueWithCondition();"
+  (keyup.enter)="emitEnter()"
+  (paste)="emitValueWithCondition()"
+  [placeholder]="placeholder"
+  [required]="required"
+  [disabled]="disable"
+  [maxlength]="maxlength"
+  [rows]="rows"
+  [cols]="cols"
   [cdkTextareaAutosize]="autoResizeHeight"
-  ></textarea>
+  [readonly]="readonly">
+  </textarea>
   <mat-error>{{label}} can't be empty</mat-error>
   <mat-hint *ngIf="error" style="color: red;" align="start">{{error}}</mat-hint>
   <mat-hint *ngIf="manuallyEmitValue && isValueChange()" style="color: goldenrod;" align="start">Press apply icon to apply input</mat-hint>

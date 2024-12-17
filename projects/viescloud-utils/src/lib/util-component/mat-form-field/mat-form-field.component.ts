@@ -67,7 +67,10 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
 
   @Input()
   defaultErrorTextColor = 'red';
-  
+
+  @Input()
+  readonly: boolean = false;
+
   //key capture
   keyDown: string[] = [];
 
@@ -85,7 +88,7 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
       this.ngOnChanges({});
     }
   }
-  
+
   ngAfterContentChecked(): void {
     this.cd.detectChanges();
   }
@@ -122,7 +125,7 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
       this.value = 0;
     else
       this.value = '';
-      
+
     this.valueChange.emit(this.value);
   }
 
@@ -232,7 +235,7 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
         color: this.defaultErrorTextColor
       }
     }
-    else  
+    else
      return {};
   }
 

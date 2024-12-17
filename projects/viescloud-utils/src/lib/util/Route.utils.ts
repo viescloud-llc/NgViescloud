@@ -17,7 +17,7 @@ export class RouteUtils {
         })
     }
 
-    static getQueryParams(): { [key: string]: string } {
+    static getQueryParams(decodeUrl?: boolean): { [key: string]: string } {
         let url = RouteUtils.getCurrentUrl();
         let result: { [key: string]: string } = {};
         let query = url.split('?')[1];
@@ -29,11 +29,18 @@ export class RouteUtils {
                 result[key] = value;
             })
         }
+
+        if (decodeUrl) {
+            for (let key in result) {
+                result[key] = decodeURIComponent(result[key]);
+            }
+        }
+
         return result;
     }
 
-    static getQueryParam(key: string): string | null {
-        let queryParams = RouteUtils.getQueryParams();
+    static getQueryParam(key: string, decodeUrl?: boolean): string | null {
+        let queryParams = RouteUtils.getQueryParams(decodeUrl);
         return queryParams[key] ?? null;
     }
 

@@ -1,4 +1,4 @@
-import { MatInputDisable, MatInputHide, MatInputRequire, MatTableDisplayLabel, MatTableHide } from "projects/viescloud-utils/src/lib/model/Mat.model";
+import { DateTime, MatInputDisable, MatInputHide, MatInputRequire, MatTableDisplayLabel, MatTableHide } from "projects/viescloud-utils/src/lib/model/Mat.model";
 
 export class EnsibleUser {
   @MatInputDisable()
@@ -111,4 +111,13 @@ export class EnsibleItem {
   vaultPasswordFilePath: string = '';
   useUserAsPassword: boolean = false;
   path: string = '';
+}
+
+export class EnsiblePlayBookLogger {
+  id: number = 0;
+  log: string = '';
+  itemId: number = 0;
+  runNumber: number = 0;
+  executedCommand: string = '';
+  triggerDateTime: DateTime = new DateTime();
 }

@@ -1,21 +1,22 @@
 <mat-form-field [appearance]="getAppearance()" [color]="matColor"  [style.width.ch]="getSize(value ? value.toString() : '')" [style.width]="styleWidth">
   <mat-label>{{label}}</mat-label>
 
-  <input 
-  #input 
-  matInput 
-  [ngStyle]="getInputColorNgStyle()" 
-  [type]="defaultType" 
-  (keyup.enter)="emitEnter()" 
+  <input
+  #input
+  matInput
+  [ngStyle]="getInputColorNgStyle()"
+  [type]="defaultType"
+  (keyup.enter)="emitEnter()"
   (keydown)="addKey($event)"
-  [(ngModel)]="value" 
+  [(ngModel)]="value"
   (focusout)="focusoutEmitValue()"
-  (paste)="emitValueWithCondition()" 
-  (ngModelChange)="emitValueWithCondition();" 
-  [placeholder]="placeholder" 
+  (paste)="emitValueWithCondition()"
+  (ngModelChange)="emitValueWithCondition();"
+  [placeholder]="placeholder"
   [maxlength]="maxlength"
   [formControl]="formControl"
-  [matAutocomplete]="auto">
+  [matAutocomplete]="auto"
+  [readonly]="readonly">
   <mat-error>{{getFormControlError()}}</mat-error>
   <mat-hint *ngIf="error" style="color: red;" align="start">{{error}}</mat-hint>
   <mat-hint *ngIf="manuallyEmitValue && isValueChange()" style="color: goldenrod;" align="start">{{manuallyEmitValueHint}}</mat-hint>
@@ -41,7 +42,7 @@
   </button>
   <app-input-type-switch *ngIf="showVisibleSwitch && !disable" matSuffix [switch]="switchVisibility" [htmlInputElement]="input" [trueValue]="defaultType" [falseValue]="switchType" [onIcon]="onIcon" [offIcon]="offIcon"></app-input-type-switch>
   <app-copy-to-clipboard-util *ngIf="showCopyToClipboard && !disable" matSuffix [copyValue]="value.toString()" [displayMessage]="copyDisplayMessage"></app-copy-to-clipboard-util>
-  
+
   <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
     <mat-option *ngFor="let option of filteredOptions  | async" [value]="option">
       {{option}}

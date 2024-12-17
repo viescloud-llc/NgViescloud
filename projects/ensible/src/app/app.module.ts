@@ -15,6 +15,9 @@ import { EnsibleFsComponent } from './ensible-fs/ensible-fs.component';
 import { EnsibleUserComponent } from './ensible-user/ensible-user.component';
 import { EnsibleItemListComponent } from './item/ensible-item-list/ensible-item-list.component';
 import { EnsibleItemComponent } from './item/ensible-item/ensible-item.component';
+import { EnsibleItemRunComponent } from './item/ensible-item-run/ensible-item-run.component';
+import { EnsibleItemRunHistoryComponent } from './item/ensible-item-run-history/ensible-item-run-history.component';
+import { EnsibleItemTabComponent } from './item/ensible-item-tab/ensible-item-tab.component';
 
 const LIST = [
   AppComponent,
@@ -25,7 +28,10 @@ const LIST = [
   EnsibleFsComponent,
   EnsibleUserComponent,
   EnsibleItemListComponent,
-  EnsibleItemComponent
+  EnsibleItemComponent,
+  EnsibleItemRunComponent,
+  EnsibleItemRunHistoryComponent,
+  EnsibleItemTabComponent
 ]
 
 @NgModule({

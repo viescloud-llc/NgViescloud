@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
-import { EnsibleWebSocketService } from './ensible-websocket.service';
+import { EnsibleWebsocketService } from './ensible-websocket.service';
 
-describe('ensiblewebsocket Service', () => {
-  let service: EnsibleWebSocketService;
+describe('EnsibleWebsocket Service', () => {
+  let service: EnsibleWebsocketService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(EnsibleWebSocketService);
+    service = TestBed.inject(EnsibleWebsocketService);
   });
 
   it('should be created', () => {

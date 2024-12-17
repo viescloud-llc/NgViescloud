@@ -1,5 +1,5 @@
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { EnsibleItemService } from '../../service/ensible-item/ensible-item.service';
 import { EnsibleItem } from '../../model/ensible.model';
 import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
@@ -13,9 +13,17 @@ import { Router } from '@angular/router';
   templateUrl: './ensible-item.component.html',
   styleUrls: ['./ensible-item.component.scss']
 })
-export class EnsibleItemComponent implements OnInit {
+export class EnsibleItemComponent implements OnChanges {
 
+  @Input()
   item!: EnsibleItem;
+
+  @Output()
+  itemChange: EventEmitter<EnsibleItem> = new EventEmitter();
+
+  @Output()
+  isEditing: EventEmitter<boolean> = new EventEmitter<boolean>();
+
   itemCopy!: EnsibleItem;
   blankItem: EnsibleItem = new EnsibleItem();
 
@@ -29,29 +37,38 @@ export class EnsibleItemComponent implements OnInit {
     private router: Router
   ) { }
 
-  ngOnInit(): void {
-    let id = RouteUtils.getPathVariableAsInteger('item');
-    if(!id) {
-      this.item = new EnsibleItem();
-    }
-    else {
-      this.ensibleItemService.get(id).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
-        next: res => {
-          this.item = res;
-          this.itemCopy = structuredClone(this.item);
-        }
-      })
+  ngOnChanges(changes: SimpleChanges): void {
+    if(changes['item']) {
+      this.itemCopy = structuredClone(this.item);
     }
   }
 
+  ngOnInit(): void {
+    // let id = RouteUtils.getPathVariableAsInteger('item');
+    // if(!id) {
+    //   this.item = new EnsibleItem();
+    // }
+    // else {
+    //   this.ensibleItemService.get(id).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+    //     next: res => {
+    //       this.item = res;
+    //       this.itemCopy = structuredClone(this.item);
+    //     }
+    //   })
+    // }
+  }
+
   isValueChange() {
-    return DataUtils.isNotEqual(this.item, this.itemCopy);
+    let isChange = DataUtils.isNotEqual(this.item, this.itemCopy);
+    this.isEditing.emit(isChange);
+    return isChange;
   }
 
   save() {
     this.ensibleItemService.postOrPatch(this.item.id, this.item).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
       next: res => {
         this.router.navigate(['item', res.id]);
+        this.itemChange.emit(res);
       },
       error: err => {
         this.dialogUtils.openErrorMessage("Saving Error", 'Error saving item, please try again or refresh the page if the error persists');
