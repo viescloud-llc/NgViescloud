@@ -28,6 +28,7 @@ import { MatFormFieldInputRgbColorPickerComponent } from '../util-component/mat-
 import { DisableKeyCaptureOnInputDirective } from '../directive/DisableKeyCaptureOnInput.directive';
 import { HeaderMinimalComponent } from '../share-component/header-minimal/header-minimal.component';
 import { CodeEditorComponent } from '../util-component/code-editor/code-editor.component';
+import { MatTablePathComponent } from '../util-component/mat-table-path/mat-table-path.component';
 
 const UTILS = [
   CopyToClipboardUtilComponent,
@@ -50,7 +51,8 @@ const UTILS = [
   TooltipDirective,
   ApplicationSettingComponent,
   DisableKeyCaptureOnInputDirective,
-  CodeEditorComponent
+  CodeEditorComponent,
+  MatTablePathComponent,
 ]
 
 const COMPONENTS = [

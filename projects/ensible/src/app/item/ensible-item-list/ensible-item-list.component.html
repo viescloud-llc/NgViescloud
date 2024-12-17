@@ -1,5 +1,5 @@
 <ul class="margin-center">
-  <li>
+  <!-- <li>
     <app-mat-table
     [matRows]="items"
     [blankObject]="blankItem"
@@ -7,6 +7,13 @@
     [showPagination]="true"
     (onEditRow)="selectItem($event)"
     ></app-mat-table>
+  </li> -->
+  <li>
+    <app-mat-table-path
+    [value]="items"
+    [getPathFn]="getPath"
+    [getLabelFn]="getLabel"
+    ></app-mat-table-path>
   </li>
   <li>
     <br>

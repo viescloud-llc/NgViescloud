@@ -65,7 +65,7 @@ export class EnsibleItemComponent implements OnChanges {
   }
 
   save() {
-    this.ensibleItemService.postOrPatch(this.item.id, this.item).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+    this.ensibleItemService.postOrPut(this.item.id, this.item).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
       next: res => {
         this.router.navigate(['item', res.id]);
         this.itemChange.emit(res);

@@ -1,3 +1,7 @@
-<p>
-  ensible-item-run-history works!
-</p>
+<app-mat-table
+[matRows]="logs"
+[showFilter]="true"
+[showPagination]="true"
+[blankObject]="blankLog"
+[pageSizeOptions]="[20, 50, 200, 1000]"
+></app-mat-table>

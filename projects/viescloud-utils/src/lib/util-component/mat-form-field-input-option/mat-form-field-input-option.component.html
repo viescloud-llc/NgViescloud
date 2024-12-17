@@ -1,4 +1,4 @@
-<mat-form-field [appearance]="getAppearance()" [color]="matColor"  [style.width.ch]="getSize(value.toString())" [style.width]="styleWidth">
+<mat-form-field [appearance]="getAppearance()" [color]="matColor"  [style.width.ch]="getSize(value ? value.toString() : '')" [style.width]="styleWidth">
   <mat-label>{{label}}</mat-label>
   <mat-select
     [(ngModel)]="value"

@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatTreePathComponent } from './mat-tree-path.component';
+import { MatTablePathComponent } from './mat-table-path.component';
 
-describe('MatTreePath Component', () => {
-  let component: MatTreePathComponent;
-  let fixture: ComponentFixture<MatTreePathComponent>;
+describe('MatTablePath Component', () => {
+  let component: MatTablePathComponent;
+  let fixture: ComponentFixture<MatTablePathComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ MatTreePathComponent ]
+      declarations: [ MatTablePathComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(MatTreePathComponent);
+    fixture = TestBed.createComponent(MatTablePathComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

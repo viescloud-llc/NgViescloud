@@ -11,6 +11,7 @@
     <mat-tab [label]="tabNames[1]" [disabled]="isEditing">
       <app-ensible-item-run-history
       [item]="item"
+      [triggerInit]="selectedIndex === 1"
       ></app-ensible-item-run-history>
     </mat-tab>
 

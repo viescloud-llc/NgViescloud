@@ -115,10 +115,17 @@ export class EnsibleItem {
 
 export class EnsiblePlayBookLogger {
   id: number = 0;
+
+  @MatTableHide()
   log: string = '';
+
   itemId: number = 0;
   runNumber: number = 0;
+
+  @MatTableHide()
   executedCommand: string = '';
+
+  @MatTableHide()
   triggerDateTime: DateTime = new DateTime();
 }
 

@@ -21,11 +21,46 @@ export class EnsibleItemListComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.ensibleItemService.getAll().pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
-      next: res => {
-        this.items = res;
-      }
-    })    
+    // this.ensibleItemService.getAll().pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+    //   next: res => {
+    //     this.items = res;
+    //   }
+    // })   
+    
+    for(let i = 0; i < 5; i++) {
+      let blankItem = new EnsibleItem();
+      blankItem.path = '/one';
+      blankItem.name = 'one' + i;
+      this.items.push(blankItem);
+    }
+
+    for(let i = 0; i < 5; i++) {
+      let blankItem = new EnsibleItem();
+      blankItem.path = '/two';
+      blankItem.name = 'two' + i;
+      this.items.push(blankItem);
+    }
+
+    for(let i = 0; i < 5; i++) {
+      let blankItem = new EnsibleItem();
+      blankItem.path = '/three/three';
+      blankItem.name = 'three' + i;
+      this.items.push(blankItem);
+    }
+
+    for(let i = 0; i < 5; i++) {
+      let blankItem = new EnsibleItem();
+      blankItem.path = '/four/four';
+      blankItem.name = 'four' + i;
+      this.items.push(blankItem);
+    }
+
+    for(let i = 0; i < 5; i++) {
+      let blankItem = new EnsibleItem();
+      blankItem.path = '/one/five';
+      blankItem.name = 'five' + i;
+      this.items.push(blankItem);
+    }
   }
 
   addItem() {
@@ -34,5 +69,13 @@ export class EnsibleItemListComponent implements OnInit {
 
   selectItem(item: EnsibleItem) {
     this.router.navigate(['item', item.id]);
+  }
+  
+  getPath(item: EnsibleItem) {
+    return item.path;
+  }
+
+  getLabel(item: EnsibleItem) {
+    return item.name;
   }
 }
