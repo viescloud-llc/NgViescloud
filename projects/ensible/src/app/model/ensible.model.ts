@@ -121,3 +121,14 @@ export class EnsiblePlayBookLogger {
   executedCommand: string = '';
   triggerDateTime: DateTime = new DateTime();
 }
+
+export class EnsiblePlayBookTrigger {
+  playbook?: string = '';
+  inventory?: string = '';
+  vaultSecretsFile?: string = '';
+  vaultPasswordFile?: string = '';
+  vaultPassword?: string = '';
+  itemId?: string = '';
+  outputTopic?: string = '';
+  consumeEverything?: boolean = false;
+}

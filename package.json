@@ -28,6 +28,7 @@
     "@angular/platform-browser": "^15.2.0",
     "@angular/platform-browser-dynamic": "^15.2.0",
     "@angular/router": "^15.2.0",
+    "@stomp/rx-stomp": "^2.0.0",
     "monaco-editor": "^0.34.1",
     "monaco-editor-webpack-plugin": "^7.1.0",
     "ng-viescloud": "file:",

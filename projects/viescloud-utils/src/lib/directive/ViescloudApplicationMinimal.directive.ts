@@ -1,4 +1,4 @@
-import { Directive, HostListener, OnInit } from '@angular/core';
+import { Directive, HostListener, OnInit, ViewChild } from '@angular/core';
 import { OpenIdService } from '../service/OpenId.service';
 import { SettingService } from '../service/Setting.service';
 import { KeyCaptureService } from '../service/KeyCapture.service';
