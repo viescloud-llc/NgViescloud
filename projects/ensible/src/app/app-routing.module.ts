@@ -42,7 +42,7 @@ const routes: Routes = [
     ]
   },
   {
-    path: 'inventories',
+    path: 'inventory',
     children: [
       {
         path: '**',

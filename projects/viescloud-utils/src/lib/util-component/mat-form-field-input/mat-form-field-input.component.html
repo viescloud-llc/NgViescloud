@@ -9,6 +9,7 @@
   (keyup.enter)="emitEnter()"
   (keydown)="addKey($event)"
   [(ngModel)]="value"
+  (focus)="isFocus = true"
   (focusout)="focusoutEmitValue()"
   (paste)="emitValueWithCondition()"
   (ngModelChange)="emitValueWithCondition();"
@@ -27,6 +28,7 @@
     <ng-container *ngIf="max">{{'\<' + max}}</ng-container>
   </mat-hint>
   <mat-hint *ngIf="customIconLabel && customIconHint && value" style="color: goldenrod;" align="start">{{customIconHint}}</mat-hint>
+  <mat-hint *ngIf="isFocus && readonly && readonlyOnFocusHint" style="color: goldenrod;" align="start">{{readonlyOnFocusHint}}</mat-hint>
 
   <button *ngIf="customIconLabel" matSuffix mat-icon-button (click)="emitCustomIcon()">
     <mat-icon>{{customIconLabel}}</mat-icon>
@@ -34,7 +36,7 @@
   <button *ngIf="manuallyEmitValue && isValueChange()" matSuffix mat-icon-button (click)="emitValue()">
     <mat-icon>check_circle_outline</mat-icon>
   </button>
-  <button *ngIf="showClearIcon && value && !disable" matSuffix mat-icon-button (click)="clear()">
+  <button *ngIf="showClearIcon && value && !disable && !readonly" matSuffix mat-icon-button (click)="clear()">
     <mat-icon>close</mat-icon>
   </button>
   <button *ngIf="value && !disable && showGoto" matSuffix mat-icon-button (click)="openLink(value.toString())">

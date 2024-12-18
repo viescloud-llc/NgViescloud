@@ -48,13 +48,13 @@ export class AppComponent extends ViescloudApplicationMinimal {
           routerLink: '/item/all'
         },
         {
-          title: 'setting',
-          routerLink: '/item/setting'
+          title: 'add new',
+          routerLink: '/item/0'
         }
       ]
     },
     {
-      title: 'Inventories',
+      title: 'Inventory',
       children: [],
       hideConditional: () => !this.ensibleAuthenticatorService.isLogin(),
     },
@@ -121,7 +121,7 @@ export class AppComponent extends ViescloudApplicationMinimal {
 
     ensibleWorkspaceParserService.onFetchWorkspace$.subscribe(ws => {
       this.parseWorkspaceToRolesMenu(ws);
-      this.parseWorkspaceToMenu('Inventories', 'inventories', () => ws.inventories);
+      this.parseWorkspaceToMenu('Inventory', 'inventory', () => ws.inventory);
       this.parseWorkspaceToMenu('Playbooks', 'playbooks', () => ws.playbooks);
       this.parseWorkspaceToMenu('Secrets', 'secrets', () => ws.secrets);
       this.parseWorkspaceToMenu('Passwords', 'passwords', () => ws.passwords);

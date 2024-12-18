@@ -44,6 +44,10 @@ export class RouteUtils {
         return queryParams[key] ?? null;
     }
 
+    static getDecodedQueryParam(key: string): string | null {
+      return RouteUtils.getQueryParam(key, true);
+  }
+
     static setQueryParam(param: string, value: string | null) {
         const currentUrl = RouteUtils.getCurrentUrl();
         const url = new URL(currentUrl);

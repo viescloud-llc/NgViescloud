@@ -106,6 +106,9 @@ export class MatFormFieldInputComponent extends MatFormFieldComponent {
   @Input()
   autoFillHttps: boolean = false;
 
+  @Input()
+  focusOutAutoFillFn?: (value: any) => any;
+
   override ngOnInit(): void {
     super.ngOnInit();
 
@@ -173,7 +176,7 @@ export class MatFormFieldInputComponent extends MatFormFieldComponent {
 
     if(errors?.['required'])
       return `${this.label} can not be empty`;
-    
+
     return '';
   }
 
@@ -211,8 +214,17 @@ export class MatFormFieldInputComponent extends MatFormFieldComponent {
   }
 
   focusoutEmitValue() {
+    this.isFocus = false;
+
     if(this.autoFillHttps) {
       this.onAutoFillHttps();
+      return;
+    }
+
+    if(this.focusOutAutoFillFn) {
+      this.value = this.focusOutAutoFillFn(this.value);
+      this.emitValue();
+      return;
     }
 
     if (this.focusoutEmit)

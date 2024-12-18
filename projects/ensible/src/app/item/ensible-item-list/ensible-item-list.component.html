@@ -1,18 +1,17 @@
 <ul class="margin-center">
-  <!-- <li>
-    <app-mat-table
-    [matRows]="items"
-    [blankObject]="blankItem"
-    [showFilter]="true"
-    [showPagination]="true"
-    (onEditRow)="selectItem($event)"
-    ></app-mat-table>
-  </li> -->
+  <li>
+
+  </li>
+
   <li>
     <app-mat-table-path
     [value]="items"
     [getPathFn]="getPath"
     [getLabelFn]="getLabel"
+    (onItemSelected)="selectItem($event)"
+    [savePathToLocalStorage]="true"
+    [unixStyleBack]="true"
+    [readonlyPathInput]="true"
     ></app-mat-table-path>
   </li>
   <li>

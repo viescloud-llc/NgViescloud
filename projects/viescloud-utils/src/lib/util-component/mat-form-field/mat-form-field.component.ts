@@ -71,12 +71,17 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
   @Input()
   readonly: boolean = false;
 
+  @Input()
+  readonlyOnFocusHint: string = '';
+
   //key capture
   keyDown: string[] = [];
 
   //dynamic type
   @Input()
   blankObject?: any;
+
+  isFocus = false;
 
   constructor(
     protected cd: ChangeDetectorRef,

@@ -4,7 +4,7 @@ export class EnsibleWorkSpace {
   roles: EnsibleRole[] = [new EnsibleRole()] as EnsibleRole[];
   secrets: EnsibleFsDir = new EnsibleFsDir();
   passwords: EnsibleFsDir = new EnsibleFsDir();
-  inventories: EnsibleFsDir = new EnsibleFsDir();
+  inventory: EnsibleFsDir = new EnsibleFsDir();
 
   isPlaybookExist(playbookName: string): boolean {
     for (const playbook of this.playbooks.child) {
@@ -43,7 +43,7 @@ export class EnsibleWorkSpace {
   }
 
   isInventoryExist(inventoryName: string): boolean {
-    for (const inventory of this.inventories.child) {
+    for (const inventory of this.inventory.child) {
       if (inventory.name === inventoryName) {
         return true;
       }
@@ -88,7 +88,7 @@ export class EnsibleWorkSpace {
   }
 
   getInventory(inventoryName: string): EnsibleFs | undefined {
-    for (const inventory of this.inventories.child) {
+    for (const inventory of this.inventory.child) {
       if (inventory.name === inventoryName) {
         return inventory;
       }

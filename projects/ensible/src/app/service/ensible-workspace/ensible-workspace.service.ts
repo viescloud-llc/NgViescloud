@@ -94,12 +94,12 @@ export class EnsibleWorkspaceParserService extends EnsibleWorkspaceService {
             this.putRoleChildNode(parent, ws, '/vars', 'vars', node);
 
             this.putWorkspaceFS(parent, node, '/playbooks', () => ws.playbooks, s => ws.isPlaybookExist(s));
-            this.putWorkspaceFS(parent, node, '/inventories', () => ws.inventories, s => ws.isInventoryExist(s));
+            this.putWorkspaceFS(parent, node, '/inventory', () => ws.inventory, s => ws.isInventoryExist(s));
             this.putWorkspaceFS(parent, node, '/passwords', () => ws.passwords, s => ws.isPasswordExist(s));
             this.putWorkspaceFS(parent, node, '/secrets', () => ws.secrets, s => ws.isSecretExist(s));
           });
 
-          this.cacheFilesOption(() => ws.inventories, this.inventoriesFileOptions).then();
+          this.cacheFilesOption(() => ws.inventory, this.inventoriesFileOptions).then();
           this.cacheFilesOption(() => ws.playbooks, this.playbooksFileOptions).then();
           this.cacheFilesOption(() => ws.secrets, this.secretsFileOptions).then();
           this.cacheFilesOption(() => ws.passwords, this.passwordFileOptions).then();
