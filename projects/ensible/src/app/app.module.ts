@@ -1,5 +1,4 @@
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -9,8 +8,6 @@ import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { EnsibleAuthInterceptor } from './guard/ensible-auth.interceptor';
 import { EnsibleSettingComponent } from './ensible-setting/ensible-setting.component';
-import { EnsibleRoleComponent } from './ensible-role/ensible-role.component';
-import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
 import { EnsibleFsComponent } from './ensible-fs/ensible-fs.component';
 import { EnsibleUserComponent } from './ensible-user/ensible-user.component';
 import { EnsibleItemListComponent } from './item/ensible-item-list/ensible-item-list.component';
@@ -24,7 +21,6 @@ const LIST = [
   HomeComponent,
   LoginComponent,
   EnsibleSettingComponent,
-  EnsibleRoleComponent,
   EnsibleFsComponent,
   EnsibleUserComponent,
   EnsibleItemListComponent,

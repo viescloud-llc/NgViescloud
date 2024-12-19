@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { RouteChangeSubcribe } from 'projects/viescloud-utils/src/lib/directive/RouteChangeSubcribe.directive';
 import { MonacoLanguage } from 'projects/viescloud-utils/src/lib/model/MonacoEditor.model';
@@ -12,23 +12,38 @@ import { EnsibleWorkspaceParserService } from '../service/ensible-workspace/ensi
 import { EnsibleVaultService } from '../service/ensible-vault/ensible-vault.service';
 import { EnsibleWorkSpace } from '../model/ensible.parser.model';
 
+enum FileType {
+  INVENTORY = 'inventory',
+  PLAYBOOK = 'playbooks',
+  ROLE = 'roles',
+  SECRET = 'secrets',
+  PASSWORD = 'passwords',
+  UNKOWN = 'unknown'
+}
+
 @Component({
   selector: 'app-ensible-fs',
   templateUrl: './ensible-fs.component.html',
   styleUrls: ['./ensible-fs.component.scss']
 })
 export class EnsibleFsComponent extends RouteChangeSubcribe {
-  fullSortedPath: string = '';
-  parentName: string = '';
-  error: string = '';
 
-  fileName: string = '';
+  @Input()
+  fsPath: string = ''; //manually input path
+
+  @Output()
+  isEditing: EventEmitter<boolean> = new EventEmitter<boolean>();
+
+  layers: string[] = [];
+  fileName: string = ''; //layer0
   fileNameCopy: string = '';
+
   fileContent: string = '';
   fileContentCopy: string = '';
 
   easyMode: boolean = false;
   newFile: boolean = false;
+  error: string = '';
 
   //secrets
   vaultSecret = '';
@@ -38,6 +53,10 @@ export class EnsibleFsComponent extends RouteChangeSubcribe {
   //Data
   ws?: EnsibleWorkSpace;
   validForm: boolean = false;
+
+  fileType = FileType.UNKOWN;
+
+  FileType = FileType;
 
   constructor(
     private ensibleFsService: EnsibleFsService,
@@ -52,8 +71,7 @@ export class EnsibleFsComponent extends RouteChangeSubcribe {
   }
 
   cleanAllValue() {
-    this.fullSortedPath = '';
-    this.parentName = '';
+    this.layers = [];
     this.fileName = '';
     this.fileNameCopy = '';
     this.fileContent = '';
@@ -62,41 +80,93 @@ export class EnsibleFsComponent extends RouteChangeSubcribe {
     this.newFile = false;
     this.vaultSecret = '';
     this.vaultDectypted = false;
+    this.fileType = FileType.UNKOWN;
   }
 
   override onRouteChange(): void {
     this.cleanAllValue();
-    let pathSplits = RouteUtils.getCurrentUrl().split('/');
-    if(pathSplits.length == 5) {
-      this.parentName = pathSplits[pathSplits.length - 2];
-      this.fileName = pathSplits[pathSplits.length - 1];
-      this.fileNameCopy = structuredClone(this.fileName);
-      this.fullSortedPath = `/${this.parentName}/${this.fileName}`;
+    
+    this.layers = this.fsPath ? this.fsPath.split('/') : RouteUtils.getCurrentPath().split('/');
 
-      if(this.fileName === 'new') {
-        this.newFile = true;
-        this.vaultDectypted = true;
-        this.fileName = '';
-        this.fileContent = `---\n`;
-        return;
+    if(this.layers.length < 2) {
+      this.error = 'Invalid fs path';
+    }
+
+    this.fileName = this.getLayerReverse(0);
+    this.fileNameCopy = structuredClone(this.fileName);
+
+    switch(this.getLayerReverse(1)) {
+      case 'inventory':
+        this.fileType = FileType.INVENTORY;
+        break;
+      case 'playbooks':
+        this.fileType = FileType.PLAYBOOK;
+        break;
+      case 'roles':
+        this.fileType = FileType.ROLE;
+        break;
+      case 'secrets':
+        this.fileType = FileType.SECRET;
+        break;
+      case 'passwords':
+        this.fileType = FileType.PASSWORD;
+        break;
+      default:
+        this.fileType = FileType.UNKOWN;
+        break;
+    }
+
+    if(this.fileName === 'new') {
+      this.newFile = true;
+      this.vaultDectypted = true;
+      this.fileName = '';
+      this.fileContent = `---\n`;
+      return;
+    }
+
+    this.ensibleFsService.readFileAsString(this.getFullPath()).pipe(this.rxJSUtils.waitLoadingDialog()).subscribe({
+      next: data => {
+        this.fileContent = data;
+        this.fileContentCopy = structuredClone(data);
+      },
+      error: (err) => {
+        this.error = "Error when reading file or invalid file";
       }
+    });
 
-      this.ensibleFsService.readFileAsString(this.fullSortedPath).pipe(this.rxJSUtils.waitLoadingDialog()).subscribe({
-        next: data => {
-          this.fileContent = data;
-          this.fileContentCopy = structuredClone(data);
-        },
-        error: (err) => {
-          this.dialogUtils.openErrorMessageFromError(err);
-        }
-      });
+  }
+
+/**
+ * Constructs the full path by joining the layers with an optional file name.
+ * @param name - Optional file name to append to the path. If provided, the last layer is temporarily removed before appending the name.
+ * @returns The full path as a string. If a name is provided, it is appended to the path after removing the last layer.
+ */
+  getFullPath(name?: string) {
+    if(!name) {
+      return this.layers.join('/');
+    } else {
+      let tempLayers = structuredClone(this.layers);
+      tempLayers.pop()
+      return tempLayers.join('/') + '/' + name;
+    }
+  }
+
+  getFullPathBy(newFile: boolean) {
+    if(newFile) {
+      return this.getFullPath(this.fileName);
     }
     else
-      this.error = 'Invalid roles path';
+      return this.getFullPath();
+  }
+
+  getLayerReverse(layer: number) {
+    return this.layers[this.layers.length - 1 - layer];
   }
 
   isValueChange() {
-    return DataUtils.isNotEqual(this.fileContent, this.fileContentCopy) || DataUtils.isNotEqual(this.fileName, this.fileNameCopy);
+    let change = DataUtils.isNotEqual(this.fileContent, this.fileContentCopy) || DataUtils.isNotEqual(this.fileName, this.fileNameCopy);
+    this.isEditing.emit(change);
+    return change;
   }
 
   save() {
@@ -106,18 +176,17 @@ export class EnsibleFsComponent extends RouteChangeSubcribe {
     }
 
     if(this.newFile) {
-      this.fullSortedPath = `/${this.parentName}/${this.fileName}`;
       this.fileNameCopy = structuredClone(this.fileName);
     }
 
     if(DataUtils.isNotEqual(this.fileContent, this.fileContentCopy)) {
-      this.ensibleFsService.writeFile(this.fullSortedPath, this.fileContent, FsWriteMode.OVERRIDEN).pipe(this.rxJSUtils.waitLoadingDialog()).subscribe({
+      this.ensibleFsService.writeFile(this.getFullPathBy(this.newFile), this.fileContent, FsWriteMode.OVERRIDEN).pipe(this.rxJSUtils.waitLoadingDialog()).subscribe({
         next: () => {
           this.fileContentCopy = structuredClone(this.fileContent);
 
           if(this.newFile) {
             this.ensibleWorkspaceParserService.triggerFetchWorkspace();
-            this.router.navigate([this.parentName, this.fileName]);
+            this.router.navigate([this.getFullPathBy(this.newFile)]);
           }
 
         },
@@ -132,11 +201,11 @@ export class EnsibleFsComponent extends RouteChangeSubcribe {
 
   private saveNameChange() {
     if (DataUtils.isNotEqual(this.fileName, this.fileNameCopy)) {
-      this.ensibleFsService.moveFile(this.fullSortedPath, `/${this.parentName}/${this.fileName}`, FsWriteMode.OVERRIDEN).pipe(this.rxJSUtils.waitLoadingDialog()).subscribe({
+      this.ensibleFsService.moveFile(this.getFullPath(), this.getFullPath(this.fileName), FsWriteMode.OVERRIDEN).pipe(this.rxJSUtils.waitLoadingDialog()).subscribe({
         next: () => {
           this.fileNameCopy = structuredClone(this.fileName);
           this.ensibleWorkspaceParserService.triggerFetchWorkspace();
-          this.router.navigate([this.parentName, this.fileName]);
+          this.router.navigate([this.getFullPath(this.fileName)]);
         },
         error: (err) => {
           this.dialogUtils.openErrorMessageFromError(err);
@@ -155,6 +224,21 @@ export class EnsibleFsComponent extends RouteChangeSubcribe {
     return MonacoLanguage.from(extension);
   }
 
+  async deleteFile() {
+    let confirm = await this.dialogUtils.openConfirmDialog("Delete", "Are you sure you want to delete this file?\nThis cannot be undone", "Yes", "No");
+    if(confirm) {
+      this.ensibleFsService.deleteFile(this.getFullPath()).pipe(this.rxJSUtils.waitLoadingDialog()).subscribe({
+        next: () => {
+          this.ensibleWorkspaceParserService.triggerFetchWorkspace();
+          this.router.navigate(['home']);
+        },
+        error: (err) => {
+          this.dialogUtils.openErrorMessage("Error", "Error when deleting file");
+        }
+      });
+    }
+  }
+
   //-----------------------------secrets--------------------------------------
   
   getVaultTypeLabel() {
@@ -162,11 +246,11 @@ export class EnsibleFsComponent extends RouteChangeSubcribe {
   }
 
   isSecretFile() {
-    return this.parentName === 'secrets';
+    return this.fileType === FileType.SECRET;
   }
 
   decryptFileContent() {
-    this.ensibleVaultService.viewVault(this.fullSortedPath, !this.vaultCrtyptionWithPassword ? this.vaultSecret : undefined, this.vaultCrtyptionWithPassword ? this.vaultSecret : undefined).pipe(this.rxJSUtils.waitLoadingDialog()).subscribe({
+    this.ensibleVaultService.viewVault(this.getFullPath(), !this.vaultCrtyptionWithPassword ? this.vaultSecret : undefined, this.vaultCrtyptionWithPassword ? this.vaultSecret : undefined).pipe(this.rxJSUtils.waitLoadingDialog()).subscribe({
       next: data => {
         this.fileContent = data;
         this.fileContentCopy = structuredClone(data);
@@ -185,16 +269,15 @@ export class EnsibleFsComponent extends RouteChangeSubcribe {
     }
 
     if(this.newFile) {
-      this.fullSortedPath = `/${this.parentName}/${this.fileName}`;
       this.fileNameCopy = structuredClone(this.fileName);
     }
 
     if(DataUtils.isNotEqual(this.fileContent, this.fileContentCopy)) {
       if(this.newFile) {
-        this.ensibleVaultService.createVault(this.fileContent, this.fullSortedPath, !this.vaultCrtyptionWithPassword ? this.vaultSecret : undefined, this.vaultCrtyptionWithPassword ? this.vaultSecret : undefined).pipe(this.rxJSUtils.waitLoadingDialog()).subscribe({
+        this.ensibleVaultService.createVault(this.fileContent, this.getFullPathBy(this.newFile), !this.vaultCrtyptionWithPassword ? this.vaultSecret : undefined, this.vaultCrtyptionWithPassword ? this.vaultSecret : undefined).pipe(this.rxJSUtils.waitLoadingDialog()).subscribe({
           next: res => {
             this.ensibleWorkspaceParserService.triggerFetchWorkspace();
-            this.router.navigate([this.parentName, this.fileName]);
+            this.router.navigate([this.getFullPathBy(this.newFile)]);
             this.onRouteChange();
           },
           error: (err) => {
@@ -203,7 +286,7 @@ export class EnsibleFsComponent extends RouteChangeSubcribe {
         });
       }
       else {
-        this.ensibleVaultService.modifyVault(this.fileContent, this.fullSortedPath, !this.vaultCrtyptionWithPassword ? this.vaultSecret : undefined, this.vaultCrtyptionWithPassword ? this.vaultSecret : undefined).pipe(this.rxJSUtils.waitLoadingDialog()).subscribe({
+        this.ensibleVaultService.modifyVault(this.fileContent, this.getFullPath(), !this.vaultCrtyptionWithPassword ? this.vaultSecret : undefined, this.vaultCrtyptionWithPassword ? this.vaultSecret : undefined).pipe(this.rxJSUtils.waitLoadingDialog()).subscribe({
           next: res => {
             this.onRouteChange();
           },
@@ -216,4 +299,6 @@ export class EnsibleFsComponent extends RouteChangeSubcribe {
 
     this.saveNameChange();
   }
+
+  
 }

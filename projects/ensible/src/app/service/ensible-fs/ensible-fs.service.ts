@@ -64,9 +64,7 @@ export class EnsibleFsService extends EnsibleService {
   }
 
   deleteFile(path: string) {
-    let params = new HttpParams();
-    params.set('path', path);
-
+    let params = new HttpParams().set('path', path);
     return this.httpClient.delete<EnsibleFsStatusResponse>(`${this.getPrefixUri()}`, {params: params});
   }
 

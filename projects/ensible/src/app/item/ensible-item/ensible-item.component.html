@@ -79,6 +79,15 @@
           styleWidth="100%"
           ></app-mat-form-field-input-option>
         </li>
+        <li *ngIf="item.inventoryPath">
+          <details>
+            <summary>Quick Edit</summary>
+            <app-ensible-fs
+            [fsPath]="item.inventoryPath"
+            (isEditing)="isFsEditing[0] = $event"
+            ></app-ensible-fs>
+          </details>
+        </li>
       </ul>
     </details>
     <br>
@@ -97,6 +106,15 @@
           styleWidth="100%"
           ></app-mat-form-field-input-option>
         </li>
+        <li *ngIf="item.playBookPath">
+          <details>
+            <summary>Quick Edit</summary>
+            <app-ensible-fs
+            [fsPath]="item.playBookPath"
+            (isEditing)="isFsEditing[1] = $event"
+            ></app-ensible-fs>
+          </details>
+        </li>
       </ul>
     </details>
     <br>
@@ -114,6 +132,16 @@
           styleWidth="100%"
           [blankObject]="''"
           ></app-mat-form-field-input-option>
+        </li>
+        <li *ngIf="item.vaultSecretsFilePath">
+          <details>
+            <summary>Quick Edit</summary>
+            <app-ensible-fs
+            [fsPath]="item.vaultSecretsFilePath"
+            (isEditing)="isFsEditing[2] = $event"
+            ></app-ensible-fs>
+          </details>
+          <hr>
         </li>
         <li>
           <app-mat-form-field-input-dynamic

@@ -101,14 +101,24 @@ export class EnsibleFsStatusResponse {
 export class EnsibleItem {
   id: number = 0;
   name: string = '';
+
+  @MatTableHide()
   githubUrl: string = '';
+  @MatTableHide()
   triggerOnGithubWebhook: boolean = false;
+  @MatTableHide()
   gitlabUrl: string = '';
+  @MatTableHide()
   triggerOnGitlabWebhook: boolean = false;
+  @MatTableHide()
   playBookPath: string = '';
+  @MatTableHide()
   inventoryPath: string = '';
+  @MatTableHide()
   vaultSecretsFilePath: string = '';
+  @MatTableHide()
   vaultPasswordFilePath: string = '';
+  @MatTableHide()
   useUserAsPassword: boolean = false;
   path: string = '';
 }
@@ -127,6 +137,11 @@ export class EnsiblePlayBookLogger {
 
   @MatTableHide()
   triggerDateTime: DateTime = new DateTime();
+
+  status: EnsiblePlaybookStatus = EnsiblePlaybookStatus.STOP;
+
+  @MatTableHide()
+  topic: string = '';
 }
 
 export class EnsiblePlayBookTrigger {
@@ -138,4 +153,12 @@ export class EnsiblePlayBookTrigger {
   itemId?: string = '';
   outputTopic?: string = '';
   consumeEverything?: boolean = false;
+}
+
+export enum EnsiblePlaybookStatus {
+  START = 'START',
+  STOP = 'STOP',
+  SUCCESS = 'SUCCESS',
+  FAILURE = "FAILURE",
+  RUNNING = 'RUNNING'
 }

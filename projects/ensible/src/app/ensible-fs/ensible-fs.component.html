@@ -3,29 +3,33 @@
 </p>
 
 <ul *ngIf="!error" class="margin-center" appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
-  <li>
-    <app-mat-form-field-input-dynamic
-    label="Easy Mode"
-    [isSlideToggle]="true"
-    [(value)]="easyMode"
-    ></app-mat-form-field-input-dynamic>
-  </li>
-  <li>
-    <p>
-      <b>File Metadata</b>
-      <br>
-      <span>File name: {{fileName}}</span>
-      <br>
-      <span>File path: {{fullSortedPath}}</span>
-    </p>
-  </li>
-  <li>
-    <app-mat-form-field-input
-    label="File Name"
-    [(value)]="fileName"
-    [required]="true"
-    ></app-mat-form-field-input>
-  </li>
+  <ng-container *ngIf="!fsPath">
+    <li>
+      <app-mat-form-field-input-dynamic
+      label="Easy Mode"
+      [isSlideToggle]="true"
+      [(value)]="easyMode"
+      ></app-mat-form-field-input-dynamic>
+    </li>
+    <li>
+      <p>
+        <b>File Metadata</b>
+        <br>
+        <span>File name: {{fileName}}</span>
+        <br>
+        <span>File path: {{getFullPath()}}</span>
+      </p>
+    </li>
+    <li>
+      <app-mat-form-field-input
+      label="File Name"
+      [(value)]="fileName"
+      [required]="true"
+      [styleWidth]="'100%'"
+      ></app-mat-form-field-input>
+    </li>
+  </ng-container>
+
   <ul *ngIf="isSecretFile() && (newFile || !vaultDectypted)">
     <hr>
     <li>
@@ -36,7 +40,7 @@
       (onValueChange)="vaultSecret = ''"
       ></app-mat-form-field-input-dynamic>
     </li>
-    <li class="flex-row-container">
+    <li class="flex-row-container-max-content">
       <app-mat-form-field-input
       *ngIf="vaultCrtyptionWithPassword"
       [label]="getVaultTypeLabel() + ' with password'"
@@ -63,16 +67,13 @@
     [(value)]="fileContent"
     styleWidth="100%"
     ></app-code-editor>
-  </li>
-  <li *ngIf="!isSecretFile()">
     <br>
-    <button mat-raised-button color="primary" style="width: 50%;" (click)="save()" [disabled]="!isValueChange() || !validForm">Save</button>
-    <button mat-raised-button color="warn" style="width: 50%;" (click)="revert()" [disabled]="!isValueChange() || !validForm">Revert</button>
   </li>
+  <li class="flex-row-container-auto">
+    <button *ngIf="!isSecretFile()" mat-raised-button color="primary" (click)="save()" [disabled]="!isValueChange() || !validForm">Save</button>
+    <button *ngIf="isSecretFile()" mat-raised-button color="primary" (click)="saveSecrets()" [disabled]="!isValueChange() || !validForm">Save secret</button>
 
-  <li *ngIf="isSecretFile() && vaultDectypted">
-    <br>
-    <button mat-raised-button color="primary" style="width: 50%;" (click)="saveSecrets()" [disabled]="!isValueChange() || !validForm">Save secret</button>
-    <button mat-raised-button color="warn" style="width: 50%;" (click)="revert()" [disabled]="!isValueChange() || !validForm">Revert</button>
+    <button mat-raised-button color="warn" (click)="revert()" [disabled]="!isValueChange() || !validForm">Revert</button>
+    <button *ngIf="!fsPath" mat-raised-button color="warn" (click)="deleteFile()">Delete</button>
   </li>
 </ul>

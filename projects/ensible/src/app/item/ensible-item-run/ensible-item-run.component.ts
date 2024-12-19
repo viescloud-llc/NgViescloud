@@ -124,4 +124,10 @@ export class EnsibleItemRunComponent implements OnChanges {
     this.logId = 0;
     this.playBookLogger = undefined;
   }
+
+  clean() {
+    this.cleanParams();
+    this.runOutput = '';
+    this.ngOnInit();
+  }
 }

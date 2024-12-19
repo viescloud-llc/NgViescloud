@@ -28,6 +28,7 @@ export class EnsibleItemComponent implements OnChanges {
   blankItem: EnsibleItem = new EnsibleItem();
 
   validForm: boolean = false;
+  isFsEditing: boolean[] = [];
 
   constructor(
     private ensibleItemService: EnsibleItemService,
@@ -59,7 +60,7 @@ export class EnsibleItemComponent implements OnChanges {
   }
 
   isValueChange() {
-    let isChange = DataUtils.isNotEqual(this.item, this.itemCopy);
+    let isChange = DataUtils.isNotEqual(this.item, this.itemCopy) || this.isFsEditing.some(e => e);
     this.isEditing.emit(isChange);
     return isChange;
   }

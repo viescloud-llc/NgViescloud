@@ -1,20 +1,23 @@
 <ul class="margin-center">
   <li>
-    <mat-toolbar class="flex-row-container">
+    <mat-toolbar class="flex-row-container-max-content">
       <span>{{item.name}}</span>
       <span class="spacer"></span>
       <span *ngIf="logId">Run Number: {{playBookLogger?.runNumber}} </span>
       <span>Elapsed Time: |not supported yet|</span>
-      <button mat-icon-button [matTooltip]="'run'" (click)="run()" [disabled]="isRunning">
+      <button mat-icon-button [matTooltip]="'Run'" (click)="run()" [disabled]="isRunning">
         <mat-icon>play_arrow</mat-icon>
       </button>
-      <button mat-icon-button [matTooltip]="'stop'" (click)="stop()" [disabled]="!isRunning">
+      <button mat-icon-button [matTooltip]="'Stop'" (click)="stop()" [disabled]="!isRunning">
         <mat-icon>stop</mat-icon>
+      </button>
+      <button *ngIf="logId" mat-icon-button [matTooltip]="'Clean log'" (click)="clean()" [disabled]="isRunning">
+        <mat-icon>delete</mat-icon>
       </button>
     </mat-toolbar>
   </li>
   <li *ngIf="logId">
-    <h3>Run Command: {{playBookLogger?.executedCommand}}</h3>
+    <p>Run Command: {{playBookLogger?.executedCommand}}</p>
   </li>
   <hr>
   <li>

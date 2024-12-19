@@ -101,6 +101,10 @@ export class RouteUtils {
         return null; // Return null if the variable is not found
     }
 
+    static getCurrentPath(): string {
+        return window.location.pathname;
+    }
+
     static getCurrentUrl(): string {
         return window.location.href;
     }

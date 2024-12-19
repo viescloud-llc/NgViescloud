@@ -3,7 +3,6 @@ import { RouterModule, Routes } from '@angular/router';
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { EnsibleSettingComponent } from './ensible-setting/ensible-setting.component';
-import { EnsibleRoleComponent } from './ensible-role/ensible-role.component';
 import { EnsibleFsComponent } from './ensible-fs/ensible-fs.component';
 import { EnsibleUserComponent } from './ensible-user/ensible-user.component';
 import { EnsibleItemListComponent } from './item/ensible-item-list/ensible-item-list.component';
@@ -37,7 +36,7 @@ const routes: Routes = [
     children: [
       {
         path: '**',
-        component: EnsibleRoleComponent
+        component: EnsibleFsComponent
       }
     ]
   },
