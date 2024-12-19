@@ -14,6 +14,8 @@ export class EnsibleItemListComponent implements OnInit {
   items: EnsibleItem[] = [];
   blankItem: EnsibleItem = new EnsibleItem();
 
+  useTable = false;
+
   constructor(
     private ensibleItemService: EnsibleItemService,
     private rxjsUtils: RxJSUtils,

@@ -1,7 +1,8 @@
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 import { EnsibleItem, EnsiblePlayBookLogger } from '../../model/ensible.model';
 import { EnsiblePlaybookLoggerService } from './../../service/ensible-playbook-logger/ensible-playbook-logger.service';
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 
 @Component({
   selector: 'app-ensible-item-run-history',
@@ -18,6 +19,9 @@ export class EnsibleItemRunHistoryComponent implements OnChanges {
 
   logs: EnsiblePlayBookLogger[] = [];
   blankLog: EnsiblePlayBookLogger = new EnsiblePlayBookLogger();
+
+  @Output()
+  onSelectedLog: EventEmitter<EnsiblePlayBookLogger> = new EventEmitter<EnsiblePlayBookLogger>();
 
   constructor(
     private ensiblePlaybookLoggerService: EnsiblePlaybookLoggerService,
@@ -36,5 +40,10 @@ export class EnsibleItemRunHistoryComponent implements OnChanges {
         this.logs = res;
       }
     });
+  }
+
+  selectLog(log: EnsiblePlayBookLogger) {
+    RouteUtils.setQueryParam('logId', log.id.toString());
+    this.onSelectedLog.emit(log);
   }
 }

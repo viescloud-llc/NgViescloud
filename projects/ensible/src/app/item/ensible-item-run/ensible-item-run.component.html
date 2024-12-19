@@ -1,9 +1,9 @@
 <ul class="margin-center">
   <li>
-    <mat-toolbar>
+    <mat-toolbar class="flex-row-container">
       <span>{{item.name}}</span>
       <span class="spacer"></span>
-      <span *ngIf="runNumber">Run Count: {{runNumber}} </span>
+      <span *ngIf="logId">Run Number: {{playBookLogger?.runNumber}} </span>
       <span>Elapsed Time: |not supported yet|</span>
       <button mat-icon-button [matTooltip]="'run'" (click)="run()" [disabled]="isRunning">
         <mat-icon>play_arrow</mat-icon>
@@ -12,6 +12,9 @@
         <mat-icon>stop</mat-icon>
       </button>
     </mat-toolbar>
+  </li>
+  <li *ngIf="logId">
+    <h3>Run Command: {{playBookLogger?.executedCommand}}</h3>
   </li>
   <hr>
   <li>

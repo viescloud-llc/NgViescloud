@@ -12,12 +12,14 @@
       <app-ensible-item-run-history
       [item]="item"
       [triggerInit]="selectedIndex === 1"
+      (onSelectedLog)="selectedIndex = 2"
       ></app-ensible-item-run-history>
     </mat-tab>
 
     <mat-tab [label]="tabNames[2]" [disabled]="isEditing">
       <app-ensible-item-run
       [item]="item"
+      [triggerInit]="selectedIndex === 2"
       ></app-ensible-item-run>
     </mat-tab>
   </mat-tab-group>

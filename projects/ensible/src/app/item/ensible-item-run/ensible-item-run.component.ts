@@ -1,6 +1,6 @@
 import { EnsibleWebsocketService } from './../../service/ensible-websocket/ensible-websocket.service';
 import { EnsiblePlaybookLoggerService } from './../../service/ensible-playbook-logger/ensible-playbook-logger.service';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { EnsibleItem, EnsiblePlayBookLogger, EnsiblePlayBookTrigger } from '../../model/ensible.model';
 import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
@@ -15,12 +15,15 @@ import { SettingService } from 'projects/viescloud-utils/src/lib/service/Setting
   templateUrl: './ensible-item-run.component.html',
   styleUrls: ['./ensible-item-run.component.scss']
 })
-export class EnsibleItemRunComponent implements OnInit {
+export class EnsibleItemRunComponent implements OnChanges {
 
   @Input()
   item!: EnsibleItem;
 
-  runNumber: number = 0;
+  @Input()
+  triggerInit: boolean = false;
+
+  logId: number = 0;
 
   playBookLogger?: EnsiblePlayBookLogger;
 
@@ -39,25 +42,40 @@ export class EnsibleItemRunComponent implements OnInit {
     private settingService: SettingService
   ) { }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if(changes['triggerInit'] && changes['triggerInit'].previousValue === false) {
+      this.ngOnInit();
+    }
+  }
+
   ngOnInit(): void {
-    let runNumber = RouteUtils.getQueryParam('runNumber', true);
-    if(runNumber) {
-      this.runNumber = parseInt(runNumber);
-      this.ensiblePlaybookLoggerService.getByItemIdAndRunNumber(this.item.id, this.runNumber).subscribe({
+    if(!this.ensibleWebsocketService.isConnected()) {
+      this.ensibleWebsocketService.connect();
+    }
+
+    let logId = RouteUtils.getDecodedQueryParam('logId');
+    let run = RouteUtils.getDecodedQueryParam('run');
+
+    if(run) {
+      this.runOutput = 'Reconnecting...';
+      this.watchTopic(run);
+    }
+    else if(logId) {
+      this.logId = parseInt(logId);
+      this.ensiblePlaybookLoggerService.get(this.logId).subscribe({
         next: res => {
           this.playBookLogger = res;
           this.runOutput = res.log;
         }
       })
     }
-
-    if(!this.ensibleWebsocketService.isConnected()) {
-      this.ensibleWebsocketService.connect();
+    else {
+      this.logId = 0;
     }
   }
 
   run() {
-    RouteUtils.setQueryParam('runNumber', null);
+    this.cleanParams();
     let uuid = StringUtils.generateUUID();
     RouteUtils.setQueryParam('run', uuid);
     this.isRunning = true;
@@ -69,28 +87,41 @@ export class EnsibleItemRunComponent implements OnInit {
       consumeEverything: true
     }
 
-    this.subscribeTopic?.unsubscribe();
-    this.subscribeTopic = this.ensibleWebsocketService.watchForEnsibleTopic(uuid).subscribe({
-      next: res => {
-        this.runOutput = res.body;
-      }
-    });
+    this.watchTopic(uuid);
 
     this.ensibleWorkSpaceService.triggerPlaybook(playbookTrigger).subscribe({
       next: res => {
         this.runOutput = res;
         this.isRunning = false;
+        this.cleanParams();
       },
       error: err => {
         this.isRunning = false;
+        this.cleanParams();
+      }
+    });
+  }
+
+  watchTopic(topic: string) {
+    this.subscribeTopic?.unsubscribe();
+    this.subscribeTopic = this.ensibleWebsocketService.watchForEnsibleTopic(topic).subscribe({
+      next: res => {
+        this.runOutput = res.body;
       }
     });
   }
 
   stop() {
-    RouteUtils.setQueryParam('run', null);
+    this.cleanParams();
     this.isRunning = false;
     this.subscribeTopic?.unsubscribe();
     //TODO: accually stop from the server
+  }
+
+  cleanParams() {
+    RouteUtils.setQueryParam('run', null);
+    RouteUtils.setQueryParam('logId', null);
+    this.logId = 0;
+    this.playBookLogger = undefined;
   }
 }

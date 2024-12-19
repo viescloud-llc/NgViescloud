@@ -1,9 +1,26 @@
 <ul class="margin-center">
-  <li>
+  <li class="flex-row-container">
+    <app-mat-form-field-input-dynamic
+    label="Table"
+    [(value)]="useTable"
+    [isSlideToggle]="true"
+    ></app-mat-form-field-input-dynamic>
 
   </li>
+  <hr>
 
-  <li>
+  <li *ngIf="useTable">
+    <app-mat-table
+    [matRows]="items"
+    [blankObject]="blankItem"
+    (onEditRow)="selectItem($event)"
+    [showFilter]="true"
+    [showPagination]="true"
+    [pageSizeOptions]="[20, 50, 100, 500]"
+    ></app-mat-table>
+  </li>
+
+  <li *ngIf="!useTable">
     <app-mat-table-path
     [value]="items"
     [getPathFn]="getPath"
@@ -14,6 +31,7 @@
     [readonlyPathInput]="true"
     ></app-mat-table-path>
   </li>
+
   <li>
     <br>
     <button style="width: 100%;" mat-raised-button color="primary" (click)="addItem()">Add Item</button>
