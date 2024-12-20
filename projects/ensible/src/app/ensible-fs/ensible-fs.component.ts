@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { RouteChangeSubcribe } from 'projects/viescloud-utils/src/lib/directive/RouteChangeSubcribe.directive';
 import { MonacoLanguage } from 'projects/viescloud-utils/src/lib/model/MonacoEditor.model';
@@ -26,7 +26,7 @@ enum FileType {
   templateUrl: './ensible-fs.component.html',
   styleUrls: ['./ensible-fs.component.scss']
 })
-export class EnsibleFsComponent extends RouteChangeSubcribe {
+export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges {
 
   @Input()
   fsPath: string = ''; //manually input path
@@ -69,6 +69,11 @@ export class EnsibleFsComponent extends RouteChangeSubcribe {
   ) {
     super(route);
   }
+  ngOnChanges(changes: SimpleChanges): void {
+    if(changes['fsPath']) {
+      this.onRouteChange();
+    }
+  }
 
   cleanAllValue() {
     this.layers = [];
@@ -85,7 +90,7 @@ export class EnsibleFsComponent extends RouteChangeSubcribe {
 
   override onRouteChange(): void {
     this.cleanAllValue();
-    
+
     this.layers = this.fsPath ? this.fsPath.split('/') : RouteUtils.getCurrentPath().split('/');
 
     if(this.layers.length < 2) {
@@ -240,7 +245,7 @@ export class EnsibleFsComponent extends RouteChangeSubcribe {
   }
 
   //-----------------------------secrets--------------------------------------
-  
+
   getVaultTypeLabel() {
     return this.newFile ? 'Encrypt' : 'Decrypt';
   }
@@ -300,5 +305,5 @@ export class EnsibleFsComponent extends RouteChangeSubcribe {
     this.saveNameChange();
   }
 
-  
+
 }

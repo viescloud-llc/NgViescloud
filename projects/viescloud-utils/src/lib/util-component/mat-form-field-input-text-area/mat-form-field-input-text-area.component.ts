@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, forwardRef } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild, forwardRef, OnChanges, SimpleChanges } from '@angular/core';
 import { MatFormFieldComponent } from '../mat-form-field/mat-form-field.component';
 
 @Component({
@@ -8,6 +8,9 @@ import { MatFormFieldComponent } from '../mat-form-field/mat-form-field.componen
   providers: [{provide: MatFormFieldComponent, useExisting: forwardRef(() => MatFormFieldInputTextAreaComponent)}],
 })
 export class MatFormFieldInputTextAreaComponent extends MatFormFieldComponent {
+
+  @ViewChild('input')
+  textarea?: ElementRef<HTMLTextAreaElement>;
 
   @Input()
   override value: string = '';
@@ -21,10 +24,10 @@ export class MatFormFieldInputTextAreaComponent extends MatFormFieldComponent {
   maxlength: string = '';
 
   @Input()
-  rows: string = '';
+  rows: string = ''; // min height
 
   @Input()
-  cols: string = '';
+  cols: string = ''; //min width
 
   @Input()
   autoResizeHeight: boolean = true;
@@ -53,9 +56,21 @@ export class MatFormFieldInputTextAreaComponent extends MatFormFieldComponent {
   @Input()
   manuallyEmitValue: boolean = false;
 
+  @Input()
+  showResizeVerticalButton: boolean = false;
+
+  @Input()
+  autoScrollToBottom: boolean = false;
+
   //input copy
   @Input()
   copyDisplayMessage: string = this.value.toString();
+
+  override ngOnChanges(changes: SimpleChanges): void {
+    if(changes['value'] && this.autoScrollToBottom) {
+      this.scrollToBottom();
+    }
+  }
 
   override emitValue(): void {
     let value = this.value;
@@ -68,6 +83,13 @@ export class MatFormFieldInputTextAreaComponent extends MatFormFieldComponent {
 
     this.valueChange.emit(value);
     this.onValueChange.emit();
+  }
+
+  scrollToBottom(): void {
+    if(this.textarea) {
+      const textarea = this.textarea.nativeElement;
+      textarea.scrollTop = textarea.scrollHeight;
+    }
   }
 
   emitValueWithCondition(): void {

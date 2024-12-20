@@ -4,6 +4,7 @@
       <span>{{item.name}}</span>
       <span class="spacer"></span>
       <span *ngIf="logId">Run Number: {{playBookLogger?.runNumber}} </span>
+      <span *ngIf="isRunning">Running...</span>
       <span>Elapsed Time: |not supported yet|</span>
       <button mat-icon-button [matTooltip]="'Run'" (click)="run()" [disabled]="isRunning">
         <mat-icon>play_arrow</mat-icon>
@@ -25,7 +26,9 @@
     [showClearIcon]="false"
     [value]="runOutput"
     [styleWidth]="'100%'"
-    [readonly]="true"
+    [rows]="'20'"
+    [autoScrollToBottom]="true"
+    [showResizeVerticalButton]="true"
     ></app-mat-form-field-input-text-area>
   </li>
 </ul>

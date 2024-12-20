@@ -1,7 +1,7 @@
 import { EnsibleWebsocketService } from './../../service/ensible-websocket/ensible-websocket.service';
 import { EnsiblePlaybookLoggerService } from './../../service/ensible-playbook-logger/ensible-playbook-logger.service';
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { EnsibleItem, EnsiblePlayBookLogger, EnsiblePlayBookTrigger } from '../../model/ensible.model';
+import { EnsibleItem, EnsiblePlayBookLogger, EnsiblePlaybookStatus, EnsiblePlayBookTrigger } from '../../model/ensible.model';
 import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 import { NumberUtils } from 'projects/viescloud-utils/src/lib/util/Number.utils';
@@ -9,6 +9,7 @@ import { StringUtils } from 'projects/viescloud-utils/src/lib/util/String.utils'
 import { EnsibleWorkSpace } from '../../model/ensible.parser.model';
 import { EnsibleWorkspaceService } from '../../service/ensible-workspace/ensible-workspace.service';
 import { SettingService } from 'projects/viescloud-utils/src/lib/service/Setting.service';
+import { EnsibleProcessService } from '../../service/ensible-process/ensible-process.service';
 
 @Component({
   selector: 'app-ensible-item-run',
@@ -39,6 +40,7 @@ export class EnsibleItemRunComponent implements OnChanges {
     private ensiblePlaybookLoggerService: EnsiblePlaybookLoggerService,
     private ensibleWebsocketService: EnsibleWebsocketService,
     private ensibleWorkSpaceService: EnsibleWorkspaceService,
+    private ensibleProcessService: EnsibleProcessService,
     private settingService: SettingService
   ) { }
 
@@ -54,18 +56,28 @@ export class EnsibleItemRunComponent implements OnChanges {
     }
 
     let logId = RouteUtils.getDecodedQueryParam('logId');
-    let run = RouteUtils.getDecodedQueryParam('run');
+    let topic = RouteUtils.getDecodedQueryParam('topic');
 
-    if(run) {
+    if(topic) {
       this.runOutput = 'Reconnecting...';
-      this.watchTopic(run);
+      this.watchTopic(topic);
+      this.continuteRun(topic);
     }
     else if(logId) {
       this.logId = parseInt(logId);
       this.ensiblePlaybookLoggerService.get(this.logId).subscribe({
         next: res => {
-          this.playBookLogger = res;
-          this.runOutput = res.log;
+          if(res.status === EnsiblePlaybookStatus.RUNNING) {
+            RouteUtils.setQueryParam('topic', res.topic);
+            this.ngOnInit();
+          }
+          else {
+            this.playBookLogger = res;
+            this.runOutput = res.log;
+          }
+        },
+        error: err => {
+          this.runOutput = 'Unable to fetch logs, please reload or select another log from history tab';
         }
       })
     }
@@ -77,7 +89,7 @@ export class EnsibleItemRunComponent implements OnChanges {
   run() {
     this.cleanParams();
     let uuid = StringUtils.generateUUID();
-    RouteUtils.setQueryParam('run', uuid);
+    RouteUtils.setQueryParam('topic', uuid);
     this.isRunning = true;
     this.runOutput = '';
 
@@ -111,15 +123,38 @@ export class EnsibleItemRunComponent implements OnChanges {
     });
   }
 
+  continuteRun(topic: string) {
+    this.isRunning = true;
+
+    this.ensibleProcessService.watchProcessByTopic(topic).subscribe({
+      next: res => {
+        this.runOutput = res;
+        this.isRunning = false;
+        this.cleanParams();
+      },
+      error: err => {
+        this.isRunning = false;
+        this.cleanParams();
+        this.runOutput = 'Unable to reconnect, process might have been stopped or finished, check latest run history for more details';
+      }
+    })
+  }
+
   stop() {
+    let topic = RouteUtils.getDecodedQueryParam('topic');
+    if(topic) {
+      this.ensibleProcessService.stopProcessByTopic(topic).subscribe({
+        next: res => {}
+      });
+    }
+
     this.cleanParams();
     this.isRunning = false;
     this.subscribeTopic?.unsubscribe();
-    //TODO: accually stop from the server
   }
 
   cleanParams() {
-    RouteUtils.setQueryParam('run', null);
+    RouteUtils.setQueryParam('topic', null);
     RouteUtils.setQueryParam('logId', null);
     this.logId = 0;
     this.playBookLogger = undefined;

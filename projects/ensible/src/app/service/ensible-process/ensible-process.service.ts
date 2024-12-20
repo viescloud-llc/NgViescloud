@@ -16,4 +16,9 @@ export class EnsibleProcessService extends EnsibleService {
     return this.httpClient.get(`${this.getPrefixUri()}`, {params: params, responseType: 'text'});
   }
 
+  stopProcessByTopic(topic: string) {
+    let params = new HttpParams().set('topic', topic);
+    return this.httpClient.delete(`${this.getPrefixUri()}`, {params: params});
+  }
+
 }

@@ -1,4 +1,9 @@
-<mat-form-field [appearance]="getAppearance()" [color]="matColor"  [style.width.ch]="getSize(value ? value.toString() : '')" [style.width]="styleWidth">
+<mat-form-field
+[appearance]="getAppearance()"
+[color]="matColor"
+[style.width.ch]="getSize(value ? value.toString() : '')"
+[style.width]="styleWidth">
+
   <mat-label>{{label}}</mat-label>
   <textarea
   #input
@@ -14,7 +19,9 @@
   [maxlength]="maxlength"
   [rows]="rows"
   [cols]="cols"
-  [cdkTextareaAutosize]="autoResizeHeight"
+  [cdkTextareaAutosize]="autoResizeHeight && !showResizeVerticalButton"
+  [style.overflow]="'auto'"
+  [style.resize]="showResizeVerticalButton ? 'vertical' : 'none'"
   [readonly]="readonly">
   </textarea>
   <mat-error>{{label}} can't be empty</mat-error>
