@@ -3,6 +3,7 @@ import { RxStomp, RxStompConfig } from '@stomp/rx-stomp';
 import { ensibleEnvironment } from 'projects/environments/ensible-environment.prod';
 import { EnsibleAuthenticatorService } from '../ensible-authenticator/ensible-authenticator.service';
 import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
+import { EnsibleService } from '../ensible/ensible.service';
 
 export const defaultRxStompConfig: RxStompConfig = {
   // Which server?
@@ -44,15 +45,8 @@ export class EnsibleWebsocketService extends RxStomp {
     super();
   }
 
-  getParseUri() {
-    if(ensibleEnvironment.env === 'prod')
-      return RouteUtils.getCurrentSchemasHostPortParsed();
-    else
-      return RouteUtils.parseUrl(ensibleEnvironment.api);
-  }
-
   connect() {
-    let uri = this.getParseUri();
+    let uri = EnsibleService.getParseUri();
     let config = structuredClone(defaultRxStompConfig);
     config.brokerURL = `ws://${uri?.host}${uri?.port ? `:${uri?.port}` : ''}/api/v1/ws`;
     config.connectHeaders = {

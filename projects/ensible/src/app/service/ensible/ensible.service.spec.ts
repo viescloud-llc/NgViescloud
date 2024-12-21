@@ -12,8 +12,4 @@ describe('ensible Service', () => {
   it('should be created', () => {
     expect(service).toBeTruthy();
   });
-
-  it('should return data from getData method', () => {
-    expect(service.getData()).toBe('Hello from EnsibleService');
-  });
 });

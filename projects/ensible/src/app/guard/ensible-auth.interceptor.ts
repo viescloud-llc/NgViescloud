@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { EnsibleAuthenticatorService } from '../service/ensible-authenticator/ensible-authenticator.service';
 import { ensibleEnvironment } from 'projects/environments/ensible-environment.prod';
+import { EnsibleService } from '../service/ensible/ensible.service';
 
 const headers = new HttpHeaders().set('content-type', 'application/json');
 
@@ -15,7 +16,7 @@ export class EnsibleAuthInterceptor implements HttpInterceptor
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>>
   {
-    if(!req.url.includes(ensibleEnvironment.api))
+    if(!req.url.includes(EnsibleService.getUri()))
       return next.handle(req);
 
     let body = req.body;
@@ -31,4 +32,6 @@ export class EnsibleAuthInterceptor implements HttpInterceptor
       headers: req.headers.set('Authorization', `Bearer ${jwt}`),
     }));
   }
+
+
 }

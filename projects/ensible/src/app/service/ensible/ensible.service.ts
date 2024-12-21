@@ -16,6 +16,17 @@ export abstract class EnsibleService extends ViesService {
   }
 
   protected override getURI(): string {
+    return EnsibleService.getUri();
+  }
+
+  static getParseUri() {
+    if(ensibleEnvironment.env === 'prod')
+      return RouteUtils.getCurrentSchemasHostPortParsed();
+    else
+      return RouteUtils.parseUrl(ensibleEnvironment.api);
+  }
+
+  static getUri() {
     if(ensibleEnvironment.env === 'prod')
       return RouteUtils.getCurrentSchemasHostPort();
     else
@@ -29,9 +40,6 @@ export abstract class EnsibleService extends ViesService {
 export abstract class EnsibleRestService<T extends Object> extends ViesRestService<T> {
 
   protected override getURI(): string {
-    if(ensibleEnvironment.env === 'prod')
-      return RouteUtils.getCurrentSchemasHostPort();
-    else
-      return ensibleEnvironment.api;
+    return EnsibleService.getUri();
   }
 }
