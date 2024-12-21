@@ -29,6 +29,8 @@ enum FileType {
 })
 export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges, AfterContentChecked {
 
+  private prefixPath: string = '/file';
+
   @Input()
   fsPath: string = ''; //manually input path
 
@@ -210,7 +212,7 @@ export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges
 
           if(this.newFile) {
             this.ensibleWorkspaceParserService.triggerFetchWorkspace();
-            this.router.navigate([this.getFullPathBy(this.newFile)]);
+            this.router.navigate([this.prefixPath, this.getFullPathBy(this.newFile)]);
           }
 
         },
@@ -229,7 +231,7 @@ export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges
         next: () => {
           this.fileNameCopy = structuredClone(this.fileName);
           this.ensibleWorkspaceParserService.triggerFetchWorkspace();
-          this.router.navigate([this.getFullPath(this.fileName)]);
+          this.router.navigate([this.prefixPath, this.getFullPath(this.fileName)]);
         },
         error: (err) => {
           this.dialogUtils.openErrorMessageFromError(err);
@@ -305,7 +307,7 @@ export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges
         this.ensibleVaultService.createVault(this.fileContent, this.getFullPathBy(this.newFile), !this.vaultCrtyptionWithPassword ? this.vaultSecret : undefined, this.vaultCrtyptionWithPassword ? this.vaultSecret : undefined).pipe(this.rxJSUtils.waitLoadingDialog()).subscribe({
           next: res => {
             this.ensibleWorkspaceParserService.triggerFetchWorkspace();
-            this.router.navigate([this.getFullPathBy(this.newFile)]);
+            this.router.navigate([this.prefixPath, this.getFullPathBy(this.newFile)]);
             this.onRouteChange();
           },
           error: (err) => {
