@@ -199,7 +199,7 @@ export class AppComponent extends ViescloudApplicationMinimal {
           ...menuChild,
           {
             title: '+ new ' + menuName,
-            routerLink: `/roles/${grandMenuName}/${menuName}/new`
+            routerLink: `/file/roles/${grandMenuName}/${menuName}/new`
           }
         ]
       }
@@ -223,7 +223,7 @@ export class AppComponent extends ViescloudApplicationMinimal {
 
     menu.children!.push({
       title: '+ new',
-      routerLink: `/${routerLinkBase}/new`
+      routerLink: `/file/${routerLinkBase}/new`
     })
   }
 
