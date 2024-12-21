@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { AfterContentChecked, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { RouteChangeSubcribe } from 'projects/viescloud-utils/src/lib/directive/RouteChangeSubcribe.directive';
 import { MonacoLanguage } from 'projects/viescloud-utils/src/lib/model/MonacoEditor.model';
@@ -11,6 +11,7 @@ import { EnsibleFsService } from '../service/ensible-fs/ensible-fs.service';
 import { EnsibleWorkspaceParserService } from '../service/ensible-workspace/ensible-workspace.service';
 import { EnsibleVaultService } from '../service/ensible-vault/ensible-vault.service';
 import { EnsibleWorkSpace } from '../model/ensible.parser.model';
+import { CodeEditorComponent } from 'projects/viescloud-utils/src/lib/util-component/code-editor/code-editor.component';
 
 enum FileType {
   INVENTORY = 'inventory',
@@ -26,13 +27,19 @@ enum FileType {
   templateUrl: './ensible-fs.component.html',
   styleUrls: ['./ensible-fs.component.scss']
 })
-export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges {
+export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges, AfterContentChecked {
 
   @Input()
   fsPath: string = ''; //manually input path
 
   @Output()
   isEditing: EventEmitter<boolean> = new EventEmitter<boolean>();
+
+  @Input()
+  extraToolbarButton: {uuid: string, label: string, icon?: string}[] = [];
+
+  @Output()
+  onExtraToolbarButtonClick = new EventEmitter<{uuid: string, label: string, icon?: string}>();
 
   layers: string[] = [];
   fileName: string = ''; //layer0
@@ -58,6 +65,9 @@ export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges
 
   FileType = FileType;
 
+  @ViewChild('codeEditor')
+  codeEditor?: CodeEditorComponent;
+
   constructor(
     private ensibleFsService: EnsibleFsService,
     public ensibleWorkspaceParserService: EnsibleWorkspaceParserService,
@@ -65,10 +75,16 @@ export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges
     private rxJSUtils: RxJSUtils,
     private dialogUtils: DialogUtils,
     private router: Router,
+    private cd: ChangeDetectorRef,
     route: ActivatedRoute,
   ) {
     super(route);
   }
+
+  ngAfterContentChecked(): void {
+    this.cd.detectChanges();
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     if(changes['fsPath']) {
       this.onRouteChange();
@@ -91,7 +107,10 @@ export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges
   override onRouteChange(): void {
     this.cleanAllValue();
 
-    this.layers = this.fsPath ? this.fsPath.split('/') : RouteUtils.getCurrentPath().split('/');
+    if(this.fsPath && !this.fsPath.startsWith('/'))
+      this.fsPath = '/' + this.fsPath;
+
+    this.layers = this.fsPath ? this.fsPath.split('/') : RouteUtils.getCurrentPath().split('/').splice(2);
 
     if(this.layers.length < 2) {
       this.error = 'Invalid fs path';
@@ -242,6 +261,10 @@ export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges
         }
       });
     }
+  }
+
+  forceResizeEditor() {
+    this.codeEditor?.resizeEditor();
   }
 
   //-----------------------------secrets--------------------------------------

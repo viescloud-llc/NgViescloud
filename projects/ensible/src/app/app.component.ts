@@ -8,6 +8,10 @@ import { SettingService } from 'projects/viescloud-utils/src/lib/service/Setting
 import { QuickSideDrawerMenu } from 'projects/viescloud-utils/src/lib/share-component/quick-side-drawer-menu/quick-side-drawer-menu.component';
 import { EnsibleWorkspaceParserService } from './service/ensible-workspace/ensible-workspace.service';
 import { EnsibleRole, EnsibleFsDir, EnsibleWorkSpace } from './model/ensible.parser.model';
+import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
+import { EnsibleFsService } from './service/ensible-fs/ensible-fs.service';
+import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
+import { FsWriteMode } from './model/ensible.model';
 
 @Component({
   selector: 'app-root',
@@ -90,6 +94,10 @@ export class AppComponent extends ViescloudApplicationMinimal {
           title: 'Users',
           routerLink: '/setting/users',
           hideConditional: () => !this.ensibleAuthenticatorService.userHaveRole('ADMIN')
+        },
+        {
+          title: 'ansible.cfg',
+          routerLink: '/setting/ansible.cfg'
         }
       ]
     },
@@ -111,7 +119,9 @@ export class AppComponent extends ViescloudApplicationMinimal {
     matDialog: MatDialog,
     public ensibleAuthenticatorService: EnsibleAuthenticatorService,
     public router: Router,
-    private ensibleWorkspaceParserService: EnsibleWorkspaceParserService
+    private ensibleWorkspaceParserService: EnsibleWorkspaceParserService,
+    private ensibleFsService: EnsibleFsService,
+    private rxjsUtils: RxJSUtils
   ) {
     super(settingService, keyCaptureService, matDialog);
 
@@ -152,13 +162,24 @@ export class AppComponent extends ViescloudApplicationMinimal {
           ...this.putRoleChildMenu(() => e.tasks!, e.self.name, 'tasks'),
           ...this.putRoleChildMenu(() => e.templates!, e.self.name, 'templates'),
           ...this.putRoleChildMenu(() => e.vars!, e.self.name, 'vars'),
+          {
+            title: `-----------------------------------`,
+            routerLink: '--',
+            click: () => {}
+          },
+          {
+            title: `- delete role ${e.self.name}`,
+            routerLink: `/roles/${e.self.name}`,
+            click: () => this.deleteRole(e.self.path)
+          }
         ]
       })
     })
 
     menu.children!.push({
       title: '+ new role',
-      routerLink: '/roles/new'
+      routerLink: '/roles/new',
+      click: () => this.addNewRole()
     })
   }
 
@@ -167,7 +188,7 @@ export class AppComponent extends ViescloudApplicationMinimal {
     supplier()?.child.forEach(value => {
       menuChild.push({
         title: value.name,
-        routerLink: `/roles/${grandMenuName}/${menuName}/${value.name}`,
+        routerLink: `/file/roles/${grandMenuName}/${menuName}/${value.name}`,
       });
     })
 
@@ -196,7 +217,7 @@ export class AppComponent extends ViescloudApplicationMinimal {
     producer().child.forEach(e => {
       menu.children!.push({
         title: e.name,
-        routerLink: `/${routerLinkBase}/${e.name}`
+        routerLink: `/file/${routerLinkBase}/${e.name}`
       })
     })
 
@@ -211,6 +232,42 @@ export class AppComponent extends ViescloudApplicationMinimal {
       return this.ensibleAuthenticatorService.user!.username;
     else
       return '';
+  }
+
+  async addNewRole() {
+    let name = await DialogUtils.openInputDialog(this.matDialog, 'Create new role', 'Role name', 'Create', 'Cancel');
+    if(name) {
+      let ws = await this.ensibleWorkspaceParserService.parseWorkspace();
+      if(ws && !ws.isRoleExist(name)) {
+        this.ensibleFsService.writeFile(`roles/${name}/tasks/main.yml`, '---', FsWriteMode.SKIP).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+          next: () => {
+            this.ensibleWorkspaceParserService.triggerFetchWorkspace();
+          },
+          error: (err) => {
+            DialogUtils.openConfirmDialog(this.matDialog, 'Error', 'Error writing file', 'Ok', '');
+          }
+        })
+      }
+      else {
+        DialogUtils.openConfirmDialog(this.matDialog, 'Error', 'Role name already exist', 'Ok', '');
+      }
+    }
+  }
+
+  async deleteRole(rolePath: string) {
+    let confirm = await DialogUtils.openConfirmDialog(this.matDialog, 'Delete', 'Are you sure you want to delete this role?\n!This cannot be undone!\n!All files under this role will be deleted!', 'Yes', 'Cancel');
+
+    if(confirm) {
+      this.ensibleFsService.deleteFile(rolePath).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+        next: () => {
+          this.ensibleWorkspaceParserService.triggerFetchWorkspace();
+          this.router.navigate(['home']);
+        },
+        error: (err) => {
+          DialogUtils.openConfirmDialog(this.matDialog, 'Error', 'Error when deleting role', 'Ok', '');
+        }
+      });
+    }
   }
 
 }

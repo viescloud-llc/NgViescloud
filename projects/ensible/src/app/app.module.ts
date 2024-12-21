@@ -15,6 +15,7 @@ import { EnsibleItemComponent } from './item/ensible-item/ensible-item.component
 import { EnsibleItemRunComponent } from './item/ensible-item-run/ensible-item-run.component';
 import { EnsibleItemRunHistoryComponent } from './item/ensible-item-run-history/ensible-item-run-history.component';
 import { EnsibleItemTabComponent } from './item/ensible-item-tab/ensible-item-tab.component';
+import { EnsibleAnsibleCfgComponent } from './ensible-ansible-cfg/ensible-ansible-cfg.component';
 
 const LIST = [
   AppComponent,
@@ -27,7 +28,8 @@ const LIST = [
   EnsibleItemComponent,
   EnsibleItemRunComponent,
   EnsibleItemRunHistoryComponent,
-  EnsibleItemTabComponent
+  EnsibleItemTabComponent,
+  EnsibleAnsibleCfgComponent
 ]
 
 @NgModule({

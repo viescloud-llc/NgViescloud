@@ -8,6 +8,7 @@ import { EnsibleUserComponent } from './ensible-user/ensible-user.component';
 import { EnsibleItemListComponent } from './item/ensible-item-list/ensible-item-list.component';
 import { EnsibleItemComponent } from './item/ensible-item/ensible-item.component';
 import { EnsibleItemTabComponent } from './item/ensible-item-tab/ensible-item-tab.component';
+import { EnsibleAnsibleCfgComponent } from './ensible-ansible-cfg/ensible-ansible-cfg.component';
 
 const routes: Routes = [
   {
@@ -32,43 +33,7 @@ const routes: Routes = [
     ]
   },
   {
-    path: 'roles',
-    children: [
-      {
-        path: '**',
-        component: EnsibleFsComponent
-      }
-    ]
-  },
-  {
-    path: 'inventory',
-    children: [
-      {
-        path: '**',
-        component: EnsibleFsComponent
-      }
-    ]
-  },
-  {
-    path: 'playbooks',
-    children: [
-      {
-        path: '**',
-        component: EnsibleFsComponent
-      }
-    ]
-  },
-  {
-    path: 'secrets',
-    children: [
-      {
-        path: '**',
-        component: EnsibleFsComponent
-      }
-    ]
-  },
-  {
-    path: 'passwords',
+    path: 'file',
     children: [
       {
         path: '**',
@@ -86,6 +51,10 @@ const routes: Routes = [
       {
         path: 'users',
         component: EnsibleUserComponent
+      },
+      {
+        path: 'ansible.cfg',
+        component: EnsibleAnsibleCfgComponent
       }
     ]
   },

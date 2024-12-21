@@ -39,6 +39,7 @@ export class CodeEditorComponent implements AfterViewInit {
       }
     });
   }
+
   ngAfterViewInit(): void {
     this.resizeEditor();
   }

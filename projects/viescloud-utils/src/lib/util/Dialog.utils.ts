@@ -5,6 +5,7 @@ import { Injectable } from "@angular/core";
 import { ProductImageSwapDialog, ProductImageSwapDialogRespondData } from "../dialog/marketing/product-image-swap-dialog/product-image-swap-dialog.component";
 import { MatOption } from "../model/Mat.model";
 import { NotAuthenticatedError } from "../model/Error.model";
+import { InputDialog } from "../dialog/input-dialog/input-dialog.component";
 
 @Injectable({
     providedIn: 'root'
@@ -73,6 +74,40 @@ export class DialogUtils {
                 }
             })
         })
+    }
+
+    openInputDialog(title: string, label: string, yes: string = 'Yes', no: string = 'No', multipleLine: boolean = false, input: string = '', placeholder: string = '', width: string = '100%', disableClose: boolean = false) {
+      return DialogUtils.openInputDialog(this.matDialog, title, label, yes, no, multipleLine, input, placeholder, width, disableClose);
+    }
+
+    static openInputDialog(matDialog: MatDialog, title: string, label: string, yes: string = 'Yes', no: string = 'No', multipleLine: boolean = false, input: string = '', placeholder: string = '', width: string = '100%', disableClose: boolean = false) {
+      return new Promise<string>((resolve, reject) => {
+        let dialog = matDialog.open(InputDialog, {
+            disableClose: disableClose,
+            data: {
+                title: title,
+                label: label,
+                yes: yes,
+                no: no,
+                multipleLine: multipleLine,
+                input: input,
+                placeholder: placeholder
+            },
+            width: width
+        });
+
+        dialog.afterClosed().subscribe({
+            next: (result) => {
+                if(result)
+                    resolve(result);
+                else
+                    reject(result);
+            },
+            error: (error) => {
+                reject(error);
+            }
+        })
+      })
     }
 
     // -------------------------PRODUCT SERVICE-------------------------

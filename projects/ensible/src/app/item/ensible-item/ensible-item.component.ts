@@ -95,4 +95,10 @@ export class EnsibleItemComponent implements OnChanges {
       }
     })
   }
+
+  routeToFile(filePath: string) {
+    if(!filePath.startsWith('/'))
+      filePath = '/' + filePath;
+    this.router.navigate(['/file', filePath]);
+  }
 }

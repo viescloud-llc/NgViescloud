@@ -6,7 +6,7 @@
   <ng-container *ngIf="!fsPath">
     <li>
       <app-mat-form-field-input-dynamic
-      label="Easy Mode"
+      label="Easy Mode (still in development)"
       [isSlideToggle]="true"
       [(value)]="easyMode"
       ></app-mat-form-field-input-dynamic>
@@ -30,7 +30,7 @@
     </li>
   </ng-container>
 
-  <ul *ngIf="isSecretFile() && (newFile || !vaultDectypted)">
+  <ng-container *ngIf="isSecretFile() && (newFile || !vaultDectypted)">
     <hr>
     <li>
       <app-mat-form-field-input-dynamic
@@ -58,11 +58,26 @@
 
       <button mat-raised-button color="primary" (click)="decryptFileContent()">{{getVaultTypeLabel()}}</button>
     </li>
-  </ul>
+  </ng-container>
+
+  <li>
+    <button mat-raised-button color="primary" (click)="forceResizeEditor()" [matTooltip]="'Refresh Editor'">
+      <mat-icon>refresh</mat-icon>
+    </button>
+
+    <ng-container *ngFor="let item of extraToolbarButton" mat-raised-button color="primary">
+      <button *ngIf="item.icon" mat-icon-button (click)="onExtraToolbarButtonClick.emit(item)" [matTooltip]="item.label">
+        <mat-icon>{{item.icon}}</mat-icon>
+      </button>
+
+      <button *ngIf="!item.icon" (click)="onExtraToolbarButtonClick.emit(item)">{{item.label}}</button>
+    </ng-container>
+  </li>
 
   <hr>
   <li *ngIf="!easyMode">
     <app-code-editor
+    #codeEditor
     [language]="getLanguageType()"
     [(value)]="fileContent"
     styleWidth="100%"
