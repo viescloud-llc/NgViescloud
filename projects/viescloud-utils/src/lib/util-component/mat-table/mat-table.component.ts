@@ -31,6 +31,9 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
   @Input()
   showPagination: boolean = false;
 
+  @Input()
+  initSort?: {key: string, order: 'asc' | 'desc' };
+
   @Output()
   onEditRow: EventEmitter<T> = new EventEmitter();
 
@@ -40,10 +43,10 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
 
   filter?: string;
 
-  @ViewChild(MatPaginator) 
+  @ViewChild(MatPaginator)
   paginator!: MatPaginator;
-  
-  @ViewChild(MatSort) 
+
+  @ViewChild(MatSort)
   sort!: MatSort;
 
   @Input()
@@ -57,6 +60,10 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
   ) { }
 
   ngAfterViewInit(): void {
+    if(this.initSort) {
+      this.sort.active = this.initSort.key;
+      this.sort.direction = this.initSort.order;
+    }
     this.ngOnInit();
     this.cd.detectChanges();
   }
@@ -84,7 +91,7 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
       this.fillColumns();
       return;
     }
-    
+
     let index = 100;
     for (const [key] of Object.entries(this.blankObject)) {
       if(!this.isHide(key)) {

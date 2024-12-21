@@ -44,6 +44,7 @@ export class EnsibleItemRunHistoryComponent implements OnChanges {
 
   selectLog(log: EnsiblePlayBookLogger) {
     RouteUtils.setQueryParam('logId', log.id.toString());
+    RouteUtils.setQueryParam('topic', null);
     this.onSelectedLog.emit(log);
   }
 }

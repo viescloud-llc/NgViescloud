@@ -4,5 +4,6 @@
 [showPagination]="true"
 [blankObject]="blankLog"
 [pageSizeOptions]="[20, 50, 200, 1000]"
+[initSort]="{key: 'runNumber', order: 'desc'}"
 (onEditRow)="selectLog($event)"
 ></app-mat-table>

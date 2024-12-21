@@ -124,13 +124,18 @@ export class EnsibleItem {
 }
 
 export class EnsiblePlayBookLogger {
+
+  @MatTableDisplayLabel('Run Number')
+  runNumber: number = 0;
+
+  @MatTableHide()
   id: number = 0;
 
   @MatTableHide()
   log: string = '';
 
+  @MatTableDisplayLabel('Item ID')
   itemId: number = 0;
-  runNumber: number = 0;
 
   @MatTableHide()
   executedCommand: string = '';
@@ -138,6 +143,7 @@ export class EnsiblePlayBookLogger {
   @MatTableHide()
   triggerDateTime: DateTime = new DateTime();
 
+  @MatTableDisplayLabel('Status')
   status: EnsiblePlaybookStatus = EnsiblePlaybookStatus.STOP;
 
   @MatTableHide()
