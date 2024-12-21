@@ -5,7 +5,14 @@
       <span class="spacer"></span>
       <span *ngIf="logId">Run Number: {{playBookLogger?.runNumber}} </span>
       <span *ngIf="isRunning">Running...</span>
-      <span>Elapsed Time: |not supported yet|</span>
+      <span>
+        <app-mat-form-field-input-dynamic
+        label="Auto Scroll"
+        [(value)]="autoScroll"
+        [isSlideToggle]="true"
+        ></app-mat-form-field-input-dynamic>
+      </span>
+      <span>Elapsed Time: |0|</span>
       <button mat-icon-button [matTooltip]="'Run'" (click)="run()" [disabled]="isRunning">
         <mat-icon>play_arrow</mat-icon>
       </button>
@@ -27,7 +34,7 @@
     [value]="runOutput"
     [styleWidth]="'100%'"
     [rows]="'20'"
-    [autoScrollToBottom]="true"
+    [autoScrollToBottom]="autoScroll"
     [showResizeVerticalButton]="true"
     ></app-mat-form-field-input-text-area>
   </li>
