@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ensibleEnvironment } from 'projects/environments/ensible-environment.prod';
 import { ViesRestService, ViesService } from 'projects/viescloud-utils/src/lib/service/Rest.service';
+import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,10 @@ export abstract class EnsibleService extends ViesService {
   }
 
   protected override getURI(): string {
-    return ensibleEnvironment.api;
+    if(ensibleEnvironment.env === 'prod')
+      return RouteUtils.getCurrentSchemasHostPort();
+    else
+      return ensibleEnvironment.api;
   }
 }
 
@@ -23,7 +27,11 @@ export abstract class EnsibleService extends ViesService {
   providedIn: 'root'
 })
 export abstract class EnsibleRestService<T extends Object> extends ViesRestService<T> {
+
   protected override getURI(): string {
-    return ensibleEnvironment.api;
+    if(ensibleEnvironment.env === 'prod')
+      return RouteUtils.getCurrentSchemasHostPort();
+    else
+      return ensibleEnvironment.api;
   }
 }

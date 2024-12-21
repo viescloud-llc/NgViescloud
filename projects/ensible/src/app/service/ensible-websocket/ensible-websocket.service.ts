@@ -2,10 +2,11 @@ import { Injectable } from '@angular/core';
 import { RxStomp, RxStompConfig } from '@stomp/rx-stomp';
 import { ensibleEnvironment } from 'projects/environments/ensible-environment.prod';
 import { EnsibleAuthenticatorService } from '../ensible-authenticator/ensible-authenticator.service';
+import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 
 export const defaultRxStompConfig: RxStompConfig = {
   // Which server?
-  brokerURL: `ws://${ensibleEnvironment.api_host}:${ensibleEnvironment.api_port}/api/v1/ws`,
+  // brokerURL: `ws://${ensibleEnvironment.api_host}:${ensibleEnvironment.api_port}/api/v1/ws`,
   // brokerURL: 'ws://127.0.0.1:15674/ws',
 
   // Headers
@@ -43,8 +44,17 @@ export class EnsibleWebsocketService extends RxStomp {
     super();
   }
 
+  getParseUri() {
+    if(ensibleEnvironment.env === 'prod')
+      return RouteUtils.getCurrentSchemasHostPortParsed();
+    else
+      return RouteUtils.parseUrl(ensibleEnvironment.api);
+  }
+
   connect() {
+    let uri = this.getParseUri();
     let config = structuredClone(defaultRxStompConfig);
+    config.brokerURL = `ws://${uri?.host}${uri?.port ? `:${uri?.port}` : ''}/api/v1/ws`;
     config.connectHeaders = {
       'Authorization': `Bearer ${this.ensibleAuthenticator.getToken()}`
     }

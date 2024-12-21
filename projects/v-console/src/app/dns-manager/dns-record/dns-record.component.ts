@@ -90,12 +90,13 @@ export class DnsRecordComponent extends FixChangeDetection implements OnInit {
 
   ngOnInit() {
     this.dnsRecord = structuredClone(this.dnsRecord);
-    
+
     this.initValue();
-    
+
     this.initReference();
 
     if(this.dnsRecord.uri) {
+      //TODO: parse url change, make sure to update this
       let url = RouteUtils.parseUrl(this.dnsRecord.uri);
       if(!url) {
         this.dialogUtils.openErrorMessage("Error", "Invalid URI");

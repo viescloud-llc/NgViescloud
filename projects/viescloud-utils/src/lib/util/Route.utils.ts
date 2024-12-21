@@ -101,25 +101,74 @@ export class RouteUtils {
         return null; // Return null if the variable is not found
     }
 
+    /**
+     * Retrieves the current path from the browser's address bar.
+     * @returns The current path as a string.
+     * @example window.location.pathname = '/users/123' => returns '/users/123'
+     */
     static getCurrentPath(): string {
         return window.location.pathname;
     }
 
+    /**
+     * Returns the current URL in the browser address bar.
+     * @returns The current URL as a string.
+     * @example window.location.href = 'https://example.com/users/123' => returns 'https://example.com/users/123'
+     */
     static getCurrentUrl(): string {
         return window.location.href;
+    }
+
+    /**
+     * Retrieves the current schema (http/https), host and port from the current URL in the browser's address bar.
+     * @returns The current schema, host and port as a string.
+     * @example window.location.href = 'https://example.com:8080/users/123' => returns 'https://example.com:8080'
+     */
+    static getCurrentSchemasHostPort() {
+      let currentUrl = RouteUtils.getCurrentUrl();
+      let url = RouteUtils.parseUrl(currentUrl);
+      return `${url?.protocol}://${url?.host}${url?.port ? `:${url?.port}` : ''}`;
+    }
+
+    /**
+     * Retrieves the current schema, host and port from the current URL in the browser's address bar,
+     * and parses them into a parsed URL object.
+     * @returns The current schema, host and port as a parsed URL object.
+     * @example window.location.href = 'https://example.com:8080/users/123' => returns { protocol: 'https', host: 'example.com', port: '8080' }
+     */
+    static getCurrentSchemasHostPortParsed() {
+      let currentUrl = RouteUtils.getCurrentUrl();
+      let url = RouteUtils.parseUrl(currentUrl);
+      return url;
     }
 
     static openLinkInNewTab(link: string): void {
         window.open(link, '_blank');
     }
 
+    /**
+     * Parses a URL into its protocol, host and port.
+     * @param url The URL to parse.
+     * @returns A parsed URL object containing the protocol, host and port as strings, or null if the URL is invalid.
+     * @example 'https://example.com:8080' => { protocol: 'https', host: 'example.com', port: '8080' }
+     * @example 'http://example.com' => { protocol: 'http', host: 'example.com', port: '' }
+     * @example 'example.com' => null
+     */
     static parseUrl(url: string): { protocol: string; host: string; port: string } | null {
-        // Regular expression to match protocol, host, and port
-        const urlPattern = /^(https?):\/\/([\d.]+):(\d+)/;
+        // Regular expression to match protocol (http or https), host, and port
+        const urlPattern = /^(https?:\/\/)?([^:]+)(:\d+)?/;
         const match = url.match(urlPattern);
 
         if (match) {
-            const [, protocol, host, port] = match;
+            let [, protocol, host, port] = match;
+
+            if(protocol.includes('://'))
+              protocol = protocol.substring(0, protocol.indexOf('://'));
+
+            if (port.startsWith(':')) {
+              port = port.substring(1);
+            }
+
             return { protocol, host, port };
         } else {
             console.error("Invalid URL format");
