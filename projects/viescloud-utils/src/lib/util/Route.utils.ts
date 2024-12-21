@@ -134,4 +134,17 @@ export class RouteUtils {
         }
         return url.toString();
     }
+
+    static formatValidUrlPath(url: string) {
+      //replace all /+ or \+ with only 1 /
+      url = url.replace(/\/+/g, '/').replace(/\\+/g, '/');
+
+      if(!url.startsWith('/'))
+        url = '/' + url;
+
+      if(url.endsWith('/'))
+        url = url.substring(0, url.length - 1);
+
+      return url;
+    }
 }

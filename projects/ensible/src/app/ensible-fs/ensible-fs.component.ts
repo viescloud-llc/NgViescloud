@@ -109,8 +109,8 @@ export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges
   override onRouteChange(): void {
     this.cleanAllValue();
 
-    if(this.fsPath && !this.fsPath.startsWith('/'))
-      this.fsPath = '/' + this.fsPath;
+    if(this.fsPath)
+      this.fsPath = RouteUtils.formatValidUrlPath(this.fsPath);
 
     this.layers = this.fsPath ? this.fsPath.split('/') : RouteUtils.getCurrentPath().split('/').splice(2);
 
@@ -162,18 +162,18 @@ export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges
 
   }
 
-/**
- * Constructs the full path by joining the layers with an optional file name.
- * @param name - Optional file name to append to the path. If provided, the last layer is temporarily removed before appending the name.
- * @returns The full path as a string. If a name is provided, it is appended to the path after removing the last layer.
- */
+  /**
+   * Constructs the full path by joining the layers with an optional file name.
+   * @param name - Optional file name to append to the path. If provided, the last layer is temporarily removed before appending the name.
+   * @returns The full path as a string. If a name is provided, it is appended to the path after removing the last layer.
+   */
   getFullPath(name?: string) {
     if(!name) {
-      return this.layers.join('/');
+      return RouteUtils.formatValidUrlPath(this.layers.join('/'));
     } else {
       let tempLayers = structuredClone(this.layers);
       tempLayers.pop()
-      return tempLayers.join('/') + '/' + name;
+      return RouteUtils.formatValidUrlPath(tempLayers.join('/') + '/' + name);
     }
   }
 
@@ -212,7 +212,7 @@ export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges
 
           if(this.newFile) {
             this.ensibleWorkspaceParserService.triggerFetchWorkspace();
-            this.router.navigate([this.prefixPath, this.getFullPathBy(this.newFile)]);
+            this.router.navigate([this.prefixPath + this.getFullPathBy(this.newFile)]);
           }
 
         },
@@ -231,7 +231,7 @@ export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges
         next: () => {
           this.fileNameCopy = structuredClone(this.fileName);
           this.ensibleWorkspaceParserService.triggerFetchWorkspace();
-          this.router.navigate([this.prefixPath, this.getFullPath(this.fileName)]);
+          this.router.navigate([this.prefixPath + this.getFullPath(this.fileName)]);
         },
         error: (err) => {
           this.dialogUtils.openErrorMessageFromError(err);
@@ -307,7 +307,7 @@ export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges
         this.ensibleVaultService.createVault(this.fileContent, this.getFullPathBy(this.newFile), !this.vaultCrtyptionWithPassword ? this.vaultSecret : undefined, this.vaultCrtyptionWithPassword ? this.vaultSecret : undefined).pipe(this.rxJSUtils.waitLoadingDialog()).subscribe({
           next: res => {
             this.ensibleWorkspaceParserService.triggerFetchWorkspace();
-            this.router.navigate([this.prefixPath, this.getFullPathBy(this.newFile)]);
+            this.router.navigate([this.prefixPath + this.getFullPathBy(this.newFile)]);
             this.onRouteChange();
           },
           error: (err) => {
