@@ -52,8 +52,8 @@ export class EnsibleWebsocketService extends RxStomp {
 
     let uri = EnsibleService.getParseUri();
     let config = structuredClone(defaultRxStompConfig);
-    config.brokerURL = `ws://${uri?.host}${uri?.port ? `:${uri?.port}` : ''}/api/v1/ws`;
-    // config.brokerURL = `ws://${uri?.host}${uri?.port ? `:${uri?.port}` : ''}/api/v1/ws?token=${this.ensibleAuthenticator.getToken()}`;
+    // config.brokerURL = `ws://${uri?.host}${uri?.port ? `:${uri?.port}` : ''}/api/v1/ws`;
+    config.brokerURL = `ws://${uri?.host}${uri?.port ? `:${uri?.port}` : ''}/api/v1/ws?token=${this.ensibleAuthenticator.getToken()}`;
     // config.connectHeaders = {
     //   'Authorization': `Bearer ${this.ensibleAuthenticator.getToken()}`
     // }
