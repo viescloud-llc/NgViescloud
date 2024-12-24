@@ -104,7 +104,7 @@ export class DnsRecordComponent extends FixChangeDetection implements OnInit {
         return;
       }
 
-      this.uriDetails.protocol = url.protocol.replace(":", '') === 'http' ? ForwardScheme.HTTP : ForwardScheme.HTTPS;
+      this.uriDetails.protocol = url.protocol === 'http' ? ForwardScheme.HTTP : ForwardScheme.HTTPS;
       this.uriDetails.host = url.host;
       this.uriDetails.port = url.port ? parseInt(url.port) : this.uriDetails.port;
       this.syncUriDetails();

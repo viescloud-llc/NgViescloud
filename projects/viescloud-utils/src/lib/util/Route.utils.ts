@@ -154,26 +154,32 @@ export class RouteUtils {
      * @example 'http://example.com' => { protocol: 'http', host: 'example.com', port: '' }
      * @example 'example.com' => null
      */
-    static parseUrl(url: string): { protocol: string; host: string; port: string } | null {
-        // Regular expression to match protocol (http or https), host, and port
-        const urlPattern = /^(https?:\/\/)?([^:]+)(:\d+)?/;
-        const match = url.match(urlPattern);
+    static parseUrl(url: string): { protocol?: string; host: string; port?: string } | null {
+      // Regular expression to match protocol (http or https), host, and port
+      const urlPattern = /^(https?:\/\/)?([^:]+)(:\d+)?/;
+      const match = url.match(urlPattern);
 
-        if (match) {
-            let [, protocol, host, port] = match;
+      if (match) {
+          let [, protocol, host, port] = match;
 
-            if(protocol.includes('://'))
-              protocol = protocol.substring(0, protocol.indexOf('://'));
+          if(protocol && protocol.includes('://'))
+            protocol = protocol.substring(0, protocol.indexOf('://'));
 
-            if (port.startsWith(':')) {
-              port = port.substring(1);
-            }
+          if (port && port.startsWith(':')) {
+            port = port.substring(1);
+          }
+          else if(!port && protocol) {
+              if(protocol === 'http')
+                  port = '80';
+              else if(protocol === 'https')
+                  port = '443';
+          }
 
-            return { protocol, host, port };
-        } else {
-            console.error("Invalid URL format");
-            return null;
-        }
+          return { protocol, host, port };
+      } else {
+          console.error("Invalid URL format");
+          return null;
+      }
     }
 
     static buildUrl(uri: string, params: { [key: string]: string }): string {
