@@ -1,6 +1,14 @@
 import { ActivatedRoute } from "@angular/router";
 import { first } from "rxjs";
 
+export const DEFAULT_PORTS: Record<string, string> = {
+  "http": "80",
+  "https": "443",
+  "ftp": "21",
+  "ws": "80",
+  "wss": "443",
+};
+
 export class RouteUtils {
 
     private constructor() { }
@@ -127,7 +135,7 @@ export class RouteUtils {
     static getCurrentSchemasHostPort() {
       let currentUrl = RouteUtils.getCurrentUrl();
       let url = RouteUtils.parseUrl(currentUrl);
-      return `${url?.protocol}://${url?.host}${url?.port ? `:${url?.port}` : ''}`;
+      return `${url?.schema}://${url?.host}${url?.port ? `:${url?.port}` : ''}`;
     }
 
     /**
@@ -154,32 +162,15 @@ export class RouteUtils {
      * @example 'http://example.com' => { protocol: 'http', host: 'example.com', port: '' }
      * @example 'example.com' => null
      */
-    static parseUrl(url: string): { protocol?: string; host: string; port?: string } | null {
-      // Regular expression to match protocol (http or https), host, and port
-      const urlPattern = /^(https?:\/\/)?([^:]+)(:\d+)?/;
-      const match = url.match(urlPattern);
+    static parseUrl(url: string): { schema: string; host: string; port: string | null } {
+      const parsedUrl = new URL(url);
+      const port = parsedUrl.port || DEFAULT_PORTS[parsedUrl.protocol.replace(":", "")] || null;
 
-      if (match) {
-          let [, protocol, host, port] = match;
-
-          if(protocol && protocol.includes('://'))
-            protocol = protocol.substring(0, protocol.indexOf('://'));
-
-          if (port && port.startsWith(':')) {
-            port = port.substring(1);
-          }
-          else if(!port && protocol) {
-              if(protocol === 'http')
-                  port = '80';
-              else if(protocol === 'https')
-                  port = '443';
-          }
-
-          return { protocol, host, port };
-      } else {
-          console.error("Invalid URL format");
-          return null;
-      }
+      return {
+          schema: parsedUrl.protocol.replace(":", ""),
+          host: parsedUrl.hostname,
+          port
+      };
     }
 
     static buildUrl(uri: string, params: { [key: string]: string }): string {
