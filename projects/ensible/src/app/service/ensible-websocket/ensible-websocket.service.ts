@@ -12,7 +12,7 @@ export const defaultRxStompConfig: RxStompConfig = {
 
   // Headers
   // Typical keys: login, passcode, host
-  connectHeaders: {},
+  // connectHeaders: {},
 
   // How often to heartbeat?
   // Interval in milliseconds, set to 0 to disable
@@ -46,15 +46,30 @@ export class EnsibleWebsocketService extends RxStomp {
   }
 
   connect() {
+    if(this.isConnected()) {
+      return;
+    }
+
     let uri = EnsibleService.getParseUri();
     let config = structuredClone(defaultRxStompConfig);
-    config.brokerURL = `ws://${uri?.host}${uri?.port ? `:${uri?.port}` : ''}/api/v1/ws`;
-    config.connectHeaders = {
-      'Authorization': `Bearer ${this.ensibleAuthenticator.getToken()}`
-    }
+    config.brokerURL = `ws://${uri?.host}${uri?.port ? `:${uri?.port}` : ''}/api/v1/ws?token=${this.ensibleAuthenticator.getToken()}`;
+    // config.connectHeaders = {
+    //   'Authorization': `Bearer ${this.ensibleAuthenticator.getToken()}`
+    // }
+    // config.beforeConnect = (c: RxStomp) => {
+    //   return new Promise<void>((resolve, reject) => {
+    //     c.configure({
+    //       connectHeaders: {
+    //         'Authorization': `Bearer ${this.ensibleAuthenticator.getToken()}`
+    //       }
+    //     });
+    //     resolve();
+    //   });
+    // }
     this.configure(config);
     this.activate();
   }
+
 
   isConnected() {
     return this.stompClient.connected;
