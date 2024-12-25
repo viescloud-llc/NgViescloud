@@ -20,8 +20,17 @@
     label="Item Path"
     [(value)]="item.path"
     styleWidth="100%"
+    [focusOutAutoFillFn]="formatValidPath"
     [required]="true"
     ></app-mat-form-field-input>
+  </li>
+  <li>
+    <app-mat-form-field-input-option
+    label="Verbosity"
+    [(value)]="item.verbosity"
+    [options]="verbosityOptions"
+    styleWidth="100%"
+    ></app-mat-form-field-input-option>
   </li>
   <li>
     <details>
@@ -41,9 +50,22 @@
           label="Github url"
           [(value)]="item.githubUrl"
           styleWidth="100%"
+          [placeholder]="'https://github.com/org/repo'"
           [required]="true"
+          [autoFillHttps]="true"
+          [showGoto]="true"
           ></app-mat-form-field-input>
         </li>
+        <li *ngIf="item.triggerOnGithubWebhook && item.githubUrl">
+          <app-mat-form-field-input
+          label="Configurate gihub to send webhook to this url"
+          [value]="getGithubWebhookUrl()"
+          styleWidth="100%"
+          [readonly]="true"
+          [showCopyToClipboard]="true"
+          ></app-mat-form-field-input>
+        </li>
+        <hr>
         <li>
           <app-mat-form-field-input-dynamic
           label="Trigger on gitlab webhook"
@@ -56,9 +78,30 @@
         <li *ngIf="item.triggerOnGitlabWebhook">
           <app-mat-form-field-input
           label="gitlab url"
-          [(value)]="item.githubUrl"
+          [(value)]="item.gitlabUrl"
           styleWidth="100%"
+          [placeholder]="'https://gitlab.com/org/repo'"
           [required]="true"
+          [autoFillHttps]="true"
+          [showGoto]="true"
+          ></app-mat-form-field-input>
+        </li>
+        <li *ngIf="item.triggerOnGitlabWebhook && item.gitlabUrl">
+          <app-mat-form-field-input
+          label="Configurate gitlab to send webhook to this url"
+          [value]="getGitlabWebhookUrl()"
+          styleWidth="100%"
+          [readonly]="true"
+          [showCopyToClipboard]="true"
+          ></app-mat-form-field-input>
+        </li>
+        <hr>
+        <li>
+          <app-mat-form-field-input
+          label="Trigger on cron job schedule"
+          [(value)]="item.cronExpression"
+          placeholder="e.g * * * * * *"
+          styleWidth="100%"
           ></app-mat-form-field-input>
         </li>
       </ul>

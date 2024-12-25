@@ -83,6 +83,9 @@ export class EnsibleUserComponent implements OnInit {
       this.ensibleUserService.postOrPatch(this.selectedUser?.id, this.selectedUser).subscribe({
         next: res => {
           this.ngOnInit();
+        },
+        error: err => {
+          this.dialogUtils.openErrorMessageFromError(err);
         }
       })
     }

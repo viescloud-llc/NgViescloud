@@ -12,7 +12,7 @@
         [isSlideToggle]="true"
         ></app-mat-form-field-input-dynamic>
       </span>
-      <span>Elapsed Time: |0|</span>
+      <span>Verbose: {{getVerboseLabel()}}</span>
       <button mat-icon-button [matTooltip]="'Run'" (click)="run()" [disabled]="isRunning">
         <mat-icon>play_arrow</mat-icon>
       </button>

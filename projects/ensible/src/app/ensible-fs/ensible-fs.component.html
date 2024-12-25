@@ -24,6 +24,7 @@
       <app-mat-form-field-input
       label="File Name"
       [(value)]="fileName"
+      [placeholder]="'e.g file.txt, local.ini, secrets.yaml'"
       [required]="true"
       [styleWidth]="'100%'"
       ></app-mat-form-field-input>
@@ -34,7 +35,7 @@
     <hr>
     <li>
       <app-mat-form-field-input-dynamic
-      [label]="getVaultTypeLabel() + ' with password?'"
+      [label]="getVaultTypeLabel() + ' with password?' + (getVaultTypeLabel() == 'Encrypt' ? ' (not recommended)' : '')"
       [(value)]="vaultCrtyptionWithPassword"
       [isSlideToggle]="true"
       (onValueChange)="vaultSecret = ''"
@@ -56,17 +57,17 @@
       [required]="true"
       ></app-mat-form-field-input-option>
 
-      <button mat-raised-button color="primary" (click)="decryptFileContent()">{{getVaultTypeLabel()}}</button>
+      <button *ngIf="!newFile" mat-raised-button color="primary" (click)="decryptFileContent()">{{getVaultTypeLabel()}}</button>
     </li>
   </ng-container>
 
   <li>
-    <button mat-raised-button color="primary" (click)="forceResizeEditor()" [matTooltip]="'Refresh Editor'">
+    <button mat-icon-button color="primary" (click)="forceResizeEditor()" [matTooltip]="'Refresh Editor'">
       <mat-icon>refresh</mat-icon>
     </button>
 
     <ng-container *ngFor="let item of extraToolbarButton" mat-raised-button color="primary">
-      <button *ngIf="item.icon" mat-icon-button (click)="onExtraToolbarButtonClick.emit(item)" [matTooltip]="item.label">
+      <button *ngIf="item.icon" mat-icon-button color="primary" (click)="onExtraToolbarButtonClick.emit(item)" [matTooltip]="item.label">
         <mat-icon>{{item.icon}}</mat-icon>
       </button>
 

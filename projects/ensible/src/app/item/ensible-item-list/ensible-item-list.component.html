@@ -5,7 +5,9 @@
     [(value)]="useTable"
     [isSlideToggle]="true"
     ></app-mat-form-field-input-dynamic>
-
+    <button mat-icon-button color="primary" (click)="ngOnInit()" [matTooltip]="'Refresh'">
+      <mat-icon>refresh</mat-icon>
+    </button>
   </li>
   <hr>
 

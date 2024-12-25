@@ -316,4 +316,15 @@ export class DataUtils {
       }
       return obj;
     }
+
+    static isInstanceOf<T>(obj: unknown, type: { new (...args: any[]): T } | Record<string, any>): boolean {
+      if (type instanceof Function) {
+        // Check if obj is an instance of the class constructor
+        return obj instanceof type;
+      } else if (typeof type === 'object' && type !== null && typeof obj === 'object' && obj !== null) {
+        // Check if obj matches the structure of type
+        return Object.keys(type).every(key => key in obj);
+      }
+      return false;
+    }
  }

@@ -36,6 +36,7 @@ export class EnsibleWorkspaceService extends EnsibleService {
 
     params = params.setIfValid('outputTopic', playbookTrigger.outputTopic);
     params = params.setIfValid('consumeEverything', playbookTrigger.consumeEverything);
+    params = params.setIfValid('verbosity', playbookTrigger.verbosity);
 
     let httpParams = params.build();
 
@@ -59,6 +60,8 @@ export class EnsibleWorkspaceParserService extends EnsibleWorkspaceService {
   secretsFileOptions: MatOption<string>[] = [];
   passwordFileOptions: MatOption<string>[] = [];
   taskFileOptions: MatOption<string>[] = [];
+  groupVarsFileOptions: MatOption<string>[] = [];
+  hostVarsFileOptions: MatOption<string>[] = [];
 
   triggerFetchWorkspace() {
     this.parseWorkspace().then(ws => {})
@@ -80,29 +83,28 @@ export class EnsibleWorkspaceParserService extends EnsibleWorkspaceService {
             this.putRole(parent, ws, node);
 
             this.putRoleChildNode(parent, ws, '/defaults', 'defaults', node);
-
             this.putRoleChildNode(parent, ws, '/files', 'files', node);
-
             this.putRoleChildNode(parent, ws, '/handlers', 'handlers', node);
-
             this.putRoleChildNode(parent, ws, '/meta', 'meta', node);
-
             this.putRoleChildNode(parent, ws, '/tasks', 'tasks', node);
-
             this.putRoleChildNode(parent, ws, '/templates', 'templates', node);
-
             this.putRoleChildNode(parent, ws, '/vars', 'vars', node);
 
             this.putWorkspaceFS(parent, node, '/playbooks', () => ws.playbooks, s => ws.isPlaybookExist(s));
             this.putWorkspaceFS(parent, node, '/inventory', () => ws.inventory, s => ws.isInventoryExist(s));
             this.putWorkspaceFS(parent, node, '/passwords', () => ws.passwords, s => ws.isPasswordExist(s));
             this.putWorkspaceFS(parent, node, '/secrets', () => ws.secrets, s => ws.isSecretExist(s));
+
+            this.putWorkspaceFS(parent, node, '/group_vars', () => ws.groupVars, s => ws.isGroupVarsExist(s));
+            this.putWorkspaceFS(parent, node, '/host_vars', () => ws.hostVars, s => ws.isHostVarsExist(s));
           });
 
           this.cacheFilesOption(() => ws.inventory, this.inventoriesFileOptions).then();
           this.cacheFilesOption(() => ws.playbooks, this.playbooksFileOptions).then();
           this.cacheFilesOption(() => ws.secrets, this.secretsFileOptions).then();
           this.cacheFilesOption(() => ws.passwords, this.passwordFileOptions).then();
+          this.cacheFilesOption(() => ws.groupVars, this.groupVarsFileOptions).then();
+          this.cacheFilesOption(() => ws.hostVars, this.hostVarsFileOptions).then();
           this.onFetchWorkspaceSubject.next(ws);
           resolve(ws);
         },

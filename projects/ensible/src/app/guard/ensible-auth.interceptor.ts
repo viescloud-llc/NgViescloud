@@ -32,6 +32,4 @@ export class EnsibleAuthInterceptor implements HttpInterceptor
       headers: req.headers.set('Authorization', `Bearer ${jwt}`),
     }));
   }
-
-
 }

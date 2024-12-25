@@ -46,6 +46,7 @@ export class AppComponent extends ViescloudApplicationMinimal {
     },
     {
       title: 'Item',
+      hideConditional: () => !this.ensibleAuthenticatorService.isLogin(),
       children: [
         {
           title: 'all',
@@ -56,6 +57,16 @@ export class AppComponent extends ViescloudApplicationMinimal {
           routerLink: '/item/0'
         }
       ]
+    },
+    {
+      title: 'Group vars',
+      children: [],
+      hideConditional: () => !this.ensibleAuthenticatorService.isLogin(),
+    },
+    {
+      title: 'Host vars',
+      children: [],
+      hideConditional: () => !this.ensibleAuthenticatorService.isLogin(),
     },
     {
       title: 'Inventory',
@@ -97,20 +108,21 @@ export class AppComponent extends ViescloudApplicationMinimal {
         },
         {
           title: 'ansible.cfg',
-          routerLink: '/setting/ansible.cfg'
+          routerLink: '/setting/ansible.cfg',
+          hideConditional: () => !this.ensibleAuthenticatorService.userHaveRole('ADMIN')
         }
       ]
     },
-    {
-      title: 'About',
-      hideChildren: true,
-      children: [
-        {
-          title: 'Policy',
-          routerLink: '/policy'
-        }
-      ]
-    }
+    // {
+    //   title: 'About',
+    //   hideChildren: true,
+    //   children: [
+    //     {
+    //       title: 'Policy',
+    //       routerLink: '/policy'
+    //     }
+    //   ]
+    // }
   ]
 
   constructor(
@@ -135,6 +147,8 @@ export class AppComponent extends ViescloudApplicationMinimal {
       this.parseWorkspaceToMenu('Playbooks', 'playbooks', () => ws.playbooks);
       this.parseWorkspaceToMenu('Secrets', 'secrets', () => ws.secrets);
       this.parseWorkspaceToMenu('Passwords', 'passwords', () => ws.passwords);
+      this.parseWorkspaceToMenu('Group vars', 'group_vars', () => ws.groupVars);
+      this.parseWorkspaceToMenu('Host vars', 'host_vars', () => ws.hostVars);
     })
   }
 

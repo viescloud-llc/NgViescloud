@@ -5,14 +5,11 @@ export class EnsibleWorkSpace {
   secrets: EnsibleFsDir = new EnsibleFsDir();
   passwords: EnsibleFsDir = new EnsibleFsDir();
   inventory: EnsibleFsDir = new EnsibleFsDir();
+  groupVars: EnsibleFsDir = new EnsibleFsDir();
+  hostVars: EnsibleFsDir = new EnsibleFsDir();
 
   isPlaybookExist(playbookName: string): boolean {
-    for (const playbook of this.playbooks.child) {
-      if (playbook.name === playbookName) {
-        return true;
-      }
-    }
-    return false;
+    return this.isFsDirNameExist(playbookName, this.playbooks.child);
   }
 
   isRoleExist(roleName: string): boolean {
@@ -25,26 +22,28 @@ export class EnsibleWorkSpace {
   }
 
   isSecretExist(secretName: string): boolean {
-    for (const secret of this.secrets.child) {
-      if (secret.name === secretName) {
-        return true;
-      }
-    }
-    return false;
+    return this.isFsDirNameExist(secretName, this.secrets.child);
   }
 
   isPasswordExist(passwordName: string): boolean {
-    for (const password of this.passwords.child) {
-      if (password.name === passwordName) {
-        return true;
-      }
-    }
-    return false;
+    return this.isFsDirNameExist(passwordName, this.passwords.child);
   }
 
   isInventoryExist(inventoryName: string): boolean {
-    for (const inventory of this.inventory.child) {
-      if (inventory.name === inventoryName) {
+    return this.isFsDirNameExist(inventoryName, this.inventory.child);
+  }
+
+  isGroupVarsExist(groupVarsName: string): boolean {
+    return this.isFsDirNameExist(groupVarsName, this.groupVars.child);
+  }
+
+  isHostVarsExist(hostVarsName: string): boolean {
+    return this.isFsDirNameExist(hostVarsName, this.hostVars.child);
+  }
+
+  private isFsDirNameExist(name: string, fs: EnsibleFs[]): boolean {
+    for(const f of fs) {
+      if(f.name === name) {
         return true;
       }
     }
@@ -52,12 +51,7 @@ export class EnsibleWorkSpace {
   }
 
   getPlaybook(playbookName: string): EnsibleFs | undefined {
-    for (const playbook of this.playbooks.child) {
-      if (playbook.name === playbookName) {
-        return playbook;
-      }
-    }
-    return undefined;
+    return this.getFsDirByName(playbookName, this.playbooks.child);
   }
 
   getRole(roleName: string): EnsibleRole | undefined {
@@ -70,27 +64,29 @@ export class EnsibleWorkSpace {
   }
 
   getSecret(secretName: string): EnsibleFs | undefined {
-    for (const secret of this.secrets.child) {
-      if (secret.name === secretName) {
-        return secret;
-      }
-    }
-    return undefined;
+    return this.getFsDirByName(secretName, this.secrets.child);
   }
 
   getPassword(passwordName: string): EnsibleFs | undefined {
-    for (const password of this.passwords.child) {
-      if (password.name === passwordName) {
-        return password;
-      }
-    }
-    return undefined;
+    return this.getFsDirByName(passwordName, this.passwords.child);
   }
 
   getInventory(inventoryName: string): EnsibleFs | undefined {
-    for (const inventory of this.inventory.child) {
-      if (inventory.name === inventoryName) {
-        return inventory;
+    return this.getFsDirByName(inventoryName, this.inventory.child);
+  }
+
+  getGroupVars(groupVarsName: string): EnsibleFs | undefined {
+    return this.getFsDirByName(groupVarsName, this.groupVars.child);
+  }
+
+  getHostVars(hostVarsName: string): EnsibleFs | undefined {
+    return this.getFsDirByName(hostVarsName, this.hostVars.child);
+  }
+
+  private getFsDirByName(name: string, fs: EnsibleFs[]): EnsibleFs | undefined {
+    for (const f of fs) {
+      if (f.name === name) {
+        return f;
       }
     }
     return undefined;

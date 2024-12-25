@@ -1,12 +1,14 @@
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { EnsibleItemService } from '../../service/ensible-item/ensible-item.service';
-import { EnsibleItem } from '../../model/ensible.model';
+import { EnsibleItem, VERPOSITY_OPTIONS } from '../../model/ensible.model';
 import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 import { EnsibleWorkspaceParserService } from '../../service/ensible-workspace/ensible-workspace.service';
 import { Router } from '@angular/router';
+import { EnsibleService } from '../../service/ensible/ensible.service';
+import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
 
 @Component({
   selector: 'app-ensible-item',
@@ -30,6 +32,8 @@ export class EnsibleItemComponent implements OnChanges {
   validForm: boolean = false;
   isFsEditing: boolean[] = [];
 
+  verbosityOptions = VERPOSITY_OPTIONS;
+
   constructor(
     private ensibleItemService: EnsibleItemService,
     public ensibleWorkspaceParserService: EnsibleWorkspaceParserService,
@@ -45,18 +49,7 @@ export class EnsibleItemComponent implements OnChanges {
   }
 
   ngOnInit(): void {
-    // let id = RouteUtils.getPathVariableAsInteger('item');
-    // if(!id) {
-    //   this.item = new EnsibleItem();
-    // }
-    // else {
-    //   this.ensibleItemService.get(id).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
-    //     next: res => {
-    //       this.item = res;
-    //       this.itemCopy = structuredClone(this.item);
-    //     }
-    //   })
-    // }
+
   }
 
   isValueChange() {
@@ -100,5 +93,17 @@ export class EnsibleItemComponent implements OnChanges {
     if(!filePath.startsWith('/'))
       filePath = '/' + filePath;
     this.router.navigate(['/file', filePath]);
+  }
+
+  getGithubWebhookUrl() {
+    return EnsibleService.getUri() + '/api/v1/webhooks/github';
+  }
+
+  getGitlabWebhookUrl() {
+    return EnsibleService.getUri() + '/api/v1/webhooks/gitlab';
+  }
+
+  formatValidPath(path: string) {
+    return RouteUtils.formatValidUrlPath(path);
   }
 }

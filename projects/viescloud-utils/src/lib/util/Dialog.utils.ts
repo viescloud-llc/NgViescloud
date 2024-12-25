@@ -4,8 +4,9 @@ import { ConfirmDialog } from "../dialog/confirm-dialog/confirm-dialog.component
 import { Injectable } from "@angular/core";
 import { ProductImageSwapDialog, ProductImageSwapDialogRespondData } from "../dialog/marketing/product-image-swap-dialog/product-image-swap-dialog.component";
 import { MatOption } from "../model/Mat.model";
-import { NotAuthenticatedError } from "../model/Error.model";
+import { NotAuthenticatedError, ViesErrorResponse } from "../model/Error.model";
 import { InputDialog } from "../dialog/input-dialog/input-dialog.component";
+import { DataUtils } from "./Data.utils";
 
 @Injectable({
     providedIn: 'root'
@@ -37,12 +38,29 @@ export class DialogUtils {
     }
 
     openErrorMessageFromError(error: any) {
-        if(!(error instanceof NotAuthenticatedError))
-            this.openErrorMessage("Error!", error.getMessage);
+      return DialogUtils.openErrorMessageFromError(this.matDialog, error);
+    }
+
+    static openErrorMessageFromError(matDialog: MatDialog, error: any) {
+      if(DataUtils.isInstanceOf(error, new ViesErrorResponse())) {
+        let err = error as ViesErrorResponse;
+        return DialogUtils.openErrorMessage(matDialog, "Error!", err.reason);
+      }
+      else if(DataUtils.isInstanceOf(error.error, new ViesErrorResponse())) {
+        let err = error.error as ViesErrorResponse;
+        return DialogUtils.openErrorMessage(matDialog, "Error!", err.reason);
+      }
+      else {
+        return DialogUtils.openErrorMessage(matDialog, "Error!", "An unexpected error has occurred");
+      }
     }
 
     openErrorMessage(title: string, message: string) {
-        return this.openConfirmDialog(title, message, 'Ok', '', '100%');
+        return DialogUtils.openErrorMessage(this.matDialog, title, message);
+    }
+
+    static openErrorMessage(matDialog: MatDialog, title: string, message: string) {
+        return this.openConfirmDialog(matDialog, title, message, 'Ok', '', '100%');
     }
 
     openConfirmDialog(title: string, message: string, yes: string = 'Yes', no: string = 'No', width: string = '100%', disableClose: boolean = false) {

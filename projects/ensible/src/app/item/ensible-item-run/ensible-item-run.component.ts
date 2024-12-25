@@ -1,7 +1,7 @@
 import { EnsibleWebsocketService } from './../../service/ensible-websocket/ensible-websocket.service';
 import { EnsiblePlaybookLoggerService } from './../../service/ensible-playbook-logger/ensible-playbook-logger.service';
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { EnsibleItem, EnsiblePlayBookLogger, EnsiblePlaybookStatus, EnsiblePlayBookTrigger } from '../../model/ensible.model';
+import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { EnsibleItem, EnsiblePlayBookLogger, EnsiblePlaybookStatus, EnsiblePlayBookTrigger, VERPOSITY_OPTIONS } from '../../model/ensible.model';
 import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 import { NumberUtils } from 'projects/viescloud-utils/src/lib/util/Number.utils';
@@ -16,7 +16,7 @@ import { EnsibleProcessService } from '../../service/ensible-process/ensible-pro
   templateUrl: './ensible-item-run.component.html',
   styleUrls: ['./ensible-item-run.component.scss']
 })
-export class EnsibleItemRunComponent implements OnChanges {
+export class EnsibleItemRunComponent implements OnChanges, OnDestroy {
 
   @Input()
   item!: EnsibleItem;
@@ -33,8 +33,11 @@ export class EnsibleItemRunComponent implements OnChanges {
   runOutput: string = '';
 
   private subscribeTopic?: any = null;
+  private onGoingRequest: any[] = [];
 
   autoScroll: boolean = true;
+
+  verbosityOptions = VERPOSITY_OPTIONS;
 
   constructor(
     private ensiblePlaybookLoggerService: EnsiblePlaybookLoggerService,
@@ -43,6 +46,11 @@ export class EnsibleItemRunComponent implements OnChanges {
     private ensibleProcessService: EnsibleProcessService,
     private settingService: SettingService
   ) { }
+  ngOnDestroy(): void {
+    this.onGoingRequest.forEach(req => {
+      req.unsubscribe();
+    })
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if(changes['triggerInit'] && changes['triggerInit'].previousValue === false) {
@@ -96,12 +104,13 @@ export class EnsibleItemRunComponent implements OnChanges {
     let playbookTrigger: EnsiblePlayBookTrigger = {
       itemId: this.item.id.toString(),
       outputTopic: uuid,
-      consumeEverything: true
+      consumeEverything: true,
+      verbosity: this.item.verbosity
     }
 
     this.watchTopic(uuid);
 
-    this.ensibleWorkSpaceService.triggerPlaybook(playbookTrigger).subscribe({
+    let sub = this.ensibleWorkSpaceService.triggerPlaybook(playbookTrigger).subscribe({
       next: res => {
         this.runOutput = res;
         this.isRunning = false;
@@ -112,6 +121,8 @@ export class EnsibleItemRunComponent implements OnChanges {
         this.cleanParams();
       }
     });
+
+    this.onGoingRequest.push(sub);
   }
 
   watchTopic(topic: string) {
@@ -126,7 +137,7 @@ export class EnsibleItemRunComponent implements OnChanges {
   continuteRun(topic: string) {
     this.isRunning = true;
 
-    this.ensibleProcessService.watchProcessByTopic(topic).subscribe({
+    let sub = this.ensibleProcessService.watchProcessByTopic(topic).subscribe({
       next: res => {
         this.runOutput = res;
         this.isRunning = false;
@@ -138,10 +149,14 @@ export class EnsibleItemRunComponent implements OnChanges {
         this.runOutput = 'Unable to reconnect, process might have been stopped or finished, check latest run history for more details';
       }
     })
+
+    this.onGoingRequest.push(sub);
   }
 
   stop() {
     let topic = RouteUtils.getDecodedQueryParam('topic');
+    this.onGoingRequest.forEach(sub => sub.unsubscribe());
+
     if(topic) {
       this.ensibleProcessService.stopProcessByTopic(topic).subscribe({
         next: res => {}
@@ -151,6 +166,7 @@ export class EnsibleItemRunComponent implements OnChanges {
     this.cleanParams();
     this.isRunning = false;
     this.subscribeTopic?.unsubscribe();
+    this.onGoingRequest.length = 0;
   }
 
   cleanParams() {
@@ -164,5 +180,10 @@ export class EnsibleItemRunComponent implements OnChanges {
     this.cleanParams();
     this.runOutput = '';
     this.ngOnInit();
+  }
+
+  getVerboseLabel() {
+    let verbosity = this.item.verbosity;
+    return this.verbosityOptions.find(opt => opt.value === verbosity)?.valueLabel ?? 'minimal';
   }
 }

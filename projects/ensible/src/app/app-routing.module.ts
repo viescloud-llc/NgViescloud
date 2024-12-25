@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { inject, NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
@@ -9,6 +9,7 @@ import { EnsibleItemListComponent } from './item/ensible-item-list/ensible-item-
 import { EnsibleItemComponent } from './item/ensible-item/ensible-item.component';
 import { EnsibleItemTabComponent } from './item/ensible-item-tab/ensible-item-tab.component';
 import { EnsibleAnsibleCfgComponent } from './ensible-ansible-cfg/ensible-ansible-cfg.component';
+import { EnsibleAuthGuard } from './guard/ensible-auth.guard';
 
 const routes: Routes = [
   {
@@ -21,6 +22,8 @@ const routes: Routes = [
   },
   {
     path: "item",
+    canActivate: [async () => inject(EnsibleAuthGuard).isLogin()],
+    canActivateChild: [async () => inject(EnsibleAuthGuard).isLogin()],
     children: [
       {
         path: 'all',
@@ -34,6 +37,8 @@ const routes: Routes = [
   },
   {
     path: 'file',
+    canActivate: [async () => inject(EnsibleAuthGuard).isLogin()],
+    canActivateChild: [async () => inject(EnsibleAuthGuard).isLogin()],
     children: [
       {
         path: '**',
@@ -50,11 +55,13 @@ const routes: Routes = [
       },
       {
         path: 'users',
-        component: EnsibleUserComponent
+        component: EnsibleUserComponent,
+        canActivate: [async () => inject(EnsibleAuthGuard).isLogin()]
       },
       {
         path: 'ansible.cfg',
-        component: EnsibleAnsibleCfgComponent
+        component: EnsibleAnsibleCfgComponent,
+        canActivate: [async () => inject(EnsibleAuthGuard).isLogin()]
       }
     ]
   },

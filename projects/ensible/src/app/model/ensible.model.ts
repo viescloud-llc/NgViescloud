@@ -1,4 +1,4 @@
-import { DateTime, MatInputDisable, MatInputHide, MatInputRequire, MatTableDisplayLabel, MatTableHide } from "projects/viescloud-utils/src/lib/model/Mat.model";
+import { DateTime, MatInputDisable, MatInputHide, MatInputRequire, MatOption, MatTableDisplayLabel, MatTableHide } from "projects/viescloud-utils/src/lib/model/Mat.model";
 
 export class EnsibleUser {
   @MatInputDisable()
@@ -120,7 +120,14 @@ export class EnsibleItem {
   vaultPasswordFilePath: string = '';
   @MatTableHide()
   useUserAsPassword: boolean = false;
+
   path: string = '';
+
+  @MatTableHide()
+  verbosity: string = '';
+
+  @MatTableHide()
+  cronExpression: string = '';
 }
 
 export class EnsiblePlayBookLogger {
@@ -159,6 +166,7 @@ export class EnsiblePlayBookTrigger {
   itemId?: string = '';
   outputTopic?: string = '';
   consumeEverything?: boolean = false;
+  verbosity?: string = '';
 }
 
 export enum EnsiblePlaybookStatus {
@@ -168,3 +176,34 @@ export enum EnsiblePlaybookStatus {
   FAILURE = "FAILURE",
   RUNNING = 'RUNNING'
 }
+
+export const VERPOSITY_OPTIONS: MatOption<string>[] = [
+  {
+    value: '',
+    valueLabel: 'Minimal'
+  },
+  {
+    value: 'v',
+    valueLabel: 'Normal'
+  },
+  {
+    value: 'vv',
+    valueLabel: 'Verbose'
+  },
+  {
+    value: 'vvv',
+    valueLabel: 'More verbose'
+  },
+  {
+    value: 'vvvv',
+    valueLabel: 'Debug'
+  },
+  {
+    value: 'vvvvv',
+    valueLabel: 'Connection Debug'
+  },
+  {
+    value: 'vvvvvv',
+    valueLabel: 'WinRM Debug'
+  }
+];
