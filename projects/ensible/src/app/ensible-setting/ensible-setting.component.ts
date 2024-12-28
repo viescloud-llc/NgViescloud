@@ -1,10 +1,14 @@
+import { EnsibleAuthenticatorService } from './../service/ensible-authenticator/ensible-authenticator.service';
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
 import { GeneralSetting } from 'projects/viescloud-utils/src/lib/model/Setting.model';
 import { MatTheme } from 'projects/viescloud-utils/src/lib/model/theme.model';
 import { SettingService } from 'projects/viescloud-utils/src/lib/service/Setting.service';
 import { ApplicationSettingComponent } from 'projects/viescloud-utils/src/lib/share-component/application-setting/application-setting.component';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
+import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
+import { EnsibleSetting } from '../model/ensible.setting.model';
 
 @Component({
   selector: 'app-ensible-setting',
@@ -12,12 +16,15 @@ import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
   styleUrls: ['./ensible-setting.component.scss']
 })
 export class EnsibleSettingComponent implements OnInit {
-  generalSetting!: GeneralSetting;
-  generalSettingCopy!: GeneralSetting;
-  blankGeneralSetting: GeneralSetting = new GeneralSetting();
+
+  generalSetting!: EnsibleSetting;
+  generalSettingCopy!: EnsibleSetting;
+  blankGeneralSetting: EnsibleSetting = new EnsibleSetting();
 
   constructor(
-    public settingService: SettingService
+    public settingService: SettingService,
+    public ensibleAuthenticatorService: EnsibleAuthenticatorService,
+    private matDialog: MatDialog
   ) {
     settingService.onGeneralSettingChange.subscribe({
       next: () => {
@@ -54,6 +61,24 @@ export class EnsibleSettingComponent implements OnInit {
   revert() {
     this.generalSetting = structuredClone(this.generalSettingCopy);
     this.settingService.applySetting();
+  }
+
+  reSync() {
+    let dialog = this.matDialog.open(ConfirmDialog, {
+      data: {
+        message: 'Are you sure you want to re-sync?\nNote: All your changes locally will be lost.',
+        title: 'Re-sync',
+        yes: 'Re-sync',
+        no: 'Cancel'
+      },
+      width: '100%'
+    })
+
+    dialog.afterClosed().subscribe(res => {
+      if(res) {
+        this.settingService.syncFromServer(this.settingService.prefix);
+      }
+    })
   }
 
   changeTheme() {

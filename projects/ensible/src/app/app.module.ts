@@ -16,6 +16,10 @@ import { EnsibleItemRunComponent } from './item/ensible-item-run/ensible-item-ru
 import { EnsibleItemRunHistoryComponent } from './item/ensible-item-run-history/ensible-item-run-history.component';
 import { EnsibleItemTabComponent } from './item/ensible-item-tab/ensible-item-tab.component';
 import { EnsibleAnsibleCfgComponent } from './ensible-ansible-cfg/ensible-ansible-cfg.component';
+import { SettingService } from 'projects/viescloud-utils/src/lib/service/Setting.service';
+import { EnsibleSettingService } from './service/ensible-setting/ensible-setting.service';
+import { S3StorageServiceV1 } from 'projects/viescloud-utils/src/lib/service/ObjectStorageManager.service';
+import { EnsibleDatabaseObjectStorageService } from './service/ensible-database-object-storage/ensible-database-object-storage.service';
 
 const LIST = [
   AppComponent,
@@ -45,6 +49,14 @@ const LIST = [
       provide: HTTP_INTERCEPTORS,
       useClass: EnsibleAuthInterceptor,
       multi: true
+    },
+    {
+      provide: SettingService,
+      useClass: EnsibleSettingService
+    },
+    {
+      provide: S3StorageServiceV1,
+      useClass: EnsibleDatabaseObjectStorageService
     }
   ],
   bootstrap: [AppComponent]

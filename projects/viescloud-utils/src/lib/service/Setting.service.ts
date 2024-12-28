@@ -23,14 +23,14 @@ import { HeaderMinimalComponent } from '../share-component/header-minimal/header
   providedIn: 'root'
 })
 export class SettingService {
-  private GENERAL_SETTING_KEY = 'generalSetting.json';
-  private generalSetting: GeneralSetting = new GeneralSetting();
-  private matThemes = DataUtils.getEnumValues(MatTheme) as string[];
-  private onLoginSubscription: any = null;
-  private onTimeoutLogoutSubscription: any = null;
-  private authenticatorService: AuthenticatorService | undefined;
+  protected GENERAL_SETTING_KEY = 'generalSetting.json';
+  protected generalSetting: GeneralSetting = new GeneralSetting();
+  protected matThemes = DataUtils.getEnumValues(MatTheme) as string[];
+  protected onLoginSubscription: any = null;
+  protected onTimeoutLogoutSubscription: any = null;
+  protected authenticatorService: AuthenticatorService | undefined;
 
-  private onGeneralSettingChangeSubject = new Subject<void>();
+  protected onGeneralSettingChangeSubject = new Subject<void>();
   onGeneralSettingChange = this.onGeneralSettingChangeSubject.asObservable();
 
   onToggleDisplayDrawerSubject = new Subject<DRAWER_STATE>();

@@ -12,6 +12,7 @@ import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils'
 import { EnsibleFsService } from './service/ensible-fs/ensible-fs.service';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 import { FsWriteMode } from './model/ensible.model';
+import { EnsibleSetting } from './model/ensible.setting.model';
 
 @Component({
   selector: 'app-root',
@@ -59,6 +60,11 @@ export class AppComponent extends ViescloudApplicationMinimal {
       ]
     },
     {
+      title: 'Roles',
+      children: [],
+      hideConditional: () => !this.ensibleAuthenticatorService.isLogin(),
+    },
+    {
       title: 'Group vars',
       children: [],
       hideConditional: () => !this.ensibleAuthenticatorService.isLogin(),
@@ -75,11 +81,6 @@ export class AppComponent extends ViescloudApplicationMinimal {
     },
     {
       title: 'Playbooks',
-      children: [],
-      hideConditional: () => !this.ensibleAuthenticatorService.isLogin(),
-    },
-    {
-      title: 'Roles',
       children: [],
       hideConditional: () => !this.ensibleAuthenticatorService.isLogin(),
     },
@@ -161,6 +162,7 @@ export class AppComponent extends ViescloudApplicationMinimal {
   parseWorkspaceToRolesMenu(ws: EnsibleWorkSpace) {
     let index = this.menu.findIndex(e => e.title === 'Roles');
     let menu = this.menu[index];
+
     let hideChildren = menu.hideChildren;
     menu.hideChildren = hideChildren === false ? false : true;
     menu.children = [];
@@ -199,6 +201,8 @@ export class AppComponent extends ViescloudApplicationMinimal {
 
   private putRoleChildMenu(supplier: () => EnsibleFsDir, grandMenuName: string, menuName: string) {
     let menuChild: QuickSideDrawerMenu[] = [];
+    let hideWorkspaceTree = this.settingService.getCopyOfGeneralSetting<EnsibleSetting>().hideWorkspaceTree;
+
     supplier()?.child.forEach(value => {
       menuChild.push({
         title: value.name,
@@ -210,9 +214,13 @@ export class AppComponent extends ViescloudApplicationMinimal {
       {
         title: menuName,
         children: [
-          ...menuChild,
+          ...hideWorkspaceTree ? [] : menuChild,
           {
-            title: '+ new ' + menuName,
+            title: 'all',
+            routerLink: `/files/roles/${grandMenuName}/${menuName}`,
+          },
+          {
+            title: '+ new file',
             routerLink: `/file/roles/${grandMenuName}/${menuName}/new`
           }
         ]
@@ -224,19 +232,28 @@ export class AppComponent extends ViescloudApplicationMinimal {
   parseWorkspaceToMenu(title: string, routerLinkBase: string, producer: () => EnsibleFsDir) {
     let index = this.menu.findIndex(e => e.title === title);
     let menu = this.menu[index];
+    let hideWorkspaceTree = this.settingService.getCopyOfGeneralSetting<EnsibleSetting>().hideWorkspaceTree;
+
     let hideChildren = menu.hideChildren;
     menu.hideChildren = hideChildren === false ? false : true;
     menu.children = [];
 
-    producer().child.forEach(e => {
-      menu.children!.push({
-        title: e.name,
-        routerLink: `/file/${routerLinkBase}/${e.name}`
+    if(!hideWorkspaceTree) {
+      producer().child.forEach(e => {
+        menu.children!.push({
+          title: e.name,
+          routerLink: `/file/${routerLinkBase}/${e.name}`
+        })
       })
+    }
+
+    menu.children!.push({
+      title: 'all',
+      routerLink: `/files/${routerLinkBase}`
     })
 
     menu.children!.push({
-      title: '+ new',
+      title: '+ new file',
       routerLink: `/file/${routerLinkBase}/new`
     })
   }
