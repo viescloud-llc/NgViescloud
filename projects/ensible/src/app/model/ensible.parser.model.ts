@@ -1,4 +1,6 @@
+import { MatTableDisplayLabel, MatTableHide } from 'projects/viescloud-utils/src/lib/model/Mat.model';
 import { FSMetadata } from './ensible.model';
+import { StringUtils } from 'projects/viescloud-utils/src/lib/util/String.utils';
 export class EnsibleWorkSpace {
   playbooks: EnsibleFsDir = new EnsibleFsDir();
   roles: EnsibleRole[] = [new EnsibleRole()] as EnsibleRole[];
@@ -111,6 +113,10 @@ export class EnsibleFsDir {
 
 export class EnsibleFs {
   name: string = '';
+
+  @MatTableDisplayLabel('Path', (path: EnsibleFs) => StringUtils.getMaxStringReverse(path.path, 30))
   path: string = '';
+
+  @MatTableHide()
   FSMetadata: FSMetadata = new FSMetadata();
 }

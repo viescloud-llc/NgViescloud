@@ -7,6 +7,8 @@ export class EnsibleUser {
   @MatInputDisable()
   sub: string = '';
 
+  alias: string = '';
+
   @MatInputRequire()
   username: string = '';
 

@@ -20,6 +20,8 @@ import { SettingService } from 'projects/viescloud-utils/src/lib/service/Setting
 import { EnsibleSettingService } from './service/ensible-setting/ensible-setting.service';
 import { S3StorageServiceV1 } from 'projects/viescloud-utils/src/lib/service/ObjectStorageManager.service';
 import { EnsibleDatabaseObjectStorageService } from './service/ensible-database-object-storage/ensible-database-object-storage.service';
+import { EnsibleFsListComponent } from './ensible-fs-list/ensible-fs-list.component';
+import { EnsibleUserSettingComponent } from './ensible-user-setting/ensible-user-setting.component';
 
 const LIST = [
   AppComponent,
@@ -33,7 +35,9 @@ const LIST = [
   EnsibleItemRunComponent,
   EnsibleItemRunHistoryComponent,
   EnsibleItemTabComponent,
-  EnsibleAnsibleCfgComponent
+  EnsibleAnsibleCfgComponent,
+  EnsibleFsListComponent,
+  EnsibleUserSettingComponent
 ]
 
 @NgModule({

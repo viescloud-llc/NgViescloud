@@ -29,10 +29,13 @@ export class EnsibleAuthGuard {
   }
 
   isLogin() {
+    if(!this.ensibleAuthenticatorService.doneInitCheck())
+      return true;
+
     return this.ensibleAuthenticatorService.isLogin();
   }
 
   isNotLogin() {
-    return !this.ensibleAuthenticatorService.isLogin();
+    return !this.isLogin();
   }
 }

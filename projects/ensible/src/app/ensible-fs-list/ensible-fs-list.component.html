@@ -1,0 +1,18 @@
+<ng-container *ngIf="ensibleFsDir; else Else">
+  <ul class="margin-center">
+    <li>
+      <app-mat-table
+      [matRows]="ensibleFsDir.child"
+      [blankObject]="blankEnsibleFs"
+      [showFilter]="true"
+      [showPagination]="true"
+      (onEditRow)="onEditFs($event)"
+      ></app-mat-table>
+    </li>
+  </ul>
+
+</ng-container>
+
+<ng-template #Else>
+  <h1 class="text-center" style="color: red;">Unable to load files</h1>
+</ng-template>

@@ -1,3 +1,4 @@
+import { EnsibleWorkspaceParserService } from './../service/ensible-workspace/ensible-workspace.service';
 import { EnsibleAuthenticatorService } from './../service/ensible-authenticator/ensible-authenticator.service';
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -24,7 +25,8 @@ export class EnsibleSettingComponent implements OnInit {
   constructor(
     public settingService: SettingService,
     public ensibleAuthenticatorService: EnsibleAuthenticatorService,
-    private matDialog: MatDialog
+    private matDialog: MatDialog,
+    private ensibleWorkspaceParserService: EnsibleWorkspaceParserService
   ) {
     settingService.onGeneralSettingChange.subscribe({
       next: () => {
@@ -44,12 +46,14 @@ export class EnsibleSettingComponent implements OnInit {
 
   saveLocally() {
     this.settingService.saveSettingLocally(this.generalSetting);
+    this.ensibleWorkspaceParserService.triggerFetchWorkspace();
     this.ngOnInit();
   }
 
   saveToServer() {
     if(this.settingService.prefix) {
       this.settingService.saveSettingToServer(this.settingService.prefix, this.generalSetting);
+      this.ensibleWorkspaceParserService.triggerFetchWorkspace();
       this.ngOnInit();
     }
   }

@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 @Directive({
   selector: '[viescloudRouteChangeSubcribe]'
 })
-export class RouteChangeSubcribe implements OnInit {
+export abstract class RouteChangeSubcribe implements OnInit {
 
   constructor(
     protected route: ActivatedRoute
@@ -24,9 +24,7 @@ export class RouteChangeSubcribe implements OnInit {
     });
   }
 
-  onRouteChange() {
-
-  }
+  abstract onRouteChange(): void;
 
   onParamsChange() {
 

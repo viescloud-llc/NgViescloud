@@ -64,7 +64,9 @@ export class EnsibleWorkspaceParserService extends EnsibleWorkspaceService {
   hostVarsFileOptions: MatOption<string>[] = [];
 
   triggerFetchWorkspace() {
-    this.parseWorkspace().then(ws => {})
+    return new Promise<EnsibleWorkSpace>((resolve, reject) => {
+      this.parseWorkspace().then(ws => resolve(ws)).catch(err => reject(err));
+    })
   }
 
   async parseWorkspace() {

@@ -44,11 +44,11 @@ export class DialogUtils {
     static openErrorMessageFromError(matDialog: MatDialog, error: any) {
       if(DataUtils.isInstanceOf(error, new ViesErrorResponse())) {
         let err = error as ViesErrorResponse;
-        return DialogUtils.openErrorMessage(matDialog, "Error!", err.reason);
+        return DialogUtils.openErrorMessage(matDialog, "Error!", err.reason ?? "An unexpected error has occurred");
       }
       else if(DataUtils.isInstanceOf(error.error, new ViesErrorResponse())) {
         let err = error.error as ViesErrorResponse;
-        return DialogUtils.openErrorMessage(matDialog, "Error!", err.reason);
+        return DialogUtils.openErrorMessage(matDialog, "Error!", err.reason ?? "An unexpected error has occurred");
       }
       else {
         return DialogUtils.openErrorMessage(matDialog, "Error!", "An unexpected error has occurred");

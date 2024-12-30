@@ -10,6 +10,8 @@ import { EnsibleItemComponent } from './item/ensible-item/ensible-item.component
 import { EnsibleItemTabComponent } from './item/ensible-item-tab/ensible-item-tab.component';
 import { EnsibleAnsibleCfgComponent } from './ensible-ansible-cfg/ensible-ansible-cfg.component';
 import { EnsibleAuthGuard } from './guard/ensible-auth.guard';
+import { EnsibleFsListComponent } from './ensible-fs-list/ensible-fs-list.component';
+import { EnsibleUserSettingComponent } from './ensible-user-setting/ensible-user-setting.component';
 
 const routes: Routes = [
   {
@@ -47,11 +49,27 @@ const routes: Routes = [
     ]
   },
   {
+    path: 'files',
+    canActivate: [async () => inject(EnsibleAuthGuard).isLogin()],
+    canActivateChild: [async () => inject(EnsibleAuthGuard).isLogin()],
+    children: [
+      {
+        path: '**',
+        component: EnsibleFsListComponent
+      }
+    ]
+  },
+  {
     path: 'setting',
     children: [
       {
         path: 'application-setting',
         component: EnsibleSettingComponent
+      },
+      {
+        path: 'account',
+        component: EnsibleUserSettingComponent,
+        canActivate: [async () => inject(EnsibleAuthGuard).isLogin()]
       },
       {
         path: 'users',

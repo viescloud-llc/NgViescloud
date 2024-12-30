@@ -16,6 +16,7 @@ export class EnsibleAuthenticatorService extends EnsibleService {
 
   user?: EnsibleUser;
   private token: string = '';
+  private initCheck = false;
 
   private onLoginSubject = new Subject<void>();
   private onLogOutSubject = new Subject<void>();
@@ -37,12 +38,26 @@ export class EnsibleAuthenticatorService extends EnsibleService {
       this.getUser().pipe(RxJSUtils.waitLoadingDialog()).subscribe({
         next: res2 => {
           this.setLoginUser(res2);
+          this.initCheck = true;
         },
         error: err => {
           this.logout();
+          this.initCheck = true;
         }
       })
     }
+    else {
+      this.initCheck = true;
+    }
+  }
+
+  doneInitCheck() {
+    let token = FileUtils.localStorageGetItem<string>('jwt');
+
+    if(!token)
+      return true;
+
+    return this.initCheck;
   }
 
   private fetchUserInterval() {
@@ -131,5 +146,23 @@ export class EnsibleAuthenticatorService extends EnsibleService {
     }
 
     this.user = user;
+  }
+
+  changeCurrentLoginUserPassword(currentPassword: string, newPassword: string) {
+    if(this.isLogin()) {
+      return this.httpClient.put(`${this.getPrefixUri()}/user/password`, {currentPassword, newPassword});
+    }
+    else {
+      throw new Error('Not login');
+    }
+  }
+
+  changeCurrentLoginUserAlias(alias: string) {
+    if(this.isLogin()) {
+      return this.httpClient.put(`${this.getPrefixUri()}/user/alias`, {alias});
+    }
+    else {
+      throw new Error('Not login');
+    }
   }
 }

@@ -62,37 +62,37 @@ export class AppComponent extends ViescloudApplicationMinimal {
     {
       title: 'Roles',
       children: [],
-      hideConditional: () => !this.ensibleAuthenticatorService.isLogin(),
+      hideConditional: () => !this.ensibleAuthenticatorService.isLogin()
     },
     {
       title: 'Group vars',
       children: [],
-      hideConditional: () => !this.ensibleAuthenticatorService.isLogin(),
+      hideConditional: () => !this.ensibleAuthenticatorService.isLogin()
     },
     {
       title: 'Host vars',
       children: [],
-      hideConditional: () => !this.ensibleAuthenticatorService.isLogin(),
+      hideConditional: () => !this.ensibleAuthenticatorService.isLogin()
     },
     {
       title: 'Inventory',
       children: [],
-      hideConditional: () => !this.ensibleAuthenticatorService.isLogin(),
+      hideConditional: () => !this.ensibleAuthenticatorService.isLogin()
     },
     {
       title: 'Playbooks',
       children: [],
-      hideConditional: () => !this.ensibleAuthenticatorService.isLogin(),
+      hideConditional: () => !this.ensibleAuthenticatorService.isLogin()
     },
     {
       title: 'Secrets',
       children: [],
-      hideConditional: () => !this.ensibleAuthenticatorService.isLogin(),
+      hideConditional: () => !this.ensibleAuthenticatorService.isLogin()
     },
     {
       title: 'Passwords',
       children: [],
-      hideConditional: () => !this.ensibleAuthenticatorService.isLogin(),
+      hideConditional: () => !this.ensibleAuthenticatorService.isLogin()
     },
     {
       title: 'Settings',
@@ -101,6 +101,11 @@ export class AppComponent extends ViescloudApplicationMinimal {
         {
           title: 'Application Setting',
           routerLink: '/setting/application-setting'
+        },
+        {
+          title: 'Account',
+          routerLink: '/setting/account',
+          hideConditional: () => !this.ensibleAuthenticatorService.isLogin()
         },
         {
           title: 'Users',
@@ -259,8 +264,9 @@ export class AppComponent extends ViescloudApplicationMinimal {
   }
 
   getUserAlias(): string {
-    if(this.ensibleAuthenticatorService.isLogin())
-      return this.ensibleAuthenticatorService.user!.username;
+    if(this.ensibleAuthenticatorService.isLogin()) {
+      return this.ensibleAuthenticatorService.user!.alias ?? this.ensibleAuthenticatorService.user!.username;
+    }
     else
       return '';
   }

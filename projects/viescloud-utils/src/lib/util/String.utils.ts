@@ -42,4 +42,12 @@ export class StringUtils {
         }
         return str;
     }
+
+    static getMaxStringReverse(str: string, length: number, replaceWith: string = '...'): string {
+      if (str.length > length) {
+        return replaceWith + str.substring(str.length - length);
+      }
+
+      return str;
+    }
 }
