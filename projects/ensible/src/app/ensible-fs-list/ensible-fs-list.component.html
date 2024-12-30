@@ -2,6 +2,7 @@
   <ul class="margin-center">
     <li>
       <button mat-icon-button color="primary" (click)="onRouteChange()" [matTooltip]="'Refresh'"><mat-icon>refresh</mat-icon></button>
+      <button mat-icon-button color="primary" (click)="addNewFs()" [matTooltip]="'Add new file'"><mat-icon>add_box</mat-icon></button>
     </li>
     <hr>
     <li>
@@ -15,9 +16,6 @@
       ></app-mat-table>
     </li>
     <br>
-    <li class="flex-row-container-auto">
-      <button mat-raised-button color="primary" (click)="addNewFs()">Add new file</button>
-    </li>
   </ul>
 </ng-container>
 

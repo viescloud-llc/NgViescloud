@@ -8,6 +8,9 @@
     <button mat-icon-button color="primary" (click)="ngOnInit()" [matTooltip]="'Refresh'">
       <mat-icon>refresh</mat-icon>
     </button>
+    <button mat-icon-button color="primary" (click)="addItem()" [matTooltip]="'Add new item'">
+      <mat-icon>add_box</mat-icon>
+    </button>
   </li>
   <hr>
 
@@ -32,10 +35,5 @@
     [unixStyleBack]="true"
     [readonlyPathInput]="true"
     ></app-mat-table-path>
-  </li>
-
-  <li>
-    <br>
-    <button style="width: 100%;" mat-raised-button color="primary" (click)="addItem()">Add Item</button>
   </li>
 </ul>
