@@ -1,6 +1,10 @@
 <ng-container *ngIf="ensibleFsDir; else Else">
   <ul class="margin-center">
     <li>
+      <button mat-icon-button color="primary" (click)="onRouteChange()" [matTooltip]="'Refresh'"><mat-icon>refresh</mat-icon></button>
+    </li>
+    <hr>
+    <li>
       <app-mat-table
       [matRows]="ensibleFsDir.child"
       [blankObject]="blankEnsibleFs"
