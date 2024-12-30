@@ -88,4 +88,9 @@ export class EnsibleFsListComponent extends RouteChangeSubcribe {
     let fullPath = '/file' + RouteUtils.formatValidUrlPath(this.layers.join('/') + '/' + fs.name);
     this.router.navigate([fullPath]);
   }
+
+  addNewFs() {
+    let fullPath = '/file' + RouteUtils.formatValidUrlPath(this.layers.join('/') + '/new');
+    this.router.navigate([fullPath]);
+  }
 }
