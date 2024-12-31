@@ -9,6 +9,7 @@ import { EnsibleWorkspaceParserService } from '../../service/ensible-workspace/e
 import { Router } from '@angular/router';
 import { EnsibleService } from '../../service/ensible/ensible.service';
 import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
+import { StringUtils } from 'projects/viescloud-utils/src/lib/util/String.utils';
 
 @Component({
   selector: 'app-ensible-item',
@@ -105,5 +106,9 @@ export class EnsibleItemComponent implements OnChanges {
 
   formatValidPath(path: string) {
     return RouteUtils.formatValidUrlPath(path);
+  }
+
+  getCronDescription(cron: string) {
+    return StringUtils.describeJavaCronExpression(cron);
   }
 }

@@ -100,9 +100,12 @@
           <app-mat-form-field-input
           label="Trigger on cron job schedule"
           [(value)]="item.cronExpression"
-          placeholder="e.g * * * * * *"
+          placeholder="e.g * * * * * *, 0 0 * * *, 0 0/5 * */3 * *"
           styleWidth="100%"
           ></app-mat-form-field-input>
+        </li>
+        <li *ngIf="item.cronExpression">
+          <span>{{getCronDescription(item.cronExpression)}}</span>
         </li>
       </ul>
     </details>
