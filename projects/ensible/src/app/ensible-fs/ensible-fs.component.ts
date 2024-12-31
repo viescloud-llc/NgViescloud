@@ -101,7 +101,6 @@ export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges
     this.fileContentCopy = '';
     this.error = '';
     this.newFile = false;
-    this.vaultSecret = '';
     this.vaultDectypted = false;
     this.fileType = FileType.UNKOWN;
   }

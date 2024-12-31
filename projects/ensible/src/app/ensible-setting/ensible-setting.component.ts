@@ -10,6 +10,7 @@ import { ApplicationSettingComponent } from 'projects/viescloud-utils/src/lib/sh
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 import { EnsibleSetting } from '../model/ensible.setting.model';
+import { EnsibleSettingService } from '../service/ensible-setting/ensible-setting.service';
 
 @Component({
   selector: 'app-ensible-setting',
@@ -23,7 +24,7 @@ export class EnsibleSettingComponent implements OnInit {
   blankGeneralSetting: EnsibleSetting = new EnsibleSetting();
 
   constructor(
-    public settingService: SettingService,
+    public settingService: EnsibleSettingService,
     public ensibleAuthenticatorService: EnsibleAuthenticatorService,
     private matDialog: MatDialog,
     private ensibleWorkspaceParserService: EnsibleWorkspaceParserService
@@ -36,8 +37,8 @@ export class EnsibleSettingComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.generalSetting = this.settingService.getCopyOfGeneralSetting();
-    this.generalSettingCopy = structuredClone(this.settingService.getCopyOfGeneralSetting());
+    this.generalSetting = this.settingService.getCopyOfGeneralSetting<EnsibleSetting>();
+    this.generalSettingCopy = structuredClone(this.settingService.getCopyOfGeneralSetting<EnsibleSetting>());
   }
 
   ngOnDestroy(): void {

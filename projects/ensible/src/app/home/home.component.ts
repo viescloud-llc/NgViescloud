@@ -1,3 +1,4 @@
+import { EnsibleAuthenticatorService } from './../service/ensible-authenticator/ensible-authenticator.service';
 import { Component } from '@angular/core';
 
 @Component({
@@ -6,5 +7,7 @@ import { Component } from '@angular/core';
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent {
-  constructor() { }
+  constructor(
+    public ensibleAuthenticatorService: EnsibleAuthenticatorService
+  ) { }
 }

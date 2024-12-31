@@ -24,7 +24,7 @@ import { HeaderMinimalComponent } from '../share-component/header-minimal/header
 })
 export class SettingService {
   protected GENERAL_SETTING_KEY = 'generalSetting.json';
-  protected generalSetting: GeneralSetting = new GeneralSetting();
+  protected generalSetting: GeneralSetting = this.newSetting();
   protected matThemes = DataUtils.getEnumValues(MatTheme) as string[];
   protected onLoginSubscription: any = null;
   protected onTimeoutLogoutSubscription: any = null;
@@ -51,7 +51,7 @@ export class SettingService {
   ) { }
 
   initMinimal(prefix: string) {
-    let setting = FileUtils.localStorageGetItem<GeneralSetting>(this.GENERAL_SETTING_KEY) ?? new GeneralSetting();
+    let setting = FileUtils.localStorageGetItem<GeneralSetting>(this.GENERAL_SETTING_KEY) ?? this.newSetting();
     this.generalSetting = setting;
     this.applySetting();
   }
@@ -72,6 +72,10 @@ export class SettingService {
     }
 
     this.onGeneralSettingChangeSubject.next();
+  }
+
+  protected newSetting() {
+    return new GeneralSetting();
   }
 
   private subscribeToSubject(prefix: string, authenticatorService: AuthenticatorService | undefined) {
@@ -108,8 +112,10 @@ export class SettingService {
         });
       },
       error: (error) => {
-        this.generalSetting = new GeneralSetting();
-        this.applySetting();
+        if(!FileUtils.localStorageGetItem<GeneralSetting>(this.GENERAL_SETTING_KEY)) {
+          this.generalSetting = this.newSetting();
+          this.applySetting();
+        }
       }
     });
   }

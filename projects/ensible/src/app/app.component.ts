@@ -13,6 +13,7 @@ import { EnsibleFsService } from './service/ensible-fs/ensible-fs.service';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 import { FsWriteMode } from './model/ensible.model';
 import { EnsibleSetting } from './model/ensible.setting.model';
+import { EnsibleSettingService } from './service/ensible-setting/ensible-setting.service';
 
 @Component({
   selector: 'app-root',
@@ -132,7 +133,7 @@ export class AppComponent extends ViescloudApplicationMinimal {
   ]
 
   constructor(
-    settingService: SettingService,
+    settingService: EnsibleSettingService,
     keyCaptureService: KeyCaptureService,
     matDialog: MatDialog,
     public ensibleAuthenticatorService: EnsibleAuthenticatorService,
@@ -142,6 +143,10 @@ export class AppComponent extends ViescloudApplicationMinimal {
     private rxjsUtils: RxJSUtils
   ) {
     super(settingService, keyCaptureService, matDialog);
+
+    ensibleAuthenticatorService.onLogout$.subscribe(() => {
+      this.router.navigate(['login']);
+    })
 
     ensibleAuthenticatorService.onLogin$.subscribe(() => {
       this.ensibleWorkspaceParserService.triggerFetchWorkspace();
@@ -156,12 +161,18 @@ export class AppComponent extends ViescloudApplicationMinimal {
       this.parseWorkspaceToMenu('Group vars', 'group_vars', () => ws.groupVars);
       this.parseWorkspaceToMenu('Host vars', 'host_vars', () => ws.hostVars);
     })
+
+    settingService.onGeneralSettingChange.subscribe({
+      next: () => {
+        this.ensibleWorkspaceParserService.triggerFetchWorkspace();
+      }
+    });
   }
 
   override async ngOnInit() {
     super.ngOnInit();
     this.ensibleAuthenticatorService.ngOnInit();
-    this.ensibleWorkspaceParserService.triggerFetchWorkspace();
+    // this.ensibleWorkspaceParserService.triggerFetchWorkspace();
   }
 
   parseWorkspaceToRolesMenu(ws: EnsibleWorkSpace) {

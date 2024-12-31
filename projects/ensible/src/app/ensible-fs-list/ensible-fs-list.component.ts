@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { RouteChangeSubcribe } from 'projects/viescloud-utils/src/lib/directive/RouteChangeSubcribe.directive';
 import { EnsibleFs, EnsibleFsDir, EnsibleWorkSpace } from '../model/ensible.parser.model';
 import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
+import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 
 @Component({
   selector: 'app-ensible-fs-list',
@@ -34,7 +35,7 @@ export class EnsibleFsListComponent extends RouteChangeSubcribe {
       let rootLayer = this.layers[0];
       switch(rootLayer) {
         case 'roles':
-          this.ensibleFsDir = this.getFsDirFromLayer();
+          this.ensibleFsDir = this.getFsDirFromLayer() ?? DataUtils.purgeArray(new EnsibleFsDir());
           break;
         case 'inventory':
           this.ensibleFsDir = ws.inventory;
@@ -53,6 +54,9 @@ export class EnsibleFsListComponent extends RouteChangeSubcribe {
           break;
         case 'host_vars':
           this.ensibleFsDir = ws.hostVars;
+          break;
+        default:
+          this.ensibleFsDir = DataUtils.purgeArray(new EnsibleFsDir());
           break;
       }
     });

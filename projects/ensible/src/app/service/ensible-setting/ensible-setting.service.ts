@@ -42,16 +42,20 @@ export class EnsibleSettingService extends SettingService {
 
     this.prefix = prefix;
 
-    let setting = FileUtils.localStorageGetItem<GeneralSetting>(this.GENERAL_SETTING_KEY);
+    let setting = FileUtils.localStorageGetItem<EnsibleSetting>(this.GENERAL_SETTING_KEY);
 
     if (setting) {
       this.generalSetting = setting;
     }
     else {
-      this.generalSetting = new GeneralSetting();
+      this.generalSetting = this.newSetting();
     }
 
     this.applySetting();
     this.onGeneralSettingChangeSubject.next();
+  }
+
+  protected override newSetting(): EnsibleSetting {
+    return new EnsibleSetting();
   }
 }
