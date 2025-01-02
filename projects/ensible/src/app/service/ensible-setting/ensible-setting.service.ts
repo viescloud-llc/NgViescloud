@@ -58,4 +58,5 @@ export class EnsibleSettingService extends SettingService {
   protected override newSetting(): EnsibleSetting {
     return new EnsibleSetting();
   }
+
 }

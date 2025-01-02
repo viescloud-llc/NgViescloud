@@ -1,3 +1,4 @@
+import { EnsiblePullImageDialog } from './dialog/ensible-pull-image-dialog/ensible-pull-image-dialog.component';
 import { NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -22,6 +23,8 @@ import { S3StorageServiceV1 } from 'projects/viescloud-utils/src/lib/service/Obj
 import { EnsibleDatabaseObjectStorageService } from './service/ensible-database-object-storage/ensible-database-object-storage.service';
 import { EnsibleFsListComponent } from './ensible-fs-list/ensible-fs-list.component';
 import { EnsibleUserSettingComponent } from './ensible-user-setting/ensible-user-setting.component';
+import { EnsibleDockerContainerTemplateComponent } from './docker/ensible-docker-container-template/ensible-docker-container-template.component';
+import { EnsibleDockerContainerTemplateListComponent } from './docker/ensible-docker-container-template-list/ensible-docker-container-template-list.component';
 
 const LIST = [
   AppComponent,
@@ -37,7 +40,10 @@ const LIST = [
   EnsibleItemTabComponent,
   EnsibleAnsibleCfgComponent,
   EnsibleFsListComponent,
-  EnsibleUserSettingComponent
+  EnsibleUserSettingComponent,
+  EnsibleDockerContainerTemplateComponent,
+  EnsibleDockerContainerTemplateListComponent,
+  EnsiblePullImageDialog
 ]
 
 @NgModule({

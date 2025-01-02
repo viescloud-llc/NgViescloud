@@ -3,6 +3,7 @@ import { MatFormFieldComponent } from '../mat-form-field/mat-form-field.componen
 import { MatOption } from '../../model/Mat.model';
 import { MatSelectChange } from '@angular/material/select';
 import { UtilsService } from '../../service/Utils.service';
+import { DataUtils } from '../../util/Data.utils';
 
 @Component({
   selector: 'app-mat-form-field-input-option',
@@ -20,6 +21,9 @@ export class MatFormFieldInputOptionComponent<T> extends MatFormFieldComponent {
 
   @Input()
   customOptionLabel = '';
+
+  @Input()
+  noneLabelValue: T | undefined = this.blankObject ?? undefined;
 
   @Output()
   opened: EventEmitter<void> = new EventEmitter();
@@ -47,7 +51,7 @@ export class MatFormFieldInputOptionComponent<T> extends MatFormFieldComponent {
 
   populateOptions() {
     this.options.forEach(e => {
-      if(UtilsService.isEqual(e.value, this.value))
+      if(DataUtils.isEqual(e.value, this.value))
         e.value = this.value;
     })
   }
@@ -66,7 +70,7 @@ export class MatFormFieldInputOptionComponent<T> extends MatFormFieldComponent {
 
   override isValidInput(): boolean {
     if (this.required)
-      return this.options.some(e => UtilsService.isEqual(e.value, this.value)) && super.isValidInput();
+      return this.options.some(e => DataUtils.isEqual(e.value, this.value)) && super.isValidInput();
     else
       return true;
   }

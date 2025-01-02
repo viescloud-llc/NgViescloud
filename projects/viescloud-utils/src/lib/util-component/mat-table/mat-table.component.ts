@@ -219,9 +219,9 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
   }
 
   getFilterWarning() {
-    if(this.matRows.length <= 0)
-      return "Table look sad and empty :(";
-    else
+    if(this.matRows && this.matRows.length && this.matRows.length > 0)
       return `No data matching the filter "${this.filter}"`;
+    else
+      return "Table look sad and empty :(";
   }
 }

@@ -1,3 +1,4 @@
+import { EnsibleDockerContainerTemplate } from './../../model/ensible.model';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { EnsibleItemService } from '../../service/ensible-item/ensible-item.service';
@@ -8,8 +9,9 @@ import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 import { EnsibleWorkspaceParserService } from '../../service/ensible-workspace/ensible-workspace.service';
 import { Router } from '@angular/router';
 import { EnsibleService } from '../../service/ensible/ensible.service';
-import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
 import { StringUtils } from 'projects/viescloud-utils/src/lib/util/String.utils';
+import { EnsibleDockerContainerTemplateService } from '../../service/ensible-docker-container-template/ensible-docker-container-template.service';
+import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
 
 @Component({
   selector: 'app-ensible-item',
@@ -35,12 +37,15 @@ export class EnsibleItemComponent implements OnChanges {
 
   verbosityOptions = VERPOSITY_OPTIONS;
 
+  ensibleDockerContainerTemplateOptions: MatOption<EnsibleDockerContainerTemplate>[] = [];
+
   constructor(
     private ensibleItemService: EnsibleItemService,
     public ensibleWorkspaceParserService: EnsibleWorkspaceParserService,
     private rxjsUtils: RxJSUtils,
     private dialogUtils: DialogUtils,
-    private router: Router
+    private router: Router,
+    private ensibleDockerContainerTemplateService: EnsibleDockerContainerTemplateService
   ) { }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -50,7 +55,16 @@ export class EnsibleItemComponent implements OnChanges {
   }
 
   ngOnInit(): void {
-
+    this.ensibleDockerContainerTemplateService.getAll().pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+      next: res => {
+        res.forEach(e => {
+          this.ensibleDockerContainerTemplateOptions.push({
+            value: e,
+            valueLabel: `id: ${e.id}, name: ${e.name}, image: ${e.repository}`
+          })
+        })
+      }
+    })
   }
 
   isValueChange() {

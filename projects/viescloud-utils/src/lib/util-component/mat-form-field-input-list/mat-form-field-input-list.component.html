@@ -43,6 +43,7 @@
       <li *ngFor="let item of value; let i = index; trackBy: trackByIndex;">
         <app-mat-form-field-input
         [label]="label + ' ' + (i + 1)"
+        [placeholder]="placeholder"
         [value]="item" (valueChange)="value[i] = $event"
         styleWidth="100%"
         [required]="required"

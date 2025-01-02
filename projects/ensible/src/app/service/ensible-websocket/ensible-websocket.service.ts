@@ -88,4 +88,8 @@ export class EnsibleWebsocketService extends RxStomp {
       return this.watch(`${this.topicPrefix}/${topic}`);
     }
   }
+
+  watchForTopic(topic: string) {
+    return this.watchForEnsibleTopic(topic);
+  }
 }

@@ -175,7 +175,7 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
     if(Array.isArray(blankObj)) {
       if(blankObj.length > 0)
         return blankObj[0];
-      else 
+      else
         throw new Error("blank object array type can't define\nPlease add and empty element to array inside object field")
     }
     else
@@ -190,7 +190,7 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
 
     if(value)
       return value;
-    else 
+    else
       return this.getKeyBlankObject(key);
   }
 
@@ -300,7 +300,10 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
   }
 
   override isValueNumber(): boolean {
-    return super.isValueNumber() && !this.isOptions;
+    if(this.blankObject)
+      return typeof this.blankObject === 'number' && !this.isOptions;
+    else
+      return super.isValueNumber() && !this.isOptions;
   }
 
   onValueChangeFn() {

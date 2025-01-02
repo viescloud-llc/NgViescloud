@@ -1,0 +1,25 @@
+<ul class="margin-center" appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
+  <li>
+    <app-mat-form-field-input-dynamic
+    [(value)]="ensibleDockerContainerTemplate"
+    [blankObject]="blankEnsibleDockerContainerTemplate"
+    [styleWidth]="'100%'"
+    [indent]="false"
+    ></app-mat-form-field-input-dynamic>
+  </li>
+  <li>
+    <app-mat-form-field-input-option
+    label="Execute with option"
+    [(value)]="ensibleDockerContainerTemplate.executeWith"
+    [noneLabel]="''"
+    [options]="executeWithOptions"
+    [required]="true"
+    [styleWidth]="'100%'"
+    ></app-mat-form-field-input-option>
+  </li>
+  <li class="flex-row-container-auto">
+    <button mat-raised-button color="primary" (click)="save()" [disabled]="!validForm || !isValueChange()">Save</button>
+    <button mat-raised-button color="warn" (click)="revert()" [disabled]="!isValueChange()">Revert</button>
+    <button mat-raised-button color="primary" (click)="pullImage()" [disabled]="!validForm">Pull image</button>
+  </li>
+</ul>

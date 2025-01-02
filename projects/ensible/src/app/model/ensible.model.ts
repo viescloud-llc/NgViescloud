@@ -1,4 +1,4 @@
-import { DateTime, MatInputDisable, MatInputHide, MatInputRequire, MatOption, MatTableDisplayLabel, MatTableHide } from "projects/viescloud-utils/src/lib/model/Mat.model";
+import { DateTime, MatInputDisable, MatInputDisplayLabel, MatInputHide, MatInputItemSetting, MatInputRequire, MatInputSetting, MatItemSettingType, MatOption, MatTableDisplayLabel, MatTableHide } from "projects/viescloud-utils/src/lib/model/Mat.model";
 
 export class EnsibleUser {
   @MatInputDisable()
@@ -130,6 +130,9 @@ export class EnsibleItem {
 
   @MatTableHide()
   cronExpression: string = '';
+
+  @MatTableHide()
+  dockerContainerTemplate?: EnsibleDockerContainerTemplate = new EnsibleDockerContainerTemplate();
 }
 
 export class EnsiblePlayBookLogger {
@@ -209,3 +212,66 @@ export const VERPOSITY_OPTIONS: MatOption<string>[] = [
     valueLabel: 'WinRM Debug'
   }
 ];
+
+export class EnsibleDockerContainerTemplate {
+
+  @MatInputDisable()
+  id: number = 0;
+
+  @MatInputRequire()
+  name: string = '';
+
+  @MatInputItemSetting(MatItemSettingType.TEXT_AREA, true)
+  description: string = '';
+
+  @MatInputRequire()
+  @MatInputDisplayLabel('Docker image', 'e.g nginx, redis, ubuntu:latest')
+  repository: string = '';
+
+  @MatInputDisplayLabel('Registry url', 'e.g https://hub.docker.com/_/ubuntu')
+  @MatInputItemSetting(MatItemSettingType.AUTO_FILL_HTTPS, true)
+  registryUrl: string = '';
+
+  @MatTableHide()
+  @MatInputItemSetting(MatItemSettingType.LIST_SHOW_ADD_ITEM_BUTTON, true)
+  @MatInputDisplayLabel('Extra parameters', 'e.g --user 99:100 -it')
+  extraParameters: string[] = [''] as string[];
+
+  @MatTableHide()
+  @MatInputItemSetting(MatItemSettingType.LIST_SHOW_ADD_ITEM_BUTTON, true)
+  @MatInputDisplayLabel('Post arguments', 'e.g bash, sh, cmd')
+  postArguments: string[] = [''] as string[];
+
+  @MatTableHide()
+  @MatInputDisplayLabel('Privileged')
+  privileged: boolean = false;
+
+  @MatTableHide()
+  @MatInputHide()
+  environmentVariables: Record<string, string> = {'':''} as Record<string, string>;
+
+  @MatTableHide()
+  @MatInputDisplayLabel('Skip run if docker is not running')
+  skipRunIfDockerNotRunning: boolean = false;
+
+  @MatTableHide()
+  @MatInputDisplayLabel('Skip run if container is not ready')
+  skipRunIfContainerNotReady: boolean = false;
+
+  @MatTableHide()
+  @MatInputDisplayLabel('Rebuild container for each run')
+  rebuildContainerEachRun: boolean = false;
+
+  @MatTableHide()
+  @MatInputHide()
+  executeWith: string = '';
+}
+
+export class EnsibleDockerContainer {
+  id: string = '';
+  name: string = '';
+  image: string = '';
+  command: string = '';
+  status: string = '';
+  created: string = '';
+}

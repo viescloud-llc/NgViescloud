@@ -12,6 +12,8 @@ import { EnsibleAnsibleCfgComponent } from './ensible-ansible-cfg/ensible-ansibl
 import { EnsibleAuthGuard } from './guard/ensible-auth.guard';
 import { EnsibleFsListComponent } from './ensible-fs-list/ensible-fs-list.component';
 import { EnsibleUserSettingComponent } from './ensible-user-setting/ensible-user-setting.component';
+import { EnsibleDockerContainerTemplateListComponent } from './docker/ensible-docker-container-template-list/ensible-docker-container-template-list.component';
+import { EnsibleDockerContainerTemplateComponent } from './docker/ensible-docker-container-template/ensible-docker-container-template.component';
 
 const routes: Routes = [
   {
@@ -34,6 +36,21 @@ const routes: Routes = [
       {
         path: ':id',
         component: EnsibleItemTabComponent
+      }
+    ]
+  },
+  {
+    path: 'docker',
+    canActivate: [async () => inject(EnsibleAuthGuard).isLogin()],
+    canActivateChild: [async () => inject(EnsibleAuthGuard).isLogin()],
+    children: [
+      {
+        path: 'container/templates',
+        component: EnsibleDockerContainerTemplateListComponent
+      },
+      {
+        path: 'container/template/:id',
+        component: EnsibleDockerContainerTemplateComponent
       }
     ]
   },

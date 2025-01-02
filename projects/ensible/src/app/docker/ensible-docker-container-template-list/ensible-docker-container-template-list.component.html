@@ -1,0 +1,17 @@
+<ul class="margin-center">
+  <li class="flex-row-container">
+    <button mat-icon-button color="primary" (click)="ngOnInit()" [matTooltip]="'Refresh'"><mat-icon>refresh</mat-icon></button>
+    <button mat-icon-button color="primary" (click)="addNewTemplate()"><mat-icon>add_box</mat-icon></button>
+  </li>
+  <hr>
+  <li>
+    <app-mat-table
+    [matRows]="ensibleDockerContainerTemplates"
+    [blankObject]="blankEnsibleDockerContainerTemplate"
+    [showFilter]="true"
+    [showPagination]="true"
+    [pageSizeOptions]="[20, 50, 100, 500]"
+    (onEditRow)="selectRow($event)"
+    ></app-mat-table>
+  </li>
+</ul>

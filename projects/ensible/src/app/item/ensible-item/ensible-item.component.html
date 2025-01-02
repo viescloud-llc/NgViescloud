@@ -214,6 +214,19 @@
     <br>
   </li>
 
+  <li>
+    <details>
+      <summary>Execution environment (run within docker container)</summary>
+      <app-mat-form-field-input-option
+      label="Docker container template"
+      [(value)]="item.dockerContainerTemplate"
+      [options]="ensibleDockerContainerTemplateOptions"
+      styleWidth="100%"
+      ></app-mat-form-field-input-option>
+    </details>
+    <br>
+  </li>
+
   <li class="flex-row-container">
     <button mat-raised-button color="primary" (click)="save()" [disabled]="!validForm || !isValueChange()">Save</button>
     <button mat-raised-button color="warn" (click)="revert()" [disabled]="!isValueChange()">Revert</button>
