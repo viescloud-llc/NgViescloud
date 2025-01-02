@@ -97,9 +97,9 @@ export class EnsibleItemComponent implements OnChanges {
   }
 
   revert() {
-    console.log(JSON.stringify(this.item));
-    console.log('vs')
-    console.log(JSON.stringify(this.itemCopy));
+    // console.log(JSON.stringify(this.item));
+    // console.log('vs')
+    // console.log(JSON.stringify(this.itemCopy));
     this.item = structuredClone(this.itemCopy);
   }
 
