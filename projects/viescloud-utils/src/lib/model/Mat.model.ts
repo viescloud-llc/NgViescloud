@@ -32,6 +32,7 @@ export enum MatItemSettingType {
     EXPANSION_PANEL = <any>'ExpansionPanelItem',
     OPTIONS = <any>'OptionsItem',
     HIDE = <any>'HideItem',
+    SHOW_GOTO_BUTTON = <any>'ShowGotoButtonItem',
     LIST_SHOW_LIST_SIZE_INPUT = <any>'ListShowListSizeInputItem',
     LIST_SHOW_REMOVE_ITEM_BUTTON = <any>'ListShowRemoveItemButtonItem',
     LIST_SHOW_ADD_ITEM_BUTTON = <any>'ListShowAddItemButtonItem',

@@ -4,13 +4,14 @@ import { EnsibleItem } from '../../model/ensible.model';
 import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
+import { FixChangeDetection } from 'projects/viescloud-utils/src/lib/directive/FixChangeDetection';
 
 @Component({
   selector: 'app-ensible-item-tab',
   templateUrl: './ensible-item-tab.component.html',
   styleUrls: ['./ensible-item-tab.component.scss']
 })
-export class EnsibleItemTabComponent implements OnInit {
+export class EnsibleItemTabComponent extends FixChangeDetection implements OnInit {
 
   item!: EnsibleItem;
   itemCopy!: EnsibleItem;
@@ -23,7 +24,9 @@ export class EnsibleItemTabComponent implements OnInit {
   constructor(
     private ensibleItemService: EnsibleItemService,
     private rxjsUtils: RxJSUtils
-  ) { }
+  ) { 
+    super();
+  }
 
   ngOnInit(): void {
     let id = RouteUtils.getPathVariableAsInteger('item');

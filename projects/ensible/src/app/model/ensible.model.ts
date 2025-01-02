@@ -230,6 +230,7 @@ export class EnsibleDockerContainerTemplate {
 
   @MatInputDisplayLabel('Registry url', 'e.g https://hub.docker.com/_/ubuntu')
   @MatInputItemSetting(MatItemSettingType.AUTO_FILL_HTTPS, true)
+  @MatInputItemSetting(MatItemSettingType.SHOW_GOTO_BUTTON, true)
   registryUrl: string = '';
 
   @MatTableHide()
@@ -261,6 +262,10 @@ export class EnsibleDockerContainerTemplate {
   @MatTableHide()
   @MatInputDisplayLabel('Rebuild container for each run')
   rebuildContainerEachRun: boolean = false;
+
+  @MatTableHide()
+  @MatInputDisplayLabel('Bind docker socket to container')
+  bindDockerSocket: boolean = false;
 
   @MatTableHide()
   @MatInputHide()

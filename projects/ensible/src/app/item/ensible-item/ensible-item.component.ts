@@ -1,6 +1,6 @@
 import { EnsibleDockerContainerTemplate } from './../../model/ensible.model';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { EnsibleItemService } from '../../service/ensible-item/ensible-item.service';
 import { EnsibleItem, VERPOSITY_OPTIONS } from '../../model/ensible.model';
 import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
@@ -12,6 +12,7 @@ import { EnsibleService } from '../../service/ensible/ensible.service';
 import { StringUtils } from 'projects/viescloud-utils/src/lib/util/String.utils';
 import { EnsibleDockerContainerTemplateService } from '../../service/ensible-docker-container-template/ensible-docker-container-template.service';
 import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
+import { FixChangeDetection } from 'projects/viescloud-utils/src/lib/directive/FixChangeDetection';
 
 @Component({
   selector: 'app-ensible-item',
@@ -49,19 +50,26 @@ export class EnsibleItemComponent implements OnChanges {
   ) { }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if(changes['item']) {
-      this.itemCopy = structuredClone(this.item);
-    }
+    this.ngOnInit();
   }
 
   ngOnInit(): void {
+    this.itemCopy = structuredClone(this.item);
+
     this.ensibleDockerContainerTemplateService.getAll().pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
       next: res => {
         res.forEach(e => {
+          if(this.ensibleDockerContainerTemplateOptions.some(o => o.value.id === e.id)) return;
           this.ensibleDockerContainerTemplateOptions.push({
             value: e,
             valueLabel: `id: ${e.id}, name: ${e.name}, image: ${e.repository}`
           })
+        })
+
+        this.ensibleDockerContainerTemplateOptions.forEach(e => {
+          if(e.value.id === this.item.dockerContainerTemplate?.id) {
+            this.item.dockerContainerTemplate = structuredClone(e.value);
+          }
         })
       }
     })
@@ -76,7 +84,10 @@ export class EnsibleItemComponent implements OnChanges {
   save() {
     this.ensibleItemService.postOrPut(this.item.id, this.item).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
       next: res => {
-        this.router.navigate(['item', res.id]);
+        if(this.item.id === 0) {
+          this.router.navigate(['item', res.id]);
+        }
+
         this.itemChange.emit(res);
       },
       error: err => {
@@ -86,6 +97,9 @@ export class EnsibleItemComponent implements OnChanges {
   }
 
   revert() {
+    console.log(JSON.stringify(this.item));
+    console.log('vs')
+    console.log(JSON.stringify(this.itemCopy));
     this.item = structuredClone(this.itemCopy);
   }
 
@@ -124,5 +138,9 @@ export class EnsibleItemComponent implements OnChanges {
 
   getCronDescription(cron: string) {
     return StringUtils.describeJavaCronExpression(cron);
+  }
+
+  log(any: any) {
+    console.log(any);
   }
 }

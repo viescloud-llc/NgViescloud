@@ -12,6 +12,7 @@ import { StringUtils } from 'projects/viescloud-utils/src/lib/util/String.utils'
 export class EnsiblePullImageDialog implements OnInit {
 
   output: string = '';
+  finish: boolean = false;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: {
@@ -32,6 +33,10 @@ export class EnsiblePullImageDialog implements OnInit {
     this.ensibleDockerService.pullImage(this.data.imageName, outputTopic).subscribe({
       next: res => {
         this.output = res;
+        this.finish = true;
+      },
+      error: err => {
+        this.finish = true;
       }
     });
   }

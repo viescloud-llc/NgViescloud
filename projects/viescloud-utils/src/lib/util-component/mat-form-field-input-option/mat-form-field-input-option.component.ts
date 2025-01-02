@@ -23,7 +23,10 @@ export class MatFormFieldInputOptionComponent<T> extends MatFormFieldComponent {
   customOptionLabel = '';
 
   @Input()
-  noneLabelValue: T | undefined = this.blankObject ?? undefined;
+  noneLabelValue: T | undefined = this.blankObject;
+
+  @Input()
+  matchByFn: (value1: T, value2: T) => boolean = (value1: T, value2: T) => DataUtils.isEqual(value1, value2);
 
   @Output()
   opened: EventEmitter<void> = new EventEmitter();
@@ -51,8 +54,9 @@ export class MatFormFieldInputOptionComponent<T> extends MatFormFieldComponent {
 
   populateOptions() {
     this.options.forEach(e => {
-      if(DataUtils.isEqual(e.value, this.value))
+      if(this.matchByFn(this.value, e.value)) {
         e.value = this.value;
+      }
     })
   }
 

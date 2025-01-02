@@ -1,5 +1,5 @@
 <br>
-<button mat-raised-button color="primary" (click)="ngOnInit()">Refresh</button>
+<button mat-icon-button color="primary" (click)="ngOnInit()" [matTooltip]="'Refresh'"><mat-icon>refresh</mat-icon></button>
 <hr>
 <app-mat-table
 [matRows]="logs"

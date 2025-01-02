@@ -45,6 +45,9 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
   isHttps: boolean = false;
 
   @Input()
+  showGotoButton: boolean = false;
+
+  @Input()
   showListSizeInput: boolean = false;
 
   @Input()

@@ -72,6 +72,7 @@
       [showVisibleSwitch]="isPassword"
       [validateEmail]="isEmail"
       [autoFillHttps]="isHttps"
+      [showGoto]="showGotoButton"
       [styleWidth]="styleWidth"
       [disable]="disable"
       [required]="required"
@@ -156,6 +157,7 @@
           [matOptions]="item.matOptions"
           (onValueChange)="onValueChangeFn()"
           [indent]="indent"
+          [showGotoButton]="containSetting(item, MatItemSettingType.SHOW_GOTO_BUTTON)"
         ></app-mat-form-field-input-dynamic>
       </li>
     </ul>

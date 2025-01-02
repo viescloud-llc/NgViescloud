@@ -71,12 +71,20 @@ export class EnsibleWebsocketService extends RxStomp {
     this.activate();
   }
 
+  disconnect() {
+    if(this.isConnected()) {
+      this.deactivate();
+    }
+  }
 
   isConnected() {
     return this.stompClient.connected;
   }
 
   watchForEnsibleTopic(topic: string) {
+    if(!this.isConnected())
+      this.connect();
+
     if(topic.startsWith(this.topicPrefix)) {
       return this.watch(topic);
     }

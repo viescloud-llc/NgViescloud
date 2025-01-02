@@ -52,8 +52,8 @@ export class DataUtils {
             const value2 = (obj2 as any)[key];
 
             // Handle missing fields
-            const isValue1Missing = value1 === undefined;
-            const isValue2Missing = value2 === undefined;
+            const isValue1Missing = value1 === undefined || value1 === null;
+            const isValue2Missing = value2 === undefined || value2 === null;
 
             // Skip if both are missing or if one is missing and the other is a default value
             if ((isValue1Missing && isValue2Missing) ||
