@@ -1,4 +1,21 @@
-import { DateTime, MatInputDisable, MatInputDisplayLabel, MatInputHide, MatInputItemSetting, MatInputRequire, MatInputSetting, MatItemSettingType, MatOption, MatTableDisplayLabel, MatTableHide } from "projects/viescloud-utils/src/lib/model/Mat.model";
+import { DateTime, MatInputDisable, MatInputDisplayLabel, MatInputEnum, MatInputHide, MatInputItemSetting, MatInputRequire, MatInputSetting, MatItemSettingType, MatOption, MatTableDisplayLabel, MatTableHide } from "projects/viescloud-utils/src/lib/model/Mat.model";
+
+export enum EnsibleExecuteOptions {
+  bash,
+  sh,
+  zsh,
+  fish,
+  ksh,
+  tcsh,
+  dash,
+  ash,
+  csh,
+  elm,
+  mksh,
+  elvish,
+  PowerShell
+}
+
 
 export class EnsibleUser {
   @MatInputDisable()
@@ -268,7 +285,9 @@ export class EnsibleDockerContainerTemplate {
   bindDockerSocket: boolean = false;
 
   @MatTableHide()
-  @MatInputHide()
+  @MatInputEnum(EnsibleExecuteOptions)
+  @MatInputRequire()
+  @MatInputDisplayLabel('Execute with')
   executeWith: string = '';
 }
 

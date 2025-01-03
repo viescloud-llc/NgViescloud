@@ -1,8 +1,9 @@
+import { RxJSUtils } from './../../../../../viescloud-utils/src/lib/util/RxJS.utils';
 import { EnsiblePlayBookTrigger } from './../../model/ensible.model';
 import { Injectable } from '@angular/core';
 import { EnsibleService } from '../ensible/ensible.service';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { firstValueFrom, Observable, Subject } from 'rxjs';
+import { first, firstValueFrom, Observable, Subject } from 'rxjs';
 import { FSNode, FSTree } from '../../model/ensible.model';
 import { EnsibleFs, EnsibleRole, EnsibleFsDir, EnsibleWorkSpace } from '../../model/ensible.parser.model';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
@@ -63,16 +64,23 @@ export class EnsibleWorkspaceParserService extends EnsibleWorkspaceService {
   groupVarsFileOptions: MatOption<string>[] = [];
   hostVarsFileOptions: MatOption<string>[] = [];
 
-  triggerFetchWorkspace() {
+  constructor(
+    httpClient: HttpClient,
+    private rxJSUtils: RxJSUtils
+  ) {
+    super(httpClient);
+  }
+
+  triggerFetchWorkspace(waitLoading: boolean = false) {
     return new Promise<EnsibleWorkSpace>((resolve, reject) => {
-      this.parseWorkspace().then(ws => resolve(ws)).catch(err => reject(err));
+      this.parseWorkspace(waitLoading).then(ws => resolve(ws)).catch(err => reject(err));
     })
   }
 
-  async parseWorkspace() {
+  async parseWorkspace(waitLoading: boolean = false) {
     return new Promise<EnsibleWorkSpace>((resolve, reject) => {
 
-      this.getWorkspace().subscribe({
+      this.getWorkspace().pipe(waitLoading ? this.rxJSUtils.waitLoadingDialog() : first()).subscribe({
         next: res => {
           let ws = DataUtils.purgeArray(new EnsibleWorkSpace());
           let workspace = new FSTree();

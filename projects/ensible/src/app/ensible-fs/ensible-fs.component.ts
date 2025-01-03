@@ -105,7 +105,7 @@ export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges
     this.fileType = FileType.UNKOWN;
   }
 
-  override onRouteChange(): void {
+  override async onRouteChange() {
     this.cleanAllValue();
 
     if(this.fsPath)

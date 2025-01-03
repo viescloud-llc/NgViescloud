@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { EnsibleDockerContainerTemplate } from '../../model/ensible.model';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { EnsibleDockerContainerTemplateService } from '../../service/ensible-docker-container-template/ensible-docker-container-template.service';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
@@ -9,35 +9,19 @@ import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
 import { MatDialog } from '@angular/material/dialog';
 import { EnsiblePullImageDialog } from '../../dialog/ensible-pull-image-dialog/ensible-pull-image-dialog.component';
 import { EnsibleDockerService } from '../../service/ensible-docker/ensible-docker.service';
-
-const executeWithOptions: MatOption<String>[] = [
-  {value: 'bash', valueLabel: 'bash'},
-  {value: 'sh', valueLabel: 'sh'},
-  {value: 'zsh', valueLabel: 'zsh'},
-  {value: 'fish', valueLabel: 'fish'},
-  {value: 'ksh', valueLabel: 'ksh'},
-  {value: 'tcsh', valueLabel: 'tcsh'},
-  {value: 'dash', valueLabel: 'dash'},
-  {value: 'ash', valueLabel: 'ash'},
-  {value: 'csh', valueLabel: 'csh'},
-  {value: 'elm', valueLabel: 'elm'},
-  {value: 'mksh', valueLabel: 'mksh'},
-  {value: 'elvish', valueLabel: 'elvish'},
-  {value: 'PowerShell', valueLabel: 'PowerShell'},
-];
+import { RouteChangeSubcribe } from 'projects/viescloud-utils/src/lib/directive/RouteChangeSubcribe.directive';
+import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 
 @Component({
   selector: 'app-ensible-docker-container-template',
   templateUrl: './ensible-docker-container-template.component.html',
   styleUrls: ['./ensible-docker-container-template.component.scss']
 })
-export class EnsibleDockerContainerTemplateComponent implements OnInit {
+export class EnsibleDockerContainerTemplateComponent extends RouteChangeSubcribe {
 
   ensibleDockerContainerTemplate!: EnsibleDockerContainerTemplate;
   ensibleDockerContainerTemplateCopy!: EnsibleDockerContainerTemplate;
   blankEnsibleDockerContainerTemplate: EnsibleDockerContainerTemplate = new EnsibleDockerContainerTemplate();
-
-  executeWithOptions = executeWithOptions;
 
   validForm = false;
   dockerReady = false;
@@ -47,11 +31,13 @@ export class EnsibleDockerContainerTemplateComponent implements OnInit {
     private ensibleDockerContainerTemplateService: EnsibleDockerContainerTemplateService,
     private ensibleDockerService: EnsibleDockerService,
     private rxjsUtils: RxJSUtils,
-    private matDialog: MatDialog,
-  ) { 
+    private dialogUtils: DialogUtils,
+    route: ActivatedRoute
+  ) {
+    super(route);
   }
 
-  async ngOnInit() {
+  override async onRouteChange() {
     let id = RouteUtils.getPathVariableAsInteger('template');
     if(!id) {
       this.ensibleDockerContainerTemplate = DataUtils.purgeArray(new EnsibleDockerContainerTemplate());
@@ -94,12 +80,25 @@ export class EnsibleDockerContainerTemplateComponent implements OnInit {
   }
 
   pullImage() {
-    let dialog = this.matDialog.open(EnsiblePullImageDialog, {
+    this.dialogUtils.matDialog.open(EnsiblePullImageDialog, {
       data: {
         imageName: this.ensibleDockerContainerTemplate.repository
       },
       width: '100%',
       disableClose: true
     })
+  }
+
+  async deleteContainerTemplate() {
+    let confirm = await this.dialogUtils.openConfirmDialog("Delete", "Are you sure you want to delete this container template?\nThis cannot be undone", "Yes", "No");
+
+    if(confirm) {
+      this.ensibleDockerContainerTemplateService.delete(this.ensibleDockerContainerTemplate.id).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+        next: () => {
+          let link = `/docker/container/templates`;
+          this.router.navigate([link]);
+        }
+      })
+    }
   }
 }

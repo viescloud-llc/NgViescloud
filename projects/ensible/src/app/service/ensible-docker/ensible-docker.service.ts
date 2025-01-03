@@ -2,7 +2,7 @@ import { RxJSUtils } from './../../../../../viescloud-utils/src/lib/util/RxJS.ut
 import { Injectable } from '@angular/core';
 import { EnsibleService } from '../ensible/ensible.service';
 import { firstValueFrom } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { EnsibleDockerContainer } from '../../model/ensible.model';
 import { HttpParamsBuilder } from 'projects/viescloud-utils/src/lib/model/Utils.model';
 
@@ -38,5 +38,10 @@ export class EnsibleDockerService extends EnsibleService {
     params.setIf('consumeEverything', consumeEverything, v => !!outputTopic);
 
     return this.httpClient.post(`${this.getPrefixUri()}/image/pull`, null, {params: params.build(), responseType: 'text'});
+  }
+
+  deleteContainerByItemId(itemId: string | number) {
+    let params = new HttpParams().set('itemId', itemId);
+    return this.httpClient.delete(`${this.getPrefixUri()}/container`, {params: params});
   }
 }

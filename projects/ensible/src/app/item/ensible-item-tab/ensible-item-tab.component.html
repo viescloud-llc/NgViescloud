@@ -3,7 +3,8 @@
   <mat-tab-group class="margin-center" [selectedIndex]="selectedIndex" (selectedIndexChange)="indexChanged($event)" *ngIf="item.id; else Else">
     <mat-tab [label]="tabNames[0]" [disabled]="isEditing">
       <app-ensible-item
-      [(item)]="item"
+      [item]="item"
+      (itemChange)="ngOnInit()"
       (isEditing)="isEditing = $event"
       ></app-ensible-item>
     </mat-tab>

@@ -10,24 +10,23 @@ export abstract class RouteChangeSubcribe implements OnInit {
     protected route: ActivatedRoute
   ) {}
 
-  ngOnInit(): void {
+  async ngOnInit() {
     // Subscribe to route changes
-    this.route.url.subscribe((urlSegments) => {
+    this.route.url.subscribe(async (urlSegments) => {
       // Add logic to handle route changes
-      this.onRouteChange();
+      await this.onRouteChange();
     });
 
     // Or if you want to listen to query params
-    this.route.queryParams.subscribe((queryParams) => {
+    this.route.queryParams.subscribe(async (queryParams) => {
       // Handle query param changes
-      this.onParamsChange();
+      await this.onParamsChange();
     });
   }
 
-  abstract onRouteChange(): void;
+  abstract onRouteChange(): Promise<void>;
 
-  onParamsChange() {
+  async onParamsChange() {
 
   }
-
 }

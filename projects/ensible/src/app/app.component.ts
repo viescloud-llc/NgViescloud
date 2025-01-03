@@ -97,6 +97,7 @@ export class AppComponent extends ViescloudApplicationMinimal {
     },
     {
       title: 'Dockers',
+      hideChildren: true,
       hideConditional: () => !this.ensibleAuthenticatorService.isLogin(),
       children: [
         {

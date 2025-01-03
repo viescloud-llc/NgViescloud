@@ -10,13 +10,15 @@ import { EnsibleWorkSpace } from '../../model/ensible.parser.model';
 import { EnsibleWorkspaceService } from '../../service/ensible-workspace/ensible-workspace.service';
 import { SettingService } from 'projects/viescloud-utils/src/lib/service/Setting.service';
 import { EnsibleProcessService } from '../../service/ensible-process/ensible-process.service';
+import { EnsibleDockerService } from '../../service/ensible-docker/ensible-docker.service';
+import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 
 @Component({
   selector: 'app-ensible-item-run',
   templateUrl: './ensible-item-run.component.html',
   styleUrls: ['./ensible-item-run.component.scss']
 })
-export class EnsibleItemRunComponent implements OnChanges, OnDestroy {
+export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
 
   @Input()
   item!: EnsibleItem;
@@ -39,12 +41,15 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy {
 
   verbosityOptions = VERPOSITY_OPTIONS;
 
+  dockerReady = false;
+
   constructor(
     private ensiblePlaybookLoggerService: EnsiblePlaybookLoggerService,
     private ensibleWebsocketService: EnsibleWebsocketService,
     private ensibleWorkSpaceService: EnsibleWorkspaceService,
     private ensibleProcessService: EnsibleProcessService,
-    private settingService: SettingService
+    private ensibleDockerService: EnsibleDockerService,
+    private rxjsUtils: RxJSUtils
   ) { }
   ngOnDestroy(): void {
     this.onGoingRequest.forEach(req => {
@@ -58,7 +63,9 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy {
     }
   }
 
-  ngOnInit(): void {
+  async ngOnInit() {
+    this.dockerReady = await this.ensibleDockerService.isDockerRunning();
+
     if(!this.ensibleWebsocketService.isConnected()) {
       this.ensibleWebsocketService.connect();
     }
@@ -185,5 +192,11 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy {
   getVerboseLabel() {
     let verbosity = this.item.verbosity;
     return this.verbosityOptions.find(opt => opt.value === verbosity)?.valueLabel ?? 'minimal';
+  }
+
+  removeContainer() {
+    this.ensibleDockerService.deleteContainerByItemId(this.item.id).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+      next: res => { }
+    })
   }
 }

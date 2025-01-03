@@ -32,21 +32,11 @@
     [indent]="false"
     ></app-mat-form-field-input-dynamic>
   </li>
-  <li>
-    <app-mat-form-field-input-option
-    label="Execute with option"
-    [(value)]="ensibleDockerContainerTemplate.executeWith"
-    [options]="executeWithOptions"
-    [noneLabel]="''"
-    [noneLabelValue]="''"
-    [required]="true"
-    [styleWidth]="'100%'"
-    ></app-mat-form-field-input-option>
-  </li>
   <li class="flex-row-container-auto">
     <button mat-raised-button color="primary" (click)="save()" [disabled]="!validForm || !isValueChange()">Save</button>
     <button mat-raised-button color="warn" (click)="revert()" [disabled]="!isValueChange()">Revert</button>
     <button mat-raised-button color="primary" (click)="pullImage()" [disabled]="!validForm || !dockerReady">Pull image</button>
+    <button *ngIf="ensibleDockerContainerTemplate.id" mat-raised-button color="warn" (click)="deleteContainerTemplate()">Delete container template</button>
   </li>
-  
+
 </ul>

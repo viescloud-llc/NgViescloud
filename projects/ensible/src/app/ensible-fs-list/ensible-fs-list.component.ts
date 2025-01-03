@@ -27,10 +27,10 @@ export class EnsibleFsListComponent extends RouteChangeSubcribe {
     super(route);
   }
 
-  override onRouteChange(): void {
+  override async onRouteChange() {
     this.layers = RouteUtils.getCurrentPath().split('/').splice(2);
 
-    this.ensibleWorkspaceParserService.triggerFetchWorkspace().then((ws) => {
+    this.ensibleWorkspaceParserService.triggerFetchWorkspace(true).then((ws) => {
       this.ensibleWorkspace = ws;
       let rootLayer = this.layers[0];
       switch(rootLayer) {

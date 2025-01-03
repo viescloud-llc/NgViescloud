@@ -22,6 +22,19 @@
       <button *ngIf="logId" mat-icon-button [matTooltip]="'Clean log'" (click)="clean()" [disabled]="isRunning">
         <mat-icon>delete</mat-icon>
       </button>
+      <button *ngIf="dockerReady" [disabled]="isRunning" mat-icon-button [matTooltip]="'Remove container'" (click)="removeContainer()">
+        <mat-icon>
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor">
+            <path d="M0 0h24v24H0z" fill="none"/>
+            <path d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1zM18 7H6v12h12V7z"/>
+          </svg>
+        </mat-icon>
+      </button>
+      <button mat-icon-button [disabled]="!runOutput" [matTooltip]="'Copy logs to clipboard'" appCopyToClipboard [copyToClipboardValue]="runOutput" [copyMessage]="'Run logs copy to clipboard'">
+        <mat-icon>
+          content_copy
+        </mat-icon>
+      </button>
     </mat-toolbar>
   </li>
   <li *ngIf="logId">
@@ -36,6 +49,7 @@
     [rows]="'20'"
     [autoScrollToBottom]="autoScroll"
     [showResizeVerticalButton]="true"
+    [readonly]="true"
     ></app-mat-form-field-input-text-area>
   </li>
 </ul>
