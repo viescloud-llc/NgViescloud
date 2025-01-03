@@ -46,13 +46,19 @@ export class EnsibleDockerContainerTemplateComponent extends RouteChangeSubcribe
     else {
       this.ensibleDockerContainerTemplateService.get(id).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
         next: res => {
-          this.ensibleDockerContainerTemplate = res;
-          this.ensibleDockerContainerTemplateCopy = structuredClone(this.ensibleDockerContainerTemplate);
+          this.updateTemplate(res);
         }
       })
     }
 
     this.dockerReady = await this.ensibleDockerService.isDockerRunning();
+  }
+
+  private updateTemplate(ensibleDockerContainerTemplate: EnsibleDockerContainerTemplate) {
+    this.ensibleDockerContainerTemplate = ensibleDockerContainerTemplate;
+    this.ensibleDockerContainerTemplate.extraParameters = this.ensibleDockerContainerTemplate.extraParameters ?? [];
+    this.ensibleDockerContainerTemplate.postArguments = this.ensibleDockerContainerTemplate.postArguments ?? [];
+    this.ensibleDockerContainerTemplateCopy = structuredClone(this.ensibleDockerContainerTemplate);
   }
 
   isValueChange() {
@@ -68,8 +74,7 @@ export class EnsibleDockerContainerTemplateComponent extends RouteChangeSubcribe
             this.router.navigate([link]);
           }
 
-          this.ensibleDockerContainerTemplate = res;
-          this.ensibleDockerContainerTemplateCopy = structuredClone(this.ensibleDockerContainerTemplate);
+          this.updateTemplate(res);
         }
       })
     }
