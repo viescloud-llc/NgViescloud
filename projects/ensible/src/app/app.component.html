@@ -7,7 +7,8 @@
   <mat-drawer-content [ngStyle]="getBackgroundImageNgStyle()">
     <viescloud-header-minimal
     [drawer]="drawer"
-    [imageSrc]="'assets/images/logo-no-background.png'"
+    imageSrc="assets/images/logo-no-background.png"
+    imageLink="https://hub.docker.com/r/viescloud/ensible-fullstack"
     [alias]="getUserAlias()"
     [isLogin]="ensibleAuthenticatorService.isLogin()"
     (onLogout)="ensibleAuthenticatorService.logout()"

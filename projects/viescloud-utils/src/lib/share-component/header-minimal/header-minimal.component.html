@@ -6,7 +6,7 @@
   <span *ngIf="getAlias()">Hello: {{getAlias()}}</span>
 
   <span class="spacer"></span>
-  <img *ngIf="imageSrc" class="cursor-hover" mat-card-avatar [src]="imageSrc" alt="!?"/>
+  <img *ngIf="imageSrc" class="cursor-hover" mat-card-avatar [src]="imageSrc" alt="!?" (click)="openLink(imageLink)"/>
   <app-copy-to-clipboard-util
   [copyValue]="getURL()"
   matIcon="share"

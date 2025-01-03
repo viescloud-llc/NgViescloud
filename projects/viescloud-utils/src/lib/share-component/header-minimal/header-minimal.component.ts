@@ -17,6 +17,9 @@ export class HeaderMinimalComponent {
   imageSrc = '';
 
   @Input()
+  imageLink = '';
+
+  @Input()
   useLogoutFlow = false;
 
   @Output()
@@ -77,5 +80,10 @@ export class HeaderMinimalComponent {
         this.settingService.onToggleDisplayDrawerSubject.next(this.drawer?.opened ? DRAWER_STATE.OPEN : DRAWER_STATE.CLOSE);
       }
     });
+  }
+
+  openLink(link: string): void {
+    if(link)
+      window.open(link);
   }
 }
