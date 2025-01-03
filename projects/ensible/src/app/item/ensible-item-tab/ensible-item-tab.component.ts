@@ -40,6 +40,7 @@ export class EnsibleItemTabComponent extends RouteChangeSubcribe implements Afte
     let id = RouteUtils.getPathVariableAsInteger('item');
     if(!id) {
       this.item = new EnsibleItem();
+      this.item.dockerContainerTemplate = undefined;
     }
     else {
       this.ensibleItemService.get(id).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
