@@ -7,21 +7,19 @@ import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 import { EnsibleWorkspaceParserService } from '../../service/ensible-workspace/ensible-workspace.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { EnsibleService } from '../../service/ensible/ensible.service';
 import { StringUtils } from 'projects/viescloud-utils/src/lib/util/String.utils';
 import { EnsibleDockerContainerTemplateService } from '../../service/ensible-docker-container-template/ensible-docker-container-template.service';
 import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
 import { FixChangeDetection } from 'projects/viescloud-utils/src/lib/directive/FixChangeDetection';
-import { RouteChangeSubcribe } from 'projects/viescloud-utils/src/lib/directive/RouteChangeSubcribe.directive';
 
 @Component({
   selector: 'app-ensible-item',
   templateUrl: './ensible-item.component.html',
   styleUrls: ['./ensible-item.component.scss']
 })
-export class EnsibleItemComponent extends RouteChangeSubcribe implements OnChanges {
-
+export class EnsibleItemComponent implements OnChanges, OnInit {
 
   @Input()
   item!: EnsibleItem;
@@ -48,17 +46,14 @@ export class EnsibleItemComponent extends RouteChangeSubcribe implements OnChang
     private rxjsUtils: RxJSUtils,
     private dialogUtils: DialogUtils,
     private router: Router,
-    private ensibleDockerContainerTemplateService: EnsibleDockerContainerTemplateService,
-    route: ActivatedRoute
-  ) {
-    super(route);
-  }
+    private ensibleDockerContainerTemplateService: EnsibleDockerContainerTemplateService
+  ) { }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.onRouteChange();
+    this.ngOnInit();
   }
 
-  override async onRouteChange() {
+  ngOnInit(): void {
     this.itemCopy = structuredClone(this.item);
 
     this.ensibleDockerContainerTemplateService.getAll().pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({

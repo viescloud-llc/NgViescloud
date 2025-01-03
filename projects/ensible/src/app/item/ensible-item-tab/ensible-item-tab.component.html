@@ -4,7 +4,7 @@
     <mat-tab [label]="tabNames[0]" [disabled]="isEditing">
       <app-ensible-item
       [item]="item"
-      (itemChange)="ngOnInit()"
+      (itemChange)="onRouteChange()"
       (isEditing)="isEditing = $event"
       ></app-ensible-item>
     </mat-tab>
@@ -27,7 +27,8 @@
 
   <ng-template #Else>
     <app-ensible-item
-    [(item)]="item"
+    [item]="item"
+    (itemChange)="onRouteChange()"
     ></app-ensible-item>
   </ng-template>
 

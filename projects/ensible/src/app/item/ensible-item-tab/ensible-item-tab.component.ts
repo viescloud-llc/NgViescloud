@@ -1,17 +1,19 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterContentChecked, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { EnsibleItemService } from '../../service/ensible-item/ensible-item.service';
 import { EnsibleItem } from '../../model/ensible.model';
 import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 import { FixChangeDetection } from 'projects/viescloud-utils/src/lib/directive/FixChangeDetection';
+import { RouteChangeSubcribe } from 'projects/viescloud-utils/src/lib/directive/RouteChangeSubcribe.directive';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-ensible-item-tab',
   templateUrl: './ensible-item-tab.component.html',
   styleUrls: ['./ensible-item-tab.component.scss']
 })
-export class EnsibleItemTabComponent extends FixChangeDetection implements OnInit {
+export class EnsibleItemTabComponent extends RouteChangeSubcribe implements AfterContentChecked {
 
   item!: EnsibleItem;
   itemCopy!: EnsibleItem;
@@ -23,12 +25,18 @@ export class EnsibleItemTabComponent extends FixChangeDetection implements OnIni
 
   constructor(
     private ensibleItemService: EnsibleItemService,
-    private rxjsUtils: RxJSUtils
-  ) { 
-    super();
+    private rxjsUtils: RxJSUtils,
+    private cd: ChangeDetectorRef,
+    route: ActivatedRoute
+  ) {
+    super(route);
   }
 
-  ngOnInit(): void {
+  ngAfterContentChecked(): void {
+    this.cd.detectChanges();
+  }
+
+  override async onRouteChange() {
     let id = RouteUtils.getPathVariableAsInteger('item');
     if(!id) {
       this.item = new EnsibleItem();
