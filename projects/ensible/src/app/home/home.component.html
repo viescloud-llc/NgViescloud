@@ -1,9 +1,9 @@
 <ul class="margin-center-li-center">
   <li>
-    <h1>This is surely a cool home page, that is.</h1>
+    <h1>Wellcome to Ensible 👋</h1>
   </li>
   <li>
-    <h2>This is a alpha version product, use with a grain of salt 🤓</h2>
+    <h2>CICD automation tool with Ansible and Docker</h2>
   </li>
   <li *ngIf="!ensibleAuthenticatorService.isLogin()">
     <h3>Please login to do more!</h3>
@@ -69,11 +69,14 @@ nginx_port: 80</code></pre>
 database_password: secret123</code></pre>
 
     <h2>5. Managing Secrets</h2>
-    <p>Use <a href="https://docs.ansible.com/ansible/latest/user_guide/vault.html" target="_blank">Ansible Vault</a> to encrypt sensitive data:</p>
-    <pre><code>ansible-vault encrypt group_vars/dbservers.yml</code></pre>
+    <p>Ensible use <a href="https://docs.ansible.com/ansible/latest/user_guide/vault.html" target="_blank">Ansible Vault</a> to encrypt sensitive data</p>
 
     <h2>6. Item</h2>
     <p>Create item to run and see the result and log</p>
-    <p>ensible also support webhook and cron job run</p>
+    <p>ensible also support webhook and cron job run job</p>
+
+    <h2>7. Docker container template (run environment)</h2>
+    <p>Create Docker container template to run item job within it (require docker to be setup and running on the server)</p>
+    <p>Refer to 👉 <a href="https://www.docker.com/resources/what-container/" target="_blank">Docker ducument here</a> for more information about docker</p>
 </div>
 </ng-container>

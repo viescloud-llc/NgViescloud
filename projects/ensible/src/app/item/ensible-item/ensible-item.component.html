@@ -195,7 +195,7 @@
         <li>
           <app-mat-form-field-input-dynamic
           *ngIf="item.vaultSecretsFilePath"
-          label="Use user password as vault password (not recommended)"
+          label="Use user SHA256 password as vault password (not recommended and working in current version of ensible)"
           [(value)]="item.useUserAsPassword"
           styleWidth="100%"
           [isSlideToggle]="true"
