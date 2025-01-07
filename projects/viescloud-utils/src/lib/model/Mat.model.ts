@@ -26,6 +26,7 @@ export enum MatItemSettingType {
     CUSTOM_PLACEHOLDER = <any>'CustomPlaceholderItem',
     INDEX = <any>'IndexItem',
     TEXT_AREA = <any>'TextAreaItem',
+    RECORD = <any>'RecordItem',
     SLIDE_TOGGLE = <any>'SlideToggleItem',
     VALIDATE_EMAIL = <any>'ValidateEmailItem',
     AUTO_FILL_HTTPS = <any>'AutoFillHttpsItem',
@@ -206,6 +207,7 @@ export class MatFromFieldInputDynamicItem {
     settings: MatItemSetting[] = [];
     index?: number;
     matOptions: MatOption<any>[] = [];
+    isBlankObjectArray: boolean = false;
 
     constructor() {}
 

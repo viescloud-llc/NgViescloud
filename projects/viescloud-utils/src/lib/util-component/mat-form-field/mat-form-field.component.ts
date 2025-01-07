@@ -216,7 +216,7 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
   }
 
   isValueArray(): boolean {
-    return Array.isArray(this.value);
+    return Array.isArray(this.value) || Array.isArray(this.blankObject);
   }
 
   isValueObject(): boolean {

@@ -16,6 +16,7 @@ export enum DynamicMatInputType {
   OBJECT = 'object',
   DATE_TIME = 'dateTime',
   RGB_COLOR = 'rgbColor',
+  RECORD = 'record'
 }
 
 @Component({
@@ -43,6 +44,9 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
 
   @Input()
   isHttps: boolean = false;
+
+  @Input()
+  isRecord: boolean = false;
 
   @Input()
   showGotoButton: boolean = false;
@@ -77,6 +81,9 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
   //dynamic type
   @Input()
   objectLabel?: string;
+
+  @Input()
+  isBlankObjectArray: boolean = false;
 
   items: MatFromFieldInputDynamicItem[] = [];
 
@@ -121,7 +128,11 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
   }
 
   private setInputType() {
-    if(this.isValueNumber())
+    if(this.isValueArray())
+      this.inputType = DynamicMatInputType.ARRAY;
+    else if(this.isValueRecord())
+      this.inputType = DynamicMatInputType.RECORD;
+    else if(this.isValueNumber())
       this.inputType = DynamicMatInputType.NUMBER;
     else if(this.isValueBoolean() && !this.isSlideToggle)
       this.inputType = DynamicMatInputType.BOOLEAN;
@@ -135,8 +146,6 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
       this.inputType = DynamicMatInputType.STRING_MULTIPLE_LINE;
     else if(this.isValueRgbColor())
       this.inputType = DynamicMatInputType.RGB_COLOR;
-    else if(this.isValueArray())
-      this.inputType = DynamicMatInputType.ARRAY;
     else if(this.isValueObject() && !this.isValueArray())
       this.inputType = DynamicMatInputType.OBJECT;
     else
@@ -159,6 +168,7 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
         let item = new MatFromFieldInputDynamicItem();
         item.ref = this.value;
         item.blankObject = this.getKeyBlankObject(key);
+        item.isBlankObjectArray = Array.isArray(this.blankObject[key]);
         item.key = key;
         item.value = this.getValue(key);
         item.settings = this.getSettings(key);
@@ -307,6 +317,14 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
       return typeof this.blankObject === 'number' && !this.isOptions;
     else
       return super.isValueNumber() && !this.isOptions;
+  }
+
+  override isValueArray(): boolean {
+    return this.isBlankObjectArray || super.isValueArray();
+  }
+
+  isValueRecord(): boolean {
+    return this.isRecord;
   }
 
   onValueChangeFn() {

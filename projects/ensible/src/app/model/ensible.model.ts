@@ -266,6 +266,7 @@ export class EnsibleDockerContainerTemplate {
 
   @MatTableHide()
   @MatInputHide()
+  @MatInputItemSetting(MatItemSettingType.RECORD, true)
   environmentVariables: Record<string, string> = {'':''} as Record<string, string>;
 
   @MatTableHide()

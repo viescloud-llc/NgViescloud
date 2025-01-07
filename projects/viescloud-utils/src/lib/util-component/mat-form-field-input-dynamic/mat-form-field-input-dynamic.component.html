@@ -33,10 +33,10 @@
 
   <!-- Boolean Input (slide toggle) -->
   <ng-container *ngSwitchCase="DynamicMatInputType.BOOLEAN_SLIDE_TOGGLE">
-    <mat-slide-toggle 
+    <mat-slide-toggle
       style="margin: 0.05rem;"
       [color]="matColor"
-      [(ngModel)]="value" 
+      [(ngModel)]="value"
       (ngModelChange)="emitValue()"
       (toggleChange)="emitValue()"
       [disabled]="disable"
@@ -155,8 +155,10 @@
           [showListAddItemButton]="containListShowAddItemButton(item)"
           [showListRemoveItemButton]="containListShowRemoveItemButton(item)"
           [matOptions]="item.matOptions"
+          [isBlankObjectArray]="item.isBlankObjectArray"
           (onValueChange)="onValueChangeFn()"
           [indent]="indent"
+          [isRecord]="containSetting(item, MatItemSettingType.RECORD)"
           [showGotoButton]="containSetting(item, MatItemSettingType.SHOW_GOTO_BUTTON)"
         ></app-mat-form-field-input-dynamic>
       </li>

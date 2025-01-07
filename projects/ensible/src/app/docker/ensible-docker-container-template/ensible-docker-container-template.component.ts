@@ -56,8 +56,6 @@ export class EnsibleDockerContainerTemplateComponent extends RouteChangeSubcribe
 
   private updateTemplate(ensibleDockerContainerTemplate: EnsibleDockerContainerTemplate) {
     this.ensibleDockerContainerTemplate = ensibleDockerContainerTemplate;
-    this.ensibleDockerContainerTemplate.extraParameters = this.ensibleDockerContainerTemplate.extraParameters ?? [];
-    this.ensibleDockerContainerTemplate.postArguments = this.ensibleDockerContainerTemplate.postArguments ?? [];
     this.ensibleDockerContainerTemplateCopy = structuredClone(this.ensibleDockerContainerTemplate);
   }
 
