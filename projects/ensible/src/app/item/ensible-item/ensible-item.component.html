@@ -34,6 +34,16 @@
     ></app-mat-form-field-input-option>
   </li>
   <li>
+    <app-mat-form-field-input-record
+    label="Variables"
+    [(value)]="item.variables"
+    styleWidth="100%"
+    [blankObject]="blankItem.variables"
+    [showSizeInput]="false"
+    ></app-mat-form-field-input-record>
+    <br>
+  </li>
+  <li>
     <details>
       <summary>Trigger</summary>
       <ul>

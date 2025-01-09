@@ -1,4 +1,4 @@
-import { DateTime, MatInputDisable, MatInputDisplayLabel, MatInputEnum, MatInputHide, MatInputItemSetting, MatInputRequire, MatInputSetting, MatItemSettingType, MatOption, MatTableDisplayLabel, MatTableHide } from "projects/viescloud-utils/src/lib/model/Mat.model";
+import { DateTime, MatInputDisable, MatInputDisplayLabel, MatInputEnum, MatInputHide, MatInputItemSetting, MatInputReadOnly, MatInputRequire, MatInputSetting, MatItemSettingType, MatOption, MatTableDisplayLabel, MatTableHide } from "projects/viescloud-utils/src/lib/model/Mat.model";
 
 export enum EnsibleExecuteOptions {
   bash,
@@ -149,6 +149,9 @@ export class EnsibleItem {
   cronExpression: string = '';
 
   @MatTableHide()
+  variables: Record<string, string> = {'key':'value'} as Record<string, string>;
+
+  @MatTableHide()
   dockerContainerTemplate?: EnsibleDockerContainerTemplate = new EnsibleDockerContainerTemplate();
 }
 
@@ -232,7 +235,7 @@ export const VERPOSITY_OPTIONS: MatOption<string>[] = [
 
 export class EnsibleDockerContainerTemplate {
 
-  @MatInputDisable()
+  @MatInputReadOnly()
   id: number = 0;
 
   @MatInputRequire()
@@ -261,13 +264,21 @@ export class EnsibleDockerContainerTemplate {
   postArguments: string[] = [''] as string[];
 
   @MatTableHide()
-  @MatInputDisplayLabel('Privileged')
-  privileged: boolean = false;
+  @MatInputItemSetting(MatItemSettingType.RECORD, true)
+  @MatInputItemSetting(MatItemSettingType.LIST_SHOW_ADD_ITEM_BUTTON, true)
+  @MatInputItemSetting(MatItemSettingType.LIST_SHOW_REMOVE_ITEM_BUTTON, true)
+  @MatInputDisplayLabel('Environment variables')
+  environmentVariables: Record<string, string> = {'key':'value'} as Record<string, string>;
 
   @MatTableHide()
-  @MatInputHide()
-  @MatInputItemSetting(MatItemSettingType.RECORD, true)
-  environmentVariables: Record<string, string> = {'':''} as Record<string, string>;
+  @MatInputEnum(EnsibleExecuteOptions)
+  @MatInputRequire()
+  @MatInputDisplayLabel('Execute with')
+  executeWith: string = '';
+
+  @MatTableHide()
+  @MatInputDisplayLabel('Privileged')
+  privileged: boolean = false;
 
   @MatTableHide()
   @MatInputDisplayLabel('Skip run if docker is not running')
@@ -284,12 +295,6 @@ export class EnsibleDockerContainerTemplate {
   @MatTableHide()
   @MatInputDisplayLabel('Bind docker socket to container')
   bindDockerSocket: boolean = false;
-
-  @MatTableHide()
-  @MatInputEnum(EnsibleExecuteOptions)
-  @MatInputRequire()
-  @MatInputDisplayLabel('Execute with')
-  executeWith: string = '';
 }
 
 export class EnsibleDockerContainer {

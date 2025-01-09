@@ -1,12 +1,10 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { AfterContentChecked, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { EnsibleDockerContainerTemplate } from '../../model/ensible.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EnsibleDockerContainerTemplateService } from '../../service/ensible-docker-container-template/ensible-docker-container-template.service';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
-import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
-import { MatDialog } from '@angular/material/dialog';
 import { EnsiblePullImageDialog } from '../../dialog/ensible-pull-image-dialog/ensible-pull-image-dialog.component';
 import { EnsibleDockerService } from '../../service/ensible-docker/ensible-docker.service';
 import { RouteChangeSubcribe } from 'projects/viescloud-utils/src/lib/directive/RouteChangeSubcribe.directive';
@@ -17,7 +15,7 @@ import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils'
   templateUrl: './ensible-docker-container-template.component.html',
   styleUrls: ['./ensible-docker-container-template.component.scss']
 })
-export class EnsibleDockerContainerTemplateComponent extends RouteChangeSubcribe {
+export class EnsibleDockerContainerTemplateComponent extends RouteChangeSubcribe implements AfterContentChecked {
 
   ensibleDockerContainerTemplate!: EnsibleDockerContainerTemplate;
   ensibleDockerContainerTemplateCopy!: EnsibleDockerContainerTemplate;
@@ -32,16 +30,20 @@ export class EnsibleDockerContainerTemplateComponent extends RouteChangeSubcribe
     private ensibleDockerService: EnsibleDockerService,
     private rxjsUtils: RxJSUtils,
     private dialogUtils: DialogUtils,
+    private cd: ChangeDetectorRef,
     route: ActivatedRoute
   ) {
     super(route);
   }
 
+  ngAfterContentChecked(): void {
+    this.cd.detectChanges();
+  }
+
   override async onRouteChange() {
     let id = RouteUtils.getPathVariableAsInteger('template');
     if(!id) {
-      this.ensibleDockerContainerTemplate = DataUtils.purgeArray(new EnsibleDockerContainerTemplate());
-      this.ensibleDockerContainerTemplateCopy = structuredClone(this.ensibleDockerContainerTemplate);
+      this.updateTemplate(DataUtils.purgeArray(new EnsibleDockerContainerTemplate()));
     }
     else {
       this.ensibleDockerContainerTemplateService.get(id).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
@@ -72,7 +74,7 @@ export class EnsibleDockerContainerTemplateComponent extends RouteChangeSubcribe
             this.router.navigate([link]);
           }
 
-          this.updateTemplate(res);
+          this.onRouteChange();
         }
       })
     }

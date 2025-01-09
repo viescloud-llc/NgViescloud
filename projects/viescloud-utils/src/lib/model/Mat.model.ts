@@ -22,6 +22,7 @@ export enum MatType {
 export enum MatItemSettingType {
     REQUIRE = <any>'RequireItem',
     DISABLE = <any>'DisableItem',
+    READ_ONLY = <any>'ReadOnlyItem',
     CUSTOM_LABEL = <any>'CustomLabelItem',
     CUSTOM_PLACEHOLDER = <any>'CustomPlaceholderItem',
     INDEX = <any>'IndexItem',
@@ -37,6 +38,7 @@ export enum MatItemSettingType {
     LIST_SHOW_LIST_SIZE_INPUT = <any>'ListShowListSizeInputItem',
     LIST_SHOW_REMOVE_ITEM_BUTTON = <any>'ListShowRemoveItemButtonItem',
     LIST_SHOW_ADD_ITEM_BUTTON = <any>'ListShowAddItemButtonItem',
+    LIST_REQUIRE = <any>'ListRequireItem'
 }
 
 export enum MatTableSettingType {
@@ -319,6 +321,12 @@ export const MatInputHideAll = (hide: boolean, keys: string[]) => {
             addValue(object.prototype, key, MatItemSettingType.HIDE.toString(), hide, true);
         }
     }
+}
+
+export const MatInputReadOnly = (readonly?: boolean) => {
+  return function MatInputReadOnly(object: any, key: any) {
+      addValue(object, key, MatItemSettingType.READ_ONLY.toString(), readonly, true);
+  }
 }
 
 /**

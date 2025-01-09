@@ -78,6 +78,7 @@ export class MatTablePathComponent<T> extends FixChangeDetection implements OnIn
 
     this.parseTableMap();
     this.parseTableRow();
+    this.onPathChange.emit(this.currentPath);
   }
 
   checkValidPath() {

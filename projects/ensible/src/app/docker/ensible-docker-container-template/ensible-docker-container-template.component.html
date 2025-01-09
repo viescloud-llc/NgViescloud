@@ -36,7 +36,7 @@
     <button mat-raised-button color="primary" (click)="save()" [disabled]="!validForm || !isValueChange()">Save</button>
     <button mat-raised-button color="warn" (click)="revert()" [disabled]="!isValueChange()">Revert</button>
     <button mat-raised-button color="primary" (click)="pullImage()" [disabled]="!validForm || !dockerReady">Pull image</button>
-    <button *ngIf="ensibleDockerContainerTemplate.id" mat-raised-button color="warn" (click)="deleteContainerTemplate()">Delete container template</button>
+    <button *ngIf="ensibleDockerContainerTemplate && ensibleDockerContainerTemplate.id" mat-raised-button color="warn" (click)="deleteContainerTemplate()">Delete container template</button>
   </li>
 
 </ul>

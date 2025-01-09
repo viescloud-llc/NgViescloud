@@ -54,6 +54,13 @@ export class EnsibleItemComponent implements OnChanges, OnInit {
   }
 
   ngOnInit(): void {
+    if(this.item.id === 0) {
+      let path = RouteUtils.getDecodedQueryParam('path');
+      if(path) {
+        this.item.path = path;
+      }
+    }
+
     this.itemCopy = structuredClone(this.item);
 
     this.ensibleDockerContainerTemplateService.getAll().pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({

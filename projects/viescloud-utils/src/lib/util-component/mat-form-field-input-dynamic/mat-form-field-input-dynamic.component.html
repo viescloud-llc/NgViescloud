@@ -12,6 +12,7 @@
       [required]="required"
       defaultType="number"
       [blankObject]="0"
+      [readonly]="readonly"
     ></app-mat-form-field-input>
   </ng-container>
 
@@ -28,6 +29,7 @@
       [disable]="disable"
       [required]="required"
       [blankObject]="blankObject"
+      [readonly]="readonly"
     ></app-mat-form-field-input-option>
   </ng-container>
 
@@ -58,6 +60,7 @@
       [disable]="disable"
       [required]="required"
       [blankObject]="blankObject"
+      [readonly]="readonly"
     ></app-mat-form-field-input-option>
   </ng-container>
 
@@ -77,6 +80,7 @@
       [disable]="disable"
       [required]="required"
       [blankObject]="''"
+      [readonly]="readonly"
     ></app-mat-form-field-input>
   </ng-container>
 
@@ -92,7 +96,30 @@
       [disable]="disable"
       [required]="required"
       [blankObject]="''"
+      [readonly]="readonly"
     ></app-mat-form-field-input-text-area>
+  </ng-container>
+
+  <!-- Record input -->
+  <ng-container *ngSwitchCase="DynamicMatInputType.RECORD">
+    <app-mat-form-field-input-record
+    [label]="label"
+    [placeholder]="placeholder"
+    [(value)]="value"
+    (onValueChange)="emitValue()"
+    [required]="required"
+    [styleWidth]="styleWidth"
+    [disable]="disable"
+    [required]="required"
+    [blankObject]="blankObject"
+    [showSizeInput]="showListSizeInput"
+    [showAddItemButton]="showListAddItemButton"
+    [showRemoveItemButton]="showListRemoveItemButton"
+    [blankObject]="blankObject"
+    [readonly]="readonly"
+    [minSize]="listRequired ? 1 : 0"
+    ></app-mat-form-field-input-record>
+    <br>
   </ng-container>
 
   <!-- rgb color Input -->
@@ -106,6 +133,7 @@
     [disable]="disable"
     [required]="required"
     [blankObject]="blankObject"
+    [readonly]="readonly"
     ></app-mat-form-field-input-rgb-color-picker>
     <br>
   </ng-container>
@@ -126,6 +154,8 @@
       [showAddItemButton]="showListAddItemButton"
       [showRemoveItemButton]="showListRemoveItemButton"
       [blankObject]="blankObject"
+      [readonly]="readonly"
+      [minSize]="listRequired ? 1 : 0"
     ></app-mat-form-field-input-list>
     <br>
   </ng-container>
@@ -143,23 +173,25 @@
           [value]="item.value" (valueChange)="item.setValueFn($event)"
           [styleWidth]="styleWidth"
           [isSlideToggle]="containSetting(item, MatItemSettingType.SLIDE_TOGGLE)"
-          [disable]="containDisable(item)"
-          [required]="containRequire(item)"
-          [isTextArea]="containTextArea(item)"
-          [isOptions]="containOptions(item)"
-          [isEmail]="containValidateEmail(item)"
-          [isHttps]="containAutoFillHttps(item)"
-          [blankObject]="item.blankObject"
-          [objectLabel]="item.key"
-          [showListSizeInput]="containListShowInputSize(item)"
-          [showListAddItemButton]="containListShowAddItemButton(item)"
-          [showListRemoveItemButton]="containListShowRemoveItemButton(item)"
+          [disable]="containSetting(item, MatItemSettingType.DISABLE)"
+          [required]="containSetting(item, MatItemSettingType.REQUIRE)"
+          [isTextArea]="containSetting(item, MatItemSettingType.TEXT_AREA)"
+          [isOptions]="containSetting(item, MatItemSettingType.OPTIONS)"
+          [isEmail]="containSetting(item, MatItemSettingType.VALIDATE_EMAIL)"
+          [isHttps]="containSetting(item, MatItemSettingType.AUTO_FILL_HTTPS)"
+          [showListSizeInput]="containSetting(item, MatItemSettingType.LIST_SHOW_LIST_SIZE_INPUT)"
+          [showListAddItemButton]="containSetting(item, MatItemSettingType.LIST_SHOW_ADD_ITEM_BUTTON)"
+          [showListRemoveItemButton]="containSetting(item, MatItemSettingType.LIST_SHOW_REMOVE_ITEM_BUTTON)"
+          [isRecord]="containSetting(item, MatItemSettingType.RECORD)"
+          [showGotoButton]="containSetting(item, MatItemSettingType.SHOW_GOTO_BUTTON)"
+          [readonly]="containSetting(item, MatItemSettingType.READ_ONLY)"
+          [listRequired]="containSetting(item, MatItemSettingType.LIST_REQUIRE)"
           [matOptions]="item.matOptions"
           [isBlankObjectArray]="item.isBlankObjectArray"
           (onValueChange)="onValueChangeFn()"
           [indent]="indent"
-          [isRecord]="containSetting(item, MatItemSettingType.RECORD)"
-          [showGotoButton]="containSetting(item, MatItemSettingType.SHOW_GOTO_BUTTON)"
+          [blankObject]="item.blankObject"
+          [objectLabel]="item.key"
         ></app-mat-form-field-input-dynamic>
       </li>
     </ul>

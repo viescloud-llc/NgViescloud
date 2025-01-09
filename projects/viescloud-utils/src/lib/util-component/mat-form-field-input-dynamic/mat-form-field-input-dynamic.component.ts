@@ -49,6 +49,9 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
   isRecord: boolean = false;
 
   @Input()
+  isBlankObjectArray: boolean = false;
+
+  @Input()
   showGotoButton: boolean = false;
 
   @Input()
@@ -61,10 +64,16 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
   showListAddItemButton: boolean = true;
 
   @Input()
+  listRequired: boolean = false;
+
+  @Input()
   indent: boolean = true;
 
   @Input()
   matOptions?: MatOption<any>[];
+
+  @Input()
+  objectLabel?: string;
 
   // mat option
   options: MatOption<any>[] = [
@@ -77,13 +86,6 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
       valueLabel: "FALSE"
     }
   ];
-
-  //dynamic type
-  @Input()
-  objectLabel?: string;
-
-  @Input()
-  isBlankObjectArray: boolean = false;
 
   items: MatFromFieldInputDynamicItem[] = [];
 
@@ -245,6 +247,7 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
     return settings;
   }
 
+  //?
   public getTextAreaSettingValue(key: string): boolean {
     if(this.isTextArea)
       return true;
@@ -258,46 +261,6 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
     let prototype = Object.getPrototypeOf(this.blankObject!);
     let name = key + MatItemSettingType.HIDE.toString();
     return Object.hasOwn(prototype, name) && !!prototype[name];
-  }
-
-  public containHide(item: MatFromFieldInputDynamicItem) {
-    return item.containSetting(MatItemSettingType.HIDE);
-  }
-
-  public containRequire(item: MatFromFieldInputDynamicItem) {
-    return item.containSetting(MatItemSettingType.REQUIRE);
-  }
-
-  public containDisable(item: MatFromFieldInputDynamicItem) {
-    return item.containSetting(MatItemSettingType.DISABLE);
-  }
-
-  public containTextArea(item: MatFromFieldInputDynamicItem) {
-    return item.containSetting(MatItemSettingType.TEXT_AREA);
-  }
-
-  public containValidateEmail(item: MatFromFieldInputDynamicItem) {
-    return item.containSetting(MatItemSettingType.VALIDATE_EMAIL);
-  }
-
-  public containAutoFillHttps(item: MatFromFieldInputDynamicItem) {
-    return item.containSetting(MatItemSettingType.AUTO_FILL_HTTPS);
-  }
-
-  public containListShowInputSize(item: MatFromFieldInputDynamicItem) {
-    return item.containSetting(MatItemSettingType.LIST_SHOW_LIST_SIZE_INPUT);
-  }
-
-  public containListShowAddItemButton(item: MatFromFieldInputDynamicItem) {
-    return item.containSetting(MatItemSettingType.LIST_SHOW_ADD_ITEM_BUTTON);
-  }
-
-  public containListShowRemoveItemButton(item: MatFromFieldInputDynamicItem) {
-    return item.containSetting(MatItemSettingType.LIST_SHOW_REMOVE_ITEM_BUTTON);
-  }
-
-  public containOptions(item: MatFromFieldInputDynamicItem) {
-    return item.containSetting(MatItemSettingType.OPTIONS);
   }
 
   public containSetting(item: MatFromFieldInputDynamicItem, matItemSettingType: MatItemSettingType) {

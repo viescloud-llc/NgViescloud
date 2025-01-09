@@ -29,6 +29,7 @@ import { DisableKeyCaptureOnInputDirective } from '../directive/DisableKeyCaptur
 import { HeaderMinimalComponent } from '../share-component/header-minimal/header-minimal.component';
 import { CodeEditorComponent } from '../util-component/code-editor/code-editor.component';
 import { MatTablePathComponent } from '../util-component/mat-table-path/mat-table-path.component';
+import { MatFormFieldInputRecordComponent } from '../util-component/mat-form-field-input-record/mat-form-field-input-record.component';
 
 const UTILS = [
   CopyToClipboardUtilComponent,
@@ -47,6 +48,7 @@ const UTILS = [
   MatFormFieldInputDynamicComponent,
   MatFormFieldInputListOptionComponent,
   MatFormFieldInputRgbColorPickerComponent,
+  MatFormFieldInputRecordComponent,
   ClickStopPropagationDirective,
   TooltipDirective,
   ApplicationSettingComponent,

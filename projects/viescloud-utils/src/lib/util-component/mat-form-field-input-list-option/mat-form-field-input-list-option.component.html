@@ -1,7 +1,7 @@
-<mat-expansion-panel appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
+<mat-expansion-panel [ngStyle]="{width: styleWidth || 'max-content'}" appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
   <mat-expansion-panel-header>
     <mat-panel-title>
-      List of {{label}}
+      {{label}}
     </mat-panel-title>
     <mat-panel-description>
       Size: {{value.length}} {{minSize > 0 ? '*' : ''}}

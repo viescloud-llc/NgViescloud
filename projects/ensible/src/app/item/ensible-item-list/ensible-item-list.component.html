@@ -34,6 +34,7 @@
     [savePathToLocalStorage]="true"
     [unixStyleBack]="true"
     [readonlyPathInput]="true"
+    (onPathChange)="currentPath = $event"
     ></app-mat-table-path>
   </li>
 </ul>

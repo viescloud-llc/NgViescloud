@@ -16,6 +16,8 @@ export class EnsibleItemListComponent implements OnInit {
 
   useTable = false;
 
+  currentPath = '/';
+
   constructor(
     private ensibleItemService: EnsibleItemService,
     private rxjsUtils: RxJSUtils,
@@ -31,7 +33,7 @@ export class EnsibleItemListComponent implements OnInit {
   }
 
   addItem() {
-    this.router.navigate(['item', 0]);
+    this.router.navigate(["item", 0], {queryParams: {path: this.currentPath}});
   }
 
   selectItem(item: EnsibleItem) {
