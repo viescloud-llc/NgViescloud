@@ -39,7 +39,7 @@ export class EnsibleItemTabComponent extends RouteChangeSubcribe implements Afte
   override async onRouteChange() {
     let id = RouteUtils.getPathVariableAsInteger('item');
     if(!id) {
-      this.item = new EnsibleItem();
+      this.item = DataUtils.purgeValue(new EnsibleItem());
       this.item.dockerContainerTemplate = undefined;
     }
     else {

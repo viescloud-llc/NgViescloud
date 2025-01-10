@@ -40,6 +40,7 @@
     styleWidth="100%"
     [blankObject]="blankItem.variables"
     [showSizeInput]="false"
+    [required]="true"
     ></app-mat-form-field-input-record>
     <br>
   </li>
@@ -241,7 +242,7 @@
     <br>
   </li>
 
-  <li class="flex-row-container">
+  <li class="flex-row-container-auto">
     <button mat-raised-button color="primary" (click)="save()" [disabled]="!validForm || !isValueChange()">Save</button>
     <button mat-raised-button color="warn" (click)="revert()" [disabled]="!isValueChange()">Revert</button>
     <button *ngIf="item.id" mat-raised-button color="warn" (click)="deleteItem()">Delete</button>

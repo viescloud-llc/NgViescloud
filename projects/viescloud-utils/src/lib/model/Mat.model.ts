@@ -351,6 +351,11 @@ export const MatInputExpansionPanel = (disable?: boolean) => {
     }
 }
 
+export const MatInputRecord = (disable?: boolean) => {
+  return function MatInputRecord(object: any, key: any) {
+      addValue(object, key, MatItemSettingType.RECORD.toString(), disable, true);
+  }
+}
 
 /**
  * This function generates options for a dynamic input field.

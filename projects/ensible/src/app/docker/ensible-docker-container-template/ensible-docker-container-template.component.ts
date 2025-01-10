@@ -43,7 +43,7 @@ export class EnsibleDockerContainerTemplateComponent extends RouteChangeSubcribe
   override async onRouteChange() {
     let id = RouteUtils.getPathVariableAsInteger('template');
     if(!id) {
-      this.updateTemplate(DataUtils.purgeArray(new EnsibleDockerContainerTemplate()));
+      this.updateTemplate(DataUtils.purgeValue(new EnsibleDockerContainerTemplate()));
     }
     else {
       this.ensibleDockerContainerTemplateService.get(id).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({

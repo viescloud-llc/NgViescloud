@@ -3,6 +3,8 @@ import { EnsibleItemService } from '../../service/ensible-item/ensible-item.serv
 import { EnsibleItem } from '../../model/ensible.model';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 import { Router } from '@angular/router';
+import { EnsibleSettingService } from '../../service/ensible-setting/ensible-setting.service';
+import { EnsibleSetting } from '../../model/ensible.setting.model';
 
 @Component({
   selector: 'app-ensible-item-list',
@@ -21,7 +23,8 @@ export class EnsibleItemListComponent implements OnInit {
   constructor(
     private ensibleItemService: EnsibleItemService,
     private rxjsUtils: RxJSUtils,
-    private router: Router
+    private router: Router,
+    private ensibleSettingService: EnsibleSettingService
   ) { }
 
   ngOnInit(): void {
@@ -30,6 +33,8 @@ export class EnsibleItemListComponent implements OnInit {
         this.items = res;
       }
     })
+
+    this.useTable = !this.ensibleSettingService.getCopyOfGeneralSetting<EnsibleSetting>().UseTreeDisplayForItemList;
   }
 
   addItem() {

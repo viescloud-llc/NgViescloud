@@ -1,4 +1,4 @@
-import { Component, EventEmitter, forwardRef, Input, Output } from '@angular/core';
+import { Component, EventEmitter, forwardRef, Input, Output, SimpleChanges } from '@angular/core';
 import { DataUtils } from '../../util/Data.utils';
 import { MatFormFieldComponent } from '../mat-form-field/mat-form-field.component';
 
@@ -68,17 +68,23 @@ export class MatFormFieldInputRecordComponent<K extends string | number, V> exte
         this.keypairs.push(new KeyPair<K, V>(key, value));
       })
     }
+
+    this.checkValidKeyPair();
   }
 
   override isValidInput(): boolean {
     let superCheck = super.isValidInput();
-    this.validKeyPair = !this.hasDuplicateKeysInKeyPairs();
+    this.checkValidKeyPair();
     if(!superCheck)
       return superCheck;
     else if(this.getRecordSize() < this.minSize)
       return false;
     else
       return this.validForm && this.validKeyPair;
+  }
+
+  checkValidKeyPair() {
+    this.validKeyPair = !this.hasDuplicateKeysInKeyPairs();
   }
 
   private hasDuplicateKeysInKeyPairs(keyPairs: KeyPair<K, V>[] = this.keypairs): boolean {
@@ -158,12 +164,14 @@ export class MatFormFieldInputRecordComponent<K extends string | number, V> exte
     this.keypairs.push(new KeyPair<K, V>(this.getBlankKey(), this.getBlankValue()));
     this.listLength = this.getKeyPairsSize();
     this.applyValue();
+    this.checkValidKeyPair();
   }
 
   remove(index: number) {
     this.keypairs.splice(index, 1);
     this.listLength = this.getKeyPairsSize();
     this.applyValue();
+    this.checkValidKeyPair();
   }
 
   reachMaxSize() {

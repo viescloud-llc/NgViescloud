@@ -1,9 +1,11 @@
+import { EnsibleSetting } from './../../model/ensible.setting.model';
 import { EnsibleDockerContainerTemplate } from './../../model/ensible.model';
 import { EnsibleDockerContainerTemplateService } from './../../service/ensible-docker-container-template/ensible-docker-container-template.service';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
+import { EnsibleSettingService } from '../../service/ensible-setting/ensible-setting.service';
 
 @Component({
   selector: 'app-ensible-docker-container-template-list',

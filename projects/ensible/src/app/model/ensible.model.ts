@@ -1,4 +1,5 @@
-import { DateTime, MatInputDisable, MatInputDisplayLabel, MatInputEnum, MatInputHide, MatInputItemSetting, MatInputReadOnly, MatInputRequire, MatInputSetting, MatItemSettingType, MatOption, MatTableDisplayLabel, MatTableHide } from "projects/viescloud-utils/src/lib/model/Mat.model";
+import { DateTime, MatInputDisable, MatInputDisplayLabel, MatInputEnum, MatInputHide, MatInputItemSetting, MatInputReadOnly, MatInputRecord, MatInputRequire, MatInputSetting, MatItemSettingType, MatOption, MatTableDisplayLabel, MatTableHide } from "projects/viescloud-utils/src/lib/model/Mat.model";
+import { DataUtils } from "projects/viescloud-utils/src/lib/util/Data.utils";
 
 export enum EnsibleExecuteOptions {
   bash,
@@ -149,6 +150,7 @@ export class EnsibleItem {
   cronExpression: string = '';
 
   @MatTableHide()
+  @MatInputRecord()
   variables: Record<string, string> = {'key':'value'} as Record<string, string>;
 
   @MatTableHide()
@@ -264,6 +266,7 @@ export class EnsibleDockerContainerTemplate {
   postArguments: string[] = [''] as string[];
 
   @MatTableHide()
+  @MatInputRequire()
   @MatInputItemSetting(MatItemSettingType.RECORD, true)
   @MatInputItemSetting(MatItemSettingType.LIST_SHOW_ADD_ITEM_BUTTON, true)
   @MatInputItemSetting(MatItemSettingType.LIST_SHOW_REMOVE_ITEM_BUTTON, true)

@@ -9,6 +9,11 @@ export class EnsibleSetting extends GeneralSetting {
   @MatInputIndex(14)
   hideWorkspaceTree: boolean = true;
 
+  @MatInputItemSetting(MatItemSettingType.SLIDE_TOGGLE, true)
+  @MatInputDisplayLabel('Use tree display for item list')
+  @MatInputIndex(15)
+  UseTreeDisplayForItemList: boolean = true;
+
   constructor() {
     super();
     ReflectionUtils.copyAllParentPrototype(this);
