@@ -98,15 +98,12 @@ export class EnsibleItemComponent implements OnChanges, OnInit {
         this.itemChange.emit(res);
       },
       error: err => {
-        this.dialogUtils.openErrorMessage("Saving Error", 'Error saving item, please try again or refresh the page if the error persists');
+        this.dialogUtils.openErrorMessageFromError(err, 'Saving Error', 'Error saving item, please try again or refresh the page if the error persists');
       }
     })
   }
 
   revert() {
-    // console.log(JSON.stringify(this.item));
-    // console.log('vs')
-    // console.log(JSON.stringify(this.itemCopy));
     this.item = structuredClone(this.itemCopy);
   }
 
@@ -120,7 +117,7 @@ export class EnsibleItemComponent implements OnChanges, OnInit {
         this.router.navigate(['item', 'all']);
       },
       error: err => {
-        this.dialogUtils.openErrorMessage("Deleting Error", 'Error deleting item, please try again or refresh the page if the error persists');
+        this.dialogUtils.openErrorMessageFromError(err, 'Deleting Error', 'Error deleting item, please try again or refresh the page if the error persists');
       }
     })
   }

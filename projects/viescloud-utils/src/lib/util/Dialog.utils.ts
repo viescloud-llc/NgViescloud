@@ -37,21 +37,21 @@ export class DialogUtils {
         return dialog;
     }
 
-    openErrorMessageFromError(error: any) {
-      return DialogUtils.openErrorMessageFromError(this.matDialog, error);
+    openErrorMessageFromError(error: any, title: string = "Error!", defaultMessage: string = "An unexpected error has occurred") {
+      return DialogUtils.openErrorMessageFromError(this.matDialog, error, title, defaultMessage);
     }
 
-    static openErrorMessageFromError(matDialog: MatDialog, error: any) {
+    static openErrorMessageFromError(matDialog: MatDialog, error: any, title: string = "Error!", defaultMessage: string = "An unexpected error has occurred") {
       if(DataUtils.isInstanceOf(error, new ViesErrorResponse())) {
         let err = error as ViesErrorResponse;
-        return DialogUtils.openErrorMessage(matDialog, "Error!", err.reason ?? "An unexpected error has occurred");
+        return DialogUtils.openErrorMessage(matDialog, title, err.reason ?? defaultMessage);
       }
       else if(DataUtils.isInstanceOf(error.error, new ViesErrorResponse())) {
         let err = error.error as ViesErrorResponse;
-        return DialogUtils.openErrorMessage(matDialog, "Error!", err.reason ?? "An unexpected error has occurred");
+        return DialogUtils.openErrorMessage(matDialog, title, err.reason ?? defaultMessage);
       }
       else {
-        return DialogUtils.openErrorMessage(matDialog, "Error!", "An unexpected error has occurred");
+        return DialogUtils.openErrorMessage(matDialog, title, defaultMessage);
       }
     }
 
