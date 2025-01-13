@@ -12,6 +12,8 @@ import { EnsibleWorkspaceParserService } from '../service/ensible-workspace/ensi
 import { EnsibleVaultService } from '../service/ensible-vault/ensible-vault.service';
 import { EnsibleWorkSpace } from '../model/ensible.parser.model';
 import { CodeEditorComponent } from 'projects/viescloud-utils/src/lib/util-component/code-editor/code-editor.component';
+import { CanDeactivateGuard, ComponentCanDeactivate } from 'projects/viescloud-utils/src/lib/guards/auth.guard';
+import { Observable } from 'rxjs';
 
 enum FileType {
   INVENTORY = 'inventory',
@@ -27,7 +29,7 @@ enum FileType {
   templateUrl: './ensible-fs.component.html',
   styleUrls: ['./ensible-fs.component.scss']
 })
-export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges, AfterContentChecked {
+export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges, AfterContentChecked, ComponentCanDeactivate {
 
   private prefixPath: string = '/file';
 
@@ -81,6 +83,10 @@ export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges
     route: ActivatedRoute,
   ) {
     super(route);
+  }
+
+  canDeactivate(): Observable<boolean> | Promise<boolean> | boolean {
+    return CanDeactivateGuard.canDeactivateDialog(this.isValueChange(), this.dialogUtils.matDialog);
   }
 
   ngAfterContentChecked(): void {

@@ -9,13 +9,15 @@ import { EnsiblePullImageDialog } from '../../dialog/ensible-pull-image-dialog/e
 import { EnsibleDockerService } from '../../service/ensible-docker/ensible-docker.service';
 import { RouteChangeSubcribe } from 'projects/viescloud-utils/src/lib/directive/RouteChangeSubcribe.directive';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
+import { CanDeactivateGuard, ComponentCanDeactivate } from 'projects/viescloud-utils/src/lib/guards/auth.guard';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-ensible-docker-container-template',
   templateUrl: './ensible-docker-container-template.component.html',
   styleUrls: ['./ensible-docker-container-template.component.scss']
 })
-export class EnsibleDockerContainerTemplateComponent extends RouteChangeSubcribe implements AfterContentChecked {
+export class EnsibleDockerContainerTemplateComponent extends RouteChangeSubcribe implements AfterContentChecked, ComponentCanDeactivate {
 
   ensibleDockerContainerTemplate!: EnsibleDockerContainerTemplate;
   ensibleDockerContainerTemplateCopy!: EnsibleDockerContainerTemplate;
@@ -34,6 +36,10 @@ export class EnsibleDockerContainerTemplateComponent extends RouteChangeSubcribe
     route: ActivatedRoute
   ) {
     super(route);
+  }
+
+  canDeactivate(): Observable<boolean> | Promise<boolean> | boolean {
+    return CanDeactivateGuard.canDeactivateDialog(this.isValueChange(), this.dialogUtils.matDialog);
   }
 
   ngAfterContentChecked(): void {

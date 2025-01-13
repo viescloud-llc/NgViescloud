@@ -138,8 +138,6 @@ export class EnsibleItem {
   vaultSecretsFilePath: string = '';
   @MatTableHide()
   vaultPasswordFilePath: string = '';
-  @MatTableHide()
-  useUserAsPassword: boolean = false;
 
   path: string = '';
 

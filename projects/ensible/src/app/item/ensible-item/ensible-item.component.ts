@@ -12,7 +12,6 @@ import { EnsibleService } from '../../service/ensible/ensible.service';
 import { StringUtils } from 'projects/viescloud-utils/src/lib/util/String.utils';
 import { EnsibleDockerContainerTemplateService } from '../../service/ensible-docker-container-template/ensible-docker-container-template.service';
 import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
-import { FixChangeDetection } from 'projects/viescloud-utils/src/lib/directive/FixChangeDetection';
 
 @Component({
   selector: 'app-ensible-item',

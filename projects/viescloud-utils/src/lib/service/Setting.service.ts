@@ -45,8 +45,8 @@ export class SettingService {
 
   constructor(
     private s3StorageService: S3StorageServiceV1,
-    private matDialog: MatDialog,
-    private snackBar: MatSnackBar,
+    protected matDialog: MatDialog,
+    protected snackBar: MatSnackBar,
     private openIdService: OpenIdService
   ) { }
 

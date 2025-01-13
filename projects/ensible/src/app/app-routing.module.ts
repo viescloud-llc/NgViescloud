@@ -1,5 +1,5 @@
 import { inject, NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { RouterModule, Routes, CanDeactivate } from '@angular/router';
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { EnsibleSettingComponent } from './ensible-setting/ensible-setting.component';
@@ -14,6 +14,8 @@ import { EnsibleFsListComponent } from './ensible-fs-list/ensible-fs-list.compon
 import { EnsibleUserSettingComponent } from './ensible-user-setting/ensible-user-setting.component';
 import { EnsibleDockerContainerTemplateListComponent } from './docker/ensible-docker-container-template-list/ensible-docker-container-template-list.component';
 import { EnsibleDockerContainerTemplateComponent } from './docker/ensible-docker-container-template/ensible-docker-container-template.component';
+import { EnsibleSettingService } from './service/ensible-setting/ensible-setting.service';
+import { CanDeactivateGuard } from 'projects/viescloud-utils/src/lib/guards/auth.guard';
 
 const routes: Routes = [
   {
@@ -61,7 +63,8 @@ const routes: Routes = [
     children: [
       {
         path: '**',
-        component: EnsibleFsComponent
+        component: EnsibleFsComponent,
+        canDeactivate: [CanDeactivateGuard]
       }
     ]
   },

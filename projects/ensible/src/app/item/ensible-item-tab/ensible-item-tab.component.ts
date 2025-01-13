@@ -7,13 +7,16 @@ import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 import { FixChangeDetection } from 'projects/viescloud-utils/src/lib/directive/FixChangeDetection';
 import { RouteChangeSubcribe } from 'projects/viescloud-utils/src/lib/directive/RouteChangeSubcribe.directive';
 import { ActivatedRoute } from '@angular/router';
+import { CanDeactivateGuard, ComponentCanDeactivate } from 'projects/viescloud-utils/src/lib/guards/auth.guard';
+import { Observable } from 'rxjs';
+import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 
 @Component({
   selector: 'app-ensible-item-tab',
   templateUrl: './ensible-item-tab.component.html',
   styleUrls: ['./ensible-item-tab.component.scss']
 })
-export class EnsibleItemTabComponent extends RouteChangeSubcribe implements AfterContentChecked {
+export class EnsibleItemTabComponent extends RouteChangeSubcribe implements AfterContentChecked, ComponentCanDeactivate {
 
   item!: EnsibleItem;
   itemCopy!: EnsibleItem;
@@ -27,9 +30,14 @@ export class EnsibleItemTabComponent extends RouteChangeSubcribe implements Afte
     private ensibleItemService: EnsibleItemService,
     private rxjsUtils: RxJSUtils,
     private cd: ChangeDetectorRef,
+    private dialogUtils: DialogUtils,
     route: ActivatedRoute
   ) {
     super(route);
+  }
+
+  canDeactivate(): Observable<boolean> | Promise<boolean> | boolean {
+    return CanDeactivateGuard.canDeactivateDialog(this.isValueChange(), this.dialogUtils.matDialog);
   }
 
   ngAfterContentChecked(): void {

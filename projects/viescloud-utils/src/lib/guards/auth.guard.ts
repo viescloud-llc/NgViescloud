@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, CanActivateChild, CanDeactivate, CanLoad, Route, Router, RouterStateSnapshot, UrlSegment, UrlTree } from '@angular/router';
 import { Observable, filter, map } from 'rxjs';
 import { AuthenticatorService } from '../service/Authenticator.service';
+import { MatDialog } from '@angular/material/dialog';
+import { DialogUtils } from '../util/Dialog.utils';
 
 @Injectable({
   providedIn: 'root'
@@ -33,7 +35,7 @@ export class AuthGuard /*, CanActivateChild, CanDeactivate<unknown>, CanLoad */
   isLoginWithRole(role: string): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     if(!this.authenticatorService.getJwt())
       return false;
-    
+
     return this.authenticatorService.getCurrentLoginUser().pipe(
     map(user => {
       let isLogin = user ? true : false;
@@ -41,11 +43,11 @@ export class AuthGuard /*, CanActivateChild, CanDeactivate<unknown>, CanLoad */
       return isLogin && matchUserRole;
     }));
   }
-  
+
   isChildLoginWithRole(role: string): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     if(!this.authenticatorService.getJwt())
     return false;
-  
+
     return this.authenticatorService.getCurrentLoginUser().pipe(
     map(user => {
       let isLogin = user ? true : false;
@@ -57,10 +59,10 @@ export class AuthGuard /*, CanActivateChild, CanDeactivate<unknown>, CanLoad */
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-    
+
     return this.isLogin();
   }
-  
+
   canActivateChild(
     childRoute: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
@@ -83,4 +85,30 @@ export class AuthGuard /*, CanActivateChild, CanDeactivate<unknown>, CanLoad */
 
   //   return false;
   // }
+}
+
+export interface ComponentCanDeactivate {
+  canDeactivate: () => Observable<boolean> | Promise<boolean> | boolean;
+}
+
+@Injectable({
+    providedIn: 'root'
+})
+export class CanDeactivateGuard implements CanDeactivate<ComponentCanDeactivate> {
+
+  canDeactivate(component: ComponentCanDeactivate): Observable<boolean> | Promise<boolean> | boolean {
+      return component.canDeactivate ? component.canDeactivate() : true;
+  }
+
+  static canDeactivateDialog(isValueChange: boolean, matDialog: MatDialog, errorTitle: string = 'Unsaved changes!', errorMessage: string = 'You have unsaved changes\nDo you want to discard them and leave?', yes: string = 'Yes', no: string = 'No', width: string = '100%', disableClose: boolean = false): Promise<boolean> {
+    return new Promise<boolean>(async (resolve, reject) => {
+      if(isValueChange) {
+        let confirm = await DialogUtils.openConfirmDialog(matDialog, errorTitle, errorMessage, yes, no, width, disableClose);
+        resolve(confirm ? true : false);
+      }
+      else {
+        resolve(true);
+      }
+    })
+  }
 }

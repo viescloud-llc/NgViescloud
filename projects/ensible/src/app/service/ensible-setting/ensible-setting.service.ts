@@ -9,6 +9,7 @@ import { OpenIdService } from 'projects/viescloud-utils/src/lib/service/OpenId.s
 import { SettingService } from 'projects/viescloud-utils/src/lib/service/Setting.service';
 import { FileUtils } from 'projects/viescloud-utils/src/lib/util/File.utils';
 import { EnsibleSetting } from '../../model/ensible.setting.model';
+import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +17,7 @@ import { EnsibleSetting } from '../../model/ensible.setting.model';
 export class EnsibleSettingService extends SettingService {
 
   onLoginSubscribe: any = null;
+  isEditing: boolean = false;
 
   constructor(
     s3StorageService: S3StorageServiceV1,
@@ -58,5 +60,4 @@ export class EnsibleSettingService extends SettingService {
   protected override newSetting(): EnsibleSetting {
     return new EnsibleSetting();
   }
-
 }
