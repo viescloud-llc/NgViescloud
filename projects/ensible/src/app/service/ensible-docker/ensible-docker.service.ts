@@ -44,4 +44,12 @@ export class EnsibleDockerService extends EnsibleService {
     let params = new HttpParams().set('itemId', itemId);
     return this.httpClient.delete(`${this.getPrefixUri()}/container`, {params: params});
   }
+
+  readyContainerByItemId(itemId: string | number, outputTopic?: string, consumeEverything: boolean = true) {
+    let params = new HttpParamsBuilder();
+    params.setIfValid('outputTopic', outputTopic);
+    params.setIfValid('consumeEverything', consumeEverything);
+
+    return this.httpClient.put(`${this.getPrefixUri()}/container/ready/item/${itemId}`, null, {params: params.build(), responseType: 'text'});
+  }
 }

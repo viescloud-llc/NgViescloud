@@ -19,10 +19,8 @@
       <button mat-icon-button [matTooltip]="'Stop'" (click)="stop()" [disabled]="!isRunning">
         <mat-icon>stop</mat-icon>
       </button>
-      <button *ngIf="logId" mat-icon-button [matTooltip]="'Clean log'" (click)="clean()" [disabled]="isRunning">
-        <mat-icon>delete</mat-icon>
-      </button>
-      <button *ngIf="dockerReady" [disabled]="isRunning" mat-icon-button [matTooltip]="'Remove container'" (click)="removeContainer()">
+
+      <button *ngIf="dockerReady && item.dockerContainerTemplate && item.dockerContainerTemplate.id" [disabled]="isRunning" mat-icon-button [matTooltip]="'Remove container'" (click)="removeContainer()">
         <mat-icon>
           <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor">
             <path d="M0 0h24v24H0z" fill="none"/>
@@ -30,10 +28,21 @@
           </svg>
         </mat-icon>
       </button>
+
+      <button *ngIf="dockerReady && item.dockerContainerTemplate && item.dockerContainerTemplate.id" [disabled]="isRunning" mat-icon-button [matTooltip]="'Ready container'" (click)="readyContainer()">
+        <mat-icon>
+          update icon
+        </mat-icon>
+      </button>
+
       <button mat-icon-button [disabled]="!runOutput" [matTooltip]="'Copy logs to clipboard'" appCopyToClipboard [copyToClipboardValue]="runOutput" [copyMessage]="'Run logs copy to clipboard'">
         <mat-icon>
           content_copy
         </mat-icon>
+      </button>
+
+      <button *ngIf="logId" mat-icon-button [matTooltip]="'Clean log'" (click)="clean()" [disabled]="isRunning">
+        <mat-icon>delete</mat-icon>
       </button>
     </mat-toolbar>
   </li>

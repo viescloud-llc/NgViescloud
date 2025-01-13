@@ -1,7 +1,7 @@
 import { HttpParams } from "@angular/common/http";
 
 export class HttpParamsBuilder {
-  params = new HttpParams();
+  private params = new HttpParams();
 
   constructor(params?: HttpParams) {
     if(params) {

@@ -12,6 +12,7 @@ import { SettingService } from 'projects/viescloud-utils/src/lib/service/Setting
 import { EnsibleProcessService } from '../../service/ensible-process/ensible-process.service';
 import { EnsibleDockerService } from '../../service/ensible-docker/ensible-docker.service';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
+import { delay, timeout } from 'rxjs';
 
 @Component({
   selector: 'app-ensible-item-run',
@@ -101,12 +102,18 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
     }
   }
 
-  run() {
+  private readyNewTopicOutput() {
     this.cleanParams();
     let uuid = StringUtils.generateUUID();
     RouteUtils.setQueryParam('topic', uuid);
     this.isRunning = true;
     this.runOutput = '';
+
+    return uuid;
+  }
+
+  run() {
+    let uuid = this.readyNewTopicOutput();
 
     let playbookTrigger: EnsiblePlayBookTrigger = {
       itemId: this.item.id.toString(),
@@ -117,7 +124,7 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
 
     this.watchTopic(uuid);
 
-    let sub = this.ensibleWorkSpaceService.triggerPlaybook(playbookTrigger).subscribe({
+    let sub = this.ensibleWorkSpaceService.triggerPlaybook(playbookTrigger).pipe(delay(1000)).subscribe({
       next: res => {
         this.runOutput = res;
         this.isRunning = false;
@@ -144,7 +151,7 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
   continuteRun(topic: string) {
     this.isRunning = true;
 
-    let sub = this.ensibleProcessService.watchProcessByTopic(topic).subscribe({
+    let sub = this.ensibleProcessService.watchProcessByTopic(topic).pipe(delay(1000)).subscribe({
       next: res => {
         this.runOutput = res;
         this.isRunning = false;
@@ -197,6 +204,18 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
   removeContainer() {
     this.ensibleDockerService.deleteContainerByItemId(this.item.id).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
       next: res => { }
+    })
+  }
+
+  readyContainer() {
+    let uuid = this.readyNewTopicOutput();
+    this.watchTopic(uuid);
+    this.ensibleDockerService.readyContainerByItemId(this.item.id, uuid).pipe(delay(1000)).subscribe({
+      next: res => {
+        this.runOutput = res;
+        this.isRunning = false;
+        this.cleanParams();
+      }
     })
   }
 }
