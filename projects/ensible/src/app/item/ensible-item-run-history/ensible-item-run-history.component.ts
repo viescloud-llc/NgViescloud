@@ -35,7 +35,7 @@ export class EnsibleItemRunHistoryComponent implements OnChanges {
   }
 
   ngOnInit(): void {
-    this.ensiblePlaybookLoggerService.getAllByItemId(this.item.id).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+    this.ensiblePlaybookLoggerService.getAllByItemIdOptimize(this.item.id).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
       next: res => {
         this.logs = res;
       }

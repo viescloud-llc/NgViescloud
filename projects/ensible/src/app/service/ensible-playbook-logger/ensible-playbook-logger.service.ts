@@ -15,6 +15,10 @@ export class EnsiblePlaybookLoggerService extends EnsibleRestService<EnsiblePlay
     return this.httpClient.get<EnsiblePlayBookLogger[]>(`${this.getPrefixUri()}/item/${itemId}`);
   }
 
+  getAllByItemIdOptimize(itemId: number) {
+    return this.httpClient.get<EnsiblePlayBookLogger[]>(`${this.getPrefixUri()}/item/${itemId}/optimize`);
+  }
+
   getByItemIdAndRunNumber(itemId: number, runNumber: number) {
     return this.httpClient.get<EnsiblePlayBookLogger>(`${this.getPrefixUri()}/item/${itemId}/run/${runNumber}`);
   }
