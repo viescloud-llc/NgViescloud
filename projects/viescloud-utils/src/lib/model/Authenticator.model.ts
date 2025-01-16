@@ -1,19 +1,29 @@
 import { MatColumn, MatInputDisable, MatInputHide, MatTableHide, MatTableDisplayLabel, DateTime } from "./Mat.model";
 
-export enum UserPermission {
+export enum AccessPermission {
     READ = "READ",
     WRITE = "WRITE",
     DELETE = "DELETE"
 }
 
 export class SharedUser {
-    userId: number = 0;
-    permissions: UserPermission[] = [UserPermission.READ] as UserPermission[];
+  userId: string = '';
+  permissions: AccessPermission[] = [AccessPermission.READ] as AccessPermission[];
 
-    constructor(userId?: number, permissions?: UserPermission[]) {
-        this.userId = userId ?? 0;
-        this.permissions = permissions ?? [UserPermission.READ] as UserPermission[];
-    }
+  constructor(userId?: string, permissions?: AccessPermission[]) {
+    this.userId = userId ?? '';
+    this.permissions = permissions ?? [AccessPermission.READ] as AccessPermission[];
+  }
+}
+
+export class SharedGroup {
+  groupId: string = '';
+  permissions: AccessPermission[] = [AccessPermission.READ] as AccessPermission[];
+
+  constructor(groupId?: string, permissions?: AccessPermission[]) {
+    this.groupId = groupId ?? '';
+    this.permissions = permissions ?? [AccessPermission.READ] as AccessPermission[];
+  }
 }
 
 export interface Jwt {
@@ -30,7 +40,7 @@ export class User {
 
     @MatInputDisable(true)
     email?: string;
-    
+
     name?: string
     username?: string;
 

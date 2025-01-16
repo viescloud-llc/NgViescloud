@@ -25,6 +25,8 @@ import { EnsibleFsListComponent } from './ensible-fs-list/ensible-fs-list.compon
 import { EnsibleUserSettingComponent } from './ensible-user-setting/ensible-user-setting.component';
 import { EnsibleDockerContainerTemplateComponent } from './docker/ensible-docker-container-template/ensible-docker-container-template.component';
 import { EnsibleDockerContainerTemplateListComponent } from './docker/ensible-docker-container-template-list/ensible-docker-container-template-list.component';
+import { EnsibleOpenIdProviderComponent } from './ensible-open-id-provider/ensible-open-id-provider.component';
+import { EnsibleOpenidLoginComponent } from './ensible-openid-login/ensible-openid-login.component';
 
 const LIST = [
   AppComponent,
@@ -43,7 +45,9 @@ const LIST = [
   EnsibleUserSettingComponent,
   EnsibleDockerContainerTemplateComponent,
   EnsibleDockerContainerTemplateListComponent,
-  EnsiblePullImageDialog
+  EnsiblePullImageDialog,
+  EnsibleOpenIdProviderComponent,
+  EnsibleOpenidLoginComponent
 ]
 
 @NgModule({

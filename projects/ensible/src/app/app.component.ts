@@ -132,6 +132,11 @@ export class AppComponent extends ViescloudApplicationMinimal {
           title: 'ansible.cfg',
           routerLink: '/setting/ansible.cfg',
           hideConditional: () => !this.ensibleAuthenticatorService.userHaveRole('ADMIN')
+        },
+        {
+          title: 'OpenId Provider',
+          routerLink: '/setting/openid-provider',
+          hideConditional: () => !this.ensibleAuthenticatorService.userHaveRole('ADMIN')
         }
       ]
     },

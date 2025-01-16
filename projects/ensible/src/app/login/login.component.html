@@ -19,4 +19,8 @@
   <li>
     <button #loginButton [style.width]="'50%'" mat-raised-button color="primary" (click)="login()" [disabled]="!validForm">Login</button>
   </li>
+  <li *ngFor="let provider of ensibleOpenIDProviders">
+    <br>
+    <button [style.width]="'50%'" mat-raised-button color="primary" (click)="loginWithProvider(provider)" >Login with {{provider.name}}</button>
+  </li>
 </ul>

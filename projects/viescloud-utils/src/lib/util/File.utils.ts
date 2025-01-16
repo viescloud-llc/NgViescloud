@@ -41,6 +41,18 @@ export class FileUtils {
     }
   }
 
+  static async fetch<T>(uri: string) {
+    try {
+      const response = await fetch(uri);
+      if (!response.ok) {
+        throw new Error('Failed to fetch file');
+      }
+      return JSON.parse(await response.json()) as T;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   static mapExtensionToContentType(extension: string): string {
     const extensionMap: { [key: string]: string } = {
       jpg: 'image/jpeg',

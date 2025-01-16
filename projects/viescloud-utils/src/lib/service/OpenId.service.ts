@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { environment } from 'projects/environments/environment.prod';
+import { StringUtils } from '../util/String.utils';
 
 @Injectable({
   providedIn: 'root'
@@ -26,23 +27,10 @@ export class OpenIdService {
     let responseType = 'code';
     let scope = 'openid+email+profile';
     let redirectUrl = encodeURIComponent(this.getRedirectUri());
-    let state = this.makeId(20);
+    let state = StringUtils.makeId(20);
 
     let authenticationUrl = `${authentikUrl}?client_id=${clientId}&response_type=${responseType}&scope=${scope}&redirect_uri=${redirectUrl}&state=${state}`;
-    
+
     this.router.navigate(["/"]).then(result=>{window.location.href = authenticationUrl;});
   }
-
-  makeId(length: number): string {
-    let result = '';
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    const charactersLength = characters.length;
-    let counter = 0;
-    while (counter < length) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-      counter += 1;
-    }
-    return result;
-  }
-
 }

@@ -16,6 +16,9 @@ import { EnsibleDockerContainerTemplateListComponent } from './docker/ensible-do
 import { EnsibleDockerContainerTemplateComponent } from './docker/ensible-docker-container-template/ensible-docker-container-template.component';
 import { EnsibleSettingService } from './service/ensible-setting/ensible-setting.service';
 import { CanDeactivateGuard } from 'projects/viescloud-utils/src/lib/guards/auth.guard';
+import { EnsibleOpenIDProvider } from './model/ensible.model';
+import { EnsibleOpenIdProviderComponent } from './ensible-open-id-provider/ensible-open-id-provider.component';
+import { EnsibleOpenidLoginComponent } from './ensible-openid-login/ensible-openid-login.component';
 
 const routes: Routes = [
   {
@@ -100,8 +103,17 @@ const routes: Routes = [
         path: 'ansible.cfg',
         component: EnsibleAnsibleCfgComponent,
         canActivate: [async () => inject(EnsibleAuthGuard).isLogin()]
+      },
+      {
+        path: 'openid-provider',
+        component: EnsibleOpenIdProviderComponent,
+        canActivate: [async () => inject(EnsibleAuthGuard).isLogin()]
       }
     ]
+  },
+  {
+    path: 'oauth2',
+    component: EnsibleOpenidLoginComponent
   },
   {
     path: "**",

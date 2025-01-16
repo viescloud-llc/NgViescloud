@@ -93,18 +93,7 @@ export class EnsibleAuthenticatorService extends EnsibleService {
       this.login(username, password).pipe(RxJSUtils.waitLoadingDialog()).subscribe({
         next: res => {
           this.setToken(res.jwt);
-
-          this.getUser().pipe(RxJSUtils.waitLoadingDialog()).subscribe({
-            next: res2 => {
-              this.setLoginUser(res2);
-              FileUtils.localStorageSetItem('jwt', this.token);
-              resolve();
-            },
-            error: err => {
-              this.dialogUtils.openErrorMessage("Fail fetch login user", "Unkown Error fetching user");
-              reject();
-            }
-          })
+          this.fetchUser(resolve, reject);
         },
         error: err => {
           this.dialogUtils.openErrorMessage("Login fail", "invalid username or password");
@@ -112,6 +101,27 @@ export class EnsibleAuthenticatorService extends EnsibleService {
         }
       });
     })
+  }
+
+  async autoLoginWithJwt(jwt: string) {
+    return new Promise<void>((resolve, reject) => {
+      this.setToken(jwt);
+      this.fetchUser(resolve, reject);
+    })
+  }
+
+  private fetchUser(resolve: (value: void | PromiseLike<void>) => void, reject: (reason?: any) => void) {
+    this.getUser().pipe(RxJSUtils.waitLoadingDialog()).subscribe({
+      next: res2 => {
+        this.setLoginUser(res2);
+        FileUtils.localStorageSetItem('jwt', this.token);
+        resolve();
+      },
+      error: err => {
+        this.dialogUtils.openErrorMessage("Fail fetch login user", "Unkown Error fetching user");
+        reject();
+      }
+    });
   }
 
   getToken() {
@@ -164,5 +174,9 @@ export class EnsibleAuthenticatorService extends EnsibleService {
     else {
       throw new Error('Not login');
     }
+  }
+
+  oauth2Login(code: string, redirectUri: string, openIdProviderId: number) {
+    return this.httpClient.post<{jwt: string}>(`${this.getPrefixUri()}/login/oauth2`, {code, redirectUri, openIdProviderId});
   }
 }

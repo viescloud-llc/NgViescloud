@@ -55,12 +55,14 @@ export class DialogUtils {
       }
     }
 
-    openErrorMessage(title: string, message: string) {
-        return DialogUtils.openErrorMessage(this.matDialog, title, message);
+
+
+    openErrorMessage(title: string, message: string, yes: string = 'OK', width: string = '100%', disableClose: boolean = false) {
+        return DialogUtils.openErrorMessage(this.matDialog, title, message, yes, width, disableClose);
     }
 
-    static openErrorMessage(matDialog: MatDialog, title: string, message: string) {
-        return this.openConfirmDialog(matDialog, title, message, 'Ok', '', '100%');
+    static openErrorMessage(matDialog: MatDialog, title: string, message: string, yes: string = 'OK', width: string = '100%', disableClose: boolean = false) {
+      return this.openConfirmDialog(matDialog, title, message, yes, '', width, disableClose);
     }
 
     openConfirmDialog(title: string, message: string, yes: string = 'Yes', no: string = 'No', width: string = '100%', disableClose: boolean = false) {
