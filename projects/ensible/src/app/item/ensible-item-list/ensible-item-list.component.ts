@@ -28,13 +28,16 @@ export class EnsibleItemListComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.init();
+    this.useTable = !this.ensibleSettingService.getCopyOfGeneralSetting<EnsibleSetting>().UseTreeDisplayForItemList;
+  }
+
+  init() {
     this.ensibleItemService.getAll().pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
       next: res => {
         this.items = res;
       }
-    })
-
-    this.useTable = !this.ensibleSettingService.getCopyOfGeneralSetting<EnsibleSetting>().UseTreeDisplayForItemList;
+    });
   }
 
   addItem() {
