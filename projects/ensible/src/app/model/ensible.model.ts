@@ -1,6 +1,7 @@
-import { SharedGroup, SharedUser } from "projects/viescloud-utils/src/lib/model/Authenticator.model";
+import { SharedGroup, SharedUser, UserAccess } from "projects/viescloud-utils/src/lib/model/Authenticator.model";
 import { DateTime, MatInputDisable, MatInputDisplayLabel, MatInputEnum, MatInputHide, MatInputItemSetting, MatInputReadOnly, MatInputRecord, MatInputRequire, MatInputSetting, MatItemSettingType, MatOption, MatTableDisplayLabel, MatTableHide } from "projects/viescloud-utils/src/lib/model/Mat.model";
 import { DataUtils } from "projects/viescloud-utils/src/lib/util/Data.utils";
+import { ReflectionUtils } from "projects/viescloud-utils/src/lib/util/Reflection.utils";
 
 export enum EnsibleExecuteOptions {
   bash,
@@ -234,9 +235,9 @@ export const VERPOSITY_OPTIONS: MatOption<string>[] = [
   }
 ];
 
-export class EnsibleDockerContainerTemplate {
+export class EnsibleDockerContainerTemplate extends UserAccess {
 
-  @MatInputReadOnly()
+  @MatInputHide()
   id: number = 0;
 
   @MatInputRequire()
@@ -297,6 +298,11 @@ export class EnsibleDockerContainerTemplate {
   @MatTableHide()
   @MatInputDisplayLabel('Bind docker socket to container')
   bindDockerSocket: boolean = false;
+
+  constructor() {
+    super();
+    ReflectionUtils.copyAllParentPrototype(this);
+  }
 }
 
 export class EnsibleDockerContainer {

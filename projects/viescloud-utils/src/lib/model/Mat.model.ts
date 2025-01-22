@@ -48,8 +48,6 @@ export enum MatTableSettingType {
     HIDE = <any>'HideColumn'
 }
 
-
-
 export enum MatSnackBarHorizontalPosition {
     START = "start",
     CENTER = "center",

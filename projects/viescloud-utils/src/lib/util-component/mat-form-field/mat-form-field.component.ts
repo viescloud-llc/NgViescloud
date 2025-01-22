@@ -180,11 +180,11 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
   }
 
   isValueChange(): boolean {
-    return this.value !== this.valueCopy;
+    return DataUtils.isNotEqual(this.value, this.valueCopy);
   }
 
   isValueNotChange(): boolean {
-    return this.value === this.valueCopy;
+    return DataUtils.isEqual(this.value, this.valueCopy);
   }
 
   isValueEnum(): boolean {

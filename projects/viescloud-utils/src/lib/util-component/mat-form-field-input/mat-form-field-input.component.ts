@@ -10,7 +10,7 @@ import { FixChangeDetection } from '../../directive/FixChangeDetection';
   selector: 'app-mat-form-field-input',
   templateUrl: './mat-form-field-input.component.html',
   styleUrls: ['./mat-form-field-input.component.scss'],
-  providers: [{ provide: MatFormFieldComponent, useExisting: forwardRef(() => MatFormFieldInputComponent) }],
+  providers: [{ provide: MatFormFieldComponent, useExisting: forwardRef(() => MatFormFieldInputComponent) }]
 })
 export class MatFormFieldInputComponent extends MatFormFieldComponent {
 
@@ -329,5 +329,12 @@ export class MatFormFieldInputComponent extends MatFormFieldComponent {
       this.value = 'https://' + this.value;
 
     this.emitValue();
+  }
+
+  getCustomIconLabelColor() {
+    if(this.customIconLabel && this.customIconLabel.toLowerCase().includes('remove'))
+      return 'red';
+    else
+      return '';
   }
 }

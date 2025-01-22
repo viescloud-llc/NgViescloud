@@ -26,6 +26,24 @@ export class SharedGroup {
   }
 }
 
+export class UserAccess {
+  @MatInputHide()
+  @MatTableHide()
+  ownerUserId: string = '';
+
+  @MatInputHide()
+  @MatTableHide()
+  sharedUsers: SharedUser[] = [new SharedUser()] as SharedUser[];
+
+  @MatInputHide()
+  @MatTableHide()
+  sharedGroups: SharedGroup[] = [new SharedGroup()] as SharedGroup[];
+
+  @MatInputHide()
+  @MatTableHide()
+  sharedOthers: AccessPermission[] = [AccessPermission.READ] as AccessPermission[];
+}
+
 export interface Jwt {
     jwt?: string;
 }

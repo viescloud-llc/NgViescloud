@@ -30,6 +30,7 @@ import { HeaderMinimalComponent } from '../share-component/header-minimal/header
 import { CodeEditorComponent } from '../util-component/code-editor/code-editor.component';
 import { MatTablePathComponent } from '../util-component/mat-table-path/mat-table-path.component';
 import { MatFormFieldInputRecordComponent } from '../util-component/mat-form-field-input-record/mat-form-field-input-record.component';
+import { MatFormFieldInputUserAccessComponent } from '../util-component/mat-form-field-input-user-access/mat-form-field-input-user-access.component';
 
 const UTILS = [
   CopyToClipboardUtilComponent,
@@ -49,6 +50,7 @@ const UTILS = [
   MatFormFieldInputListOptionComponent,
   MatFormFieldInputRgbColorPickerComponent,
   MatFormFieldInputRecordComponent,
+  MatFormFieldInputUserAccessComponent,
   ClickStopPropagationDirective,
   TooltipDirective,
   ApplicationSettingComponent,

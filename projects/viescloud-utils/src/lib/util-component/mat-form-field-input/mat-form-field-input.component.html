@@ -31,7 +31,7 @@
   <mat-hint *ngIf="isFocus && readonly && readonlyOnFocusHint" style="color: goldenrod;" align="start">{{readonlyOnFocusHint}}</mat-hint>
 
   <button *ngIf="customIconLabel" matSuffix mat-icon-button (click)="emitCustomIcon()">
-    <mat-icon>{{customIconLabel}}</mat-icon>
+    <mat-icon [style.color]="getCustomIconLabelColor()">{{customIconLabel}}</mat-icon>
   </button>
   <button *ngIf="manuallyEmitValue && isValueChange()" matSuffix mat-icon-button (click)="emitValue()">
     <mat-icon>check_circle_outline</mat-icon>
