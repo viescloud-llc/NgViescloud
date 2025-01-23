@@ -1,4 +1,4 @@
-<mat-expansion-panel [ngStyle]="{width: styleWidth || 'max-content'}" appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
+<mat-expansion-panel [expanded]="expanded" (expandedChange)="expandedChange.emit($event)" [ngStyle]="{width: styleWidth || 'max-content'}" appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
   <mat-expansion-panel-header>
     <mat-panel-title>
       {{label}}

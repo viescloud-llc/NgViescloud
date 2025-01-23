@@ -44,6 +44,12 @@ export class MatFormFieldInputRecordComponent<K extends string | number, V> exte
   @Input()
   minSize: number = 0;
 
+  @Input()
+  expanded: boolean = false;
+
+  @Output()
+  expandedChange: EventEmitter<boolean> = new EventEmitter<boolean>();
+
   listLength!: number;
 
   validForm: boolean = false;

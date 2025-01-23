@@ -1,17 +1,27 @@
-<ul [class]="indent ? '' : 'no-indented-ul'" appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
-  <li [class]="indent ? '' : 'no-indented-li'" *ngIf="showOwnerUserId">
-    <app-mat-form-field-input
-    [label]="'Owner User ID'"
-    [placeholder]="'e.g 1, 2, 3, book, book2, book3'"
-    [(value)]="ownerUserId"
-    blankObject="''"
-    styleWidth="100%"
-    [required]="required"
-    [readonly]="readonly"
-    ></app-mat-form-field-input>
-  </li>
+<mat-expansion-panel [expanded]="expanded" (expandedChange)="expandedChange.emit($event)" [ngStyle]="{width: styleWidth || 'max-content'}" appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
+  <mat-expansion-panel-header>
+    <mat-panel-title>
+      {{label}}
+    </mat-panel-title>
+    <mat-panel-description>
+      
+    </mat-panel-description>
+  </mat-expansion-panel-header>
+  <ul>
+    <li *ngIf="showOwnerUserId">
+      <app-mat-form-field-input
+      [label]="'Owner User ID'"
+      [placeholder]="'e.g 1, 2, 3, book, book2, book3'"
+      [(value)]="ownerUserId"
+      blankObject="''"
+      styleWidth="100%"
+      [required]="required"
+      [readonly]="readonly"
+      ></app-mat-form-field-input>
+    </li>
 
-  <li [class]="indent ? '' : 'no-indented-li'">
-
-  </li>
-</ul>
+    <li>
+      
+    </li>
+  </ul>
+</mat-expansion-panel>

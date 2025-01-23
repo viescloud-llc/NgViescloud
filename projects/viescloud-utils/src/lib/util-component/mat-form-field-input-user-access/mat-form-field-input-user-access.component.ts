@@ -1,4 +1,4 @@
-import { Component, EventEmitter, forwardRef, Input, ViewChildren } from '@angular/core';
+import { Component, EventEmitter, forwardRef, Input, Output, ViewChildren } from '@angular/core';
 import { MatFormFieldComponent } from '../mat-form-field/mat-form-field.component';
 import { AccessPermission, SharedGroup, SharedUser, UserAccess } from '../../model/Authenticator.model';
 
@@ -20,6 +20,7 @@ export class MatFormFieldInputUserAccessComponent<T extends UserAccess | SharedU
   override value!: T;
   override valueCopy!: T;
   override valueChange: EventEmitter<T> = new EventEmitter<T>;
+  override label: string = 'User Access';
 
   @Input()
   inputType: UserAccessInputType[] | UserAccessInputType = UserAccessInputType.ALL;
@@ -28,7 +29,10 @@ export class MatFormFieldInputUserAccessComponent<T extends UserAccess | SharedU
   showOwnerUserId: boolean = true;
 
   @Input()
-  indent: boolean = true;
+  expanded: boolean = false;
+
+  @Output()
+  expandedChange: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   ownerUserId?: string;
   sharedUsers?: SharedUser[];

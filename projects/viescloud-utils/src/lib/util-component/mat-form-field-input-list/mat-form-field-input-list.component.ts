@@ -41,6 +41,12 @@ export class MatFormFieldInputListComponent extends MatFormFieldComponent {
   @Input()
   blankObjectType!: string;
 
+  @Input()
+  expanded: boolean = false;
+
+  @Output()
+  expandedChange: EventEmitter<boolean> = new EventEmitter<boolean>();
+
   override ngOnInit() {
     super.ngOnInit();
     this.listLength = this.value.length;
