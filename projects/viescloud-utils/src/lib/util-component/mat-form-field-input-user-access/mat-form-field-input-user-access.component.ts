@@ -47,8 +47,6 @@ export class MatFormFieldInputUserAccessComponent<T extends UserAccess | SharedU
   sharedGroups: SharedGroup[] = [];
   sharedOthers: AccessPermission[] = [];
 
-  sharedValues: SharedUser[] | SharedGroup[] | AccessPermission[] = [];
-
   blankSharedUsers: SharedUser[] = [new SharedUser()] as SharedUser[];
   blankSharedGroups: SharedGroup[] = [new SharedGroup()] as SharedGroup[];
   blankSharedOthers: AccessPermission[] = [AccessPermission.READ] as AccessPermission[];
@@ -70,10 +68,9 @@ export class MatFormFieldInputUserAccessComponent<T extends UserAccess | SharedU
       this.sharedOthers = this.value.sharedOthers;
     }
     else if(Array.isArray(this.value)) {
-      this.sharedValues = this.value;
-    }
-    else {
-
+      this.sharedUsers = this.value as any;
+      this.sharedGroups = this.value as any;
+      this.sharedOthers = this.value as any;
     }
   }
 
@@ -95,5 +92,9 @@ export class MatFormFieldInputUserAccessComponent<T extends UserAccess | SharedU
 
   removeSharedGroup(index: number) {
     this.sharedGroups?.splice(index, 1);
+  }
+
+  override isValidInput(): boolean {
+    return this.validForm && super.isValidInput();
   }
 }
