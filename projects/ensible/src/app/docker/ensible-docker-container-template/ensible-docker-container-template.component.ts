@@ -11,6 +11,8 @@ import { RouteChangeSubcribe } from 'projects/viescloud-utils/src/lib/directive/
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 import { CanDeactivateGuard, ComponentCanDeactivate } from 'projects/viescloud-utils/src/lib/guards/auth.guard';
 import { Observable } from 'rxjs';
+import { EnsibleUserService } from '../../service/ensible-user/ensible-user.service';
+import { EnsibleUserGroupService } from '../../service/ensible-user-group/ensible-user-group.service';
 
 @Component({
   selector: 'app-ensible-docker-container-template',

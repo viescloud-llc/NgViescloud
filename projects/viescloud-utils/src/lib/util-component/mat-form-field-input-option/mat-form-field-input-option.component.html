@@ -10,7 +10,7 @@
     (selectionChange)="emitSelectionChange($event)">
     <mat-option *ngIf="noneLabel" [value]="noneLabelValue">{{noneLabel}}</mat-option>
     <mat-option *ngFor="let option of options" [value]="option.value" [disabled]="option.disable">{{option.valueLabel}}</mat-option>
-    <mat-option *ngIf="customOptionLabel" value="" (click)="onCustomOptionSelected.emit()">{{customOptionLabel}}</mat-option>
+    <mat-option *ngIf="customOptionLabel" [value]="customOptionLabel" (click)="onCustomOptionSelected.emit()">{{customOptionLabel}}</mat-option>
   </mat-select>
   <mat-error>{{label}} can't be empty</mat-error>
 </mat-form-field>

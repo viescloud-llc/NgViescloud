@@ -1,6 +1,8 @@
 import { Component, EventEmitter, forwardRef, Input, Output, ViewChildren } from '@angular/core';
 import { MatFormFieldComponent } from '../mat-form-field/mat-form-field.component';
 import { AccessPermission, SharedGroup, SharedUser, UserAccess } from '../../model/Authenticator.model';
+import { MatOption } from '../../model/Mat.model';
+import { DataUtils } from '../../util/Data.utils';
 
 export enum UserAccessInputType {
   SHARED_USERS = 'sharedUsers',
@@ -31,19 +33,30 @@ export class MatFormFieldInputUserAccessComponent<T extends UserAccess | SharedU
   @Input()
   expanded: boolean = false;
 
+  @Input()
+  userIdOptions: MatOption<String>[] = [];
+
+  @Input()
+  groupIdOptions: MatOption<String>[] = [];
+
   @Output()
   expandedChange: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   ownerUserId?: string;
-  sharedUsers?: SharedUser[];
-  sharedGroups?: SharedGroup[];
-  sharedOthers?: AccessPermission[];
+  sharedUsers: SharedUser[] = [];
+  sharedGroups: SharedGroup[] = [];
+  sharedOthers: AccessPermission[] = [];
 
-  sharedValues?: SharedUser[] | SharedGroup[] | AccessPermission[];
+  sharedValues: SharedUser[] | SharedGroup[] | AccessPermission[] = [];
 
   blankSharedUsers: SharedUser[] = [new SharedUser()] as SharedUser[];
   blankSharedGroups: SharedGroup[] = [new SharedGroup()] as SharedGroup[];
   blankSharedOthers: AccessPermission[] = [AccessPermission.READ] as AccessPermission[];
+  permissionOptions: MatOption<AccessPermission>[] = [
+    { value: AccessPermission.READ, valueLabel: 'Read' },
+    { value: AccessPermission.WRITE, valueLabel: 'Write' },
+    { value: AccessPermission.DELETE, valueLabel: 'Delete' }
+  ]
 
   UserAccessInputType = UserAccessInputType;
 
@@ -66,5 +79,21 @@ export class MatFormFieldInputUserAccessComponent<T extends UserAccess | SharedU
 
   isInputType(inputType: UserAccessInputType): boolean {
     return Array.isArray(this.inputType) ? this.inputType.includes(inputType) : this.inputType === inputType
+  }
+
+  addNewSharedUser() {
+    this.sharedUsers?.push(DataUtils.purgeValue(new SharedUser()));
+  }
+
+  addNewSharedGroup() {
+    this.sharedGroups?.push(DataUtils.purgeValue(new SharedGroup()));
+  }
+
+  removeSharedUser(index: number) {
+    this.sharedUsers?.splice(index, 1);
+  }
+
+  removeSharedGroup(index: number) {
+    this.sharedGroups?.splice(index, 1);
   }
 }

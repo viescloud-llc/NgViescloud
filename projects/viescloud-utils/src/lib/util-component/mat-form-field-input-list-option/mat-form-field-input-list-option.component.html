@@ -38,9 +38,8 @@
         [customOptionLabel]="'Remove'"
         (onCustomOptionSelected)="remove(i)"
         ></app-mat-form-field-input-option>
-        <hr>
       </ng-container>
     </ng-container>
-    <li><button mat-raised-button color="primary" style="width: 100%;" (click)="addNewItem()" [disabled]="reachMaxSize()">Add new {{label}}</button></li>
+    <li *ngIf="!reachMaxSize()"><button mat-raised-button color="primary" style="width: 100%;" (click)="addNewItem()">Add new {{label}}</button></li>
   </ul>
 </mat-expansion-panel>

@@ -19,9 +19,84 @@
       [readonly]="readonly"
       ></app-mat-form-field-input>
     </li>
-
+    <hr>
+    <li><p>Shared Users</p></li>
+    <li *ngFor="let sharedUser of sharedUsers; let i = index; trackBy: trackByIndex">
+      <ul>
+        <li>
+          <app-mat-form-field-input-option
+          label="User"
+          [(value)]="sharedUser.userId"
+          [options]="userIdOptions"
+          [required]="true"
+          styleWidth="100%"
+          [noneLabel]="''"
+          [customOptionLabel]="'Remove'"
+          (onCustomOptionSelected)="removeSharedUser(i)"
+          ></app-mat-form-field-input-option>
+        </li>
+        <li>
+          <app-mat-form-field-input-list-option
+          label="Permissions"
+          [(value)]="sharedUser.permissions"
+          [options]="permissionOptions"
+          styleWidth="100%"
+          [expanded]="true"
+          [showSizeInput]="false"
+          [minSize]="1"
+          [uniqueValue]="true"
+          ></app-mat-form-field-input-list-option>
+        </li>
+      </ul>
+      <br>
+    </li>
+    <li class="flex-row-container-auto">
+      <button mat-raised-button color="primary" (click)="addNewSharedUser()" *ngIf="(sharedUsers ?? []).length < userIdOptions.length">New share user</button>
+    </li>
+    <hr>
+    <li><p>Shared groups</p></li>
+    <li *ngFor="let sharedGroup of sharedGroups; let i = index; trackBy: trackByIndex">
+      <ul>
+        <li>
+          <app-mat-form-field-input-option
+          label="Group"
+          [(value)]="sharedGroup.groupId"
+          [options]="groupIdOptions"
+          [required]="true"
+          styleWidth="100%"
+          [noneLabel]="''"
+          [customOptionLabel]="'Remove'"
+          (onCustomOptionSelected)="removeSharedGroup(i)"
+          ></app-mat-form-field-input-option>
+        </li>
+        <li>
+          <app-mat-form-field-input-list-option
+          label="Permissions"
+          [(value)]="sharedGroup.permissions"
+          [options]="permissionOptions"
+          styleWidth="100%"
+          [expanded]="true"
+          [showSizeInput]="false"
+          [uniqueValue]="true"
+          [minSize]="1"
+          ></app-mat-form-field-input-list-option>
+        </li>
+      </ul>
+      <br>
+    </li>
+    <li class="flex-row-container-auto">
+      <button mat-raised-button color="primary" (click)="addNewSharedGroup()" *ngIf="(sharedGroups ?? []).length < groupIdOptions.length">New share group</button>
+    </li>
+    <hr>
     <li>
-      
+      <app-mat-form-field-input-list-option
+      label="Shared to others"
+      [(value)]="sharedOthers"
+      [options]="permissionOptions"
+      styleWidth="100%"
+      [showSizeInput]="false"
+      [uniqueValue]="true"
+      ></app-mat-form-field-input-list-option>
     </li>
   </ul>
 </mat-expansion-panel>

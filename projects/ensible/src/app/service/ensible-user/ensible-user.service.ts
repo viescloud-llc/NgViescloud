@@ -10,4 +10,8 @@ export class EnsibleUserService extends EnsibleRestService<EnsibleUser> {
   protected override getPrefixes(): string[] {
     return ['api', 'v1', 'users'];
   }
+
+  getAllPublicUser() {
+    return this.httpClient.get<EnsibleUser[]>(`${this.getPrefixUri()}/public`);
+  }
 }

@@ -27,6 +27,7 @@ import { EnsibleDockerContainerTemplateComponent } from './docker/ensible-docker
 import { EnsibleDockerContainerTemplateListComponent } from './docker/ensible-docker-container-template-list/ensible-docker-container-template-list.component';
 import { EnsibleOpenIdProviderComponent } from './ensible-open-id-provider/ensible-open-id-provider.component';
 import { EnsibleOpenidLoginComponent } from './ensible-openid-login/ensible-openid-login.component';
+import { EnsibleUserAccessComponent } from './ensible-user-access/ensible-user-access.component';
 
 const LIST = [
   AppComponent,
@@ -47,7 +48,8 @@ const LIST = [
   EnsibleDockerContainerTemplateListComponent,
   EnsiblePullImageDialog,
   EnsibleOpenIdProviderComponent,
-  EnsibleOpenidLoginComponent
+  EnsibleOpenidLoginComponent,
+  EnsibleUserAccessComponent
 ]
 
 @NgModule({
