@@ -3,7 +3,7 @@
     <mat-panel-title>
       {{label}}
     </mat-panel-title>
-    <mat-panel-description>
+    <mat-panel-description [style.color]="minSize > 0 && value.length <= 0 ? 'red' : ''">
       Size: {{value.length}} {{minSize > 0 ? '*' : ''}}
     </mat-panel-description>
   </mat-expansion-panel-header>
@@ -24,6 +24,7 @@
       [manuallyEmitValue]="true"
       [showClearIcon]="false"
       [focusoutEmit]="false"
+      [readonly]="readonly"
       ></app-mat-form-field-input>
     </li>
 
@@ -34,6 +35,7 @@
         [value]="item" (valueChange)="value[i] = $event"
         [blankObject]="blankObject"
         styleWidth="100%"
+        [readonly]="readonly"
         ></app-mat-form-field-input-dynamic>
         <button *ngIf="showRemoveItemButton" (click)="removeWithWarning(i)" mat-raised-button color="warn">Remove this {{label}}</button>
         <hr>
@@ -50,6 +52,7 @@
         [required]="required"
         customIconLabel="remove_circle"
         (onCustomIconClick)="remove(i)"
+        [readonly]="readonly"
         ></app-mat-form-field-input>
       </li>
     </ng-template>

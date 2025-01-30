@@ -1,12 +1,12 @@
 <ul class="margin-center" appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
-  <li>
+  <!-- <li>
     <app-mat-form-field-input
     label="ID"
     [(value)]="item.id"
     [styleWidth]="'100%'"
     [disable]="true"
     ></app-mat-form-field-input>
-  </li>
+  </li> -->
   <li>
     <app-mat-form-field-input
     label="Item Name"
@@ -42,6 +42,14 @@
     [showSizeInput]="false"
     [required]="true"
     ></app-mat-form-field-input-record>
+    <br>
+  </li>
+  <li>
+    <app-ensible-user-access
+    [(value)]="item"
+    styleWidth="100%"
+    [inputType]="[UserAccessInputType.SHARED_USERS, UserAccessInputType.SHARED_GROUPS, UserAccessInputType.SHARED_OTHERS]"
+    ></app-ensible-user-access>
     <br>
   </li>
   <li>

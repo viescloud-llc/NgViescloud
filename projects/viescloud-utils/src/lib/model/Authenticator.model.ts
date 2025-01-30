@@ -1,3 +1,4 @@
+import { ReflectionUtils } from "../util/Reflection.utils";
 import { MatColumn, MatInputDisable, MatInputHide, MatTableHide, MatTableDisplayLabel, DateTime } from "./Mat.model";
 
 export enum AccessPermission {
@@ -42,6 +43,10 @@ export class UserAccess {
   @MatInputHide()
   @MatTableHide()
   sharedOthers: AccessPermission[] = [AccessPermission.READ] as AccessPermission[];
+
+  constructor() {
+    ReflectionUtils.copyAllParentPrototype(this);
+  }
 }
 
 export interface Jwt {

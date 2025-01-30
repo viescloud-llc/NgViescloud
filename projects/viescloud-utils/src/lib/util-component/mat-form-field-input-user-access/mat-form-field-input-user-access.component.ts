@@ -8,6 +8,7 @@ export enum UserAccessInputType {
   SHARED_USERS = 'sharedUsers',
   SHARED_GROUPS = 'sharedGroups',
   SHARED_OTHERS = 'sharedOthers',
+  OWNER_USER_ID = 'ownerUserId',
   ALL = 'all'
 }
 
@@ -26,9 +27,6 @@ export class MatFormFieldInputUserAccessComponent<T extends UserAccess | SharedU
 
   @Input()
   inputType: UserAccessInputType[] | UserAccessInputType = UserAccessInputType.ALL;
-
-  @Input()
-  showOwnerUserId: boolean = true;
 
   @Input()
   expanded: boolean = false;
@@ -61,16 +59,16 @@ export class MatFormFieldInputUserAccessComponent<T extends UserAccess | SharedU
   validForm = false;
 
   override ngOnInit(): void {
-    if(this.value instanceof UserAccess) {
+    if(Array.isArray(this.value)) {
+      this.sharedUsers = this.value as any;
+      this.sharedGroups = this.value as any;
+      this.sharedOthers = this.value as any;
+    }
+    else {
       this.ownerUserId = this.value.ownerUserId;
       this.sharedUsers = this.value.sharedUsers;
       this.sharedGroups = this.value.sharedGroups;
       this.sharedOthers = this.value.sharedOthers;
-    }
-    else if(Array.isArray(this.value)) {
-      this.sharedUsers = this.value as any;
-      this.sharedGroups = this.value as any;
-      this.sharedOthers = this.value as any;
     }
   }
 
@@ -79,11 +77,11 @@ export class MatFormFieldInputUserAccessComponent<T extends UserAccess | SharedU
   }
 
   addNewSharedUser() {
-    this.sharedUsers?.push(DataUtils.purgeValue(new SharedUser()));
+    this.sharedUsers?.push(new SharedUser());
   }
 
   addNewSharedGroup() {
-    this.sharedGroups?.push(DataUtils.purgeValue(new SharedGroup()));
+    this.sharedGroups?.push(new SharedGroup());
   }
 
   removeSharedUser(index: number) {
@@ -96,5 +94,14 @@ export class MatFormFieldInputUserAccessComponent<T extends UserAccess | SharedU
 
   override isValidInput(): boolean {
     return this.validForm && super.isValidInput();
+  }
+
+  containInputType(type: UserAccessInputType): boolean {
+    if(Array.isArray(this.inputType)) {
+      return this.inputType.some(e => e === UserAccessInputType.ALL || e === type);
+    }
+    else {
+      return this.inputType === UserAccessInputType.ALL || this.inputType === type;
+    }
   }
 }

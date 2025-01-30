@@ -3,7 +3,7 @@
     <mat-panel-title>
       {{label}}
     </mat-panel-title>
-    <mat-panel-description>
+    <mat-panel-description [style.color]="minSize > 0 && getKeyPairsSize() <= 0 ? 'red' : ''">
       Size: {{getKeyPairsSize()}} {{minSize > 0 ? '*' : ''}}
     </mat-panel-description>
   </mat-expansion-panel-header>
@@ -24,6 +24,7 @@
       [manuallyEmitValue]="true"
       [showClearIcon]="false"
       [focusoutEmit]="false"
+      [readonly]="readonly"
       ></app-mat-form-field-input>
     </li>
 

@@ -23,7 +23,7 @@ export class EnsibleDockerService extends EnsibleService {
   }
 
   async isDockerRunning() {
-    let result = await firstValueFrom(this.httpClient.get<{running: boolean}>(`${this.getPrefixUri()}/running`).pipe(this.rxJSUtils.waitLoadingDialog()));
+    let result = await firstValueFrom(this.httpClient.get<{running: boolean}>(`${this.getPrefixUri()}/running`).pipe(this.rxJSUtils.waitLoadingDynamicMessagePopup('Checking if docker engine is running')));
     return result.running;
   }
 

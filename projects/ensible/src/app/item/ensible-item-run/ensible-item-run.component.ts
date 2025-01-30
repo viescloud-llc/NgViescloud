@@ -65,7 +65,7 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
   }
 
   async ngOnInit() {
-    this.dockerReady = await this.ensibleDockerService.isDockerRunning();
+    this.dockerReady = await this.ensibleDockerService.isDockerRunning().catch(err => false);
 
     if(!this.ensibleWebsocketService.isConnected()) {
       this.ensibleWebsocketService.connect();

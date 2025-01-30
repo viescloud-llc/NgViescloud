@@ -72,7 +72,7 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
   readonly: boolean = false;
 
   @Input()
-  readonlyOnFocusHint: string = '';
+  readonlyOnFocusHint: string = 'Read only';
 
   //key capture
   keyDown: string[] = [];

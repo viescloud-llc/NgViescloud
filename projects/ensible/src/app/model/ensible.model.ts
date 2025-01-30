@@ -120,7 +120,7 @@ export class EnsibleFsStatusResponse {
   path: string = '';
 }
 
-export class EnsibleItem {
+export class EnsibleItem extends UserAccess {
   id: number = 0;
   name: string = '';
 
@@ -298,11 +298,6 @@ export class EnsibleDockerContainerTemplate extends UserAccess {
   @MatTableHide()
   @MatInputDisplayLabel('Bind docker socket to container')
   bindDockerSocket: boolean = false;
-
-  constructor() {
-    super();
-    ReflectionUtils.copyAllParentPrototype(this);
-  }
 }
 
 export class EnsibleDockerContainer {

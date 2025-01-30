@@ -12,6 +12,7 @@ import { EnsibleService } from '../../service/ensible/ensible.service';
 import { StringUtils } from 'projects/viescloud-utils/src/lib/util/String.utils';
 import { EnsibleDockerContainerTemplateService } from '../../service/ensible-docker-container-template/ensible-docker-container-template.service';
 import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
+import { UserAccessInputType } from 'projects/viescloud-utils/src/lib/util-component/mat-form-field-input-user-access/mat-form-field-input-user-access.component';
 
 @Component({
   selector: 'app-ensible-item',
@@ -38,6 +39,8 @@ export class EnsibleItemComponent implements OnChanges, OnInit {
   verbosityOptions = VERPOSITY_OPTIONS;
 
   ensibleDockerContainerTemplateOptions: MatOption<EnsibleDockerContainerTemplate>[] = [];
+
+  UserAccessInputType = UserAccessInputType;
 
   constructor(
     private ensibleItemService: EnsibleItemService,

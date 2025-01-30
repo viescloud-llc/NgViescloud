@@ -8,20 +8,20 @@
     </mat-panel-description>
   </mat-expansion-panel-header>
   <ul>
-    <li *ngIf="showOwnerUserId">
+    <li *ngIf="containInputType(UserAccessInputType.OWNER_USER_ID)">
       <app-mat-form-field-input
       [label]="'Owner User ID'"
       [placeholder]="'e.g 1, 2, 3, book, book2, book3'"
       [(value)]="ownerUserId"
       blankObject="''"
       styleWidth="100%"
-      [required]="required"
+      [required]="true"
       [readonly]="readonly"
       ></app-mat-form-field-input>
+      <hr>
     </li>
 
-    <ng-container *ngIf="inputType === UserAccessInputType.ALL || inputType === UserAccessInputType.SHARED_USERS">
-      <hr>
+    <ng-container *ngIf="containInputType(UserAccessInputType.SHARED_USERS)">
       <li><p>Shared Users</p></li>
       <li *ngFor="let sharedUser of sharedUsers; let i = index; trackBy: trackByIndex">
         <ul>
@@ -34,7 +34,9 @@
             styleWidth="100%"
             [noneLabel]="''"
             [customOptionLabel]="'Remove'"
+            [customOptionLabelColor]="'red'"
             (onCustomOptionSelected)="removeSharedUser(i)"
+            [readonly]="readonly"
             ></app-mat-form-field-input-option>
           </li>
           <li>
@@ -43,22 +45,22 @@
             [(value)]="sharedUser.permissions"
             [options]="permissionOptions"
             styleWidth="100%"
-            [expanded]="true"
             [showSizeInput]="false"
             [minSize]="1"
             [uniqueValue]="true"
+            [readonly]="readonly"
             ></app-mat-form-field-input-list-option>
           </li>
         </ul>
         <br>
       </li>
       <li class="flex-row-container-auto">
-        <button mat-raised-button color="primary" (click)="addNewSharedUser()" *ngIf="(sharedUsers ?? []).length < userIdOptions.length">New share user</button>
+        <button mat-raised-button color="primary" (click)="addNewSharedUser()" *ngIf="!readonly && (sharedUsers ?? []).length < userIdOptions.length">New share user</button>
       </li>
+      <hr>
     </ng-container>
 
-    <ng-container *ngIf="inputType === UserAccessInputType.ALL || inputType === UserAccessInputType.SHARED_GROUPS">
-      <hr>
+    <ng-container *ngIf="containInputType(UserAccessInputType.SHARED_GROUPS)">
       <li><p>Shared groups</p></li>
       <li *ngFor="let sharedGroup of sharedGroups; let i = index; trackBy: trackByIndex">
         <ul>
@@ -71,7 +73,9 @@
             styleWidth="100%"
             [noneLabel]="''"
             [customOptionLabel]="'Remove'"
+            [customOptionLabelColor]="'red'"
             (onCustomOptionSelected)="removeSharedGroup(i)"
+            [readonly]="readonly"
             ></app-mat-form-field-input-option>
           </li>
           <li>
@@ -80,30 +84,32 @@
             [(value)]="sharedGroup.permissions"
             [options]="permissionOptions"
             styleWidth="100%"
-            [expanded]="true"
             [showSizeInput]="false"
             [uniqueValue]="true"
             [minSize]="1"
+            [readonly]="readonly"
             ></app-mat-form-field-input-list-option>
           </li>
         </ul>
         <br>
       </li>
       <li class="flex-row-container-auto">
-        <button mat-raised-button color="primary" (click)="addNewSharedGroup()" *ngIf="(sharedGroups ?? []).length < groupIdOptions.length">New share group</button>
+        <button mat-raised-button color="primary" (click)="addNewSharedGroup()" *ngIf="!readonly && (sharedGroups ?? []).length < groupIdOptions.length">New share group</button>
       </li>
+      <hr>
     </ng-container>
 
-    <ng-container *ngIf="inputType === UserAccessInputType.ALL || inputType === UserAccessInputType.SHARED_OTHERS">
-      <hr>
+    <ng-container *ngIf="containInputType(UserAccessInputType.SHARED_OTHERS)">
       <li>
         <app-mat-form-field-input-list-option
         label="Shared to others"
         [(value)]="sharedOthers"
         [options]="permissionOptions"
         styleWidth="100%"
+        [expanded]="true"
         [showSizeInput]="false"
         [uniqueValue]="true"
+        [readonly]="readonly"
         ></app-mat-form-field-input-list-option>
       </li>
     </ng-container>

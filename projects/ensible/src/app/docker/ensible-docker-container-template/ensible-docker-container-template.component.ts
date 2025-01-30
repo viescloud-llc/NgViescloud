@@ -13,6 +13,7 @@ import { CanDeactivateGuard, ComponentCanDeactivate } from 'projects/viescloud-u
 import { Observable } from 'rxjs';
 import { EnsibleUserService } from '../../service/ensible-user/ensible-user.service';
 import { EnsibleUserGroupService } from '../../service/ensible-user-group/ensible-user-group.service';
+import { UserAccessInputType } from 'projects/viescloud-utils/src/lib/util-component/mat-form-field-input-user-access/mat-form-field-input-user-access.component';
 
 @Component({
   selector: 'app-ensible-docker-container-template',
@@ -27,6 +28,8 @@ export class EnsibleDockerContainerTemplateComponent extends RouteChangeSubcribe
 
   validForm = false;
   dockerReady = false;
+
+  UserAccessInputType = UserAccessInputType;
 
   constructor(
     private router: Router,
@@ -61,7 +64,9 @@ export class EnsibleDockerContainerTemplateComponent extends RouteChangeSubcribe
       })
     }
 
-    this.dockerReady = await this.ensibleDockerService.isDockerRunning();
+    this.ensibleDockerService.isDockerRunning().then((res) => {
+      this.dockerReady = res
+    }).catch(err => {});
   }
 
   private updateTemplate(ensibleDockerContainerTemplate: EnsibleDockerContainerTemplate) {

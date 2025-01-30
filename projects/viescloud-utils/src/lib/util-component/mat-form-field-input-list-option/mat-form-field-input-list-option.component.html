@@ -3,7 +3,7 @@
     <mat-panel-title>
       {{label}}
     </mat-panel-title>
-    <mat-panel-description>
+    <mat-panel-description [style.color]="minSize > 0 && value.length <= 0 ? 'red' : ''">
       Size: {{value.length}} {{minSize > 0 ? '*' : ''}}
     </mat-panel-description>
   </mat-expansion-panel-header>
@@ -24,6 +24,7 @@
       [manuallyEmitValue]="true"
       [showClearIcon]="false"
       [focusoutEmit]="false"
+      [readonly]="readonly"
       ></app-mat-form-field-input>
     </li>
     <ng-container>
@@ -36,10 +37,12 @@
         noneLabel=""
         [required]="required"
         [customOptionLabel]="'Remove'"
+        [customOptionLabelColor]="'red'"
         (onCustomOptionSelected)="remove(i)"
+        [readonly]="readonly"
         ></app-mat-form-field-input-option>
       </ng-container>
     </ng-container>
-    <li *ngIf="!reachMaxSize()"><button mat-raised-button color="primary" style="width: 100%;" (click)="addNewItem()">Add new {{label}}</button></li>
+    <li *ngIf="!readonly && !reachMaxSize()"><button mat-raised-button color="primary" style="width: 100%;" (click)="addNewItem()">Add new {{label}}</button></li>
   </ul>
 </mat-expansion-panel>

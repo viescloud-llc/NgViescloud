@@ -23,6 +23,9 @@ export class MatFormFieldInputOptionComponent<T> extends MatFormFieldComponent {
   customOptionLabel = '';
 
   @Input()
+  customOptionLabelColor = '';
+
+  @Input()
   noneLabelValue: T | undefined = this.blankObject;
 
   @Input()
