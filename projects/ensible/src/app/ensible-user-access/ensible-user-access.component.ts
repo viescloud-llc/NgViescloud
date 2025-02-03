@@ -20,33 +20,21 @@ export class EnsibleUserAccessComponent<T extends UserAccess | SharedUser[] | Sh
     private rxjsUtils: RxJSUtils,
     cd: ChangeDetectorRef,
     dialogUtils: DialogUtils
-  ) { 
+  ) {
     super(cd, dialogUtils);
   }
-  
+
   override ngOnInit(): void {
     super.ngOnInit();
-    this.ensibleUserGroupService.getAll().pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+    this.ensibleUserGroupService.getAllPublicGroupIdOptions().pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
       next: res => {
-        this.groupIdOptions = [];
-        res.forEach(e => {
-          this.groupIdOptions.push({
-            value: e.id + '',
-            valueLabel: e.name
-          });
-        });
+        this.groupIdOptions = res;
       }
     })
 
-    this.ensibleUserService.getAllPublicUser().pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+    this.ensibleUserService.getAllPublicUserIdOptions().pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
       next: res => {
-        this.userIdOptions = [];
-        res.forEach(e => {
-          this.userIdOptions.push({
-            value: e.id + '',
-            valueLabel: `id: ${e.id} - ${e.alias}`
-          });
-        });
+        this.userIdOptions = res;
       }
     })
   }

@@ -32,6 +32,9 @@ export class MatFormFieldInputUserAccessComponent<T extends UserAccess | SharedU
   expanded: boolean = false;
 
   @Input()
+  showExpansionPanel: boolean = true;
+
+  @Input()
   userIdOptions: MatOption<String>[] = [];
 
   @Input()

@@ -1,4 +1,4 @@
-import { Observable, first, firstValueFrom } from "rxjs";
+import { Observable, first, firstValueFrom, map } from "rxjs";
 import HttpClientUtils from "../model/HttpClientUtils.model";
 import { HttpClient } from "@angular/common/http";
 import { UtilsService } from "./Utils.service";
@@ -41,12 +41,12 @@ export abstract class ViesRestService<T extends Object> extends ViesService {
 
     public getAnyMatch(object: T): Observable<T[]> {
         let params = HttpClientUtils.toHttpParams(object);
-        return this.httpClient.get<T[]>(`${this.getPrefixUri()}/match_any`, { params: params }).pipe(first());
+        return this.httpClient.get<T[]>(`${this.getPrefixUri()}/match_any`, { params: params }).pipe(map(data => data ?? [])).pipe(first());
     }
 
     public getAllMatch(object: T): Observable<T[]> {
         let params = HttpClientUtils.toHttpParams(object);
-        return this.httpClient.get<T[]>(`${this.getPrefixUri()}/match_all`, { params: params }).pipe(first());
+        return this.httpClient.get<T[]>(`${this.getPrefixUri()}/match_all`, { params: params }).pipe(map(data => data ?? [])).pipe(first());
     }
 
     public getAnyMatchWithMatchCase(object: T, matchCase: string | PropertyMatcherEnum): Observable<T[]> {
@@ -60,7 +60,7 @@ export abstract class ViesRestService<T extends Object> extends ViesService {
     }
 
     public getAll(): Observable<T[]> {
-        return this.httpClient.get<T[]>(`${this.getPrefixUri()}`).pipe(first());
+        return this.httpClient.get<T[]>(`${this.getPrefixUri()}`).pipe(map(data => data ?? [])).pipe(first());
     }
 
     public get(id: any): Observable<T> {
