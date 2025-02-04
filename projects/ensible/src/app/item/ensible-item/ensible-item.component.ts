@@ -139,7 +139,7 @@ export class EnsibleItemComponent implements OnChanges, OnInit {
   }
 
   getBuildStatusUrl() {
-    return `<iframe src="${EnsibleService.getUri()}/api/v1/playbook/loggers/item/${this.item.id}/status" width="100%" ></iframe>`;
+    return `<iframe src="${EnsibleService.getUri()}/api/v1/playbook/loggers/item/${this.item.id}/status/html" width="100%" ></iframe>`;
   }
 
   formatValidPath(path: string) {
