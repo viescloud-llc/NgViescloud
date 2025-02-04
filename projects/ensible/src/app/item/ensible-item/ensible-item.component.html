@@ -240,6 +240,22 @@
     <br>
   </li>
 
+  <li>
+    <details>
+      <summary>Build status</summary>
+      <app-mat-form-field-input
+      label="Build status"
+      [value]="getBuildStatusUrl()"
+      [readonly]="true"
+      [showCopyToClipboard]="true"
+      [styleWidth]="'100%'"
+      ></app-mat-form-field-input>
+      <br>
+      <p [style.color]="'yellow'">Add this iframe to your web page or github, gitlab, etc.</p>
+    </details>
+    <br>
+  </li>
+
   <li class="flex-row-container-auto">
     <button mat-raised-button color="primary" (click)="save()" [disabled]="!validForm || !isValueChange()">Save</button>
     <button mat-raised-button color="warn" (click)="revert()" [disabled]="!isValueChange()">Revert</button>

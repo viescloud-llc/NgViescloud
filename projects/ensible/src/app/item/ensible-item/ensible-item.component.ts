@@ -138,6 +138,10 @@ export class EnsibleItemComponent implements OnChanges, OnInit {
     return EnsibleService.getUri() + '/api/v1/webhooks/gitlab';
   }
 
+  getBuildStatusUrl() {
+    return `<iframe src="${EnsibleService.getUri()}/api/v1/playbook/loggers/item/${this.item.id}/status" width="100%" ></iframe>`;
+  }
+
   formatValidPath(path: string) {
     return RouteUtils.formatValidUrlPath(path);
   }
@@ -149,4 +153,6 @@ export class EnsibleItemComponent implements OnChanges, OnInit {
   log(any: any) {
     console.log(any);
   }
+
+
 }
