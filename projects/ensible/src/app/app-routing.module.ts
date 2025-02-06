@@ -19,6 +19,7 @@ import { CanDeactivateGuard } from 'projects/viescloud-utils/src/lib/guards/auth
 import { EnsibleOpenIDProvider } from './model/ensible.model';
 import { EnsibleOpenIdProviderComponent } from './ensible-open-id-provider/ensible-open-id-provider.component';
 import { EnsibleOpenidLoginComponent } from './ensible-openid-login/ensible-openid-login.component';
+import { EnsibleUserGroupListComponent } from './ensible-user-group-list/ensible-user-group-list.component';
 
 const routes: Routes = [
   {
@@ -97,6 +98,11 @@ const routes: Routes = [
       {
         path: 'users',
         component: EnsibleUserComponent,
+        canActivate: [async () => inject(EnsibleAuthGuard).isLogin()]
+      },
+      {
+        path: 'user/groups',
+        component: EnsibleUserGroupListComponent,
         canActivate: [async () => inject(EnsibleAuthGuard).isLogin()]
       },
       {

@@ -3,6 +3,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatColumn, MatTableSettingType } from '../../model/Mat.model';
+import { DataUtils } from '../../util/Data.utils';
 
 @Component({
   selector: 'app-mat-table',
@@ -22,9 +23,6 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
   @Input()
   pageSizeOptions: number[] = [5, 10, 25, 100];
 
-  @Output()
-  pageIndexChange: EventEmitter<number> = new EventEmitter<number>();
-
   @Input()
   showFilter: boolean = false;
 
@@ -34,8 +32,17 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
   @Input()
   initSort?: {key: string, order: 'asc' | 'desc' };
 
+  @Input()
+  blankObject?: any;
+
+  @Input()
+  showMatTooltip: boolean = false;
+
   @Output()
   onEditRow: EventEmitter<T> = new EventEmitter();
+
+  @Output()
+  pageIndexChange: EventEmitter<number> = new EventEmitter<number>();
 
   displayedColumns: string[] = [];
 
@@ -48,12 +55,6 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
 
   @ViewChild(MatSort)
   sort!: MatSort;
-
-  @Input()
-  blankObject?: any;
-
-  @Input()
-  showMatTooltip: boolean = false;
 
   constructor(
     private cd: ChangeDetectorRef

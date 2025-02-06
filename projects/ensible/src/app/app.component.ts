@@ -129,6 +129,11 @@ export class AppComponent extends ViescloudApplicationMinimal {
           hideConditional: () => !this.ensibleAuthenticatorService.userHaveRole('ADMIN')
         },
         {
+          title: 'User groups',
+          routerLink: '/setting/user/groups',
+          hideConditional: () => !this.ensibleAuthenticatorService.userHaveRole('ADMIN')
+        },
+        {
           title: 'ansible.cfg',
           routerLink: '/setting/ansible.cfg',
           hideConditional: () => !this.ensibleAuthenticatorService.userHaveRole('ADMIN')

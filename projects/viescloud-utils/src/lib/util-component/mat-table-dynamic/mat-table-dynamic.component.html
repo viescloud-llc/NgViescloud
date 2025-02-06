@@ -1,0 +1,41 @@
+<ul *ngIf="!selectedRow">
+  <li>
+    <button mat-icon-button color="primary" (click)="init()" [matTooltip]="'Refresh'">
+      <mat-icon>refresh</mat-icon>
+    </button>
+    <button mat-icon-button color="primary" (click)="addNewRow()" [matTooltip]="'Add new row'">
+      <mat-icon>add_box</mat-icon>
+    </button>
+  </li>
+  <hr>
+  <li>
+    <app-mat-table
+    [filterDisplay]="filterDisplay"
+    [matRows]="matRows"
+    [pageSizeOptions]="pageSizeOptions"
+    [showFilter]="showFilter"
+    [showPagination]="showPagination"
+    [initSort]="initSort"
+    [blankObject]="blankObject"
+    [showMatTooltip]="showMatTooltip"
+    (onEditRow)="editRow($event)"
+    (pageIndexChange)="pageIndexChange.emit($event)"
+    ></app-mat-table>
+  </li>
+</ul>
+
+<ul *ngIf="selectedRow" appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
+  <li>
+    <app-mat-form-field-input-dynamic
+    [(value)]="selectedRow"
+    [styleWidth]="styleWidth"
+    [blankObject]="blankObject"
+    ></app-mat-form-field-input-dynamic>
+  </li>
+  <li [class]="styleWidth === '100%' ? 'flex-row-container-auto' : ''">
+    <button *ngIf="addOrSaveFn" mat-raised-button color="primary" (click)="save()" [disabled]="!isValueChange() || !validForm">Save</button>
+    <button *ngIf="addOrSaveFn" mat-raised-button color="warn" (click)="revert()" [disabled]="!isValueChange()">Revert</button>
+    <button mat-raised-button color="warn" (click)="selectRow(null)">{{ !addOrSaveFn ? 'Close' : !isValueChange() ? 'Cancel' : 'Discard' }}</button>
+    <button *ngIf="deleteFn" mat-raised-button color="warn" (click)="deleteRow()">Delete</button>
+  </li>
+</ul>
