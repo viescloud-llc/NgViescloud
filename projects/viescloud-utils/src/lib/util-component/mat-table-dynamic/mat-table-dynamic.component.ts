@@ -101,13 +101,15 @@ export class MatTableDynamicComponent<I, T extends object, S> extends MatTableCo
       if(this.addOrSaveFn && this.service) {
         FunctionUtils.applyObservable<T | void>(this.addOrSaveFn(this.selectedRow, this.service), this.service).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
           next: res => {
-            this.init();
             if(res != null && res != undefined) {
+              this.matRows.push(res);
               this.selectRow(res);
             }
             else {
               this.editRow(this.selectedRow!);
             }
+
+            this.init();
           },
           error: err => {
             this.dialogUtils.openErrorMessageFromError(err, "Error saving row", "Error when saving row\nPlease try again later");

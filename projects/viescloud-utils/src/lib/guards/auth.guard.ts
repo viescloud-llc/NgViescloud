@@ -100,10 +100,10 @@ export class CanDeactivateGuard implements CanDeactivate<ComponentCanDeactivate>
       return component.canDeactivate ? component.canDeactivate() : true;
   }
 
-  static canDeactivateDialog(isValueChange: boolean, matDialog: MatDialog, errorTitle: string = 'Unsaved changes!', errorMessage: string = 'You have unsaved changes\nDo you want to discard them and leave?', yes: string = 'Yes', no: string = 'No', width: string = '100%', disableClose: boolean = false): Promise<boolean> {
+  static canDeactivateDialog(isValueChange: boolean, matDialog: MatDialog | DialogUtils, errorTitle: string = 'Unsaved changes!', errorMessage: string = 'You have unsaved changes\nDo you want to discard them and leave?', yes: string = 'Yes', no: string = 'No', width: string = '100%', disableClose: boolean = false): Promise<boolean> {
     return new Promise<boolean>(async (resolve, reject) => {
       if(isValueChange) {
-        let confirm = await DialogUtils.openConfirmDialog(matDialog, errorTitle, errorMessage, yes, no, width, disableClose);
+        let confirm = await DialogUtils.openConfirmDialog(matDialog instanceof MatDialog ? matDialog : matDialog.matDialog, errorTitle, errorMessage, yes, no, width, disableClose);
         resolve(confirm ? true : false);
       }
       else {

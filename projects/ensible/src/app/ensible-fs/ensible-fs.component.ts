@@ -13,7 +13,7 @@ import { EnsibleVaultService } from '../service/ensible-vault/ensible-vault.serv
 import { EnsibleWorkSpace } from '../model/ensible.parser.model';
 import { CodeEditorComponent } from 'projects/viescloud-utils/src/lib/util-component/code-editor/code-editor.component';
 import { CanDeactivateGuard, ComponentCanDeactivate } from 'projects/viescloud-utils/src/lib/guards/auth.guard';
-import { Observable } from 'rxjs';
+import { firstValueFrom, Observable } from 'rxjs';
 
 enum FileType {
   INVENTORY = 'inventory',
@@ -86,7 +86,7 @@ export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges
   }
 
   canDeactivate(): Observable<boolean> | Promise<boolean> | boolean {
-    return CanDeactivateGuard.canDeactivateDialog(this.isValueChange(), this.dialogUtils.matDialog);
+    return CanDeactivateGuard.canDeactivateDialog(!this.newFile && this.isValueChange(), this.dialogUtils);
   }
 
   ngAfterContentChecked(): void {
@@ -200,7 +200,7 @@ export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges
     return change;
   }
 
-  save() {
+  async save() {
     if(this.fileName === 'new' || !this.fileName) {
       this.dialogUtils.openErrorMessage('File name Error', 'File name cannot be "new"');
       return;
@@ -211,20 +211,20 @@ export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges
     }
 
     if(DataUtils.isNotEqual(this.fileContent, this.fileContentCopy)) {
-      this.ensibleFsService.writeFile(this.getFullPathBy(this.newFile), this.fileContent, FsWriteMode.OVERRIDEN).pipe(this.rxJSUtils.waitLoadingDialog()).subscribe({
-        next: () => {
-          this.fileContentCopy = structuredClone(this.fileContent);
+      let res = await firstValueFrom(this.ensibleFsService.writeFile(this.getFullPathBy(this.newFile), this.fileContent, FsWriteMode.OVERRIDEN).pipe(this.rxJSUtils.waitLoadingDialog())).catch(err => {
+        this.dialogUtils.openErrorMessageFromError(err);
+        return null;
+      });
 
-          if(this.newFile) {
-            this.ensibleWorkspaceParserService.triggerFetchWorkspace();
-            this.router.navigate([this.prefixPath + this.getFullPathBy(this.newFile)]);
-          }
+      if(res !== null) {
+        this.fileContentCopy = structuredClone(this.fileContent);
 
-        },
-        error: (err) => {
-          this.dialogUtils.openErrorMessageFromError(err);
+        if(this.newFile) {
+          this.ensibleWorkspaceParserService.triggerFetchWorkspace();
+          this.navigate(this.prefixPath + this.getFullPathBy(this.newFile));
+          return;
         }
-      })
+      }
     }
 
     this.saveNameChange();
@@ -236,7 +236,7 @@ export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges
         next: () => {
           this.fileNameCopy = structuredClone(this.fileName);
           this.ensibleWorkspaceParserService.triggerFetchWorkspace();
-          this.router.navigate([this.prefixPath + this.getFullPath(this.fileName)]);
+          this.navigate(this.prefixPath + this.getFullPath(this.fileName));
         },
         error: (err) => {
           this.dialogUtils.openErrorMessageFromError(err);
@@ -261,7 +261,7 @@ export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges
       this.ensibleFsService.deleteFile(this.getFullPath()).pipe(this.rxJSUtils.waitLoadingDialog()).subscribe({
         next: () => {
           this.ensibleWorkspaceParserService.triggerFetchWorkspace();
-          this.router.navigate(['home']);
+          this.navigate('home');
         },
         error: (err) => {
           this.dialogUtils.openErrorMessage("Error", "Error when deleting file");
@@ -297,7 +297,7 @@ export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges
     })
   }
 
-  saveSecrets() {
+  async saveSecrets() {
     if(this.fileName === 'new' || !this.fileName) {
       this.dialogUtils.openErrorMessage('File name Error', 'File name cannot be "new"');
       return;
@@ -309,31 +309,34 @@ export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges
 
     if(DataUtils.isNotEqual(this.fileContent, this.fileContentCopy)) {
       if(this.newFile) {
-        this.ensibleVaultService.createVault(this.fileContent, this.getFullPathBy(this.newFile), !this.vaultCrtyptionWithPassword ? this.vaultSecret : undefined, this.vaultCrtyptionWithPassword ? this.vaultSecret : undefined).pipe(this.rxJSUtils.waitLoadingDialog()).subscribe({
-          next: res => {
-            this.ensibleWorkspaceParserService.triggerFetchWorkspace();
-            this.router.navigate([this.prefixPath + this.getFullPathBy(this.newFile)]);
-            this.onRouteChange();
-          },
-          error: (err) => {
-            this.dialogUtils.openErrorMessage("Error", "Error when creating new vault");
-          }
+        let res = await firstValueFrom(this.ensibleVaultService.createVault(this.fileContent, this.getFullPathBy(this.newFile), !this.vaultCrtyptionWithPassword ? this.vaultSecret : undefined, this.vaultCrtyptionWithPassword ? this.vaultSecret : undefined).pipe(this.rxJSUtils.waitLoadingDialog())).catch(err => {
+          this.dialogUtils.openErrorMessage("Error", "Error when creating new vault");
+          return null;
         });
+
+        if(res !== null) {
+          this.ensibleWorkspaceParserService.triggerFetchWorkspace();
+          this.navigate(this.prefixPath + this.getFullPathBy(this.newFile));
+          this.onRouteChange();
+          return;
+        }
       }
       else {
-        this.ensibleVaultService.modifyVault(this.fileContent, this.getFullPath(), !this.vaultCrtyptionWithPassword ? this.vaultSecret : undefined, this.vaultCrtyptionWithPassword ? this.vaultSecret : undefined).pipe(this.rxJSUtils.waitLoadingDialog()).subscribe({
-          next: res => {
-            this.onRouteChange();
-          },
-          error: (err) => {
-            this.dialogUtils.openErrorMessage("Error", "Error when modifying vault");
-          }
+        let res = await firstValueFrom(this.ensibleVaultService.modifyVault(this.fileContent, this.getFullPath(), !this.vaultCrtyptionWithPassword ? this.vaultSecret : undefined, this.vaultCrtyptionWithPassword ? this.vaultSecret : undefined).pipe(this.rxJSUtils.waitLoadingDialog())).catch(err => {
+          this.dialogUtils.openErrorMessage("Error", "Error when modifying vault");
+          return null;
         });
+
+        if(res !== null) {
+          this.onRouteChange();
+        }
       }
     }
 
     this.saveNameChange();
   }
 
-
+  private navigate(path: string) {
+    this.router.navigate([path]);
+  }
 }

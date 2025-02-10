@@ -54,6 +54,7 @@ export class EnsibleUserGroup {
   @MatInputRequire()
   name: string = '';
 
+  @MatInputItemSetting(MatItemSettingType.TEXT_AREA)
   description: string = '';
 }
 

@@ -438,7 +438,7 @@ export const MatInputListSetting = (showListSizeInput?: boolean, showAddItemButt
     }
 }
 
-export const MatInputItemSetting = (type: MatItemSettingType, value: any) => {
+export const MatInputItemSetting = (type: MatItemSettingType, value: any = true) => {
     return function MatInputItemSetting(object: any, key: any) {
         addValue(object, key, type.toString(), value, value);
     }

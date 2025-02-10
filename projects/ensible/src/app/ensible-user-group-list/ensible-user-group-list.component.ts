@@ -17,7 +17,7 @@ export class EnsibleUserGroupListComponent {
     public rxjsUtils: RxJSUtils
   ) { }
 
-  put(userGroup: EnsibleUserGroup, service: EnsibleUserGroupService) {
-    return service?.put(userGroup.id, userGroup);
+  postOrPut(userGroup: EnsibleUserGroup, service: EnsibleUserGroupService) {
+    return service?.postOrPut(userGroup.id, userGroup);
   }
 }
