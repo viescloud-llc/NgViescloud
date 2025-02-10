@@ -114,6 +114,7 @@ export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges
   
   onKeyCaptureEvent(event: KeyCaptureEvent) {
     if(KeyCaptureService.isKeyCombination(event, ['Ctrl', 's'])) {
+      event.keyboardEvent.preventDefault();
       if(this.isValueChange() && this.validForm) {
         if(this.isSecretFile()) {
           this.saveSecrets();
@@ -124,6 +125,7 @@ export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges
       }
     }
     else if(KeyCaptureService.isKeyCombination(event, ['Ctrl', 'r'])) {
+      event.keyboardEvent.preventDefault();
       this.revert();
     }
   }

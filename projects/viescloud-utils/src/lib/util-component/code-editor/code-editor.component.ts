@@ -33,9 +33,6 @@ export class CodeEditorComponent implements AfterViewInit, OnDestroy {
   @Output()
   onKeyCaptureEvent = new EventEmitter<KeyCaptureEvent>();
 
-  @Output()
-  onCrtlSKeyCaptureEvent = new EventEmitter<KeyCaptureEvent>();
-
   onToggleDisplayDrawerSubscription: any = null;
   onKeyCaptureSubscription: any = null;
 
@@ -57,10 +54,6 @@ export class CodeEditorComponent implements AfterViewInit, OnDestroy {
       this.onKeyCaptureSubscription = this.keycaptureService.keyEvents$.subscribe({
         next: event => {
           this.onKeyCaptureEvent.emit(event);
-
-          if(KeyCaptureService.isKeyCombination(event, ['Ctrl', 's'])) {
-            this.onCrtlSKeyCaptureEvent.emit(event);
-          }
         }
       })
     }
@@ -103,15 +96,5 @@ export class CodeEditorComponent implements AfterViewInit, OnDestroy {
   emitValue(value: string) {
     this.valueChange.emit(value);
     this.onValueChange.emit();
-  }
-
-  @HostListener('document:keydown', ['$event'])
-  handleKeyboardEvent(event: KeyboardEvent) {
-    if (event.ctrlKey && event.key === 's') {
-      event.preventDefault(); // This prevents the default 'Save' behavior
-    }
-    else if(event.ctrlKey && event.key === 'r') {
-      event.preventDefault(); // This prevents the default 'reload page' behavior
-    }
   }
 }

@@ -4,6 +4,7 @@ import { Subject } from 'rxjs';
 export interface KeyCaptureEvent {
   key: string;
   isCombination: boolean;
+  keyboardEvent: KeyboardEvent;
 }
 
 @Injectable({
@@ -42,7 +43,7 @@ export class KeyCaptureService {
     this.keyQueue.push({ key, timestamp: Date.now(), isCombination });
 
     // Emit the key event for subscribers
-    this.keySubject.next({ key, isCombination });
+    this.keySubject.next({ key, isCombination, keyboardEvent: event});
 
     // Schedule key removal after expiry time
     setTimeout(() => this.removeExpiredKeys(), this.expiryTime);
