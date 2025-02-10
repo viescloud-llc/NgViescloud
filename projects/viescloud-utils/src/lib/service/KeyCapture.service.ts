@@ -1,13 +1,18 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 
+export interface KeyCaptureEvent {
+  key: string;
+  isCombination: boolean;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class KeyCaptureService {
   private keyQueue: { key: string; timestamp: number; isCombination: boolean }[] = [];
   private expiryTime = 5000; // Default expiry time (5 seconds)
-  private keySubject = new Subject<{ key: string; isCombination: boolean }>();
+  private keySubject = new Subject<KeyCaptureEvent>();
   private captureEnabled = true; // Safety lock to enable/disable key capturing
 
   // Observable for key events
@@ -70,5 +75,24 @@ export class KeyCaptureService {
   // Optional method to set a custom expiry time
   setExpiryTime(milliseconds: number) {
     this.expiryTime = milliseconds;
+  }
+
+  static isKeyCombination(event: KeyCaptureEvent, keys: string[]): boolean {
+    if(!event.isCombination) {
+      return false;
+    }
+
+    let eventKeys = event.key.split("+").map(e => e.trim());
+    return JSON.stringify(eventKeys) === JSON.stringify(keys);
+  }
+
+  static isKeyCombinationIgnoreCase(event: KeyCaptureEvent, keys: string[]): boolean {
+    if(!event.isCombination) {
+      return false;
+    }
+    
+    let lowserCaseKeys = [...keys.map(e => e.toLowerCase())];
+    let eventKeys = event.key.split("+").map(e => e.trim().toLowerCase());
+    return JSON.stringify(eventKeys) === JSON.stringify(lowserCaseKeys);
   }
 }

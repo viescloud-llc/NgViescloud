@@ -1,4 +1,4 @@
-import { AfterContentChecked, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterContentChecked, ChangeDetectorRef, Component, EventEmitter, HostListener, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { RouteChangeSubcribe } from 'projects/viescloud-utils/src/lib/directive/RouteChangeSubcribe.directive';
 import { MonacoLanguage } from 'projects/viescloud-utils/src/lib/model/MonacoEditor.model';
@@ -14,6 +14,7 @@ import { EnsibleWorkSpace } from '../model/ensible.parser.model';
 import { CodeEditorComponent } from 'projects/viescloud-utils/src/lib/util-component/code-editor/code-editor.component';
 import { CanDeactivateGuard, ComponentCanDeactivate } from 'projects/viescloud-utils/src/lib/guards/auth.guard';
 import { firstValueFrom, Observable } from 'rxjs';
+import { KeyCaptureEvent, KeyCaptureService } from 'projects/viescloud-utils/src/lib/service/KeyCapture.service';
 
 enum FileType {
   INVENTORY = 'inventory',
@@ -109,6 +110,22 @@ export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges
     this.newFile = false;
     this.vaultDectypted = false;
     this.fileType = FileType.UNKOWN;
+  }
+  
+  onKeyCaptureEvent(event: KeyCaptureEvent) {
+    if(KeyCaptureService.isKeyCombination(event, ['Ctrl', 's'])) {
+      if(this.isValueChange() && this.validForm) {
+        if(this.isSecretFile()) {
+          this.saveSecrets();
+        }
+        else {
+          this.save();
+        }
+      }
+    }
+    else if(KeyCaptureService.isKeyCombination(event, ['Ctrl', 'r'])) {
+      this.revert();
+    }
   }
 
   override async onRouteChange() {
