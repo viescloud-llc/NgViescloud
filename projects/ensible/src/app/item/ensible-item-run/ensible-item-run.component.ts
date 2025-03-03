@@ -83,12 +83,12 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
       this.logId = parseInt(logId);
       this.ensiblePlaybookLoggerService.get(this.logId).subscribe({
         next: res => {
+          this.playBookLogger = res;
           if(res.status === EnsiblePlaybookStatus.RUNNING) {
             RouteUtils.setQueryParam('topic', res.topic);
             this.ngOnInit();
           }
           else {
-            this.playBookLogger = res;
             this.runOutput = res.log;
           }
         },

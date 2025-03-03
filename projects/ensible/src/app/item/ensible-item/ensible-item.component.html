@@ -259,6 +259,7 @@
   <li class="flex-row-container-auto">
     <button mat-raised-button color="primary" (click)="save()" [disabled]="!validForm || !isValueChange()">Save</button>
     <button mat-raised-button color="warn" (click)="revert()" [disabled]="!isValueChange()">Revert</button>
+    <button *ngIf="item.id" mat-raised-button color="primary" (click)="clone()">Clone</button>
     <button *ngIf="item.id" mat-raised-button color="warn" (click)="deleteItem()">Delete</button>
   </li>
 </ul>

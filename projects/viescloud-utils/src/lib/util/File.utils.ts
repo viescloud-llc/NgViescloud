@@ -262,7 +262,7 @@ export class FileUtils {
   static localStorageGetItem<T>(key: string): T | null {
     let value = localStorage.getItem(key);
     if (value) {
-      let parseValue: T = JSON.parse(value);
+      let parseValue: T = JSON.parse(value) as T;
       return parseValue;
     }
 
@@ -271,6 +271,15 @@ export class FileUtils {
 
   static localStorageRemoveItem(key: string): void {
     localStorage.removeItem(key);
+  }
+
+  static localStorageGetAndRemoveItem<T>(key: string): T | null {
+    let value = FileUtils.localStorageGetItem<T>(key);
+    if(value) {
+      FileUtils.localStorageRemoveItem(key);
+    }
+
+    return value;
   }
 
   static async isObjectUrlValid(url: string): Promise<boolean> {

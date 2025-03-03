@@ -45,4 +45,29 @@ export class ReflectionUtils {
         }
         return obj;
     }
+
+    static mergeObjects<T>(obj1: any, obj2: any): T {
+        if (obj1 === null || obj2 === null) return obj1; // Return if either is null
+        if (typeof obj1 !== 'object' || typeof obj2 !== 'object') return obj1; // Only merge if both are objects
+    
+        // Loop through keys in obj2
+        for (const key in obj2) {
+          if (obj2.hasOwnProperty(key)) {
+            const value1 = obj1[key];
+            const value2 = obj2[key];
+    
+            // If value2 is not null or undefined, apply it to obj1
+            if (value2 !== null && value2 !== undefined) {
+              // If both values are objects, merge recursively
+              if (typeof value1 === 'object' && typeof value2 === 'object') {
+                this.mergeObjects(value1, value2);
+              } else {
+                obj1[key] = value2;
+              }
+            }
+          }
+        }
+
+        return obj1;
+    }
 }

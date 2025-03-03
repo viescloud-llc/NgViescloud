@@ -13,6 +13,8 @@ import { StringUtils } from 'projects/viescloud-utils/src/lib/util/String.utils'
 import { EnsibleDockerContainerTemplateService } from '../../service/ensible-docker-container-template/ensible-docker-container-template.service';
 import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
 import { UserAccessInputType } from 'projects/viescloud-utils/src/lib/util-component/mat-form-field-input-user-access/mat-form-field-input-user-access.component';
+import { FileUtils } from 'projects/viescloud-utils/src/lib/util/File.utils';
+import { ReflectionUtils } from 'projects/viescloud-utils/src/lib/util/Reflection.utils';
 
 @Component({
   selector: 'app-ensible-item',
@@ -42,6 +44,8 @@ export class EnsibleItemComponent implements OnChanges, OnInit {
 
   UserAccessInputType = UserAccessInputType;
 
+  private CLONE_ITEM = "clone_item";
+
   constructor(
     private ensibleItemService: EnsibleItemService,
     public ensibleWorkspaceParserService: EnsibleWorkspaceParserService,
@@ -60,6 +64,15 @@ export class EnsibleItemComponent implements OnChanges, OnInit {
       let path = RouteUtils.getDecodedQueryParam('path');
       if(path) {
         this.item.path = path;
+      }
+
+      // if clone item
+      let cloneItem = FileUtils.localStorageGetAndRemoveItem<EnsibleItem>(this.CLONE_ITEM) as EnsibleItem;
+
+      if(cloneItem) {
+        this.item = structuredClone(cloneItem);
+        this.item.id = 0;
+        this.item.name = '';
       }
     }
 
@@ -154,5 +167,8 @@ export class EnsibleItemComponent implements OnChanges, OnInit {
     console.log(any);
   }
 
-
+  clone() {
+    FileUtils.localStorageSetItem(this.CLONE_ITEM, this.item);
+    this.router.navigate(["/item/0"]);
+  }
 }

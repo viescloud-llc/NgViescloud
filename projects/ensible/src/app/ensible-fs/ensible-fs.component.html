@@ -4,13 +4,13 @@
 
 <ul *ngIf="!error" class="margin-center" appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
   <ng-container *ngIf="!fsPath">
-    <li>
+    <!-- <li>
       <app-mat-form-field-input-dynamic
       label="Easy Mode (still in development)"
       [isSlideToggle]="true"
       [(value)]="easyMode"
       ></app-mat-form-field-input-dynamic>
-    </li>
+    </li> -->
     <li>
       <p>
         <b>File Metadata</b>
