@@ -123,10 +123,31 @@ export class MatTablePathComponent<T> extends FixChangeDetection implements OnIn
     if(!this.customRowsMap.has(path))
       this.customRowsMap.set(path, []);
 
-    if(row.name === '' || this.customRowsMap.get(path)?.some(e => e.name === row.name))
+    if (row.type !== 'path') {
+      row = this.increaseCounter(path, row);
+    }
+
+    if (row.name === '' || this.customRowsMap.get(path)?.some(e => e.name === row.name)) {
       return;
+    }
 
     this.customRowsMap.get(path)?.push(row);
+  }
+
+  private increaseCounter(path: string, row: customRow<T>) {
+    let count = 0;
+    let tempName = row.name;
+    let found = this.customRowsMap.get(path)?.some(e => e.name === tempName);
+    while(found) {
+      count++;
+      tempName = `${row.name} (${count})`;
+      found = this.customRowsMap.get(path)?.some(e => e.name === tempName);
+    }
+
+    if (count > 0)
+      row.name = `${row.name} (${count})`;
+
+    return row;
   }
 
   parseTableRow() {

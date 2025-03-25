@@ -11,6 +11,8 @@ import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 import { UserAccess } from 'projects/viescloud-utils/src/lib/model/Authenticator.model';
 import { UserAccessInputType } from 'projects/viescloud-utils/src/lib/util-component/mat-form-field-input-user-access/mat-form-field-input-user-access.component';
 import { FixChangeDetection } from 'projects/viescloud-utils/src/lib/directive/FixChangeDetection';
+import { FileUtils } from 'projects/viescloud-utils/src/lib/util/File.utils';
+import { SnackBarUtils } from 'projects/viescloud-utils/src/lib/util/SnackBar.utils';
 
 @Component({
   selector: 'app-ensible-item-list',
@@ -31,7 +33,8 @@ export class EnsibleItemListComponent extends FixChangeDetection implements OnIn
     private rxjsUtils: RxJSUtils,
     private dialogUtils: EnsibleDialogUtilsService,
     private router: Router,
-    private ensibleSettingService: EnsibleSettingService
+    private ensibleSettingService: EnsibleSettingService,
+    private snackBarUtils: SnackBarUtils
   ) {
     super();
   }
@@ -94,5 +97,55 @@ export class EnsibleItemListComponent extends FixChangeDetection implements OnIn
 
       this.init();
     }
+  }
+
+  backupItems() {
+    if(this.useTable) {
+      FileUtils.saveFile('itemsBackup.json', 'application/json', JSON.stringify(this.items));
+    }
+    else {
+      FileUtils.saveFile('itemsBackup.json', 'application/json', JSON.stringify(this.items.filter(item => item.path === this.currentPath)));
+    }
+  }
+
+  async restoreItems() {
+    let file = await FileUtils.uploadFileAsVFile('application/json').catch(err => undefined);
+    if (file) {
+      let items = JSON.parse(file.value);
+
+      let override = await this.dialogUtils.openConfirmDialog("Restore", "If any item is already exist, do you want to override it?", "Yes", "No").catch(err => '');
+
+      for (let item of items) {
+        let index = this.items.findIndex(e => e.path === item.path && e.name === item.name);
+        // if already exist and override
+        if (index > -1 && override) {
+          let currentItem = this.items[index];
+          this.ensibleItemService.put(currentItem.id, item).subscribe({
+            next: res => {
+              this.snackBarUtils.openSnackBarDynamicString('Item ' + item.name + ' has been restored (updated/override)');
+            },
+            error: err => {
+              this.snackBarUtils.openSnackBarDynamicString(`Error restoring item ${item.name}`);
+            }
+          });
+        }
+        else if (index === -1) {
+          item.id = 0;
+          this.ensibleItemService.post(item).subscribe({
+            next: res => {
+              this.snackBarUtils.openSnackBarDynamicString('Item ' + item.name + ' has been restored (created)');
+            },
+            error: err => {
+              this.snackBarUtils.openSnackBarDynamicString(`Error restoring item ${item.name}`);
+            }
+          })
+        }
+      }
+
+      this.init();
+      return;
+    }
+
+    this.dialogUtils.openErrorMessage("Error", "Error when restoring items (invalid or corrupted file)");
   }
 }

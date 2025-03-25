@@ -14,6 +14,12 @@
     <button mat-icon-button color="primary" (click)="modifyCurrentPathUserAccess()" [matTooltip]="'Modify user access of all item in path: ' + currentPath">
       <mat-icon>lock</mat-icon>
     </button>
+    <button mat-icon-button color="primary" (click)="backupItems()" [matTooltip]="useTable ? 'Backup all item': 'Backup all item in path: ' + currentPath">
+      <mat-icon>backup</mat-icon>
+    </button>
+    <button mat-icon-button color="primary" (click)="restoreItems()" [matTooltip]="'Restore items'">
+      <mat-icon>restore</mat-icon>
+    </button>
   </li>
   <hr>
 
