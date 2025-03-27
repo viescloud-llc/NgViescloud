@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 })
 export class EnsibleVaultService extends EnsibleService {
   protected override getPrefixes(): string[] {
-    return ['api', 'v1', 'ensibles', 'vaults'];
+    return ['api', 'v1', 'ansible', 'vaults'];
   }
 
   viewVault(vaultSecretFilePath: string, vaultPasswordFilePath?: string, vaultPassword?: string): Observable<string> {

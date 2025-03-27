@@ -16,7 +16,7 @@ import { HttpParamsBuilder } from 'projects/viescloud-utils/src/lib/model/Utils.
 export class EnsibleWorkspaceService extends EnsibleService {
 
   protected override getPrefixes(): string[] {
-    return ['api', 'v1', 'ensibles', 'workspaces'];
+    return ['api', 'v1', 'ansible', 'workspaces'];
   }
 
   getWorkspace() {

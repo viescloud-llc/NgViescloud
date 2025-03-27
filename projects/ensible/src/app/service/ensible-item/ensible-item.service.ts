@@ -8,6 +8,6 @@ import { EnsibleItem } from '../../model/ensible.model';
 export class EnsibleItemService extends EnsibleRestService<EnsibleItem> {
 
   protected override getPrefixes(): string[] {
-    return ['api', 'v1', 'items']
+    return ['api', 'v1', 'playbook', 'items']
   }
 }
