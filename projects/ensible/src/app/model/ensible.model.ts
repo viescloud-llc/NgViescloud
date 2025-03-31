@@ -3,6 +3,12 @@ import { DateTime, MatInputDisable, MatInputDisplayLabel, MatInputEnum, MatInput
 import { DataUtils } from "projects/viescloud-utils/src/lib/util/Data.utils";
 import { ReflectionUtils } from "projects/viescloud-utils/src/lib/util/Reflection.utils";
 
+export enum EnsibleItemType {
+  ANSIBLE,
+  SHELL,
+  TERRAFORM
+}
+
 export enum EnsibleExecuteOptions {
   bash,
   sh,
@@ -383,4 +389,3 @@ export class EnsibleOpenIDProvider {
   @MatInputDisplayLabel('Auto update user info on login if user exist (not recommended)')
   autoUpdateUserInfo:    boolean = false;
 }
-

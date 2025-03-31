@@ -1,7 +1,7 @@
 import { EnsibleWebsocketService } from './../../service/ensible-websocket/ensible-websocket.service';
 import { EnsiblePlaybookLoggerService } from './../../service/ensible-playbook-logger/ensible-playbook-logger.service';
 import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
-import { EnsibleItem, EnsiblePlayBookLogger, EnsiblePlaybookStatus, EnsiblePlayBookTrigger, VERPOSITY_OPTIONS } from '../../model/ensible.model';
+import { EnsibleItem, EnsibleItemType, EnsiblePlayBookLogger, EnsiblePlaybookStatus, EnsiblePlayBookTrigger, VERPOSITY_OPTIONS } from '../../model/ensible.model';
 import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 import { NumberUtils } from 'projects/viescloud-utils/src/lib/util/Number.utils';
@@ -202,7 +202,7 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
   }
 
   removeContainer() {
-    this.ensibleDockerService.deleteContainerByItemId(this.item.id).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+    this.ensibleDockerService.deleteContainerByItemId(EnsibleItemType.ANSIBLE, this.item.id).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
       next: res => { }
     })
   }
@@ -210,7 +210,7 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
   readyContainer() {
     let uuid = this.readyNewTopicOutput();
     this.watchTopic(uuid);
-    this.ensibleDockerService.readyContainerByItemId(this.item.id, uuid).pipe(delay(1000)).subscribe({
+    this.ensibleDockerService.readyContainerByItemId(EnsibleItemType.ANSIBLE, this.item.id, uuid).pipe(delay(1000)).subscribe({
       next: res => {
         this.runOutput = res;
         this.isRunning = false;
