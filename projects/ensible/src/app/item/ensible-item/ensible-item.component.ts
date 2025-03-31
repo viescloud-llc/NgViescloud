@@ -1,12 +1,12 @@
 import { EnsibleDockerContainerTemplate } from './../../model/ensible.model';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { EnsibleItemService } from '../../service/ensible-item/ensible-item.service';
-import { EnsibleItem, VERPOSITY_OPTIONS } from '../../model/ensible.model';
+import { EnsiblePlaybookItemService } from '../../service/ensible-item/ensible-item.service';
+import { EnsiblePlaybookItem, VERPOSITY_OPTIONS } from '../../model/ensible.model';
 import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
-import { EnsibleWorkspaceParserService } from '../../service/ensible-workspace/ensible-workspace.service';
+import { AnsibleWorkspaceParserService } from '../../service/ensible-workspace/ensible-workspace.service';
 import { Router } from '@angular/router';
 import { EnsibleService } from '../../service/ensible/ensible.service';
 import { StringUtils } from 'projects/viescloud-utils/src/lib/util/String.utils';
@@ -24,16 +24,16 @@ import { ReflectionUtils } from 'projects/viescloud-utils/src/lib/util/Reflectio
 export class EnsibleItemComponent implements OnChanges, OnInit {
 
   @Input()
-  item!: EnsibleItem;
+  item!: EnsiblePlaybookItem;
 
   @Output()
-  itemChange: EventEmitter<EnsibleItem> = new EventEmitter();
+  itemChange: EventEmitter<EnsiblePlaybookItem> = new EventEmitter();
 
   @Output()
   isEditing: EventEmitter<boolean> = new EventEmitter<boolean>();
 
-  itemCopy!: EnsibleItem;
-  blankItem: EnsibleItem = new EnsibleItem();
+  itemCopy!: EnsiblePlaybookItem;
+  blankItem: EnsiblePlaybookItem = new EnsiblePlaybookItem();
 
   validForm: boolean = false;
   isFsEditing: boolean[] = [];
@@ -47,8 +47,8 @@ export class EnsibleItemComponent implements OnChanges, OnInit {
   private CLONE_ITEM = "clone_item";
 
   constructor(
-    private ensibleItemService: EnsibleItemService,
-    public ensibleWorkspaceParserService: EnsibleWorkspaceParserService,
+    private ensibleItemService: EnsiblePlaybookItemService,
+    public ensibleWorkspaceParserService: AnsibleWorkspaceParserService,
     private rxjsUtils: RxJSUtils,
     private dialogUtils: DialogUtils,
     private router: Router,
@@ -67,7 +67,7 @@ export class EnsibleItemComponent implements OnChanges, OnInit {
       }
 
       // if clone item
-      let cloneItem = FileUtils.localStorageGetAndRemoveItem<EnsibleItem>(this.CLONE_ITEM) as EnsibleItem;
+      let cloneItem = FileUtils.localStorageGetAndRemoveItem<EnsiblePlaybookItem>(this.CLONE_ITEM) as EnsiblePlaybookItem;
 
       if(cloneItem) {
         this.item = structuredClone(cloneItem);

@@ -46,6 +46,29 @@ export class ReflectionUtils {
         return obj;
     }
 
+    static copyParentPrototypes<T>(obj: T, layers: number): T {
+        let currentPrototype = Object.getPrototypeOf(obj);
+    
+        // Loop through the layers and copy properties from each prototype layer
+        for (let i = 0; i < layers; i++) {
+            if (currentPrototype === null) {
+                // If we reach the end of the prototype chain, stop
+                break;
+            }
+    
+            let parentPrototype = Object.getPrototypeOf(currentPrototype);
+            // Copy all properties from the parent prototype to the current prototype
+            for (const [key, value] of Object.entries(parentPrototype)) {
+                currentPrototype[key] = value;
+            }
+    
+            // Move to the next layer up the prototype chain
+            currentPrototype = parentPrototype;
+        }
+    
+        return obj;
+    }
+
     static mergeObjects<T>(obj1: any, obj2: any): T {
         if (obj1 === null || obj2 === null) return obj1; // Return if either is null
         if (typeof obj1 !== 'object' || typeof obj2 !== 'object') return obj1; // Only merge if both are objects

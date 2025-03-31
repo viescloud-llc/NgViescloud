@@ -1,4 +1,4 @@
-import { EnsibleWorkspaceParserService } from './../service/ensible-workspace/ensible-workspace.service';
+import { AnsibleWorkspaceParserService } from './../service/ensible-workspace/ensible-workspace.service';
 import { EnsibleAuthenticatorService } from './../service/ensible-authenticator/ensible-authenticator.service';
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -27,7 +27,7 @@ export class EnsibleSettingComponent implements OnInit {
     public settingService: EnsibleSettingService,
     public ensibleAuthenticatorService: EnsibleAuthenticatorService,
     private matDialog: MatDialog,
-    private ensibleWorkspaceParserService: EnsibleWorkspaceParserService
+    private ensibleWorkspaceParserService: AnsibleWorkspaceParserService
   ) {
     settingService.onGeneralSettingChange.subscribe({
       next: () => {

@@ -13,14 +13,69 @@ import { HttpParamsBuilder } from 'projects/viescloud-utils/src/lib/model/Utils.
 @Injectable({
   providedIn: 'root'
 })
-export class EnsibleWorkspaceService extends EnsibleService {
+export abstract class EnsibleWorkspaceService extends EnsibleService {
+  getWorkspace() {
+    return this.httpClient.get<FSTree>(this.getPrefixUri());
+  }
+
+  protected putWorkspaceFS(p: FSNode | undefined, e: FSNode, parentPathEndWith: string, producer: () => EnsibleFsDir, checkFn: (name: string) => boolean) {
+    if (p?.metadata.directory && p.metadata.path.endsWith(parentPathEndWith)) {
+      if(!producer().self.path) {
+        let self = new EnsibleFs();
+        self.name = p.getName();
+        self.path = p.metadata.path;
+        self.FSMetadata = p.metadata;
+        producer().self = self;
+        producer().child = [];
+      }
+
+      if(!checkFn(e.getName())) {
+        let fs = DataUtils.purgeObject(new EnsibleFs());
+        fs.name = e.getName();
+        fs.path = e.metadata.path;
+        fs.FSMetadata = e.metadata;
+        producer().child.push(fs);
+      }
+    }
+  }
+
+  protected async cacheFilesOption(producer: () => EnsibleFsDir, opions: MatOption<string>[]) {
+    return new Promise<void>((resolve, reject) => {
+      opions.length = 0;
+      for (const value of producer().child) {
+        opions.push({ value: value.path, valueLabel: value.name });
+      }
+      resolve();
+    })
+  }
+
+  protected newFSNode(e: FSNode) {
+    let fsNode = new FSNode();
+    fsNode.metadata = e.metadata;
+    fsNode.children = e.children;
+    fsNode.metadata = e.metadata;
+    fsNode.parent = e.parent;
+    return fsNode;
+  }
+
+  protected newEnsibleFS(e: FSNode) {
+    let fs = new EnsibleFs();
+    fs.name = e.getName();
+    fs.path = e.metadata.path;
+    fs.FSMetadata = e.metadata;
+    return fs;
+  }
+}
+
+//----------------------------------Ansible----------------------------------
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AnsibleWorkspaceService extends EnsibleWorkspaceService {
 
   protected override getPrefixes(): string[] {
     return ['api', 'v1', 'ansible', 'workspaces'];
-  }
-
-  getWorkspace() {
-    return this.httpClient.get<FSTree>(this.getPrefixUri());
   }
 
   triggerPlaybook(playbookTrigger: EnsiblePlayBookTrigger) {
@@ -52,7 +107,7 @@ export class EnsibleWorkspaceService extends EnsibleService {
 @Injectable({
   providedIn: 'root'
 })
-export class EnsibleWorkspaceParserService extends EnsibleWorkspaceService {
+export class AnsibleWorkspaceParserService extends AnsibleWorkspaceService {
 
   private onFetchWorkspaceSubject = new Subject<EnsibleWorkSpace>();
   onFetchWorkspace$ = this.onFetchWorkspaceSubject.asObservable();
@@ -131,7 +186,7 @@ export class EnsibleWorkspaceParserService extends EnsibleWorkspaceService {
       let role = ws.getRole(grandParent.getName());
       if (role) {
         if(!role[property] && property !== 'self') {
-          role[property] = this.newEnsibleRoleDir(parent!);
+          role[property] = this.newAnsibleRoleDir(parent!);
         }
 
         const dir = role[property] as EnsibleFsDir;
@@ -142,24 +197,7 @@ export class EnsibleWorkspaceParserService extends EnsibleWorkspaceService {
     }
   }
 
-  private newFSNode(e: FSNode) {
-    let fsNode = new FSNode();
-    fsNode.metadata = e.metadata;
-    fsNode.children = e.children;
-    fsNode.metadata = e.metadata;
-    fsNode.parent = e.parent;
-    return fsNode;
-  }
-
-  private newEnsibleFS(e: FSNode) {
-    let fs = new EnsibleFs();
-    fs.name = e.getName();
-    fs.path = e.metadata.path;
-    fs.FSMetadata = e.metadata;
-    return fs;
-  }
-
-  private newEnsibleRoleDir(e: FSNode) {
+  private newAnsibleRoleDir(e: FSNode) {
     let tasks = DataUtils.purgeArray(new EnsibleFsDir());
     tasks.self = new EnsibleFs();
     tasks.self.name = e.getName();
@@ -179,35 +217,7 @@ export class EnsibleWorkspaceParserService extends EnsibleWorkspaceService {
       ws.roles.push(role);
     }
   }
-
-  private putWorkspaceFS(p: FSNode | undefined, e: FSNode, parentPathEndWith: string, producer: () => EnsibleFsDir, checkFn: (name: string) => boolean) {
-    if (p?.metadata.directory && p.metadata.path.endsWith(parentPathEndWith)) {
-      if(!producer().self.path) {
-        let self = new EnsibleFs();
-        self.name = p.getName();
-        self.path = p.metadata.path;
-        self.FSMetadata = p.metadata;
-        producer().self = self;
-        producer().child = [];
-      }
-
-      if(!checkFn(e.getName())) {
-        let fs = DataUtils.purgeObject(new EnsibleFs());
-        fs.name = e.getName();
-        fs.path = e.metadata.path;
-        fs.FSMetadata = e.metadata;
-        producer().child.push(fs);
-      }
-    }
-  }
-
-  private async cacheFilesOption(producer: () => EnsibleFsDir, opions: MatOption<string>[]) {
-    return new Promise<void>((resolve, reject) => {
-      opions.length = 0;
-      for (const value of producer().child) {
-        opions.push({ value: value.path, valueLabel: value.name });
-      }
-      resolve();
-    })
-  }
 }
+
+//----------------------------------Shell----------------------------------
+

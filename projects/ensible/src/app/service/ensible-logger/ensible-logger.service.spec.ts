@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { EnsiblePlaybookLoggerService } from './ensible-playbook-logger.service';
+import { EnsiblePlaybookLoggerService } from './ensible-logger.service';
 
 describe('ensibleplaybooklogger Service', () => {
   let service: EnsiblePlaybookLoggerService;

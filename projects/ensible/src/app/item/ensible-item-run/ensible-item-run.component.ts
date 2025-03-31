@@ -1,13 +1,13 @@
 import { EnsibleWebsocketService } from './../../service/ensible-websocket/ensible-websocket.service';
-import { EnsiblePlaybookLoggerService } from './../../service/ensible-playbook-logger/ensible-playbook-logger.service';
+import { EnsiblePlaybookLoggerService } from '../../service/ensible-logger/ensible-logger.service';
 import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
-import { EnsibleItem, EnsibleItemType, EnsiblePlayBookLogger, EnsiblePlaybookStatus, EnsiblePlayBookTrigger, VERPOSITY_OPTIONS } from '../../model/ensible.model';
+import { EnsiblePlaybookItem, EnsibleItemType, EnsiblePlayBookLogger, EnsiblePlaybookStatus, EnsiblePlayBookTrigger, VERPOSITY_OPTIONS } from '../../model/ensible.model';
 import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 import { NumberUtils } from 'projects/viescloud-utils/src/lib/util/Number.utils';
 import { StringUtils } from 'projects/viescloud-utils/src/lib/util/String.utils';
 import { EnsibleWorkSpace } from '../../model/ensible.parser.model';
-import { EnsibleWorkspaceService } from '../../service/ensible-workspace/ensible-workspace.service';
+import { AnsibleWorkspaceService } from '../../service/ensible-workspace/ensible-workspace.service';
 import { SettingService } from 'projects/viescloud-utils/src/lib/service/Setting.service';
 import { EnsibleProcessService } from '../../service/ensible-process/ensible-process.service';
 import { EnsibleDockerService } from '../../service/ensible-docker/ensible-docker.service';
@@ -22,7 +22,7 @@ import { delay, timeout } from 'rxjs';
 export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
 
   @Input()
-  item!: EnsibleItem;
+  item!: EnsiblePlaybookItem;
 
   @Input()
   triggerInit: boolean = false;
@@ -47,7 +47,7 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
   constructor(
     private ensiblePlaybookLoggerService: EnsiblePlaybookLoggerService,
     private ensibleWebsocketService: EnsibleWebsocketService,
-    private ensibleWorkSpaceService: EnsibleWorkspaceService,
+    private ensibleWorkSpaceService: AnsibleWorkspaceService,
     private ensibleProcessService: EnsibleProcessService,
     private ensibleDockerService: EnsibleDockerService,
     private rxjsUtils: RxJSUtils

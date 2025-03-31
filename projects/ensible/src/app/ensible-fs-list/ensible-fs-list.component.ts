@@ -1,4 +1,4 @@
-import { EnsibleWorkspaceParserService } from './../service/ensible-workspace/ensible-workspace.service';
+import { AnsibleWorkspaceParserService } from './../service/ensible-workspace/ensible-workspace.service';
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RouteChangeSubcribe } from 'projects/viescloud-utils/src/lib/directive/RouteChangeSubcribe.directive';
@@ -21,7 +21,7 @@ export class EnsibleFsListComponent extends RouteChangeSubcribe {
 
   constructor(
     route: ActivatedRoute,
-    private ensibleWorkspaceParserService: EnsibleWorkspaceParserService,
+    private ensibleWorkspaceParserService: AnsibleWorkspaceParserService,
     private router: Router
   ) {
     super(route);

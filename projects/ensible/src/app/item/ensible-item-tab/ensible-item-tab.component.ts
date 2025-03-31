@@ -1,6 +1,6 @@
 import { AfterContentChecked, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { EnsibleItemService } from '../../service/ensible-item/ensible-item.service';
-import { EnsibleItem } from '../../model/ensible.model';
+import { EnsiblePlaybookItemService } from '../../service/ensible-item/ensible-item.service';
+import { EnsiblePlaybookItem } from '../../model/ensible.model';
 import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
@@ -18,8 +18,8 @@ import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils'
 })
 export class EnsibleItemTabComponent extends RouteChangeSubcribe implements AfterContentChecked, ComponentCanDeactivate {
 
-  item!: EnsibleItem;
-  itemCopy!: EnsibleItem;
+  item!: EnsiblePlaybookItem;
+  itemCopy!: EnsiblePlaybookItem;
 
   selectedIndex: number = 0;
   tabNames: string[] = ['Item', 'Run histories', 'Runs'];
@@ -27,7 +27,7 @@ export class EnsibleItemTabComponent extends RouteChangeSubcribe implements Afte
   isEditing: boolean = false;
 
   constructor(
-    private ensibleItemService: EnsibleItemService,
+    private ensibleItemService: EnsiblePlaybookItemService,
     private rxjsUtils: RxJSUtils,
     private cd: ChangeDetectorRef,
     private dialogUtils: DialogUtils,
@@ -47,7 +47,7 @@ export class EnsibleItemTabComponent extends RouteChangeSubcribe implements Afte
   override async onRouteChange() {
     let id = RouteUtils.getPathVariableAsInteger('item');
     if(!id) {
-      this.item = DataUtils.purgeValue(new EnsibleItem());
+      this.item = DataUtils.purgeValue(new EnsiblePlaybookItem());
       this.item.dockerContainerTemplate = undefined;
     }
     else {

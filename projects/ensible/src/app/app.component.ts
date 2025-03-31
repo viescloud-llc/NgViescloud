@@ -6,7 +6,7 @@ import { ViescloudApplicationMinimal } from 'projects/viescloud-utils/src/lib/di
 import { KeyCaptureService } from 'projects/viescloud-utils/src/lib/service/KeyCapture.service';
 import { SettingService } from 'projects/viescloud-utils/src/lib/service/Setting.service';
 import { QuickSideDrawerMenu } from 'projects/viescloud-utils/src/lib/share-component/quick-side-drawer-menu/quick-side-drawer-menu.component';
-import { EnsibleWorkspaceParserService } from './service/ensible-workspace/ensible-workspace.service';
+import { AnsibleWorkspaceParserService } from './service/ensible-workspace/ensible-workspace.service';
 import { EnsibleRole, EnsibleFsDir, EnsibleWorkSpace } from './model/ensible.parser.model';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 import { EnsibleFsService } from './service/ensible-fs/ensible-fs.service';
@@ -96,6 +96,11 @@ export class AppComponent extends ViescloudApplicationMinimal {
       hideConditional: () => !this.ensibleAuthenticatorService.isLogin()
     },
     {
+      title: 'Shell',
+      children: [],
+      hideConditional: () => !this.ensibleAuthenticatorService.isLogin()
+    },
+    {
       title: 'Dockers',
       hideChildren: true,
       hideConditional: () => !this.ensibleAuthenticatorService.isLogin(),
@@ -163,7 +168,7 @@ export class AppComponent extends ViescloudApplicationMinimal {
     matDialog: MatDialog,
     public ensibleAuthenticatorService: EnsibleAuthenticatorService,
     public router: Router,
-    private ensibleWorkspaceParserService: EnsibleWorkspaceParserService,
+    private ensibleWorkspaceParserService: AnsibleWorkspaceParserService,
     private ensibleFsService: EnsibleFsService,
     private rxjsUtils: RxJSUtils
   ) {

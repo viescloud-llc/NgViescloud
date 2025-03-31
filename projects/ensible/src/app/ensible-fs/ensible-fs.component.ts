@@ -8,7 +8,7 @@ import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 import { FsWriteMode } from '../model/ensible.model';
 import { EnsibleFsService } from '../service/ensible-fs/ensible-fs.service';
-import { EnsibleWorkspaceParserService } from '../service/ensible-workspace/ensible-workspace.service';
+import { AnsibleWorkspaceParserService } from '../service/ensible-workspace/ensible-workspace.service';
 import { EnsibleVaultService } from '../service/ensible-vault/ensible-vault.service';
 import { EnsibleWorkSpace } from '../model/ensible.parser.model';
 import { CodeEditorComponent } from 'projects/viescloud-utils/src/lib/util-component/code-editor/code-editor.component';
@@ -75,7 +75,7 @@ export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges
 
   constructor(
     private ensibleFsService: EnsibleFsService,
-    public ensibleWorkspaceParserService: EnsibleWorkspaceParserService,
+    public ensibleWorkspaceParserService: AnsibleWorkspaceParserService,
     private ensibleVaultService: EnsibleVaultService,
     private rxJSUtils: RxJSUtils,
     private dialogUtils: DialogUtils,

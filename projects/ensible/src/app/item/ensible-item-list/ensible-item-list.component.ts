@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { EnsibleItemService } from '../../service/ensible-item/ensible-item.service';
-import { EnsibleItem } from '../../model/ensible.model';
+import { EnsiblePlaybookItemService } from '../../service/ensible-item/ensible-item.service';
+import { EnsiblePlaybookItem } from '../../model/ensible.model';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 import { Router } from '@angular/router';
 import { EnsibleSettingService } from '../../service/ensible-setting/ensible-setting.service';
@@ -21,15 +21,15 @@ import { SnackBarUtils } from 'projects/viescloud-utils/src/lib/util/SnackBar.ut
 })
 export class EnsibleItemListComponent extends FixChangeDetection implements OnInit {
 
-  items: EnsibleItem[] = [];
-  blankItem: EnsibleItem = new EnsibleItem();
+  items: EnsiblePlaybookItem[] = [];
+  blankItem: EnsiblePlaybookItem = new EnsiblePlaybookItem();
 
   useTable = false;
 
   currentPath = '/';
 
   constructor(
-    private ensibleItemService: EnsibleItemService,
+    private ensibleItemService: EnsiblePlaybookItemService,
     private rxjsUtils: RxJSUtils,
     private dialogUtils: EnsibleDialogUtilsService,
     private router: Router,
@@ -56,15 +56,15 @@ export class EnsibleItemListComponent extends FixChangeDetection implements OnIn
     this.router.navigate(["item", 0], {queryParams: {path: this.currentPath}});
   }
 
-  selectItem(item: EnsibleItem) {
+  selectItem(item: EnsiblePlaybookItem) {
     this.router.navigate(['item', item.id]);
   }
 
-  getPath(item: EnsibleItem) {
+  getPath(item: EnsiblePlaybookItem) {
     return item.path;
   }
 
-  getLabel(item: EnsibleItem) {
+  getLabel(item: EnsiblePlaybookItem) {
     return item.name;
   }
 

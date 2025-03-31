@@ -139,19 +139,8 @@ export class EnsibleItem extends UserAccess {
   gitlabUrl: string = '';
   @MatTableHide()
   triggerOnGitlabWebhook: boolean = false;
-  @MatTableHide()
-  playBookPath: string = '';
-  @MatTableHide()
-  inventoryPath: string = '';
-  @MatTableHide()
-  vaultSecretsFilePath: string = '';
-  @MatTableHide()
-  vaultPasswordFilePath: string = '';
 
   path: string = '';
-
-  @MatTableHide()
-  verbosity: string = '';
 
   @MatTableHide()
   cronExpression: string = '';
@@ -164,13 +153,29 @@ export class EnsibleItem extends UserAccess {
   dockerContainerTemplate?: EnsibleDockerContainerTemplate = new EnsibleDockerContainerTemplate();
 }
 
-export class EnsiblePlayBookLogger {
-
-  @MatTableDisplayLabel('Run Number')
-  runNumber: number = 0;
+export class EnsiblePlaybookItem extends EnsibleItem {
+  @MatTableHide()
+  playBookPath: string = '';
+  @MatTableHide()
+  inventoryPath: string = '';
+  @MatTableHide()
+  vaultSecretsFilePath: string = '';
+  @MatTableHide()
+  vaultPasswordFilePath: string = '';
 
   @MatTableHide()
-  id: number = 0;
+  verbosity: string = '';
+}
+
+export class EnsibleShellItem extends EnsibleItem {
+  type: string = '';
+  code: string = '';
+  codeFilePath: string = '';
+}
+
+export class EnsibleProcessLogger {
+  @MatTableDisplayLabel('Run Number')
+  runNumber: number = 0;
 
   @MatTableHide()
   log: string = '';
@@ -189,6 +194,19 @@ export class EnsiblePlayBookLogger {
 
   @MatTableHide()
   topic: string = '';
+}
+
+export class EnsiblePlayBookLogger extends EnsibleProcessLogger {
+  @MatTableHide()
+  id: number = 0;
+
+  @MatTableHide()
+  verbosity: string = '';
+}
+
+export class EnsibleShellLogger extends EnsibleProcessLogger {
+  @MatTableHide()
+  id: number = 0;
 }
 
 export class EnsiblePlayBookTrigger {

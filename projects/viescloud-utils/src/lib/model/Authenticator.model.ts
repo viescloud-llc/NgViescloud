@@ -45,7 +45,7 @@ export class UserAccess {
   sharedOthers: AccessPermission[] = [AccessPermission.READ] as AccessPermission[];
 
   constructor() {
-    ReflectionUtils.copyAllParentPrototype(this);
+    ReflectionUtils.copyAllParentPrototype(this); //child extends this class don't need to copy
   }
 }
 

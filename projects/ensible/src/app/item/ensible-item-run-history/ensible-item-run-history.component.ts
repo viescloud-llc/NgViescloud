@@ -1,6 +1,6 @@
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
-import { EnsibleItem, EnsiblePlayBookLogger } from '../../model/ensible.model';
-import { EnsiblePlaybookLoggerService } from './../../service/ensible-playbook-logger/ensible-playbook-logger.service';
+import { EnsiblePlaybookItem, EnsiblePlayBookLogger } from '../../model/ensible.model';
+import { EnsiblePlaybookLoggerService } from '../../service/ensible-logger/ensible-logger.service';
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 
@@ -12,7 +12,7 @@ import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 export class EnsibleItemRunHistoryComponent implements OnChanges {
 
   @Input()
-  item!: EnsibleItem;
+  item!: EnsiblePlaybookItem;
 
   @Input()
   triggerInit: boolean = false;

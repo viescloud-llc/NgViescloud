@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
-import { EnsibleItemService } from './ensible-item.service';
+import { EnsiblePlaybookItemService } from './ensible-item.service';
 
 describe('ensibleitem Service', () => {
-  let service: EnsibleItemService;
+  let service: EnsiblePlaybookItemService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(EnsibleItemService);
+    service = TestBed.inject(EnsiblePlaybookItemService);
   });
 
   it('should be created', () => {
