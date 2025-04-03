@@ -37,36 +37,42 @@ export class ReflectionUtils {
         });
     }
 
-    static copyAllParentPrototype<T>(obj: T): T {
-        let prototype = Object.getPrototypeOf(obj);
-        let parentPrototype = Object.getPrototypeOf(prototype);
-        for(const [key, value] of Object.entries(parentPrototype)) {
-            prototype[key] = value;
-        }
-        return obj;
-    }
+    static copyAllParentPrototype<T>(obj: T, layers?: number): T {
+        if (layers) {
+            let currentPrototype = Object.getPrototypeOf(obj);
+            let selectedPrototype = Object.getPrototypeOf(obj);
+    
+            // Loop through the layers and copy properties from each prototype layer
+            for (let i = 0; i < layers; i++) {
+                if (selectedPrototype === null) {
+                    // If we reach the end of the prototype chain, stop
+                    break;
+                }
+        
+                let parentPrototype = Object.getPrototypeOf(selectedPrototype);
+                if (parentPrototype === null) {
+                    break;
+                }
 
-    static copyParentPrototypes<T>(obj: T, layers: number): T {
-        let currentPrototype = Object.getPrototypeOf(obj);
-    
-        // Loop through the layers and copy properties from each prototype layer
-        for (let i = 0; i < layers; i++) {
-            if (currentPrototype === null) {
-                // If we reach the end of the prototype chain, stop
-                break;
+                // Copy all properties from the parent prototype to the current prototype
+                for (const [key, value] of Object.entries(parentPrototype)) {
+                    currentPrototype[key] = value;
+                }
+        
+                // Move to the next layer up the prototype chain
+                selectedPrototype = parentPrototype;
             }
     
-            let parentPrototype = Object.getPrototypeOf(currentPrototype);
-            // Copy all properties from the parent prototype to the current prototype
-            for (const [key, value] of Object.entries(parentPrototype)) {
-                currentPrototype[key] = value;
-            }
-    
-            // Move to the next layer up the prototype chain
-            currentPrototype = parentPrototype;
+            return obj;
         }
-    
-        return obj;
+        else {
+            let prototype = Object.getPrototypeOf(obj);
+            let parentPrototype = Object.getPrototypeOf(prototype);
+            for(const [key, value] of Object.entries(parentPrototype)) {
+                prototype[key] = value;
+            }
+            return obj;
+        }
     }
 
     static mergeObjects<T>(obj1: any, obj2: any): T {
