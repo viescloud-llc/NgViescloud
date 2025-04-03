@@ -1,12 +1,11 @@
-import { EnsibleDockerContainerTemplate } from './../../model/ensible.model';
+import { EnsibleDockerContainerTemplate, EnsibleItem } from './../../model/ensible.model';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { EnsiblePlaybookItemService } from '../../service/ensible-item/ensible-item.service';
-import { EnsiblePlaybookItem, VERPOSITY_OPTIONS } from '../../model/ensible.model';
+import { T, VERPOSITY_OPTIONS } from '../../model/ensible.model';
 import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
-import { AnsibleWorkspaceParserService } from '../../service/ensible-workspace/ensible-workspace.service';
 import { Router } from '@angular/router';
 import { EnsibleService } from '../../service/ensible/ensible.service';
 import { StringUtils } from 'projects/viescloud-utils/src/lib/util/String.utils';
@@ -15,25 +14,26 @@ import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
 import { UserAccessInputType } from 'projects/viescloud-utils/src/lib/util-component/mat-form-field-input-user-access/mat-form-field-input-user-access.component';
 import { FileUtils } from 'projects/viescloud-utils/src/lib/util/File.utils';
 import { ReflectionUtils } from 'projects/viescloud-utils/src/lib/util/Reflection.utils';
+import { EnsibleFsService } from '../../service/ensible-fs/ensible-fs.service';
 
 @Component({
   selector: 'app-ensible-item',
   templateUrl: './ensible-item.component.html',
   styleUrls: ['./ensible-item.component.scss']
 })
-export class EnsibleItemComponent implements OnChanges, OnInit {
+export class EnsibleItemComponent<T extends EnsibleItem> implements OnChanges, OnInit {
 
   @Input()
-  item!: EnsiblePlaybookItem;
+  item!: T;
 
   @Output()
-  itemChange: EventEmitter<EnsiblePlaybookItem> = new EventEmitter();
+  itemChange: EventEmitter<T> = new EventEmitter();
 
   @Output()
   isEditing: EventEmitter<boolean> = new EventEmitter<boolean>();
 
-  itemCopy!: EnsiblePlaybookItem;
-  blankItem: EnsiblePlaybookItem = new EnsiblePlaybookItem();
+  itemCopy!: T;
+  blankItem: T = new T();
 
   validForm: boolean = false;
   isFsEditing: boolean[] = [];
@@ -48,7 +48,7 @@ export class EnsibleItemComponent implements OnChanges, OnInit {
 
   constructor(
     private ensibleItemService: EnsiblePlaybookItemService,
-    public ensibleWorkspaceParserService: AnsibleWorkspaceParserService,
+    public ensibleFsService: EnsibleFsService,
     private rxjsUtils: RxJSUtils,
     private dialogUtils: DialogUtils,
     private router: Router,
@@ -67,7 +67,7 @@ export class EnsibleItemComponent implements OnChanges, OnInit {
       }
 
       // if clone item
-      let cloneItem = FileUtils.localStorageGetAndRemoveItem<EnsiblePlaybookItem>(this.CLONE_ITEM) as EnsiblePlaybookItem;
+      let cloneItem = FileUtils.localStorageGetAndRemoveItem<T>(this.CLONE_ITEM) as T;
 
       if(cloneItem) {
         this.item = structuredClone(cloneItem);

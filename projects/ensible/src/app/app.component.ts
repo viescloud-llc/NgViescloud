@@ -6,7 +6,6 @@ import { ViescloudApplicationMinimal } from 'projects/viescloud-utils/src/lib/di
 import { KeyCaptureService } from 'projects/viescloud-utils/src/lib/service/KeyCapture.service';
 import { SettingService } from 'projects/viescloud-utils/src/lib/service/Setting.service';
 import { QuickSideDrawerMenu } from 'projects/viescloud-utils/src/lib/share-component/quick-side-drawer-menu/quick-side-drawer-menu.component';
-import { AnsibleWorkspaceParserService } from './service/ensible-workspace/ensible-workspace.service';
 import { EnsibleRole, EnsibleFsDir, EnsibleWorkSpace } from './model/ensible.parser.model';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 import { EnsibleFsService } from './service/ensible-fs/ensible-fs.service';
@@ -51,12 +50,20 @@ export class AppComponent extends ViescloudApplicationMinimal {
       hideConditional: () => !this.ensibleAuthenticatorService.isLogin(),
       children: [
         {
-          title: 'all',
-          routerLink: '/item/all'
+          title: 'Playbooks',
+          routerLink: '/item/playbooks/all'
         },
         {
-          title: 'add new',
-          routerLink: '/item/0'
+          title: 'add new playbook',
+          routerLink: '/item/playbooks/0'
+        },
+        {
+          title: 'Shells',
+          routerLink: '/item/shells/all'
+        },
+        {
+          title: 'add new shell',
+          routerLink: '/item/shells/0'
         }
       ]
     },
@@ -96,7 +103,7 @@ export class AppComponent extends ViescloudApplicationMinimal {
       hideConditional: () => !this.ensibleAuthenticatorService.isLogin()
     },
     {
-      title: 'Shell',
+      title: 'Shells',
       children: [],
       hideConditional: () => !this.ensibleAuthenticatorService.isLogin()
     },
@@ -168,7 +175,6 @@ export class AppComponent extends ViescloudApplicationMinimal {
     matDialog: MatDialog,
     public ensibleAuthenticatorService: EnsibleAuthenticatorService,
     public router: Router,
-    private ensibleWorkspaceParserService: AnsibleWorkspaceParserService,
     private ensibleFsService: EnsibleFsService,
     private rxjsUtils: RxJSUtils
   ) {
@@ -179,10 +185,10 @@ export class AppComponent extends ViescloudApplicationMinimal {
     })
 
     ensibleAuthenticatorService.onLogin$.subscribe(() => {
-      this.ensibleWorkspaceParserService.triggerFetchWorkspace();
+      this.ensibleFsService.triggerFetchWorkspace();
     })
 
-    ensibleWorkspaceParserService.onFetchWorkspace$.subscribe(ws => {
+    ensibleFsService.onFetchWorkspace$.subscribe(ws => {
       this.parseWorkspaceToRolesMenu(ws);
       this.parseWorkspaceToMenu('Inventory', 'inventory', () => ws.inventory);
       this.parseWorkspaceToMenu('Playbooks', 'playbooks', () => ws.playbooks);
@@ -190,11 +196,12 @@ export class AppComponent extends ViescloudApplicationMinimal {
       this.parseWorkspaceToMenu('Passwords', 'passwords', () => ws.passwords);
       this.parseWorkspaceToMenu('Group vars', 'group_vars', () => ws.groupVars);
       this.parseWorkspaceToMenu('Host vars', 'host_vars', () => ws.hostVars);
+      this.parseWorkspaceToMenu('Shells', 'shells', () => ws.shells);
     })
 
     settingService.onGeneralSettingChange.subscribe({
       next: () => {
-        this.ensibleWorkspaceParserService.triggerFetchWorkspace();
+        this.ensibleFsService.triggerFetchWorkspace();
       }
     });
   }
@@ -202,7 +209,7 @@ export class AppComponent extends ViescloudApplicationMinimal {
   override async ngOnInit() {
     super.ngOnInit();
     this.ensibleAuthenticatorService.ngOnInit();
-    // this.ensibleWorkspaceParserService.triggerFetchWorkspace();
+    // this.ensibleFsService.triggerFetchWorkspace();
   }
 
   parseWorkspaceToRolesMenu(ws: EnsibleWorkSpace) {
@@ -315,11 +322,11 @@ export class AppComponent extends ViescloudApplicationMinimal {
   async addNewRole() {
     let name = await DialogUtils.openInputDialog(this.matDialog, 'Create new role', 'Role name', 'Create', 'Cancel');
     if(name) {
-      let ws = await this.ensibleWorkspaceParserService.parseWorkspace();
+      let ws = await this.ensibleFsService.parseWorkspace();
       if(ws && !ws.isRoleExist(name)) {
         this.ensibleFsService.writeFile(`roles/${name}/tasks/main.yml`, '---', FsWriteMode.SKIP).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
           next: () => {
-            this.ensibleWorkspaceParserService.triggerFetchWorkspace();
+            this.ensibleFsService.triggerFetchWorkspace();
           },
           error: (err) => {
             DialogUtils.openConfirmDialog(this.matDialog, 'Error', 'Error writing file', 'Ok', '');
@@ -338,7 +345,7 @@ export class AppComponent extends ViescloudApplicationMinimal {
     if(confirm) {
       this.ensibleFsService.deleteFile(rolePath).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
         next: () => {
-          this.ensibleWorkspaceParserService.triggerFetchWorkspace();
+          this.ensibleFsService.triggerFetchWorkspace();
           this.router.navigate(['home']);
         },
         error: (err) => {

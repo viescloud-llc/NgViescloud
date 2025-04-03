@@ -1,4 +1,3 @@
-import { AnsibleWorkspaceParserService } from './../service/ensible-workspace/ensible-workspace.service';
 import { EnsibleAuthenticatorService } from './../service/ensible-authenticator/ensible-authenticator.service';
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -11,6 +10,7 @@ import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 import { EnsibleSetting } from '../model/ensible.setting.model';
 import { EnsibleSettingService } from '../service/ensible-setting/ensible-setting.service';
+import { EnsibleFsService } from '../service/ensible-fs/ensible-fs.service';
 
 @Component({
   selector: 'app-ensible-setting',
@@ -27,7 +27,7 @@ export class EnsibleSettingComponent implements OnInit {
     public settingService: EnsibleSettingService,
     public ensibleAuthenticatorService: EnsibleAuthenticatorService,
     private matDialog: MatDialog,
-    private ensibleWorkspaceParserService: AnsibleWorkspaceParserService
+    private ensibleFsService: EnsibleFsService
   ) {
     settingService.onGeneralSettingChange.subscribe({
       next: () => {
@@ -47,14 +47,14 @@ export class EnsibleSettingComponent implements OnInit {
 
   saveLocally() {
     this.settingService.saveSettingLocally(this.generalSetting);
-    this.ensibleWorkspaceParserService.triggerFetchWorkspace();
+    this.ensibleFsService.triggerFetchWorkspace();
     this.ngOnInit();
   }
 
   saveToServer() {
     if(this.settingService.prefix) {
       this.settingService.saveSettingToServer(this.settingService.prefix, this.generalSetting);
-      this.ensibleWorkspaceParserService.triggerFetchWorkspace();
+      this.ensibleFsService.triggerFetchWorkspace();
       this.ngOnInit();
     }
   }

@@ -53,7 +53,7 @@
       *ngIf="!vaultCrtyptionWithPassword"
       [label]="getVaultTypeLabel() + ' with password file'"
       (selectionChange)="vaultSecret = $event"
-      [options]="ensibleWorkspaceParserService.passwordFileOptions"
+      [options]="ensibleFsService.passwordFileOptions"
       [required]="true"
       ></app-mat-form-field-input-option>
 

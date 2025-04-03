@@ -140,7 +140,7 @@
           <app-mat-form-field-input-option
           label="Inventory"
           [(value)]="item.inventoryPath"
-          [options]="ensibleWorkspaceParserService.inventoriesFileOptions"
+          [options]="ensibleFsService.inventoriesFileOptions"
           [noneLabel]="''"
           [required]="true"
           styleWidth="100%"
@@ -168,7 +168,7 @@
           <app-mat-form-field-input-option
           label="Playbook"
           [(value)]="item.playBookPath"
-          [options]="ensibleWorkspaceParserService.playbooksFileOptions"
+          [options]="ensibleFsService.playbooksFileOptions"
           [noneLabel]="''"
           [required]="true"
           styleWidth="100%"
@@ -196,7 +196,7 @@
           <app-mat-form-field-input-option
           label="Secret File"
           [(value)]="item.vaultSecretsFilePath"
-          [options]="ensibleWorkspaceParserService.secretsFileOptions"
+          [options]="ensibleFsService.secretsFileOptions"
           styleWidth="100%"
           [blankObject]="''"
           ></app-mat-form-field-input-option>
@@ -216,7 +216,7 @@
           *ngIf="item.vaultSecretsFilePath"
           label="Secret password file"
           [(value)]="item.vaultPasswordFilePath"
-          [options]="ensibleWorkspaceParserService.passwordFileOptions"
+          [options]="ensibleFsService.passwordFileOptions"
           styleWidth="100%"
           [required]="true"
           ></app-mat-form-field-input-option>

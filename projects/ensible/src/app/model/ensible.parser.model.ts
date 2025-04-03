@@ -9,6 +9,7 @@ export class EnsibleWorkSpace {
   inventory: EnsibleFsDir = new EnsibleFsDir();
   groupVars: EnsibleFsDir = new EnsibleFsDir();
   hostVars: EnsibleFsDir = new EnsibleFsDir();
+  shells: EnsibleFsDir = new EnsibleFsDir();
 
   isPlaybookExist(playbookName: string): boolean {
     return this.isFsDirNameExist(playbookName, this.playbooks.child);
@@ -41,6 +42,10 @@ export class EnsibleWorkSpace {
 
   isHostVarsExist(hostVarsName: string): boolean {
     return this.isFsDirNameExist(hostVarsName, this.hostVars.child);
+  }
+
+  isShellExist(shellName: string): boolean {
+    return this.isFsDirNameExist(shellName, this.shells.child);
   }
 
   private isFsDirNameExist(name: string, fs: EnsibleFs[]): boolean {
@@ -83,6 +88,10 @@ export class EnsibleWorkSpace {
 
   getHostVars(hostVarsName: string): EnsibleFs | undefined {
     return this.getFsDirByName(hostVarsName, this.hostVars.child);
+  }
+
+  getShell(shellName: string): EnsibleFs | undefined {
+    return this.getFsDirByName(shellName, this.shells.child);
   }
 
   private getFsDirByName(name: string, fs: EnsibleFs[]): EnsibleFs | undefined {

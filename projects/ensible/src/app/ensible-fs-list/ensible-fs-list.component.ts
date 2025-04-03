@@ -1,10 +1,10 @@
-import { AnsibleWorkspaceParserService } from './../service/ensible-workspace/ensible-workspace.service';
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RouteChangeSubcribe } from 'projects/viescloud-utils/src/lib/directive/RouteChangeSubcribe.directive';
 import { EnsibleFs, EnsibleFsDir, EnsibleWorkSpace } from '../model/ensible.parser.model';
 import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
+import { EnsibleFsService } from '../service/ensible-fs/ensible-fs.service';
 
 @Component({
   selector: 'app-ensible-fs-list',
@@ -21,7 +21,7 @@ export class EnsibleFsListComponent extends RouteChangeSubcribe {
 
   constructor(
     route: ActivatedRoute,
-    private ensibleWorkspaceParserService: AnsibleWorkspaceParserService,
+    private ensibleFsService: EnsibleFsService,
     private router: Router
   ) {
     super(route);
@@ -30,7 +30,7 @@ export class EnsibleFsListComponent extends RouteChangeSubcribe {
   override async onRouteChange() {
     this.layers = RouteUtils.getCurrentPath().split('/').splice(2);
 
-    this.ensibleWorkspaceParserService.triggerFetchWorkspace(true).then((ws) => {
+    this.ensibleFsService.triggerFetchWorkspace(true).then((ws) => {
       this.ensibleWorkspace = ws;
       let rootLayer = this.layers[0];
       switch(rootLayer) {

@@ -29,6 +29,8 @@ import { EnsibleOpenIdProviderComponent } from './ensible-open-id-provider/ensib
 import { EnsibleOpenidLoginComponent } from './ensible-openid-login/ensible-openid-login.component';
 import { EnsibleUserAccessComponent } from './ensible-user-access/ensible-user-access.component';
 import { EnsibleUserGroupListComponent } from './ensible-user-group-list/ensible-user-group-list.component';
+import { EnsibleItemListPlaybookComponent } from './item/ensible-item-list/ensible-item-list-playbook/ensible-item-list-playbook.component';
+import { EnsibleItemListShellComponent } from './item/ensible-item-list/ensible-item-list-shell/ensible-item-list-shell.component';
 
 const LIST = [
   AppComponent,
@@ -38,6 +40,8 @@ const LIST = [
   EnsibleFsComponent,
   EnsibleUserComponent,
   EnsibleItemListComponent,
+  EnsibleItemListPlaybookComponent,
+  EnsibleItemListShellComponent,
   EnsibleItemComponent,
   EnsibleItemRunComponent,
   EnsibleItemRunHistoryComponent,

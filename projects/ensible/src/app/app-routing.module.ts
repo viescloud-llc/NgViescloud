@@ -20,6 +20,8 @@ import { EnsibleOpenIDProvider } from './model/ensible.model';
 import { EnsibleOpenIdProviderComponent } from './ensible-open-id-provider/ensible-open-id-provider.component';
 import { EnsibleOpenidLoginComponent } from './ensible-openid-login/ensible-openid-login.component';
 import { EnsibleUserGroupListComponent } from './ensible-user-group-list/ensible-user-group-list.component';
+import { EnsibleItemListPlaybookComponent } from './item/ensible-item-list/ensible-item-list-playbook/ensible-item-list-playbook.component';
+import { EnsibleItemListShellComponent } from './item/ensible-item-list/ensible-item-list-shell/ensible-item-list-shell.component';
 
 const routes: Routes = [
   {
@@ -36,11 +38,19 @@ const routes: Routes = [
     canActivateChild: [async () => inject(EnsibleAuthGuard).isLogin()],
     children: [
       {
-        path: 'all',
-        component: EnsibleItemListComponent
+        path: 'playbooks/all',
+        component: EnsibleItemListPlaybookComponent
       },
       {
-        path: ':id',
+        path: 'playbooks/:id',
+        component: EnsibleItemTabComponent
+      },
+      {
+        path: 'shells/all',
+        component: EnsibleItemListShellComponent
+      },
+      {
+        path: 'shells/:id',
         component: EnsibleItemTabComponent
       }
     ]

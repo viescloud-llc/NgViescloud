@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { EnsiblePlaybookItemService } from '../../service/ensible-item/ensible-item.service';
-import { EnsiblePlaybookItem } from '../../model/ensible.model';
+import { EnsibleItemService } from '../../service/ensible-item/ensible-item.service';
+import { EnsibleItem } from '../../model/ensible.model';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 import { Router } from '@angular/router';
 import { EnsibleSettingService } from '../../service/ensible-setting/ensible-setting.service';
@@ -19,17 +19,17 @@ import { SnackBarUtils } from 'projects/viescloud-utils/src/lib/util/SnackBar.ut
   templateUrl: './ensible-item-list.component.html',
   styleUrls: ['./ensible-item-list.component.scss']
 })
-export class EnsibleItemListComponent extends FixChangeDetection implements OnInit {
+export class EnsibleItemListComponent<T extends EnsibleItem> extends FixChangeDetection implements OnInit {
 
-  items: EnsiblePlaybookItem[] = [];
-  blankItem: EnsiblePlaybookItem = new EnsiblePlaybookItem();
+  items: T[] = [];
+  blankItem!: T;
 
   useTable = false;
 
   currentPath = '/';
 
   constructor(
-    private ensibleItemService: EnsiblePlaybookItemService,
+    private ensibleItemService: EnsibleItemService<T>,
     private rxjsUtils: RxJSUtils,
     private dialogUtils: EnsibleDialogUtilsService,
     private router: Router,
@@ -37,6 +37,7 @@ export class EnsibleItemListComponent extends FixChangeDetection implements OnIn
     private snackBarUtils: SnackBarUtils
   ) {
     super();
+    this.blankItem = ensibleItemService.newEmptyItem();
   }
 
   ngOnInit(): void {
@@ -56,15 +57,15 @@ export class EnsibleItemListComponent extends FixChangeDetection implements OnIn
     this.router.navigate(["item", 0], {queryParams: {path: this.currentPath}});
   }
 
-  selectItem(item: EnsiblePlaybookItem) {
+  selectItem(item: T) {
     this.router.navigate(['item', item.id]);
   }
 
-  getPath(item: EnsiblePlaybookItem) {
+  getPath(item: T) {
     return item.path;
   }
 
-  getLabel(item: EnsiblePlaybookItem) {
+  getLabel(item: T) {
     return item.name;
   }
 

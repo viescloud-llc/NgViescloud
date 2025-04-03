@@ -8,7 +8,6 @@ import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 import { FsWriteMode } from '../model/ensible.model';
 import { EnsibleFsService } from '../service/ensible-fs/ensible-fs.service';
-import { AnsibleWorkspaceParserService } from '../service/ensible-workspace/ensible-workspace.service';
 import { EnsibleVaultService } from '../service/ensible-vault/ensible-vault.service';
 import { EnsibleWorkSpace } from '../model/ensible.parser.model';
 import { CodeEditorComponent } from 'projects/viescloud-utils/src/lib/util-component/code-editor/code-editor.component';
@@ -74,8 +73,7 @@ export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges
   codeEditor?: CodeEditorComponent;
 
   constructor(
-    private ensibleFsService: EnsibleFsService,
-    public ensibleWorkspaceParserService: AnsibleWorkspaceParserService,
+    public ensibleFsService: EnsibleFsService,
     private ensibleVaultService: EnsibleVaultService,
     private rxJSUtils: RxJSUtils,
     private dialogUtils: DialogUtils,
@@ -239,7 +237,7 @@ export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges
         this.fileContentCopy = structuredClone(this.fileContent);
 
         if(this.newFile) {
-          this.ensibleWorkspaceParserService.triggerFetchWorkspace();
+          this.ensibleFsService.triggerFetchWorkspace();
           this.navigate(this.prefixPath + this.getFullPathBy(this.newFile));
           return;
         }
@@ -254,7 +252,7 @@ export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges
       this.ensibleFsService.moveFile(this.getFullPath(), this.getFullPath(this.fileName), FsWriteMode.OVERRIDEN).pipe(this.rxJSUtils.waitLoadingDialog()).subscribe({
         next: () => {
           this.fileNameCopy = structuredClone(this.fileName);
-          this.ensibleWorkspaceParserService.triggerFetchWorkspace();
+          this.ensibleFsService.triggerFetchWorkspace();
           this.navigate(this.prefixPath + this.getFullPath(this.fileName));
         },
         error: (err) => {
@@ -279,7 +277,7 @@ export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges
     if(confirm) {
       this.ensibleFsService.deleteFile(this.getFullPath()).pipe(this.rxJSUtils.waitLoadingDialog()).subscribe({
         next: () => {
-          this.ensibleWorkspaceParserService.triggerFetchWorkspace();
+          this.ensibleFsService.triggerFetchWorkspace();
           this.navigate('home');
         },
         error: (err) => {
@@ -334,7 +332,7 @@ export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges
         });
 
         if(res !== null) {
-          this.ensibleWorkspaceParserService.triggerFetchWorkspace();
+          this.ensibleFsService.triggerFetchWorkspace();
           this.navigate(this.prefixPath + this.getFullPathBy(this.newFile));
           this.onRouteChange();
           return;
