@@ -26,4 +26,7 @@ export class EnsibleItemListPlaybookComponent extends EnsibleItemListComponent<E
     super(ensiblePlaybookItemService, rxjsUtils, dialogUtils, router, ensibleSettingService, snackBarUtils);
   }
 
+  override getPathSuffix(): string {
+    return 'playbooks'
+  }
 }

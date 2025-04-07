@@ -3,7 +3,7 @@ import { DateTime, MatInputDisable, MatInputDisplayLabel, MatInputEnum, MatInput
 import { DataUtils } from "projects/viescloud-utils/src/lib/util/Data.utils";
 import { ReflectionUtils } from "projects/viescloud-utils/src/lib/util/Reflection.utils";
 
-export enum EnsibleItemType {
+export enum EnsibleItemTypeEnum {
   ANSIBLE,
   SHELL,
   TERRAFORM
@@ -171,6 +171,7 @@ export class EnsibleShellItem extends EnsibleItem {
   type: string = '';
   code: string = '';
   codeFilePath: string = '';
+  runCodeFilePath: boolean = false;
 }
 
 export class EnsibleProcessLogger {
@@ -194,9 +195,13 @@ export class EnsibleProcessLogger {
 
   @MatTableHide()
   topic: string = '';
+
+  constructor() {
+    ReflectionUtils.copyAllParentPrototype(this);
+  }
 }
 
-export class EnsiblePlayBookLogger extends EnsibleProcessLogger {
+export class EnsiblePlaybookLogger extends EnsibleProcessLogger {
   @MatTableHide()
   id: number = 0;
 
@@ -209,16 +214,25 @@ export class EnsibleShellLogger extends EnsibleProcessLogger {
   id: number = 0;
 }
 
-export class EnsiblePlayBookTrigger {
+export class EnsibleItemTrigger {
+  itemId?: string = '';
+  outputTopic?: string = '';
+  consumeEverything?: boolean = false;
+  verbosity?: string = '';
+}
+
+export class EnsiblePlayBookTrigger extends EnsibleItemTrigger {
   playbook?: string = '';
   inventory?: string = '';
   vaultSecretsFile?: string = '';
   vaultPasswordFile?: string = '';
   vaultPassword?: string = '';
-  itemId?: string = '';
-  outputTopic?: string = '';
-  consumeEverything?: boolean = false;
-  verbosity?: string = '';
+}
+
+export class EnsibleShellTrigger extends EnsibleItemTrigger {
+  type?: string = '';
+  code?: string = '';
+  codeFilePath?: string = '';
 }
 
 export enum EnsiblePlaybookStatus {

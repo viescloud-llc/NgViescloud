@@ -31,6 +31,8 @@ import { EnsibleUserAccessComponent } from './ensible-user-access/ensible-user-a
 import { EnsibleUserGroupListComponent } from './ensible-user-group-list/ensible-user-group-list.component';
 import { EnsibleItemListPlaybookComponent } from './item/ensible-item-list/ensible-item-list-playbook/ensible-item-list-playbook.component';
 import { EnsibleItemListShellComponent } from './item/ensible-item-list/ensible-item-list-shell/ensible-item-list-shell.component';
+import { EnsibleItemPlaybookComponent } from './item/ensible-item/ensible-item-playbook/ensible-item-playbook.component';
+import { EnsibleItemShellComponent } from './item/ensible-item/ensible-item-shell/ensible-item-shell.component';
 
 const LIST = [
   AppComponent,
@@ -43,6 +45,8 @@ const LIST = [
   EnsibleItemListPlaybookComponent,
   EnsibleItemListShellComponent,
   EnsibleItemComponent,
+  EnsibleItemPlaybookComponent,
+  EnsibleItemShellComponent,
   EnsibleItemRunComponent,
   EnsibleItemRunHistoryComponent,
   EnsibleItemTabComponent,

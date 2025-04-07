@@ -1,8 +1,7 @@
-import { EnsibleDockerContainerTemplate, EnsibleItem } from './../../model/ensible.model';
+import { EnsibleDockerContainerTemplate, EnsibleItem, EnsiblePlaybookItem, EnsibleShellItem } from './../../model/ensible.model';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { EnsiblePlaybookItemService } from '../../service/ensible-item/ensible-item.service';
-import { T, VERPOSITY_OPTIONS } from '../../model/ensible.model';
+import { VERPOSITY_OPTIONS } from '../../model/ensible.model';
 import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
@@ -15,6 +14,8 @@ import { UserAccessInputType } from 'projects/viescloud-utils/src/lib/util-compo
 import { FileUtils } from 'projects/viescloud-utils/src/lib/util/File.utils';
 import { ReflectionUtils } from 'projects/viescloud-utils/src/lib/util/Reflection.utils';
 import { EnsibleFsService } from '../../service/ensible-fs/ensible-fs.service';
+import { EnsibleItemService, EnsiblePlaybookItemService, EnsibleShellItemService } from '../../service/ensible-item/ensible-item.service';
+import { EnsibleItemServiceType, EnsibleItemType } from '../ensible-item-tab/ensible-item-tab.component';
 
 @Component({
   selector: 'app-ensible-item',
@@ -33,7 +34,6 @@ export class EnsibleItemComponent<T extends EnsibleItem> implements OnChanges, O
   isEditing: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   itemCopy!: T;
-  blankItem: T = new T();
 
   validForm: boolean = false;
   isFsEditing: boolean[] = [];
@@ -47,7 +47,7 @@ export class EnsibleItemComponent<T extends EnsibleItem> implements OnChanges, O
   private CLONE_ITEM = "clone_item";
 
   constructor(
-    private ensibleItemService: EnsiblePlaybookItemService,
+    private itemService: EnsibleItemService<T>,
     public ensibleFsService: EnsibleFsService,
     private rxjsUtils: RxJSUtils,
     private dialogUtils: DialogUtils,
@@ -57,6 +57,10 @@ export class EnsibleItemComponent<T extends EnsibleItem> implements OnChanges, O
 
   ngOnChanges(changes: SimpleChanges): void {
     this.ngOnInit();
+  }
+
+  getSuffix() {
+    return '';
   }
 
   ngOnInit(): void {
@@ -104,10 +108,10 @@ export class EnsibleItemComponent<T extends EnsibleItem> implements OnChanges, O
   }
 
   save() {
-    this.ensibleItemService.postOrPut(this.item.id, this.item).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+    this.itemService.postOrPut(this.item.id, this.item).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
       next: res => {
         if(this.item.id === 0) {
-          this.router.navigate(['item', res.id]);
+          this.router.navigate(['item', this.getSuffix(), res.id]);
         }
 
         this.itemChange.emit(res);
@@ -127,9 +131,9 @@ export class EnsibleItemComponent<T extends EnsibleItem> implements OnChanges, O
 
     if(!yes) return;
 
-    this.ensibleItemService.delete(this.item.id).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+    this.itemService.delete(this.item.id).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
       next: () => {
-        this.router.navigate(['item', 'all']);
+        this.router.navigate(['item', this.getSuffix(), 'all']);
       },
       error: err => {
         this.dialogUtils.openErrorMessageFromError(err, 'Deleting Error', 'Error deleting item, please try again or refresh the page if the error persists');
@@ -169,6 +173,6 @@ export class EnsibleItemComponent<T extends EnsibleItem> implements OnChanges, O
 
   clone() {
     FileUtils.localStorageSetItem(this.CLONE_ITEM, this.item);
-    this.router.navigate(["/item/0"]);
+    this.router.navigate(['item', this.getSuffix(), 0]);
   }
 }

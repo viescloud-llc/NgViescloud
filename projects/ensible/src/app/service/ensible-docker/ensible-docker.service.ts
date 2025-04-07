@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { EnsibleService } from '../ensible/ensible.service';
 import { firstValueFrom } from 'rxjs';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { EnsibleDockerContainer, EnsibleItemType } from '../../model/ensible.model';
+import { EnsibleDockerContainer, EnsibleItemTypeEnum } from '../../model/ensible.model';
 import { HttpParamsBuilder } from 'projects/viescloud-utils/src/lib/model/Utils.model';
 
 @Injectable({
@@ -40,12 +40,12 @@ export class EnsibleDockerService extends EnsibleService {
     return this.httpClient.post(`${this.getPrefixUri()}/image/pull`, null, {params: params.build(), responseType: 'text'});
   }
 
-  deleteContainerByItemId(type: EnsibleItemType, itemId: string | number) {
+  deleteContainerByItemId(type: EnsibleItemTypeEnum, itemId: string | number) {
     let params = new HttpParams().set('itemId', itemId).set('type', type);
     return this.httpClient.delete(`${this.getPrefixUri()}/container`, {params: params});
   }
 
-  readyContainerByItemId(type: EnsibleItemType, itemId: string | number, outputTopic?: string, consumeEverything: boolean = true) {
+  readyContainerByItemId(type: EnsibleItemTypeEnum, itemId: string | number, outputTopic?: string, consumeEverything: boolean = true) {
     let params = new HttpParamsBuilder();
     params.setIfValid('outputTopic', outputTopic);
     params.setIfValid('consumeEverything', consumeEverything);

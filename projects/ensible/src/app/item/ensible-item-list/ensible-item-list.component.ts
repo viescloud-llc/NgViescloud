@@ -40,6 +40,10 @@ export class EnsibleItemListComponent<T extends EnsibleItem> extends FixChangeDe
     this.blankItem = ensibleItemService.newEmptyItem();
   }
 
+  getPathSuffix() {
+    return '';
+  }
+
   ngOnInit(): void {
     this.init();
     this.useTable = !this.ensibleSettingService.getCopyOfGeneralSetting<EnsibleSetting>().UseTreeDisplayForItemList;
@@ -54,11 +58,11 @@ export class EnsibleItemListComponent<T extends EnsibleItem> extends FixChangeDe
   }
 
   addItem() {
-    this.router.navigate(["item", 0], {queryParams: {path: this.currentPath}});
+    this.router.navigate(["item", this.getPathSuffix(), 0], {queryParams: {path: this.currentPath}});
   }
 
   selectItem(item: T) {
-    this.router.navigate(['item', item.id]);
+    this.router.navigate(['item', this.getPathSuffix(), item.id]);
   }
 
   getPath(item: T) {

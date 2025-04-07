@@ -1,0 +1,265 @@
+<ul class="margin-center" appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
+  <!-- <li>
+    <app-mat-form-field-input
+    label="ID"
+    [(value)]="item.id"
+    [styleWidth]="'100%'"
+    [disable]="true"
+    ></app-mat-form-field-input>
+  </li> -->
+  <li>
+    <app-mat-form-field-input
+    label="Item Name"
+    [(value)]="item.name"
+    styleWidth="100%"
+    [required]="true"
+    ></app-mat-form-field-input>
+  </li>
+  <li>
+    <app-mat-form-field-input
+    label="Item Path"
+    [(value)]="item.path"
+    styleWidth="100%"
+    [focusOutAutoFillFn]="formatValidPath"
+    [required]="true"
+    ></app-mat-form-field-input>
+  </li>
+  <li>
+    <app-mat-form-field-input-option
+    label="Verbosity"
+    [(value)]="item.verbosity"
+    [options]="verbosityOptions"
+    styleWidth="100%"
+    [noneLabelValue]="''"
+    ></app-mat-form-field-input-option>
+  </li>
+  <li>
+    <app-mat-form-field-input-record
+    label="Variables"
+    [(value)]="item.variables"
+    styleWidth="100%"
+    [blankObject]="blankItem.variables"
+    [showSizeInput]="false"
+    [required]="true"
+    ></app-mat-form-field-input-record>
+    <br>
+  </li>
+  <li>
+    <app-ensible-user-access
+    [(value)]="item"
+    styleWidth="100%"
+    [inputType]="[UserAccessInputType.SHARED_USERS, UserAccessInputType.SHARED_GROUPS, UserAccessInputType.SHARED_OTHERS]"
+    ></app-ensible-user-access>
+    <br>
+  </li>
+  <li>
+    <details>
+      <summary>Trigger</summary>
+      <ul>
+        <li>
+          <app-mat-form-field-input-dynamic
+          label="Trigger on github webhook"
+          [(value)]="item.triggerOnGithubWebhook"
+          styleWidth="100%"
+          [isSlideToggle]="true"
+          [blankObject]="false"
+          ></app-mat-form-field-input-dynamic>
+        </li>
+        <li *ngIf="item.triggerOnGithubWebhook">
+          <app-mat-form-field-input
+          label="Github url"
+          [(value)]="item.githubUrl"
+          styleWidth="100%"
+          [placeholder]="'https://github.com/org/repo'"
+          [required]="true"
+          [autoFillHttps]="true"
+          [showGoto]="true"
+          ></app-mat-form-field-input>
+        </li>
+        <li *ngIf="item.triggerOnGithubWebhook && item.githubUrl">
+          <app-mat-form-field-input
+          label="Configurate gihub to send webhook to this url"
+          [value]="getGithubWebhookUrl()"
+          styleWidth="100%"
+          [readonly]="true"
+          [showCopyToClipboard]="true"
+          ></app-mat-form-field-input>
+        </li>
+        <hr>
+        <li>
+          <app-mat-form-field-input-dynamic
+          label="Trigger on gitlab webhook (not supported yet)"
+          [(value)]="item.triggerOnGitlabWebhook"
+          styleWidth="100%"
+          [isSlideToggle]="true"
+          [blankObject]="false"
+          ></app-mat-form-field-input-dynamic>
+        </li>
+        <li *ngIf="item.triggerOnGitlabWebhook">
+          <app-mat-form-field-input
+          label="gitlab url"
+          [(value)]="item.gitlabUrl"
+          styleWidth="100%"
+          [placeholder]="'https://gitlab.com/org/repo'"
+          [required]="true"
+          [autoFillHttps]="true"
+          [showGoto]="true"
+          ></app-mat-form-field-input>
+        </li>
+        <li *ngIf="item.triggerOnGitlabWebhook && item.gitlabUrl">
+          <app-mat-form-field-input
+          label="Configurate gitlab to send webhook to this url"
+          [value]="getGitlabWebhookUrl()"
+          styleWidth="100%"
+          [readonly]="true"
+          [showCopyToClipboard]="true"
+          ></app-mat-form-field-input>
+        </li>
+        <hr>
+        <li>
+          <app-mat-form-field-input
+          label="Trigger on cron job schedule"
+          [(value)]="item.cronExpression"
+          placeholder="e.g * * * * * *, 0 0 * * *, 0 0/5 * */3 * *"
+          styleWidth="100%"
+          ></app-mat-form-field-input>
+        </li>
+        <li *ngIf="item.cronExpression">
+          <span>{{getCronDescription(item.cronExpression)}}</span>
+        </li>
+      </ul>
+    </details>
+    <br>
+  </li>
+
+  <li>
+    <details open>
+      <summary>Inventory</summary>
+      <ul>
+        <li>
+          <app-mat-form-field-input-option
+          label="Inventory"
+          [(value)]="item.inventoryPath"
+          [options]="ensibleFsService.inventoriesFileOptions"
+          [noneLabel]="''"
+          [required]="true"
+          styleWidth="100%"
+          ></app-mat-form-field-input-option>
+        </li>
+        <li *ngIf="item.inventoryPath">
+          <details>
+            <summary>Quick Edit</summary>
+            <app-ensible-fs
+            [fsPath]="item.inventoryPath"
+            (isEditing)="isFsEditing[0] = $event"
+            ></app-ensible-fs>
+          </details>
+        </li>
+      </ul>
+    </details>
+    <br>
+  </li>
+
+  <li>
+    <details open>
+      <summary>Playbook</summary>
+      <ul>
+        <li>
+          <app-mat-form-field-input-option
+          label="Playbook"
+          [(value)]="item.playBookPath"
+          [options]="ensibleFsService.playbooksFileOptions"
+          [noneLabel]="''"
+          [required]="true"
+          styleWidth="100%"
+          ></app-mat-form-field-input-option>
+        </li>
+        <li *ngIf="item.playBookPath">
+          <details>
+            <summary>Quick Edit</summary>
+            <app-ensible-fs
+            [fsPath]="item.playBookPath"
+            (isEditing)="isFsEditing[1] = $event"
+            ></app-ensible-fs>
+          </details>
+        </li>
+      </ul>
+    </details>
+    <br>
+  </li>
+
+  <li>
+    <details>
+      <summary>Secret</summary>
+      <ul>
+        <li>
+          <app-mat-form-field-input-option
+          label="Secret File"
+          [(value)]="item.vaultSecretsFilePath"
+          [options]="ensibleFsService.secretsFileOptions"
+          styleWidth="100%"
+          [blankObject]="''"
+          ></app-mat-form-field-input-option>
+        </li>
+        <li *ngIf="item.vaultSecretsFilePath">
+          <details>
+            <summary>Quick Edit</summary>
+            <app-ensible-fs
+            [fsPath]="item.vaultSecretsFilePath"
+            (isEditing)="isFsEditing[2] = $event"
+            ></app-ensible-fs>
+          </details>
+          <hr>
+        </li>
+        <li>
+          <app-mat-form-field-input-option
+          *ngIf="item.vaultSecretsFilePath"
+          label="Secret password file"
+          [(value)]="item.vaultPasswordFilePath"
+          [options]="ensibleFsService.passwordFileOptions"
+          styleWidth="100%"
+          [required]="true"
+          ></app-mat-form-field-input-option>
+        </li>
+      </ul>
+    </details>
+    <br>
+  </li>
+
+  <li>
+    <details>
+      <summary>Execution environment (run within docker container)</summary>
+      <app-mat-form-field-input-option
+      label="Docker container template"
+      [(value)]="item.dockerContainerTemplate"
+      [options]="ensibleDockerContainerTemplateOptions"
+      styleWidth="100%"
+      [noneLabelValue]="undefined"
+      ></app-mat-form-field-input-option>
+    </details>
+    <br>
+  </li>
+
+  <li>
+    <details>
+      <summary>Build status</summary>
+      <app-mat-form-field-input
+      label="Build status"
+      [value]="getBuildStatusUrl()"
+      [readonly]="true"
+      [showCopyToClipboard]="true"
+      [styleWidth]="'100%'"
+      ></app-mat-form-field-input>
+      <br>
+      <p [style.color]="'yellow'">Add this iframe to your web page or github, gitlab, etc.</p>
+    </details>
+    <br>
+  </li>
+
+  <li class="flex-row-container-auto">
+    <button mat-raised-button color="primary" (click)="save()" [disabled]="!validForm || !isValueChange()">Save</button>
+    <button mat-raised-button color="warn" (click)="revert()" [disabled]="!isValueChange()">Revert</button>
+    <button *ngIf="item.id" mat-raised-button color="primary" (click)="clone()">Clone</button>
+    <button *ngIf="item.id" mat-raised-button color="warn" (click)="deleteItem()">Delete</button>
+  </li>
+</ul>

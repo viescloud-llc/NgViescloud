@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
-import { AnsibleWorkspaceService } from './ensible-workspace.service';
+import { EnsibleAnsibleWorkspaceService } from './ensible-workspace.service';
 
 describe('ensibleworkspace Service', () => {
-  let service: AnsibleWorkspaceService;
+  let service: EnsibleAnsibleWorkspaceService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(AnsibleWorkspaceService);
+    service = TestBed.inject(EnsibleAnsibleWorkspaceService);
   });
 
   it('should be created', () => {

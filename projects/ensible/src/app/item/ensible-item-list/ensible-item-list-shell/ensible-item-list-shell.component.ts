@@ -27,4 +27,7 @@ export class EnsibleItemListShellComponent extends EnsibleItemListComponent<Ensi
     super(ensibleShellItemService, rxjsUtils, dialogUtils, router, ensibleSettingService, snackBarUtils);
   }
 
+  override getPathSuffix(): string {
+    return 'shells'
+  }
 }

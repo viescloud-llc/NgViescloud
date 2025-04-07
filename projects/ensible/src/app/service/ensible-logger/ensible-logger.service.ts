@@ -1,21 +1,37 @@
 import { Injectable } from '@angular/core';
 import { EnsibleRestService } from '../ensible/ensible.service';
-import { EnsiblePlayBookLogger, EnsibleProcessLogger, EnsibleShellLogger } from '../../model/ensible.model';
+import { EnsiblePlaybookLogger, EnsibleProcessLogger, EnsibleShellLogger } from '../../model/ensible.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export abstract class EnsibleProcessLoggerService<T extends EnsibleProcessLogger> extends EnsibleRestService<T> {
   getAllByItemId(itemId: number) {
-    return this.httpClient.get<EnsiblePlayBookLogger[]>(`${this.getPrefixUri()}/item/${itemId}`);
+    return this.httpClient.get<EnsiblePlaybookLogger[]>(`${this.getPrefixUri()}/item/${itemId}`);
   }
 
   getAllByItemIdOptimize(itemId: number) {
-    return this.httpClient.get<EnsiblePlayBookLogger[]>(`${this.getPrefixUri()}/item/${itemId}/optimize`);
+    return this.httpClient.get<EnsiblePlaybookLogger[]>(`${this.getPrefixUri()}/item/${itemId}/optimize`);
   }
 
   getByItemIdAndRunNumber(itemId: number, runNumber: number) {
-    return this.httpClient.get<EnsiblePlayBookLogger>(`${this.getPrefixUri()}/item/${itemId}/run/${runNumber}`);
+    return this.httpClient.get<EnsiblePlaybookLogger>(`${this.getPrefixUri()}/item/${itemId}/run/${runNumber}`);
+  }
+
+  abstract newEmptyObject(): T;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class EnsiblePlaybookLoggerService extends EnsibleProcessLoggerService<EnsiblePlaybookLogger> {
+
+  protected override getPrefixes(): string[] {
+    return ['api', 'v1', 'playbook', 'loggers'];
+  }
+
+  override newEmptyObject(): EnsiblePlaybookLogger {
+    return new EnsiblePlaybookLogger();
   }
 }
 
@@ -27,14 +43,8 @@ export class EnsibleShellLoggerService extends EnsibleProcessLoggerService<Ensib
   protected override getPrefixes(): string[] {
     return ['api', 'v1', 'shell', 'loggers'];
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class EnsiblePlaybookLoggerService extends EnsibleProcessLoggerService<EnsiblePlayBookLogger> {
-
-  protected override getPrefixes(): string[] {
-    return ['api', 'v1', 'playbook', 'loggers'];
+  override newEmptyObject(): EnsibleShellLogger {
+    return new EnsibleShellLogger();
   }
 }

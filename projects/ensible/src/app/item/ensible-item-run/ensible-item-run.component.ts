@@ -1,18 +1,13 @@
 import { EnsibleWebsocketService } from './../../service/ensible-websocket/ensible-websocket.service';
-import { EnsiblePlaybookLoggerService } from '../../service/ensible-logger/ensible-logger.service';
 import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
-import { EnsiblePlaybookItem, EnsibleItemType, EnsiblePlayBookLogger, EnsiblePlaybookStatus, EnsiblePlayBookTrigger, VERPOSITY_OPTIONS } from '../../model/ensible.model';
+import { EnsibleItem, EnsibleItemTrigger, EnsibleItemTypeEnum, EnsiblePlaybookItem, EnsiblePlaybookLogger, EnsiblePlaybookStatus, EnsiblePlayBookTrigger, EnsibleShellItem, EnsibleShellTrigger, VERPOSITY_OPTIONS } from '../../model/ensible.model';
 import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
-import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
-import { NumberUtils } from 'projects/viescloud-utils/src/lib/util/Number.utils';
 import { StringUtils } from 'projects/viescloud-utils/src/lib/util/String.utils';
-import { EnsibleWorkSpace } from '../../model/ensible.parser.model';
-import { AnsibleWorkspaceService } from '../../service/ensible-workspace/ensible-workspace.service';
-import { SettingService } from 'projects/viescloud-utils/src/lib/service/Setting.service';
 import { EnsibleProcessService } from '../../service/ensible-process/ensible-process.service';
 import { EnsibleDockerService } from '../../service/ensible-docker/ensible-docker.service';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
-import { delay, timeout } from 'rxjs';
+import { delay } from 'rxjs';
+import { EnsibleItemLoggerServiceType, EnsibleItemloggerType, EnsibleItemType, EnsibleWorkspaceServiceType } from '../ensible-item-tab/ensible-item-tab.component';
 
 @Component({
   selector: 'app-ensible-item-run',
@@ -22,14 +17,20 @@ import { delay, timeout } from 'rxjs';
 export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
 
   @Input()
-  item!: EnsiblePlaybookItem;
+  item!: EnsibleItemType;
+
+  @Input()
+  itemLoggerService!: EnsibleItemLoggerServiceType;
+
+  @Input()
+  itemWorkspaceService!: EnsibleWorkspaceServiceType;
 
   @Input()
   triggerInit: boolean = false;
 
   logId: number = 0;
 
-  playBookLogger?: EnsiblePlayBookLogger;
+  playBookLogger?: EnsibleItemloggerType;
 
   isRunning: boolean = false;
 
@@ -45,9 +46,7 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
   dockerReady = false;
 
   constructor(
-    private ensiblePlaybookLoggerService: EnsiblePlaybookLoggerService,
     private ensibleWebsocketService: EnsibleWebsocketService,
-    private ensibleWorkSpaceService: AnsibleWorkspaceService,
     private ensibleProcessService: EnsibleProcessService,
     private ensibleDockerService: EnsibleDockerService,
     private rxjsUtils: RxJSUtils
@@ -81,7 +80,7 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
     }
     else if(logId) {
       this.logId = parseInt(logId);
-      this.ensiblePlaybookLoggerService.get(this.logId).subscribe({
+      this.itemLoggerService.get(this.logId).subscribe({
         next: res => {
           this.playBookLogger = res;
           if(res.status === EnsiblePlaybookStatus.RUNNING) {
@@ -113,18 +112,35 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
   }
 
   run() {
+    if(this.item instanceof EnsiblePlaybookItem) {
+      this.runItem(this.item as EnsiblePlaybookItem, (i, uuid) => {
+        return {
+          itemId: i.id.toString(),
+          outputTopic: uuid,
+          consumeEverything: true,
+          verbosity: i.verbosity
+        }
+      });
+    }
+    else if(this.item instanceof EnsibleShellItem) {
+      this.runItem(this.item as EnsibleShellItem, (i, uuid) => {
+        return {
+          itemId: i.id.toString(),
+          outputTopic: uuid,
+          consumeEverything: true
+        }
+      });
+    }
+  }
+
+  runItem<T extends EnsibleItem>(item: T, func: (i: T, uuid: string) => EnsibleItemTrigger): void {
     let uuid = this.readyNewTopicOutput();
 
-    let playbookTrigger: EnsiblePlayBookTrigger = {
-      itemId: this.item.id.toString(),
-      outputTopic: uuid,
-      consumeEverything: true,
-      verbosity: this.item.verbosity
-    }
+    let itemTrigger = func(item, uuid);
 
     this.watchTopic(uuid);
 
-    let sub = this.ensibleWorkSpaceService.triggerPlaybook(playbookTrigger).pipe(delay(1000)).subscribe({
+    let sub = this.itemWorkspaceService.triggerPlaybook(itemTrigger).pipe(delay(1000)).subscribe({
       next: res => {
         this.runOutput = res;
         this.isRunning = false;
@@ -197,12 +213,31 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
   }
 
   getVerboseLabel() {
-    let verbosity = this.item.verbosity;
+    let verbosity = VERPOSITY_OPTIONS[0].value;
+
+    if(this.item instanceof EnsiblePlaybookItem) {
+      verbosity = (this.item as EnsiblePlaybookItem).verbosity;
+    }
+    else if(this.item instanceof EnsibleShellItem) {
+      //TODO add verbose for shell script maybe
+    }
+
     return this.verbosityOptions.find(opt => opt.value === verbosity)?.valueLabel ?? 'minimal';
   }
 
   removeContainer() {
-    this.ensibleDockerService.deleteContainerByItemId(EnsibleItemType.ANSIBLE, this.item.id).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+    let type: EnsibleItemTypeEnum | null = null;
+    if(this.item instanceof EnsiblePlaybookItem) {
+      type = EnsibleItemTypeEnum.ANSIBLE;
+    }
+    else if(this.item instanceof EnsibleShellItem) {
+      type = EnsibleItemTypeEnum.SHELL;
+    }
+    else {
+      return;
+    }
+
+    this.ensibleDockerService.deleteContainerByItemId(type, this.item.id).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
       next: res => { }
     })
   }
@@ -210,7 +245,19 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
   readyContainer() {
     let uuid = this.readyNewTopicOutput();
     this.watchTopic(uuid);
-    this.ensibleDockerService.readyContainerByItemId(EnsibleItemType.ANSIBLE, this.item.id, uuid).pipe(delay(1000)).subscribe({
+
+    let type: EnsibleItemTypeEnum | null = null;
+    if(this.item instanceof EnsiblePlaybookItem) {
+      type = EnsibleItemTypeEnum.ANSIBLE;
+    }
+    else if(this.item instanceof EnsibleShellItem) {
+      type = EnsibleItemTypeEnum.SHELL;
+    }
+    else {
+      return;
+    }
+    
+    this.ensibleDockerService.readyContainerByItemId(type, this.item.id, uuid).pipe(delay(1000)).subscribe({
       next: res => {
         this.runOutput = res;
         this.isRunning = false;
