@@ -140,7 +140,7 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
 
     this.watchTopic(uuid);
 
-    let sub = this.itemWorkspaceService.triggerPlaybook(itemTrigger).pipe(delay(1000)).subscribe({
+    let sub = this.itemWorkspaceService.runCommand(itemTrigger).pipe(delay(1000)).subscribe({
       next: res => {
         this.runOutput = res;
         this.isRunning = false;

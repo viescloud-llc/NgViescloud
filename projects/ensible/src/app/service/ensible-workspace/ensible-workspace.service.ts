@@ -14,7 +14,7 @@ import { HttpParamsBuilder } from 'projects/viescloud-utils/src/lib/model/Utils.
   providedIn: 'root'
 })
 export abstract class EnsibleWorkspaceService<T extends EnsibleItemTrigger> extends EnsibleService {
-  abstract triggerPlaybook(itemTrigger: T): Observable<string>;
+  abstract runCommand(itemTrigger: T): Observable<string>;
 }
 
 //----------------------------------Ansible----------------------------------
@@ -28,7 +28,7 @@ export class EnsibleAnsibleWorkspaceService extends EnsibleWorkspaceService<Ensi
     return ['api', 'v1', 'ansible', 'workspaces'];
   }
 
-  override triggerPlaybook(playbookTrigger: EnsiblePlayBookTrigger): Observable<string> {
+  override runCommand(playbookTrigger: EnsiblePlayBookTrigger): Observable<string> {
     let params = new HttpParamsBuilder();
     if(playbookTrigger.itemId) {
       params = params.setIfValid('itemId', playbookTrigger.itemId);
@@ -46,7 +46,7 @@ export class EnsibleAnsibleWorkspaceService extends EnsibleWorkspaceService<Ensi
 
     let httpParams = params.build();
 
-    return this.httpClient.post(`${this.getPrefixUri()}/playbook`, null, {params: httpParams, responseType: 'text'});
+    return this.httpClient.post(`${this.getPrefixUri()}/run`, null, {params: httpParams, responseType: 'text'});
   }
 
   createTemplate() {
@@ -65,7 +65,7 @@ export class EnsibleShellWorkspaceService extends EnsibleWorkspaceService<Ensibl
     return ['api', 'v1', 'shell', 'workspaces'];
   }
 
-  override triggerPlaybook(itemTrigger: EnsibleShellTrigger): Observable<string> {
+  override runCommand(itemTrigger: EnsibleShellTrigger): Observable<string> {
     let params = new HttpParamsBuilder();
     if(itemTrigger.itemId) {
       params = params.setIfValid('itemId', itemTrigger.itemId);
@@ -73,6 +73,7 @@ export class EnsibleShellWorkspaceService extends EnsibleWorkspaceService<Ensibl
       params = params.setIfValid('type', itemTrigger.type);
       params = params.setIfValid('code', itemTrigger.code);
       params = params.setIfValid('codeFilePath', itemTrigger.codeFilePath);
+      params = params.setIfValid('runCodeFilePath', itemTrigger.runCodeFilePath ?? false);
     }
 
     params = params.setIfValid('outputTopic', itemTrigger.outputTopic);
@@ -80,7 +81,8 @@ export class EnsibleShellWorkspaceService extends EnsibleWorkspaceService<Ensibl
     params = params.setIfValid('verbosity', itemTrigger.verbosity);
 
     let httpParams = params.build();
+    let body = itemTrigger.code ?? null; 
 
-    return this.httpClient.post(`${this.getPrefixUri()}/playbook`, null, {params: httpParams, responseType: 'text'});
+    return this.httpClient.post(`${this.getPrefixUri()}/run`, body, {params: httpParams, responseType: 'text'});
   }
 }

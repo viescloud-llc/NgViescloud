@@ -150,6 +150,9 @@ export class EnsibleItem extends UserAccess {
   variables: Record<string, string> = {'key':'value'} as Record<string, string>;
 
   @MatTableHide()
+  variableList: string[] = [] as string[];
+
+  @MatTableHide()
   dockerContainerTemplate?: EnsibleDockerContainerTemplate = new EnsibleDockerContainerTemplate();
 }
 
@@ -233,6 +236,7 @@ export class EnsibleShellTrigger extends EnsibleItemTrigger {
   type?: string = '';
   code?: string = '';
   codeFilePath?: string = '';
+  runCodeFilePath?: boolean = false;
 }
 
 export enum EnsiblePlaybookStatus {
