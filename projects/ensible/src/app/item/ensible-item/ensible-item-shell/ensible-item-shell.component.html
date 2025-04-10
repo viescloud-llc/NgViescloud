@@ -34,7 +34,7 @@
   </li>
   <li>
     <app-mat-form-field-input-record
-    label="Variables"
+    label="Environment variable"
     [(value)]="item.variables"
     styleWidth="100%"
     [blankObject]="blankItem.variables"
@@ -45,14 +45,24 @@
   </li>
   <li>
     <app-mat-form-field-input-list
-    label="Variables"
+    label="Parameter variable"
     [(value)]="item.variableList"
     styleWidth="100%"
     [blankObject]="''"
     [showSizeInput]="false"
-    [required]="false"
+    [required]="true"
     ></app-mat-form-field-input-list>
     <br>
+  </li>
+  <li>
+    <app-mat-form-field-input-option
+    label="Run Shell with"
+    [(value)]="item.type"
+    [options]="typeOptions"
+    [noneLabel]="''"
+    [required]="true"
+    styleWidth="100%"
+    ></app-mat-form-field-input-option>
   </li>
   <li>
     <details>
@@ -134,33 +144,64 @@
     <br>
   </li>
 
-  <!-- <li>
+  <li>
     <details open>
-      <summary>Inventory</summary>
+      <summary>Code</summary>
       <ul>
         <li>
+          <app-mat-form-field-input-dynamic
+          label="Use code from file"
+          [(value)]="item.runCodeFilePath"
+          styleWidth="100%"
+          [isSlideToggle]="true"
+          [blankObject]="false"
+          ></app-mat-form-field-input-dynamic>
+        </li>
+
+        <hr>
+
+        <li *ngIf="!item.runCodeFilePath">
+          <button mat-icon-button color="primary" (click)="forceResizeEditor()" [matTooltip]="'Refresh Editor'">
+            <mat-icon>refresh</mat-icon>
+          </button>
+        </li>
+        
+        <li *ngIf="!item.runCodeFilePath">
+          <app-code-editor
+          #codeEditorRef
+          [(value)]="item.code"
+          [language]="'shell'"
+          ></app-code-editor>
+        </li>
+
+        <li *ngIf="item.runCodeFilePath">
           <app-mat-form-field-input-option
-          label="Inventory"
-          [(value)]="item.inventoryPath"
-          [options]="ensibleFsService.inventoriesFileOptions"
-          [noneLabel]="''"
+          label="Shell code file"
+          [(value)]="item.codeFilePath"
+          [options]="ensibleFsService.shellsFileOptions"
+          [noneLabel]="'None'"
           [required]="true"
           styleWidth="100%"
           ></app-mat-form-field-input-option>
         </li>
-        <li *ngIf="item.inventoryPath">
+
+        <li *ngIf="item.runCodeFilePath && ensibleFsService.shellsFileOptions.length">
           <details>
             <summary>Quick Edit</summary>
             <app-ensible-fs
-            [fsPath]="item.inventoryPath"
+            [fsPath]="item.codeFilePath"
             (isEditing)="isFsEditing[0] = $event"
             ></app-ensible-fs>
           </details>
         </li>
+
+        <li *ngIf="item.runCodeFilePath && !ensibleFsService.shellsFileOptions.length">
+          <p class="text-center" style="color: red;">Unable to load files or no file exist under Shells (you can add new file on left side under Shells category)</p>
+        </li>
       </ul>
     </details>
     <br>
-  </li> -->
+  </li>
 
   <li>
     <details>

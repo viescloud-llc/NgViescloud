@@ -1,4 +1,5 @@
 import { DataUtils } from "../util/Data.utils";
+import { ViesUtils } from "../util/Vies.utils";
 
 export enum PropertyMatcherEnum {
     CASE_SENSITIVE = "CASE_SENSITIVE",
@@ -384,20 +385,7 @@ export const MatInputOptions = (options: (string | number)[], noneLabel?: string
 
 export const MatInputEnum = (Enum: any, noneLabel?: string | number, noneValue?: string | number) => {
     return function MatInputEnum(object: any, key: any) {
-        let matOptions: MatOption<any>[] = [];
-        let enumArray = DataUtils.getEnumValues(Enum);
-        if(noneLabel) {
-            matOptions.push({
-                value: noneValue,
-                valueLabel: noneLabel.toString()
-            })
-        }
-        enumArray.forEach(option => {
-            matOptions.push({
-                value: option,
-                valueLabel: option.toString()
-            })
-        })
+        let matOptions = ViesUtils.enumValuesToMatOptions(Enum, noneLabel, noneValue);
         addValue(object, key, MatItemSettingType.OPTIONS.toString(), matOptions, matOptions);
     }
 }

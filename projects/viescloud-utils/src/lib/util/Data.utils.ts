@@ -270,7 +270,9 @@ export class DataUtils {
   static getEnumValues(enumObj: any): (string | number)[] {
     if (DataUtils.isEnum(enumObj)) {
         let arr: (string | number)[] = [];
-        Object.values(enumObj).forEach(value => {
+        Object.values(enumObj)
+        .filter(value => isNaN(Number(value)))
+        .forEach(value => {
             if (typeof value === "string" || typeof value === "number") {
                 arr.push(value);
             }
@@ -278,6 +280,35 @@ export class DataUtils {
         return arr;
     }
     return [];
+  }
+
+  static getEnumKeys(enumObj: any): (string | number)[] {
+    if (DataUtils.isEnum(enumObj)) {
+        let arr: (string | number)[] = [];
+        Object.keys(enumObj)
+        .filter(key => isNaN(Number(key)))
+        .forEach(key => {
+            if (typeof key === "string" || typeof key === "number") {
+                arr.push(key);
+            }
+        })
+        return arr;
+    }
+    return [];
+  }
+
+  static getEnumMap(enumType: object): Map<string, number> {
+    const enumMap = new Map<string, number>();
+  
+    // Iterate over the keys of the enum
+    Object.keys(enumType)
+      .filter(key => isNaN(Number(key)))  // Filter out the reverse mappings (numeric keys)
+      .forEach(key => {
+        const value = enumType[key as keyof typeof enumType]; // Get the enum value
+        enumMap.set(key, value); // Add to the map (key -> value)
+      });
+  
+    return enumMap;
   }
 
   static getEnumMatOptions(Enum: any): MatOption<any>[] {

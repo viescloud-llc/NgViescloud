@@ -171,9 +171,13 @@ export class EnsiblePlaybookItem extends EnsibleItem {
 }
 
 export class EnsibleShellItem extends EnsibleItem {
+  @MatTableHide()
   type: string = '';
+  @MatTableHide()
   code: string = '';
+  @MatTableHide()
   codeFilePath: string = '';
+  @MatTableHide()
   runCodeFilePath: boolean = false;
 }
 
