@@ -8,6 +8,7 @@ import { EnsibleDockerService } from '../../service/ensible-docker/ensible-docke
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 import { delay } from 'rxjs';
 import { EnsibleItemLoggerServiceType, EnsibleItemloggerType, EnsibleItemType, EnsibleWorkspaceServiceType } from '../ensible-item-tab/ensible-item-tab.component';
+import { EnsibleAnsibleWorkspaceService, EnsibleShellWorkspaceService } from '../../service/ensible-workspace/ensible-workspace.service';
 
 @Component({
   selector: 'app-ensible-item-run',
@@ -112,7 +113,7 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
   }
 
   run() {
-    if(this.item instanceof EnsiblePlaybookItem) {
+    if(this.item instanceof EnsiblePlaybookItem || this.itemWorkspaceService instanceof EnsibleAnsibleWorkspaceService) {
       this.runItem(this.item as EnsiblePlaybookItem, (i, uuid) => {
         return {
           itemId: i.id.toString(),
@@ -122,7 +123,7 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
         }
       });
     }
-    else if(this.item instanceof EnsibleShellItem) {
+    else if(this.item instanceof EnsibleShellItem || this.itemWorkspaceService instanceof EnsibleShellWorkspaceService) {
       this.runItem(this.item as EnsibleShellItem, (i, uuid) => {
         return {
           itemId: i.id.toString(),
