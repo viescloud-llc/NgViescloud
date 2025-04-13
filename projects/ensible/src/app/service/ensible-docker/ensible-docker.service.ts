@@ -49,6 +49,7 @@ export class EnsibleDockerService extends EnsibleService {
     let params = new HttpParamsBuilder();
     params.setIfValid('outputTopic', outputTopic);
     params.setIfValid('consumeEverything', consumeEverything);
+    params.setIfValid('type', type);
 
     return this.httpClient.put(`${this.getPrefixUri()}/container/ready/item/${itemId}`, null, {params: params.build(), responseType: 'text'});
   }

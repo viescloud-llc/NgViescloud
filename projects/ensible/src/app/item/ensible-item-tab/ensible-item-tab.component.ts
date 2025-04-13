@@ -1,6 +1,6 @@
 import { AfterContentChecked, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { EnsibleItemService, EnsiblePlaybookItemService, EnsibleShellItemService } from '../../service/ensible-item/ensible-item.service';
-import { EnsibleItem, EnsiblePlaybookItem, EnsiblePlaybookLogger, EnsibleShellItem, EnsibleShellLogger } from '../../model/ensible.model';
+import { EnsiblePlaybookItemService, EnsibleShellItemService } from '../../service/ensible-item/ensible-item.service';
+import { EnsibleItemTypeEnum, EnsiblePlaybookItem, EnsiblePlaybookLogger, EnsibleShellItem, EnsibleShellLogger } from '../../model/ensible.model';
 import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
@@ -13,7 +13,7 @@ import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils'
 import { EnsiblePlaybookLoggerService, EnsibleShellLoggerService } from '../../service/ensible-logger/ensible-logger.service';
 import { EnsibleAnsibleWorkspaceService, EnsibleShellWorkspaceService } from '../../service/ensible-workspace/ensible-workspace.service';
 
-class ItemType {
+class EnsibleItem {
   static PLAYBOOK = 'playbooks';
   static SHELL = 'shells';
   static TERRAFORM = 'terraforms'
@@ -21,14 +21,14 @@ class ItemType {
 
   static formType(type: string) {
     switch(type) {
-      case ItemType.PLAYBOOK:
-        return ItemType.PLAYBOOK;
-      case ItemType.SHELL:
-        return ItemType.SHELL;
-      case ItemType.TERRAFORM:
-        return ItemType.TERRAFORM;
+      case EnsibleItem.PLAYBOOK:
+        return EnsibleItem.PLAYBOOK;
+      case EnsibleItem.SHELL:
+        return EnsibleItem.SHELL;
+      case EnsibleItem.TERRAFORM:
+        return EnsibleItem.TERRAFORM;
       default:
-        return ItemType.UNKNOWN;
+        return EnsibleItem.UNKNOWN;
     }
   }
 }
@@ -54,8 +54,8 @@ export class EnsibleItemTabComponent extends RouteChangeSubcribe implements Afte
 
   isEditing: boolean = false;
 
-  ItemType = ItemType;
-  itemType: string = ItemType.UNKNOWN;
+  ItemType = EnsibleItem;
+  itemType: string = EnsibleItem.UNKNOWN;
 
   constructor(
     public ensiblePlaybookItemService: EnsiblePlaybookItemService,
@@ -82,9 +82,9 @@ export class EnsibleItemTabComponent extends RouteChangeSubcribe implements Afte
 
   getEnsibleItemService() {
     switch(this.itemType) {
-      case ItemType.PLAYBOOK:
+      case EnsibleItem.PLAYBOOK:
         return this.ensiblePlaybookItemService;
-      case ItemType.SHELL:
+      case EnsibleItem.SHELL:
         return this.ensibleShellItemService;
       default:
         throw Error('Unknown item type');
@@ -93,9 +93,9 @@ export class EnsibleItemTabComponent extends RouteChangeSubcribe implements Afte
 
   getEnsibleItemLoggerService() {
     switch(this.itemType) {
-      case ItemType.PLAYBOOK:
+      case EnsibleItem.PLAYBOOK:
         return this.ensiblePlaybookLoggerService;
-      case ItemType.SHELL:
+      case EnsibleItem.SHELL:
         return this.ensibleShellLoggerService;
       default:
         throw Error('Unknown item type');
@@ -104,9 +104,9 @@ export class EnsibleItemTabComponent extends RouteChangeSubcribe implements Afte
 
   getEnsibleWorkspaceService() {
     switch(this.itemType) {
-      case ItemType.PLAYBOOK:
+      case EnsibleItem.PLAYBOOK:
         return this.ensibleAnsibleWorkspaceService;
-      case ItemType.SHELL:
+      case EnsibleItem.SHELL:
         return this.ensibleShellWorkspaceService;
       default:
         throw Error('Unknown item type');
@@ -114,11 +114,11 @@ export class EnsibleItemTabComponent extends RouteChangeSubcribe implements Afte
   }
 
   override async onRouteChange() {
-    let type = ItemType.formType(RouteUtils.getPathVariable('item') ?? '');
+    let type = EnsibleItem.formType(RouteUtils.getPathVariable('item') ?? '');
     this.itemType = type;
     let id = RouteUtils.getPathVariableAsInteger(type);
 
-    if(type === ItemType.UNKNOWN) {
+    if(type === EnsibleItem.UNKNOWN) {
       throw Error('Unknown item type');
     }
 
@@ -127,7 +127,7 @@ export class EnsibleItemTabComponent extends RouteChangeSubcribe implements Afte
       this.item.dockerContainerTemplate = undefined;
     }
     else {
-      if (type === ItemType.PLAYBOOK) {
+      if (type === EnsibleItem.PLAYBOOK) {
         this.ensiblePlaybookItemService.get(id).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
           next: res => {
             this.item = res;
@@ -135,7 +135,7 @@ export class EnsibleItemTabComponent extends RouteChangeSubcribe implements Afte
           }
         })
       }
-      else if(type === ItemType.SHELL) {
+      else if(type === EnsibleItem.SHELL) {
         this.ensibleShellItemService.get(id).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
           next: res => {
             this.item = res;
@@ -168,5 +168,17 @@ export class EnsibleItemTabComponent extends RouteChangeSubcribe implements Afte
   indexChanged(index: number) {
     this.selectedIndex = index;
     RouteUtils.setQueryParam('tab', this.tabNames[index]);
+  }
+
+  static fromService(service: EnsibleItemServiceType | EnsibleItemLoggerServiceType | EnsibleItemloggerType | EnsibleWorkspaceServiceType) {
+    if(service instanceof EnsiblePlaybookItemService || service instanceof EnsiblePlaybookLoggerService || service instanceof EnsiblePlaybookLogger || service instanceof EnsibleAnsibleWorkspaceService) {
+      return EnsibleItemTypeEnum.ANSIBLE;
+    }
+    else if (service instanceof EnsibleShellItemService || service instanceof EnsibleShellLoggerService || service instanceof EnsibleShellLogger || service instanceof EnsibleShellWorkspaceService) {
+      return EnsibleItemTypeEnum.SHELL;
+    }
+    else {
+      return EnsibleItemTypeEnum.UNKNOWN;
+    }
   }
 }

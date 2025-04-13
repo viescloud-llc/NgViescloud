@@ -1,5 +1,5 @@
 <ngx-monaco-editor
-  [options]="{theme: getVsCodeThemeColor(), language: language}"
+  [options]="{theme: getVsCodeThemeColor(), language: language, automaticLayout: true, tabSize: getTabSize()}"
   [ngModel]="value"
   (ngModelChange)="emitValue($event)"
   [style.width]="styleWidth"

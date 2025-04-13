@@ -4,9 +4,10 @@ import { DataUtils } from "projects/viescloud-utils/src/lib/util/Data.utils";
 import { ReflectionUtils } from "projects/viescloud-utils/src/lib/util/Reflection.utils";
 
 export enum EnsibleItemTypeEnum {
-  ANSIBLE,
-  SHELL,
-  TERRAFORM
+  ANSIBLE = 'ANSIBLE',
+  SHELL = 'SHELL',
+  TERRAFORM = 'TERRAFORM',
+  UNKNOWN = 'UNKNOWN'
 }
 
 export enum EnsibleExecuteOptions {

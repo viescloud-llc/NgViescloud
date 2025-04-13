@@ -2,6 +2,7 @@ import { Component, ElementRef, Input, AfterViewInit, Output, EventEmitter, View
 import { EditorComponent } from 'ngx-monaco-editor-v2';
 import { SettingService } from '../../service/Setting.service';
 import { KeyCaptureEvent, KeyCaptureService } from '../../service/KeyCapture.service';
+import { MonacoLanguage } from '../../model/MonacoEditor.model';
 
 @Component({
   selector: 'app-code-editor',
@@ -96,5 +97,9 @@ export class CodeEditorComponent implements AfterViewInit, OnDestroy {
   emitValue(value: string) {
     this.valueChange.emit(value);
     this.onValueChange.emit();
+  }
+
+  getTabSize() {
+    return MonacoLanguage.getTabSizeForLanguage(this.language);
   }
 }
