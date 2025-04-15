@@ -115,6 +115,17 @@
           [showCopyToClipboard]="true"
           ></app-mat-form-field-input>
         </li>
+        <li *ngIf="item.triggerOnGithubWebhook || item.triggerOnGitlabWebhook">
+          <hr>
+          <app-mat-form-field-input-dynamic
+          label="Auto Add git commit as extra variable or parameter"
+          [(value)]="item.autoAddGitWebhookCommitMessage"
+          styleWidth="100%"
+          [isSlideToggle]="true"
+          [blankObject]="false"
+          ></app-mat-form-field-input-dynamic>
+          <p *ngIf="item.autoAddGitWebhookCommitMessage" style="color: yellow;">This will add GITLAB_COMMIT_MESSAGE or GITHUB_COMMIT_MESSAGE as key and the message as value into variables map</p>
+        </li>
         <hr>
         <li>
           <app-mat-form-field-input

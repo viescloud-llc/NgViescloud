@@ -140,6 +140,8 @@ export class EnsibleItem extends UserAccess {
   gitlabUrl: string = '';
   @MatTableHide()
   triggerOnGitlabWebhook: boolean = false;
+  @MatTableHide()
+  autoAddGitWebhookCommitMessage: boolean = false;
 
   path: string = '';
 
