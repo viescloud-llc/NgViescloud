@@ -1,6 +1,6 @@
 import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
-import { MatPaginator } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatColumn, MatTableSettingType } from '../../model/Mat.model';
 import { DataUtils } from '../../util/Data.utils';
@@ -42,7 +42,9 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
   onEditRow: EventEmitter<T> = new EventEmitter();
 
   @Output()
-  pageIndexChange: EventEmitter<number> = new EventEmitter<number>();
+  onPageIndexChange: EventEmitter<number> = new EventEmitter<number>();
+
+  totalItems = 0;
 
   displayedColumns: string[] = [];
 
@@ -50,14 +52,14 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
 
   filter?: string;
 
-  @ViewChild(MatPaginator)
+  @ViewChild(MatPaginator, { read: true })
   paginator!: MatPaginator;
 
   @ViewChild(MatSort)
   sort!: MatSort;
 
   constructor(
-    private cd: ChangeDetectorRef
+    protected cd: ChangeDetectorRef
   ) { }
 
   ngAfterViewInit(): void {
@@ -65,11 +67,14 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
       this.sort.active = this.initSort.key;
       this.sort.direction = this.initSort.order;
     }
+    this.dataSource.sort = this.sort;
+    this.dataSource.paginator = this.paginator;
     this.ngOnInit();
     this.cd.detectChanges();
   }
 
   ngOnInit() {
+    this.setTotalItems()
     this.matColumns = [];
     this.displayedColumns = [];
     this.populateMatColumn();
@@ -77,8 +82,12 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
 
     this.pageSizeOptions = this.pageSizeOptions.sort((a, b) => a - b);
     this.dataSource.data = this.matRows;
-    this.dataSource.sort = this.sort;
-    this.dataSource.paginator = this.paginator;
+    
+  }
+
+  setTotalItems() {
+    this.paginator.length = this.matRows.length;
+    // this.totalItems = this.matRows.length;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -224,5 +233,9 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
       return `No data matching the filter "${this.filter}"`;
     else
       return "Table look sad and empty :(";
+  }
+
+  onPageIndexChangeEmit(event: PageEvent) {
+    this.onPageIndexChange.emit(event.pageIndex);
   }
 }

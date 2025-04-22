@@ -3,11 +3,12 @@ import HttpClientUtils from "../model/HttpClientUtils.model";
 import { HttpClient } from "@angular/common/http";
 import { UtilsService } from "./Utils.service";
 import { environment } from "projects/environments/environment.prod";
-import { PropertyMatcherEnum } from "../model/Mat.model";
+import { Pageable, PropertyMatcherEnum } from "../model/Mat.model";
 import { MatDialog } from "@angular/material/dialog";
 import { ObjectDialog, ObjectDialogData } from "../dialog/object-dialog/object-dialog.component";
 import { Injectable } from "@angular/core";
 import { RxJSUtils } from "../util/RxJS.utils";
+import { HttpParamsBuilder } from "../model/Utils.model";
 
 export abstract class ViesService {
     protected getURI(): string {
@@ -61,6 +62,14 @@ export abstract class ViesRestService<T extends Object> extends ViesService {
 
     public getAll(): Observable<T[]> {
         return this.httpClient.get<T[]>(`${this.getPrefixUri()}`).pipe(map(data => data ?? [])).pipe(first());
+    }
+
+    public getAllPageable(page: number, size: number, sort?: string): Observable<Pageable<T>> {
+        let params = new HttpParamsBuilder();
+        params.set('page', page);
+        params.set('size', size);
+        params.setIfValid('sort', sort);
+        return this.httpClient.get<Pageable<T>>(`${this.getPrefixUri()}`, {params: params.build()}).pipe(map(data => data ?? [])).pipe(first());
     }
 
     public get(id: any): Observable<T> {

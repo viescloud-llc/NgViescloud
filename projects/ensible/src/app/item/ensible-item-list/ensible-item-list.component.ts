@@ -14,6 +14,8 @@ import { FixChangeDetection } from 'projects/viescloud-utils/src/lib/directive/F
 import { FileUtils } from 'projects/viescloud-utils/src/lib/util/File.utils';
 import { SnackBarUtils } from 'projects/viescloud-utils/src/lib/util/SnackBar.utils';
 import { firstValueFrom } from 'rxjs';
+import { Pageable } from 'projects/viescloud-utils/src/lib/model/Mat.model';
+import { LazyPageChange } from 'projects/viescloud-utils/src/lib/util-component/mat-table-lazy/mat-table-lazy.component';
 
 @Component({
   selector: 'app-ensible-item-list',
@@ -22,6 +24,7 @@ import { firstValueFrom } from 'rxjs';
 })
 export class EnsibleItemListComponent<T extends EnsibleItem> extends FixChangeDetection implements OnInit {
 
+  pageItems: Pageable<T> = new Pageable<T>;
   items: T[] = [];
   blankItem!: T;
 
@@ -30,7 +33,7 @@ export class EnsibleItemListComponent<T extends EnsibleItem> extends FixChangeDe
   currentPath = '/';
 
   constructor(
-    private ensibleItemService: EnsibleItemService<T>,
+    public ensibleItemService: EnsibleItemService<T>,
     private rxjsUtils: RxJSUtils,
     private dialogUtils: EnsibleDialogUtilsService,
     private router: Router,
@@ -52,9 +55,9 @@ export class EnsibleItemListComponent<T extends EnsibleItem> extends FixChangeDe
 
   init() {
     if(this.useTable) {
-      this.ensibleItemService.getAll().pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+      this.ensibleItemService.getAllPageable(0, 20).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
         next: res => {
-          this.items = res;
+          this.pageItems = res;
         }
       });
     }
@@ -63,11 +66,25 @@ export class EnsibleItemListComponent<T extends EnsibleItem> extends FixChangeDe
         next: res => {
           this.items = res;
         }
-      })
+      });
     }
   }
 
-  onPathChange(path: string) {
+  onLazyPageChange(lazyPageChange: LazyPageChange) {
+    let sortKey = lazyPageChange.sort.key;
+    let sortOrder = lazyPageChange.sort.order;
+    let sort = '';
+    if(sortKey && sortOrder)
+      sort = sortKey + sortOrder;
+
+    this.ensibleItemService.getAllPageable(lazyPageChange.pageIndex, lazyPageChange.pageSize, sort).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+      next: res => {
+        this.pageItems = res;
+      }
+    });
+  }
+
+  onLazyPathChange(path: string) {
     if(this.currentPath !== path) {
       this.currentPath = path;
       this.init();

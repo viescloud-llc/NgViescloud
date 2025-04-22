@@ -33,6 +33,7 @@ import { MatFormFieldInputRecordComponent } from '../util-component/mat-form-fie
 import { MatFormFieldInputUserAccessComponent } from '../util-component/mat-form-field-input-user-access/mat-form-field-input-user-access.component';
 import { MatTableDynamicComponent } from '../util-component/mat-table-dynamic/mat-table-dynamic.component';
 import { MatTablePathLazyComponent } from '../util-component/mat-table-path-lazy/mat-table-path-lazy.component';
+import { MatTableLazyComponent } from '../util-component/mat-table-lazy/mat-table-lazy.component';
 
 const UTILS = [
   CopyToClipboardUtilComponent,
@@ -42,6 +43,7 @@ const UTILS = [
   FilterNamePipe,
   FilterNameReversePipe,
   MatTableComponent,
+  MatTableLazyComponent,
   MatTableDynamicComponent,
   MatFormFieldGroupDirective,
   MatFormFieldComponent,

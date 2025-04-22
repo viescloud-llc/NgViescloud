@@ -24,18 +24,19 @@
   <hr>
 
   <li *ngIf="useTable">
-    <app-mat-table
-    [matRows]="items"
+    <app-mat-table-lazy
+    [matRowsPage]="pageItems"
     [blankObject]="blankItem"
     (onEditRow)="selectItem($event)"
     [showFilter]="true"
     [showPagination]="true"
     [pageSizeOptions]="[20, 50, 100, 500]"
-    ></app-mat-table>
+    (onLazyPageChange)="onLazyPageChange($event)"
+    ></app-mat-table-lazy>
   </li>
 
   <li *ngIf="!useTable">
-    <app-mat-table-path
+    <app-mat-table-path-lazy
     [value]="items"
     [getPathFn]="getPath"
     [getLabelFn]="getLabel"
@@ -43,7 +44,7 @@
     [savePathToLocalStorage]="true"
     [unixStyleBack]="true"
     [readonlyPathInput]="true"
-    (onPathChange)="onPathChange($event)"
-    ></app-mat-table-path>
+    (onLazyPathChange)="onLazyPathChange($event)"
+    ></app-mat-table-path-lazy>
   </li>
 </ul>

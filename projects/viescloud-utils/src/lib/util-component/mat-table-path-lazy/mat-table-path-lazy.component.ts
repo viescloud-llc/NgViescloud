@@ -1,6 +1,7 @@
-import { Component, EventEmitter, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
 import { MatTablePathComponent } from '../mat-table-path/mat-table-path.component';
 import { Observable } from 'rxjs';
+import { FixedSizeMap } from '../../model/DataStructure.model';
 
 @Component({
   selector: 'app-mat-table-path-lazy',
@@ -10,37 +11,35 @@ import { Observable } from 'rxjs';
 export class MatTablePathLazyComponent<T> extends MatTablePathComponent<T> {
 
   @Input()
-  OnPathChangeFetchFn?: (changedPath: string) => T[] | Observable<T[]> | Promise<T[]>;
+  maxCachePath: number = 20;
+
+  fixSizeMap = new FixedSizeMap<String, T[]>(this.maxCachePath);
+
+  @Output()
+  onLazyPathChange: EventEmitter<string> = new EventEmitter<string>();
 
   override ngOnInit(): void {
-    this.onPathChangeEmit(this.currentPath);
     super.ngOnInit();
+    if(this.fixSizeMap.getMaxSize() !== this.maxCachePath) {
+      this.fixSizeMap = new FixedSizeMap<String, T[]>(this.maxCachePath);
+    }
   }
 
-  override onPathChangeEmit(path: string): void {
-    super.onPathChangeEmit(path);
-    if(this.OnPathChangeFetchFn && (!this.value || this.currentPath !== path)) {
-      const fetchFn = this.OnPathChangeFetchFn(path);
+  override ngOnChanges(changes: SimpleChanges): void {
+    if(changes['value']) {
+      this.fixSizeMap.set(this.currentPath, structuredClone(this.value));
+    }
+    super.ngOnChanges(changes);
+  }
 
-      if(fetchFn instanceof Observable) {
-        fetchFn.subscribe({
-          next: res => {
-            this.value = res;
-          }
-        });
-      }
-      else if(fetchFn instanceof Promise) {
-        fetchFn.then(
-          res => this.value = res
-        ).catch(
-          err => {}
-        );
-      }
-      else {
-        this.value = fetchFn as T[];
-      }
-
-      this.ngOnInit();
+  override checkValidPath(): void {
+    super.checkValidPath();
+    if(this.fixSizeMap.has(this.currentPath)) {
+      this.value = structuredClone(this.fixSizeMap.get(this.currentPath)!);
+      super.ngOnInit();
+    } 
+    else {
+      this.onLazyPathChange.emit(this.currentPath);
     }
   }
 }

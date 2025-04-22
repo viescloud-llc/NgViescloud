@@ -67,6 +67,19 @@ export enum PathNodeType {
     PATH = "PATH"
 }
 
+export class Pageable<T> {
+    content: T[] = [];
+    _metadata: PageableMetadata<T> = new PageableMetadata();
+}
+
+export class PageableMetadata<T> {
+    pageNumber: number = 0;
+    pageSize: number = 0;
+    totalPage: number = 0;
+    totalElement: number = 0;
+    filters?: T;
+}
+
 export class PathNode<T> {
     value?: T;
     path!: string;
