@@ -13,6 +13,7 @@ import { UserAccessInputType } from 'projects/viescloud-utils/src/lib/util-compo
 import { FixChangeDetection } from 'projects/viescloud-utils/src/lib/directive/FixChangeDetection';
 import { FileUtils } from 'projects/viescloud-utils/src/lib/util/File.utils';
 import { SnackBarUtils } from 'projects/viescloud-utils/src/lib/util/SnackBar.utils';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-ensible-item-list',
@@ -45,16 +46,32 @@ export class EnsibleItemListComponent<T extends EnsibleItem> extends FixChangeDe
   }
 
   ngOnInit(): void {
-    this.init();
     this.useTable = !this.ensibleSettingService.getCopyOfGeneralSetting<EnsibleSetting>().UseTreeDisplayForItemList;
+    this.init();
   }
 
   init() {
-    this.ensibleItemService.getAll().pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
-      next: res => {
-        this.items = res;
-      }
-    });
+    if(this.useTable) {
+      this.ensibleItemService.getAll().pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+        next: res => {
+          this.items = res;
+        }
+      });
+    }
+    else {
+      this.ensibleItemService.getItemByPath(this.currentPath).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+        next: res => {
+          this.items = res;
+        }
+      })
+    }
+  }
+
+  onPathChange(path: string) {
+    if(this.currentPath !== path) {
+      this.currentPath = path;
+      this.init();
+    }
   }
 
   addItem() {

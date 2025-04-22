@@ -62,6 +62,17 @@ export enum MatSnackBarVerticalPosition {
     BOTTOM = "bottom"
 }
 
+export enum PathNodeType {
+    ITEM = "ITEM",
+    PATH = "PATH"
+}
+
+export class PathNode<T> {
+    value?: T;
+    path!: string;
+    type!: PathNodeType;
+}
+
 export class MatItemSetting {
     type: MatItemSettingType | string;
     value: any;

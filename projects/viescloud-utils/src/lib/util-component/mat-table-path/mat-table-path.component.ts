@@ -78,7 +78,7 @@ export class MatTablePathComponent<T> extends FixChangeDetection implements OnIn
 
     this.parseTableMap();
     this.parseTableRow();
-    this.onPathChange.emit(this.currentPath);
+    this.onPathChangeEmit(this.currentPath);
   }
 
   checkValidPath() {
@@ -195,7 +195,7 @@ export class MatTablePathComponent<T> extends FixChangeDetection implements OnIn
   selectedRow(customRow: customRow<T>) {
     if(customRow.type === 'path') {
       if(this.unixStyleBack && customRow.name === '..') {
-        this.goBack();
+        this.goBackAPath();
         return;
       }
 
@@ -212,11 +212,15 @@ export class MatTablePathComponent<T> extends FixChangeDetection implements OnIn
     }
   }
 
+  goBackAPath() {
+    let split = this.currentPath.split('/');
+    split.pop();
+    this.currentPath = split.join('/');
+  }
+
   goBack() {
     if(this.pathHistory.length === 0) {
-      let split = this.currentPath.split('/');
-      split.pop();
-      this.currentPath = split.join('/');
+      this.goBackAPath();
       return;
     }
 
@@ -237,7 +241,11 @@ export class MatTablePathComponent<T> extends FixChangeDetection implements OnIn
       if(this.savePathToParam)
         RouteUtils.setQueryParam(this.savePathKeyName, path);
 
-      this.onPathChange.emit(path);
+      this.onPathChangeEmit(path);
     }
+  }
+
+  onPathChangeEmit(path: string) {
+    this.onPathChange.emit(path);
   }
 }

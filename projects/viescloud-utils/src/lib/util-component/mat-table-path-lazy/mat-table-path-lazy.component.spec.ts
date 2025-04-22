@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatTablePathComponent } from './mat-table-path.component';
+import { MatTablePathLazyComponent } from './mat-table-path-lazy.component';
 
-describe('MatTablePath Component', <T> () => {
-  let component: MatTablePathComponent<T>;
-  let fixture: ComponentFixture<MatTablePathComponent<T>>;
+describe('MatTablePathLazy Component', () => {
+  let component: MatTablePathLazyComponent;
+  let fixture: ComponentFixture<MatTablePathLazyComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ MatTablePathComponent ]
+      declarations: [ MatTablePathLazyComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(MatTablePathComponent<T>);
+    fixture = TestBed.createComponent(MatTablePathLazyComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

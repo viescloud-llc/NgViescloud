@@ -32,6 +32,7 @@ import { MatTablePathComponent } from '../util-component/mat-table-path/mat-tabl
 import { MatFormFieldInputRecordComponent } from '../util-component/mat-form-field-input-record/mat-form-field-input-record.component';
 import { MatFormFieldInputUserAccessComponent } from '../util-component/mat-form-field-input-user-access/mat-form-field-input-user-access.component';
 import { MatTableDynamicComponent } from '../util-component/mat-table-dynamic/mat-table-dynamic.component';
+import { MatTablePathLazyComponent } from '../util-component/mat-table-path-lazy/mat-table-path-lazy.component';
 
 const UTILS = [
   CopyToClipboardUtilComponent,
@@ -59,6 +60,7 @@ const UTILS = [
   DisableKeyCaptureOnInputDirective,
   CodeEditorComponent,
   MatTablePathComponent,
+  MatTablePathLazyComponent
 ]
 
 const COMPONENTS = [
