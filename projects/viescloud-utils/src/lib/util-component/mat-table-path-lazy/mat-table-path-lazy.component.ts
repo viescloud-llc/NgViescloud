@@ -34,8 +34,9 @@ export class MatTablePathLazyComponent<T> extends MatTablePathComponent<T> {
 
   override checkValidPath(): void {
     super.checkValidPath();
-    if(this.fixSizeMap.has(this.currentPath)) {
-      this.value = structuredClone(this.fixSizeMap.get(this.currentPath)!);
+    let cacheValue = this.fixSizeMap.get(this.currentPath);
+    if(cacheValue && cacheValue.length > 0) {
+      this.value = structuredClone(cacheValue);
       super.ngOnInit();
     } 
     else {
