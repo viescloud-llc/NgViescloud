@@ -5,13 +5,15 @@
   </li>
   <hr>
   <li>
-    <app-mat-table
-    [matRows]="ensibleDockerContainerTemplates"
+    <app-mat-table-lazy
+    [matRowsPage]="ensibleDockerContainerTemplatesPage"
     [blankObject]="blankEnsibleDockerContainerTemplate"
     [showFilter]="true"
     [showPagination]="true"
     [pageSizeOptions]="[20, 50, 100, 500]"
     (onEditRow)="selectRow($event)"
-    ></app-mat-table>
+    (onLazyPageChange)="onLazyPageChange($event)"
+    [sendPageIndexChangeSubject]="sendPageIndexChangeSubject"
+    ></app-mat-table-lazy>
   </li>
 </ul>

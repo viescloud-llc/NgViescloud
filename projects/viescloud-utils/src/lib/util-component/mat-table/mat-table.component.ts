@@ -44,15 +44,13 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
   @Output()
   onPageIndexChange: EventEmitter<number> = new EventEmitter<number>();
 
-  totalItems = 0;
-
   displayedColumns: string[] = [];
 
   dataSource = new MatTableDataSource(this.matRows);
 
   filter?: string;
 
-  @ViewChild(MatPaginator, { read: true })
+  @ViewChild(MatPaginator)
   paginator!: MatPaginator;
 
   @ViewChild(MatSort)
@@ -67,6 +65,7 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
       this.sort.active = this.initSort.key;
       this.sort.direction = this.initSort.order;
     }
+    
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
     this.ngOnInit();
@@ -74,7 +73,6 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
   }
 
   ngOnInit() {
-    this.setTotalItems()
     this.matColumns = [];
     this.displayedColumns = [];
     this.populateMatColumn();
@@ -82,12 +80,6 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
 
     this.pageSizeOptions = this.pageSizeOptions.sort((a, b) => a - b);
     this.dataSource.data = this.matRows;
-    
-  }
-
-  setTotalItems() {
-    this.paginator.length = this.matRows.length;
-    // this.totalItems = this.matRows.length;
   }
 
   ngOnChanges(changes: SimpleChanges): void {

@@ -392,4 +392,15 @@ export class DataUtils {
     }
     return false;
   }
+
+  static async generateSha256(json: object): Promise<string> {
+    const jsonString = JSON.stringify(json, Object.keys(json).sort());
+    const encoder = new TextEncoder();
+    const data = encoder.encode(jsonString);
+    
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+  }
 }

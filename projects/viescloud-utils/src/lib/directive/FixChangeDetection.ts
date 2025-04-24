@@ -5,7 +5,7 @@ import { AfterContentChecked, ChangeDetectorRef, Directive, inject } from '@angu
 })
 export class FixChangeDetection implements AfterContentChecked {
 
-  private cd: ChangeDetectorRef = inject(ChangeDetectorRef);
+  protected cd: ChangeDetectorRef = inject(ChangeDetectorRef);
 
   constructor() { }
 

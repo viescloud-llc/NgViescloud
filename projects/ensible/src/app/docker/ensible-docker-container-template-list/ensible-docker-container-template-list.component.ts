@@ -6,6 +6,10 @@ import { Router } from '@angular/router';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 import { EnsibleSettingService } from '../../service/ensible-setting/ensible-setting.service';
+import { Subject } from 'rxjs';
+import { Pageable } from 'projects/viescloud-utils/src/lib/model/Mat.model';
+import { RestUtils } from 'projects/viescloud-utils/src/lib/util/Rest.utils';
+import { LazyPageChange } from 'projects/viescloud-utils/src/lib/util-component/mat-table-lazy/mat-table-lazy.component';
 
 @Component({
   selector: 'app-ensible-docker-container-template-list',
@@ -14,8 +18,9 @@ import { EnsibleSettingService } from '../../service/ensible-setting/ensible-set
 })
 export class EnsibleDockerContainerTemplateListComponent implements OnInit {
 
-  ensibleDockerContainerTemplates: EnsibleDockerContainerTemplate[] = [];
+  ensibleDockerContainerTemplatesPage = new Pageable<EnsibleDockerContainerTemplate>();
   blankEnsibleDockerContainerTemplate: EnsibleDockerContainerTemplate = new EnsibleDockerContainerTemplate();
+  sendPageIndexChangeSubject = new Subject<void>();
 
   constructor(
     private router: Router,
@@ -24,9 +29,15 @@ export class EnsibleDockerContainerTemplateListComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.ensibleDockerContainerTemplateService.getAll().pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+    setTimeout(() => {
+      this.sendPageIndexChangeSubject.next();
+    });
+  }
+
+  onLazyPageChange(lazyPageChange: LazyPageChange) {
+    this.ensibleDockerContainerTemplateService.getAllPageable(lazyPageChange.pageIndex, lazyPageChange.pageSize, RestUtils.formatSort(lazyPageChange)).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
       next: res => {
-        this.ensibleDockerContainerTemplates = res;
+        this.ensibleDockerContainerTemplatesPage = res;
       }
     });
   }

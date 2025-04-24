@@ -4,6 +4,10 @@ import { EnsiblePlaybookLoggerService, EnsibleShellLoggerService } from '../../s
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 import { EnsibleItemLoggerServiceType, EnsibleItemloggerType, EnsibleItemType } from '../ensible-item-tab/ensible-item-tab.component';
+import { Pageable } from 'projects/viescloud-utils/src/lib/model/Mat.model';
+import { RestUtils } from 'projects/viescloud-utils/src/lib/util/Rest.utils';
+import { LazyPageChange } from 'projects/viescloud-utils/src/lib/util-component/mat-table-lazy/mat-table-lazy.component';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-ensible-item-run-history',
@@ -21,11 +25,12 @@ export class EnsibleItemRunHistoryComponent implements OnChanges {
   @Input()
   triggerInit: boolean = false;
 
-  logs: EnsibleItemloggerType[] = [];
-  blankLog!: EnsibleItemloggerType;
-
   @Output()
   onSelectedLog: EventEmitter<EnsibleItemloggerType> = new EventEmitter<EnsibleItemloggerType>();
+
+  pageLogs!: Pageable<EnsibleItemloggerType>;
+  blankLog!: EnsibleItemloggerType;
+  sendPageIndexChangeSubject = new Subject<void>();
 
   constructor(
     private rxjsUtils: RxJSUtils
@@ -38,11 +43,16 @@ export class EnsibleItemRunHistoryComponent implements OnChanges {
   }
 
   ngOnInit(): void {
-    this.blankLog = this.itemLoggerService.newEmptyObject();
+    if(this.triggerInit) {
+      this.blankLog = this.itemLoggerService.newEmptyObject();
+      this.sendPageIndexChangeSubject.next();
+    }
+  }
 
-    this.itemLoggerService.getAllByItemIdOptimize(this.item.id).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+  onLazyPageChange(lazyPageChange: LazyPageChange) {
+    this.itemLoggerService.getAllPageable(lazyPageChange.pageIndex, lazyPageChange.pageSize, RestUtils.formatSort(lazyPageChange)).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
       next: res => {
-        this.logs = res;
+        this.pageLogs = res;
       }
     });
   }

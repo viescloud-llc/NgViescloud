@@ -1,12 +1,14 @@
 <br>
 <button mat-icon-button color="primary" (click)="ngOnInit()" [matTooltip]="'Refresh'"><mat-icon>refresh</mat-icon></button>
 <hr>
-<app-mat-table
-[matRows]="logs"
+<app-mat-table-lazy
+[matRowsPage]="pageLogs"
 [showFilter]="true"
 [showPagination]="true"
 [blankObject]="blankLog"
 [pageSizeOptions]="[20, 50, 200, 1000]"
 [initSort]="{key: 'runNumber', order: 'desc'}"
 (onEditRow)="selectLog($event)"
-></app-mat-table>
+(onLazyPageChange)="onLazyPageChange($event)"
+[sendPageIndexChangeSubject]="sendPageIndexChangeSubject"
+></app-mat-table-lazy>

@@ -1,8 +1,10 @@
-import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, Output, SimpleChanges } from '@angular/core';
 import { MatTableComponent } from '../mat-table/mat-table.component';
-import { merge } from 'rxjs';
+import { merge, Observable } from 'rxjs';
 import { PageEvent } from '@angular/material/paginator';
 import { Pageable } from '../../model/Mat.model';
+import { DataUtils } from '../../util/Data.utils';
+import { FixedSizeMap } from '../../model/DataStructure.model';
 
 export interface LazyPageChange {
   pageIndex: number;
@@ -15,75 +17,114 @@ export interface LazyPageChange {
   templateUrl: '../mat-table/mat-table.component.html',
   styleUrls: ['../mat-table/mat-table.component.scss']
 })
-export class MatTableLazyComponent<T extends object> extends MatTableComponent<T> {
+export class MatTableLazyComponent<T extends object> extends MatTableComponent<T> implements OnDestroy{
 
   @Input()
-  maxCachePage: number = 5;
+  maxCachePage: number = 20;
 
   @Input()
-  matRowsPage?: Pageable<T>;
+  matRowsPage?: Pageable<T> | null;
+
+  @Input()
+  sendPageIndexChangeSubject?: Observable<void>;
 
   @Output()
   onLazyPageChange = new EventEmitter<LazyPageChange>();
 
-  // override ngAfterViewInit(): void {
-  //   merge(this.sort.sortChange, this.paginator.page)
-  //     .pipe(
-  //       startWith({}),
-  //       switchMap(() => {
-  //         this.isLoadingResults = true;
-  //         return this.exampleDatabase!.getRepoIssues(
-  //           this.sort.active,
-  //           this.sort.direction,
-  //           this.paginator.pageIndex,
-  //         ).pipe(catchError(() => observableOf(null)));
-  //       }),
-  //       map(data => {
-  //         // Flip flag to show that loading has finished.
-  //         this.isLoadingResults = false;
-  //         this.isRateLimitReached = data === null;
+  fixSizeMap = new FixedSizeMap<String, T[] | null>(this.maxCachePage);
+  sendPageIndexChangeSubjectSubscription?: any;
 
-  //         if (data === null) {
-  //           return [];
-  //         }
-
-  //         // Only refresh the result length if there is new data. In case of rate
-  //         // limit errors, we do not want to reset the paginator to zero, as that
-  //         // would prevent users from re-triggering requests.
-  //         this.resultsLength = data.total_count;
-  //         return data.items;
-  //       }),
-  //     )
-  //     .subscribe(data => (this.data = data));
-  //   }
-  // }
-
-  // override ngAfterViewInit(): void {
-    
-  // }
-
-  override totalItems: number = 1000;
-
-  override ngOnChanges(changes: SimpleChanges): void {
-    super.ngOnChanges(changes);
-    if (changes['matRowsPage'] && this.matRowsPage) {
-      this.matRows = this.matRowsPage.content ?? [];
-      this.ngOnInit();
+  ngOnDestroy(): void {
+    if(this.sendPageIndexChangeSubjectSubscription) {
+      this.sendPageIndexChangeSubjectSubscription.unsubscribe();
     }
   }
 
-  override setTotalItems(): void {
-    this.totalItems = this.matRowsPage?._metadata.totalElement ?? 0;
-    this.cd.detectChanges();
+  override ngAfterViewInit(): void {
+    super.ngAfterViewInit();
+    this.dataSource.paginator = null;
+
+    this.sort.sortChange.subscribe(() => {
+      this.paginator.pageIndex = 0
+      this.sendPageIndexChangeEmit();
+    });
+
+    if(!this.matRowsPage?._metadata) {
+      this.sendPageIndexChangeEmit();
+    }
+  }
+
+  override ngOnInit(): void {
+    super.ngOnInit();
+
+    if(this.sendPageIndexChangeSubject) {
+      if(this.sendPageIndexChangeSubjectSubscription) {
+        this.sendPageIndexChangeSubjectSubscription.unsubscribe();
+      }
+
+      this.sendPageIndexChangeSubjectSubscription = this.sendPageIndexChangeSubject.subscribe(() => {
+        this.fixSizeMap.clear();
+        this.paginator.pageIndex = 0
+        setTimeout(() => this.sendPageIndexChangeEmit());
+      })
+    }
+
+    setTimeout(() => {
+      this.paginator.length = this.matRowsPage?._metadata.totalElement ?? 0;
+    });
+
+    if (this.maxCachePage != this.fixSizeMap.getMaxSize()) {
+      this.fixSizeMap = new FixedSizeMap<String, T[]>(this.maxCachePage);
+    }
+  }
+
+  override ngOnChanges(changes: SimpleChanges): void {
+    super.ngOnChanges(changes);
+    if (changes['matRowsPage']) {
+      if(this.matRowsPage) {
+        this.matRows = this.matRowsPage.content ?? [];
+  
+        setTimeout(() => {
+          let lazyPageChange: LazyPageChange = {
+            pageIndex: this.matRowsPage!._metadata.pageNumber,
+            pageSize: this.matRowsPage!._metadata.pageSize,
+            sort: {key: this.sort.active, order: this.sort.direction}
+          }
+  
+          let id = JSON.stringify(lazyPageChange);
+          this.fixSizeMap.set(id, structuredClone(this.matRows));
+        })
+        
+        this.ngOnInit();
+      }
+    }
+  }
+
+  sendPageIndexChangeEmit() {
+    this.onPageIndexChangeEmit({
+      pageIndex: 0,
+      pageSize: this.paginator.pageSize,
+      length: this.paginator.length
+    })
   }
 
   override onPageIndexChangeEmit(event: PageEvent): void {
     super.onPageIndexChangeEmit(event);
+
     let lazyPageChange: LazyPageChange = {
       pageIndex: event.pageIndex,
       pageSize: event.pageSize,
       sort: {key: this.sort.active, order: this.sort.direction}
     }
-    this.onLazyPageChange.emit(lazyPageChange);
+
+    let id = JSON.stringify(lazyPageChange);
+    if (this.fixSizeMap.has(id) && this.fixSizeMap.get(id) !== null) {
+      this.matRows = structuredClone(this.fixSizeMap.get(id)!);
+      this.ngOnInit();
+    }
+    else {
+      this.fixSizeMap.set(id, null);
+      this.onLazyPageChange.emit(lazyPageChange);
+    }
   }
 }
