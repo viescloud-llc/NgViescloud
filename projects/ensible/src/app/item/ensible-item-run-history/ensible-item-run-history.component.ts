@@ -50,7 +50,7 @@ export class EnsibleItemRunHistoryComponent implements OnChanges {
   }
 
   onLazyPageChange(lazyPageChange: LazyPageChange) {
-    this.itemLoggerService.getAllPageable(lazyPageChange.pageIndex, lazyPageChange.pageSize, RestUtils.formatSort(lazyPageChange)).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+    this.itemLoggerService.getAllByItemIdOptimizePage(this.item.id, lazyPageChange.pageIndex, lazyPageChange.pageSize, RestUtils.formatSort(lazyPageChange)).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
       next: res => {
         this.pageLogs = res;
       }
