@@ -6,9 +6,10 @@ import { StringUtils } from 'projects/viescloud-utils/src/lib/util/String.utils'
 import { EnsibleProcessService } from '../../service/ensible-process/ensible-process.service';
 import { EnsibleDockerService } from '../../service/ensible-docker/ensible-docker.service';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
-import { delay } from 'rxjs';
+import { catchError, delay, retry, retryWhen, scan, throwError, timer } from 'rxjs';
 import { EnsibleItemLoggerServiceType, EnsibleItemloggerType, EnsibleItemTabComponent, EnsibleItemType, EnsibleWorkspaceServiceType } from '../ensible-item-tab/ensible-item-tab.component';
 import { EnsibleAnsibleWorkspaceService, EnsibleShellWorkspaceService } from '../../service/ensible-workspace/ensible-workspace.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-ensible-item-run',
@@ -31,7 +32,7 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
 
   logId: number = 0;
 
-  playBookLogger?: EnsibleItemloggerType;
+  itemLogger?: EnsibleItemloggerType;
 
   isRunning: boolean = false;
 
@@ -48,6 +49,8 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
 
   EnsibleItemTypeEnum = EnsibleItemTypeEnum;
   type = EnsibleItemTypeEnum.UNKNOWN;
+
+  waitMs = 2000;
 
   constructor(
     private ensibleWebsocketService: EnsibleWebsocketService,
@@ -80,14 +83,14 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
 
     if(topic) {
       this.runOutput = 'Reconnecting...';
-      this.watchTopic(topic);
-      this.continuteRun(topic);
+      this.watchTopicWs(topic);
+      this.waitRun(topic);
     }
     else if(logId) {
       this.logId = parseInt(logId);
       this.itemLoggerService.get(this.logId).subscribe({
         next: res => {
-          this.playBookLogger = res;
+          this.itemLogger = res;
           if(res.status === EnsiblePlaybookStatus.RUNNING) {
             RouteUtils.setQueryParam('topic', res.topic);
             this.ngOnInit();
@@ -143,13 +146,12 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
 
     let itemTrigger = func(item, uuid);
 
-    this.watchTopic(uuid);
+    this.watchTopicWs(uuid);
 
-    let sub = this.itemWorkspaceService.runCommand(itemTrigger).pipe(delay(1000)).subscribe({
+    let sub = this.itemWorkspaceService.runCommandAndGetLog(itemTrigger).subscribe({
       next: res => {
-        this.runOutput = res;
-        this.isRunning = false;
-        this.cleanParams();
+        this.itemLogger = res;
+        this.waitRun(uuid);
       },
       error: err => {
         this.isRunning = false;
@@ -160,7 +162,7 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
     this.onGoingRequest.push(sub);
   }
 
-  watchTopic(topic: string) {
+  watchTopicWs(topic: string) {
     this.subscribeTopic?.unsubscribe();
     this.subscribeTopic = this.ensibleWebsocketService.watchForEnsibleTopic(topic).subscribe({
       next: res => {
@@ -169,10 +171,22 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
     });
   }
 
-  continuteRun(topic: string) {
+  waitRun(topic: string) {
     this.isRunning = true;
 
-    let sub = this.ensibleProcessService.watchProcessByTopic(topic).pipe(delay(1000)).subscribe({
+    let sub = this.ensibleProcessService.watchProcessByTopic(topic, this.waitMs).pipe(
+      retry({
+        count: 1000,
+        delay: (err, retryCount) => {
+          switch (err.status) {
+            case 408:
+              return timer(this.waitMs);
+            default:
+              return throwError(() => err);
+          }
+        },
+      }))
+      .subscribe({
       next: res => {
         this.runOutput = res;
         this.isRunning = false;
@@ -208,7 +222,7 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
     RouteUtils.setQueryParam('topic', null);
     RouteUtils.setQueryParam('logId', null);
     this.logId = 0;
-    this.playBookLogger = undefined;
+    this.itemLogger = undefined;
   }
 
   clean() {
@@ -239,7 +253,7 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
 
   readyContainer() {
     let uuid = this.readyNewTopicOutput();
-    this.watchTopic(uuid);
+    this.watchTopicWs(uuid);
     
     this.ensibleDockerService.readyContainerByItemId(this.type, this.item.id, uuid).subscribe({
       next: res => {

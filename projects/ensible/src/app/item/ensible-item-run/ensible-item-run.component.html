@@ -3,7 +3,7 @@
     <mat-toolbar class="flex-row-container-max-content">
       <span>{{item.name}}</span>
       <span class="spacer"></span>
-      <span *ngIf="logId">Run Number: {{playBookLogger?.runNumber}} </span>
+      <span *ngIf="logId">Run Number: {{itemLogger?.runNumber}} </span>
       <span *ngIf="isRunning">Running...</span>
       <span>
         <app-mat-form-field-input-dynamic
@@ -46,18 +46,18 @@
       </button>
     </mat-toolbar>
   </li>
-  <li *ngIf="logId && playBookLogger">
+  <li *ngIf="logId && itemLogger">
     <details>
       <summary style="color: yellow;">Detail Log Info</summary>
       <ul>
-        <li>Run number: {{ playBookLogger.runNumber }}</li>
-        <li>Run status: {{ playBookLogger.status }}</li>
-        <li>Triggered: {{ playBookLogger.triggerDateTime.dateTime }} {{ playBookLogger.triggerDateTime.zoneId ?? 'EST' }}</li>
+        <li>Run number: {{ itemLogger.runNumber }}</li>
+        <li>Run status: {{ itemLogger.status }}</li>
+        <li>Triggered: {{ itemLogger.triggerDateTime.dateTime }} {{ itemLogger.triggerDateTime.zoneId ?? 'EST' }}</li>
         <li>
-          Run Command: {{ playBookLogger.executedCommand }}
+          Run Command: {{ itemLogger.executedCommand }}
         </li>
         <li>
-          <button mat-icon-button [disabled]="!runOutput" [matTooltip]="'Copy run command'" appCopyToClipboard [copyToClipboardValue]="playBookLogger.executedCommand" [copyMessage]="'Ansible execute command copied to clipboard'">
+          <button mat-icon-button [disabled]="!runOutput" [matTooltip]="'Copy run command'" appCopyToClipboard [copyToClipboardValue]="itemLogger.executedCommand" [copyMessage]="'Ansible execute command copied to clipboard'">
             <mat-icon>
               content_copy
             </mat-icon>
