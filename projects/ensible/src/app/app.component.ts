@@ -50,11 +50,11 @@ export class AppComponent extends ViescloudApplicationMinimal {
       hideConditional: () => !this.ensibleAuthenticatorService.isLogin(),
       children: [
         {
-          title: 'Playbooks',
+          title: 'Ansibles',
           routerLink: '/item/playbooks/all'
         },
         {
-          title: 'add new playbook',
+          title: 'Ansible +',
           routerLink: '/item/playbooks/0'
         },
         {
@@ -62,7 +62,7 @@ export class AppComponent extends ViescloudApplicationMinimal {
           routerLink: '/item/shells/all'
         },
         {
-          title: 'add new shell',
+          title: 'Shell +',
           routerLink: '/item/shells/0'
         }
       ]

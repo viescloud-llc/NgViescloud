@@ -1,6 +1,6 @@
 import { EnsibleWebsocketService } from './../../service/ensible-websocket/ensible-websocket.service';
 import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
-import { EnsibleItem, EnsibleItemTrigger, EnsibleItemTypeEnum, EnsiblePlaybookItem, EnsiblePlaybookLogger, EnsiblePlaybookStatus, EnsiblePlayBookTrigger, EnsibleShellItem, EnsibleShellTrigger, VERPOSITY_OPTIONS } from '../../model/ensible.model';
+import { EnsibleItem, EnsibleItemTrigger, EnsibleItemTypeEnum, EnsiblePlaybookItem, EnsiblePlaybookLogger, EnsibleProcessLoggerStatus, EnsiblePlayBookTrigger, EnsibleShellItem, EnsibleShellTrigger, VERPOSITY_OPTIONS } from '../../model/ensible.model';
 import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 import { StringUtils } from 'projects/viescloud-utils/src/lib/util/String.utils';
 import { EnsibleProcessService } from '../../service/ensible-process/ensible-process.service';
@@ -88,21 +88,11 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
     }
     else if(logId) {
       this.logId = parseInt(logId);
-      this.itemLoggerService.get(this.logId).subscribe({
-        next: res => {
-          this.itemLogger = res;
-          if(res.status === EnsiblePlaybookStatus.RUNNING) {
-            RouteUtils.setQueryParam('topic', res.topic);
-            this.ngOnInit();
-          }
-          else {
-            this.runOutput = res.log;
-          }
-        },
-        error: err => {
-          this.runOutput = 'Unable to fetch logs, please reload or select another log from history tab';
-        }
-      })
+      this.subscribeTopic?.unsubscribe();
+      this.fetchLog(this.logId, err => {
+        this.runOutput = 'Unable to fetch logs, please reload or select another log from history tab';
+      });
+      
     }
     else {
       this.logId = 0;
@@ -190,12 +180,25 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
       next: res => {
         this.runOutput = res;
         this.isRunning = false;
+        if(this.itemLogger && this.itemLogger.id) {
+          this.fetchLog(this.itemLogger.id);
+        }
+
         this.cleanParams();
       },
       error: err => {
         this.isRunning = false;
+
+        if(this.itemLogger && this.itemLogger.id) {
+          this.fetchLog(this.itemLogger.id, err => {
+            this.runOutput = 'Unable to reconnect, process might have been stopped or finished, check latest run history for more details';
+          });
+        }
+        else {
+          this.runOutput = 'Unable to reconnect, process might have been stopped or finished, check latest run history for more details';
+        }
+
         this.cleanParams();
-        this.runOutput = 'Unable to reconnect, process might have been stopped or finished, check latest run history for more details';
       }
     })
 
@@ -222,12 +225,12 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
     RouteUtils.setQueryParam('topic', null);
     RouteUtils.setQueryParam('logId', null);
     this.logId = 0;
-    this.itemLogger = undefined;
   }
 
   clean() {
     this.cleanParams();
     this.runOutput = '';
+    this.itemLogger = undefined;
     this.ngOnInit();
   }
 
@@ -262,5 +265,25 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
         this.cleanParams();
       }
     })
+  }
+
+  private fetchLog(logId: number, errorHandler?: (error: any) => void) {
+    this.itemLoggerService.get(logId).subscribe({
+      next: res => {
+        this.itemLogger = res;
+        if(res.status === EnsibleProcessLoggerStatus.RUNNING) {
+          RouteUtils.setQueryParam('topic', res.topic);
+          this.ngOnInit();
+        }
+        else {
+          this.runOutput = res.log;
+        }
+      },
+      error: err => {
+        if(errorHandler) {
+          errorHandler(err);
+        }
+      }
+    });
   }
 }

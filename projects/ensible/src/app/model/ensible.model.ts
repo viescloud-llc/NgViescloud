@@ -201,7 +201,7 @@ export class EnsibleProcessLogger {
   triggerDateTime: DateTime = new DateTime();
 
   @MatTableDisplayLabel('Status')
-  status: EnsiblePlaybookStatus = EnsiblePlaybookStatus.STOP;
+  status: EnsibleProcessLoggerStatus = EnsibleProcessLoggerStatus.STOP;
 
   @MatTableHide()
   topic: string = '';
@@ -246,7 +246,7 @@ export class EnsibleShellTrigger extends EnsibleItemTrigger {
   runCodeFilePath?: boolean = false;
 }
 
-export enum EnsiblePlaybookStatus {
+export enum EnsibleProcessLoggerStatus {
   START = 'START',
   STOP = 'STOP',
   SUCCESS = 'SUCCESS',
