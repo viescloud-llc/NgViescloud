@@ -191,13 +191,13 @@ export class EnsibleProcessLogger {
   @MatTableHide()
   log: string = '';
 
-  @MatTableDisplayLabel('Item ID')
+  @MatTableHide()
   itemId: number = 0;
 
   @MatTableHide()
   executedCommand: string = '';
 
-  @MatTableHide()
+  @MatTableDisplayLabel('Trigger Date Time', (value: EnsibleProcessLogger) => `${value.triggerDateTime.year}-${value.triggerDateTime.month}-${value.triggerDateTime.day} | ${value.triggerDateTime.hour}:${value.triggerDateTime.minute}:${value.triggerDateTime.second}`)
   triggerDateTime: DateTime = new DateTime();
 
   @MatTableDisplayLabel('Status')

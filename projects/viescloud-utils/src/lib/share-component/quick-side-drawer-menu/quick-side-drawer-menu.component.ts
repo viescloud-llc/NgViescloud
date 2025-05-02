@@ -12,6 +12,7 @@ export class QuickSideDrawerMenu {
   click?: () => void;
   children?: QuickSideDrawerMenu[];
   loadComponentOnClick?: Type<any>;
+  disableMiddleClick?: boolean;
 }
 
 @Component({
@@ -20,7 +21,6 @@ export class QuickSideDrawerMenu {
   styleUrls: ['./quick-side-drawer-menu.component.scss']
 })
 export class QuickSideDrawerMenuComponent implements OnInit {
-
   @Input()
   menu!: QuickSideDrawerMenu[];
 
@@ -60,8 +60,7 @@ export class QuickSideDrawerMenuComponent implements OnInit {
     this.router.navigate([url]);
   }
 
-  click(item: QuickSideDrawerMenu) {
-
+  click(item: QuickSideDrawerMenu, event?: MouseEvent) {
     if (item.loadComponentOnClick) {
       this.onClickLoadComponent.emit(item.loadComponentOnClick);
     }
@@ -73,7 +72,14 @@ export class QuickSideDrawerMenuComponent implements OnInit {
       item.click();
     }
     else if (item.routerLink) {
-      this.navigateUrl(item.routerLink);
+      if (event) {
+        if(event.button === 1 && !item.disableMiddleClick) {
+          window.open(item.routerLink, '_blank');
+        }
+      }
+      else {
+        this.navigateUrl(item.routerLink);
+      }
     }
   }
 

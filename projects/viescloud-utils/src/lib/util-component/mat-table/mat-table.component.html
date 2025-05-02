@@ -11,7 +11,7 @@
 <ng-container>
     <table mat-table [dataSource]="dataSource" matSort class="full-width-table">
 
-        <ng-container *ngFor="let column of displayedColumns" [matColumnDef]="column">
+        <ng-container *ngFor="let column of getManageColumns()" [matColumnDef]="column">
             <th mat-header-cell *matHeaderCellDef mat-sort-header [sortActionDescription]="'Sort by ' + column">
             {{getLabel(column)}}
             </th>
@@ -26,7 +26,7 @@
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;" style="cursor: pointer;" (click)="editRow(row)"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" style="cursor: pointer;" (click)="editRow(row)" (mousedown)="editRow(row, $event)"></tr>
 
         <tr class="mat-row" *matNoDataRow>
             <td class="mat-cell" colspan="4">{{getFilterWarning()}}</td>

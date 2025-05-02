@@ -1,5 +1,5 @@
-import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
+import { AfterContentInit, AfterViewInit, ChangeDetectorRef, Component, ContentChild, ContentChildren, Directive, EventEmitter, Input, OnChanges, OnInit, Output, QueryList, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
+import { MatColumnDef, MatTable, MatTableDataSource } from '@angular/material/table';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatColumn, MatTableSettingType } from '../../model/Mat.model';
@@ -10,7 +10,7 @@ import { DataUtils } from '../../util/Data.utils';
   templateUrl: './mat-table.component.html',
   styleUrls: ['./mat-table.component.scss']
 })
-export class MatTableComponent<T extends object> implements OnInit, OnChanges, AfterViewInit {
+export class MatTableComponent<T extends object> implements OnInit, OnChanges, AfterViewInit, AfterContentInit {
 
   @Input()
   filterDisplay: number = 0;
@@ -38,8 +38,13 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
   @Input()
   showMatTooltip: boolean = false;
 
+  extraColumns: string[] = [];
+
   @Output()
   onEditRow: EventEmitter<T> = new EventEmitter();
+
+  @Output()
+  onMiddleClickRow: EventEmitter<T> = new EventEmitter();
 
   @Output()
   onPageIndexChange: EventEmitter<number> = new EventEmitter<number>();
@@ -56,9 +61,23 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
   @ViewChild(MatSort)
   sort!: MatSort;
 
+  @ContentChildren(MatColumnDef) columnDefs?: QueryList<MatColumnDef>;
+  @ViewChild(MatTable, { static: true }) table!: MatTable<any>;
+
   constructor(
     protected cd: ChangeDetectorRef
   ) { }
+  ngAfterContentInit(): void {
+    let elements = this.columnDefs?.toArray();
+    if(elements) {
+      elements.forEach(e => {
+        this.extraColumns.push(e.name);
+        this.table.addColumnDef(e);
+      })
+
+      this.ngOnInit();
+    }
+  }
 
   ngAfterViewInit(): void {
     if(this.initSort) {
@@ -162,6 +181,13 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
         this.displayedColumns.push(e.key);
       });
     }
+    if (this.extraColumns) {
+      this.extraColumns.forEach(e => {
+        if(e) {
+          this.displayedColumns.push(e);
+        }
+      });
+    }
   }
 
   getValue(element: object, label: string): any {
@@ -194,8 +220,15 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
     }
   }
 
-  editRow(row: T) {
-    this.onEditRow.emit(row);
+  editRow(row: T, event?: MouseEvent) {
+    if (event) {
+      if (event.button === 1) {
+        this.onMiddleClickRow.emit(row);
+      }
+    }
+    else {
+      this.onEditRow.emit(row);
+    }
   }
 
   getColumnSetting(label: string): MatColumn {
@@ -229,5 +262,9 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
 
   onPageIndexChangeEmit(event: PageEvent) {
     this.onPageIndexChange.emit(event.pageIndex);
+  }
+
+  getManageColumns() {
+    return this.displayedColumns.filter(e => !this.extraColumns.includes(e));
   }
 }

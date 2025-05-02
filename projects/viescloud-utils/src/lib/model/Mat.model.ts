@@ -494,6 +494,12 @@ export const MatTableDisplayLabel = (label?: string, displayValueFn?: Function) 
     }
 }
 
+export const MatTableDisplayValue = (displayValueFn: Function) => {
+    return function MatTableDisplayValue(object: any, key: any) {
+        addValue(object, key, MatTableSettingType.DISPLAY_VALUE_FN.toString(), displayValueFn, null);
+    }
+}
+
 export const addGetPrototype = (object: any) => {
     Object.defineProperty(object, "getPrototype", {
         value: function a() {},

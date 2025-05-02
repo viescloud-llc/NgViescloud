@@ -17,6 +17,7 @@
           <button 
           mat-flat-button 
           (click)="click(item)"
+          (mousedown)="item.hideChildren = !item.hideChildren; click(item, $event)"
           [disabled]="isDisable(item)">
             {{item.title}}
           </button>
@@ -28,6 +29,7 @@
           <button 
           mat-icon-button  
           (click)="item.hideChildren = !item.hideChildren; click(item)"
+          
           [disabled]="isDisable(item)">
             <mat-icon class="my-button">
               {{item.hideChildren ? 'expand_more' : 'chevron_right'}}

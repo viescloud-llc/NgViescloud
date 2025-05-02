@@ -137,7 +137,7 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
     let itemTrigger = func(item, uuid);
 
     this.watchTopicWs(uuid);
-
+    this.itemLogger = undefined;
     let sub = this.itemWorkspaceService.runCommandAndGetLog(itemTrigger).subscribe({
       next: res => {
         this.itemLogger = res;
@@ -180,7 +180,8 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
       next: res => {
         this.runOutput = res;
         this.isRunning = false;
-        if(this.itemLogger && this.itemLogger.id) {
+
+        if(this.itemLogger) {
           this.fetchLog(this.itemLogger.id);
         }
 

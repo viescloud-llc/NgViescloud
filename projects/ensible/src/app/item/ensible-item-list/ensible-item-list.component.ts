@@ -92,6 +92,10 @@ export class EnsibleItemListComponent<T extends EnsibleItem> extends FixChangeDe
     this.router.navigate(['item', this.getPathSuffix(), item.id]);
   }
 
+  selectItemInNewTab(item: T) {
+    window.open('/item/' + this.getPathSuffix() + '/' + item.id, '_blank');
+  }
+
   getPath(item: T) {
     return item.path;
   }
@@ -132,8 +136,8 @@ export class EnsibleItemListComponent<T extends EnsibleItem> extends FixChangeDe
   }
 
   backupItems() {
-    if(this.useTable) {
-      FileUtils.saveFile('itemsBackup.json', 'application/json', JSON.stringify(this.items));
+    if(this.useTable && this.pageItems) {
+      FileUtils.saveFile('itemsBackup.json', 'application/json', JSON.stringify(this.pageItems.content));
     }
     else {
       FileUtils.saveFile('itemsBackup.json', 'application/json', JSON.stringify(this.items.filter(item => item.path === this.currentPath)));
@@ -180,4 +184,6 @@ export class EnsibleItemListComponent<T extends EnsibleItem> extends FixChangeDe
 
     this.dialogUtils.openErrorMessage("Error", "Error when restoring items (invalid or corrupted file)");
   }
+
+  
 }

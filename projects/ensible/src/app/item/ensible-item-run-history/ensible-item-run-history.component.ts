@@ -1,5 +1,5 @@
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
-import { EnsiblePlaybookItem, EnsiblePlaybookLogger, EnsibleShellLogger } from '../../model/ensible.model';
+import { EnsiblePlaybookItem, EnsiblePlaybookLogger, EnsibleProcessLoggerStatus, EnsibleShellLogger } from '../../model/ensible.model';
 import { EnsiblePlaybookLoggerService, EnsibleShellLoggerService } from '../../service/ensible-logger/ensible-logger.service';
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
@@ -8,6 +8,8 @@ import { Pageable } from 'projects/viescloud-utils/src/lib/model/Mat.model';
 import { RestUtils } from 'projects/viescloud-utils/src/lib/util/Rest.utils';
 import { LazyPageChange } from 'projects/viescloud-utils/src/lib/util-component/mat-table-lazy/mat-table-lazy.component';
 import { Subject } from 'rxjs';
+import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
+import { EnsibleProcessService } from '../../service/ensible-process/ensible-process.service';
 
 @Component({
   selector: 'app-ensible-item-run-history',
@@ -33,7 +35,9 @@ export class EnsibleItemRunHistoryComponent implements OnChanges {
   sendPageIndexChangeSubject = new Subject<void>();
 
   constructor(
-    private rxjsUtils: RxJSUtils
+    private rxjsUtils: RxJSUtils,
+    private dialogUtils: DialogUtils,
+    private ensibleProcessService: EnsibleProcessService,
   ) { }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -61,5 +65,44 @@ export class EnsibleItemRunHistoryComponent implements OnChanges {
     RouteUtils.setQueryParam('logId', log.id.toString());
     RouteUtils.setQueryParam('topic', null);
     this.onSelectedLog.emit(log);
+  }
+
+  selectLogInNewTab(log: EnsibleItemloggerType) {
+    RouteUtils.setQueryParam('logId', log.id.toString());
+    RouteUtils.setQueryParam('topic', null);
+    RouteUtils.setQueryParam('tab', 'Runs');
+    window.open(window.location.href, '_blank');
+  }
+
+  isRunning(log: EnsibleItemloggerType) {
+    return log.status === EnsibleProcessLoggerStatus.RUNNING || log.status === EnsibleProcessLoggerStatus.START;
+  }
+
+  removeLog(log: EnsibleItemloggerType) {
+    if(log.id) {
+      this.itemLoggerService.delete(log.id).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+        next: () => {
+          this.sendPageIndexChangeSubject.next();
+        },
+        error: err => {
+          this.dialogUtils.openErrorMessageFromError(err);
+        }
+      });
+    }
+  }
+
+  stop(log: EnsibleItemloggerType) {
+    let topic = log.topic;
+
+    if(topic) {
+      this.ensibleProcessService.stopProcessByTopic(topic).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+        next: res => {
+          this.sendPageIndexChangeSubject.next();
+        },
+        error: err => {
+          this.dialogUtils.openErrorMessageFromError(err);
+        }
+      });
+    }
   }
 }

@@ -51,6 +51,9 @@ export class MatTablePathComponent<T> extends FixChangeDetection implements OnIn
   @Output()
   onItemSelected: EventEmitter<T> = new EventEmitter<T>();
 
+  @Output()
+  onMiddleClickItem: EventEmitter<T> = new EventEmitter<T>();
+
   currentPath: string = '/';
 
   customRowsMap: Map<string, customRow<T>[]> = new Map();
@@ -209,6 +212,12 @@ export class MatTablePathComponent<T> extends FixChangeDetection implements OnIn
       }
     } else if(customRow.type === this.itemLabel) {
       this.onItemSelected.emit(customRow.value);
+    }
+  }
+
+  middleClickItem(customRow: customRow<T>) {
+    if(customRow.type === this.itemLabel) {
+      this.onMiddleClickItem.emit(customRow.value);
     }
   }
 
