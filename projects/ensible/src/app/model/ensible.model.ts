@@ -140,8 +140,6 @@ export class EnsibleItem extends UserAccess {
   gitlabUrl: string = '';
   @MatTableHide()
   triggerOnGitlabWebhook: boolean = false;
-  @MatTableHide()
-  autoAddGitWebhookCommitMessage: boolean = false;
 
   path: string = '';
 
@@ -157,6 +155,9 @@ export class EnsibleItem extends UserAccess {
 
   @MatTableHide()
   dockerContainerTemplate?: EnsibleDockerContainerTemplate = new EnsibleDockerContainerTemplate();
+
+  @MatTableHide()
+  webhookConfig: EnsibleWebhookConfig = new EnsibleWebhookConfig();
 }
 
 export class EnsiblePlaybookItem extends EnsibleItem {
@@ -205,6 +206,9 @@ export class EnsibleProcessLogger {
 
   @MatTableHide()
   topic: string = '';
+
+  @MatTableHide()
+  webhookLog: EnsibleWebhookLog = new EnsibleWebhookLog();
 
   constructor() {
     ReflectionUtils.copyAllParentPrototype(this);
@@ -431,4 +435,119 @@ export class EnsibleOpenIDProvider {
   @MatTableHide()
   @MatInputDisplayLabel('Auto update user info on login if user exist (not recommended)')
   autoUpdateUserInfo:    boolean = false;
+}
+
+export class EnsibleWebhookConfig {
+  webhookAddRepositoryName = false;
+  webhookAddRepositoryOwnerOrOrganization = false;
+  webhookAddRepositoryUrl = false;
+  webhookAddRepositoryDefaultBranch = false;
+
+  webhookAddCommitShaOrId = false;
+  webhookAddCommitMessage = false;
+  webhookAddCommitAuthor = false;
+  webhookAddCommitTimeStamp = false;
+  webhookAddFilesChanged = false;
+  webhookAddDiffStatistic = false;
+
+  webhookAddBranchName = false;
+  webhookAddBaseBranch = false;
+  webhookAddIsDefaultBranch = false;
+
+  webhookAddEventType = false;
+  webhookAddEventId = false;
+  webhookAddEventTriggeredWorkflowOrPipelineName = false;
+
+  webhookAddPullOrMergeNumberOrId = false;
+  webhookAddPullOrMergeTitle = false;
+  webhookAddPullOrMergeDescription = false;
+  webhookAddPullOrMergeState = false;
+  webhookAddPullOrMergeLabels = false;
+  webhookAddPullOrMergeReviewers = false;
+  webhookAddPullOrMergeApprovialCount = false;
+
+  webhookAddTagName = false;
+  webhookAddTagMessage = false;
+  webhookAddTagNameAndEmail = false;
+
+  webhookAddTriggeredUsername = false;
+  webhookAddTriggeredUserEmail = false;
+  webhookAddTriggeredUserPermissionOrRole = false;
+
+  //---------------------------------------------------------------------
+
+  webhookVariableRepositoryName = '';
+  webhookVariableRepositoryOwnerOrOrganization = '';
+  webhookVariableRepositoryUrl = '';
+  webhookVariableRepositoryDefaultBranch = '';
+
+  webhookVariableCommitShaOrId = '';
+  webhookVariableCommitMessage = '';
+  webhookVariableCommitAuthor = '';
+  webhookVariableCommitTimeStamp = '';
+  webhookVariableFilesChanged = '';
+  webhookVariableDiffStatistic = '';
+
+  webhookVariableBranchName = '';
+  webhookVariableBaseBranch = '';
+  webhookVariableIsDefaultBranch = '';
+
+  webhookVariableEventType = '';
+  webhookVariableEventId = '';
+  webhookVariableEventTriggeredWorkflowOrPipelineName = '';
+
+  webhookVariablePullOrMergeNumberOrId = '';
+  webhookVariablePullOrMergeTitle = '';
+  webhookVariablePullOrMergeDescription = '';
+  webhookVariablePullOrMergeState = '';
+  webhookVariablePullOrMergeLabels = '';
+  webhookVariablePullOrMergeReviewers = '';
+  webhookVariablePullOrMergeApprovialCount = '';
+
+  webhookVariableTagName = '';
+  webhookVariableTagMessage = '';
+  webhookVariableTagNameAndEmail = '';
+
+  webhookVariableTriggeredUsername = '';
+  webhookVariableTriggeredUserEmail = '';
+  webhookVariableTriggeredUserPermissionOrRole = '';
+  webhookDefaultEmptyValue = '';
+}
+
+export class EnsibleWebhookLog {
+  webhookRepositoryName = '';
+  webhookRepositoryOwnerOrOrganization = '';
+  webhookRepositoryUrl = '';
+  webhookRepositoryDefaultBranch = '';
+
+  webhookCommitShaOrId = '';
+  webhookCommitMessage = '';
+  webhookCommitAuthor = '';
+  webhookCommitTimeStamp: DateTime = new DateTime();
+  webhookFilesChanged = '';
+  webhookDiffStatistic = '';
+
+  webhookBranchName = '';
+  webhookBaseBranch = '';
+  webhookIsDefaultBranch = '';
+
+  webhookEventType = '';
+  webhookEventId = '';
+  webhookEventTriggeredWorkflowOrPipelineName = '';
+
+  webhookPullOrMergeNumberOrId = '';
+  webhookPullOrMergeTitle = '';
+  webhookPullOrMergeDescription = '';
+  webhookPullOrMergeState = '';
+  webhookPullOrMergeLabels = '';
+  webhookPullOrMergeReviewers = '';
+  webhookPullOrMergeApprovialCount = '';
+
+  webhookTagName = '';
+  webhookTagMessage = '';
+  webhookTagNameAndEmail = '';
+
+  webhookTriggeredUsername = '';
+  webhookTriggeredUserEmail = '';
+  webhookTriggeredUserPermissionOrRole = '';
 }

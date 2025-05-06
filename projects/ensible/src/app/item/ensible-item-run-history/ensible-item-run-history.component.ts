@@ -105,4 +105,11 @@ export class EnsibleItemRunHistoryComponent implements OnChanges {
       });
     }
   }
+
+  getAuthor(log: EnsibleItemloggerType) {
+    if(log && log.webhookLog && log.webhookLog.webhookCommitAuthor)
+      return log.webhookLog.webhookCommitAuthor;
+    else
+      return "Cron job";
+  }
 }

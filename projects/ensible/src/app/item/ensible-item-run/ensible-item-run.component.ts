@@ -50,7 +50,7 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
   EnsibleItemTypeEnum = EnsibleItemTypeEnum;
   type = EnsibleItemTypeEnum.UNKNOWN;
 
-  waitMs = 10000;
+  waitMs = 30000;
 
   constructor(
     private ensibleWebsocketService: EnsibleWebsocketService,
