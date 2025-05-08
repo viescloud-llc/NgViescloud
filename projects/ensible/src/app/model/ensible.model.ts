@@ -511,7 +511,8 @@ export class EnsibleWebhookConfig {
   webhookVariableTriggeredUsername = '';
   webhookVariableTriggeredUserEmail = '';
   webhookVariableTriggeredUserPermissionOrRole = '';
-  webhookDefaultEmptyValue = '';
+
+  webhookDefaultEmptyValue = 'null';
 }
 
 export class EnsibleWebhookLog {

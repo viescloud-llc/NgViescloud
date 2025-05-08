@@ -1,4 +1,4 @@
-import { EnsibleDockerContainerTemplate, EnsibleItem } from './../../model/ensible.model';
+import { EnsibleDockerContainerTemplate, EnsibleItem, EnsibleWebhookConfig } from './../../model/ensible.model';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 import { AfterContentChecked, Component, ContentChildren, EventEmitter, Input, OnChanges, OnInit, Output, QueryList, SimpleChanges } from '@angular/core';
 import { VERPOSITY_OPTIONS } from '../../model/ensible.model';
@@ -63,6 +63,10 @@ export class EnsibleItemComponent<T extends EnsibleItem> implements OnChanges, O
   contentChildrens!: QueryList<MatFormFieldComponent>;
   contentChildrensValidForms: boolean[] = [];
 
+  webhookEnvironmentVariables: Record<string, string> = {} as Record<string, string>;
+  webhookEnvironmentVariableList: string[] = [];
+  cacheWebhookConfig?: EnsibleWebhookConfig;
+
   constructor(
     public ensibleFsService: EnsibleFsService,
     private rxjsUtils: RxJSUtils,
@@ -105,6 +109,10 @@ export class EnsibleItemComponent<T extends EnsibleItem> implements OnChanges, O
       }
     }
 
+    if (!this.item.webhookConfig) {
+      this.item.webhookConfig = new EnsibleWebhookConfig();
+    }
+
     this.itemCopy = structuredClone(this.item);
 
     this.ensibleDockerContainerTemplateService.getAll().pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
@@ -129,6 +137,7 @@ export class EnsibleItemComponent<T extends EnsibleItem> implements OnChanges, O
   isValueChange() {
     let isChange = DataUtils.isNotEqual(this.item, this.itemCopy) || this.isFsEditing.some(e => e);
     this.isEditing.emit(isChange);
+    this.checkWebhookVariables();
     return isChange;
   }
 
@@ -204,5 +213,60 @@ export class EnsibleItemComponent<T extends EnsibleItem> implements OnChanges, O
 
   isValidForm() {
     return this.validForm && this.contentChildrensValidForms.every(e => e === true);
+  }
+
+  checkWebhookVariables() {
+    if(this.item.webhookConfig) {
+      let config = this.item.webhookConfig;
+      if(!this.cacheWebhookConfig || DataUtils.isSimpleNotEqual(this.cacheWebhookConfig, config)) {
+        this.webhookEnvironmentVariables = {} as Record<string, string>;
+        this.webhookEnvironmentVariableList = [];
+  
+        this.addWebhookVariable(config.webhookAddRepositoryName, config.webhookVariableRepositoryName);
+        this.addWebhookVariable(config.webhookAddRepositoryOwnerOrOrganization, config.webhookVariableRepositoryOwnerOrOrganization);
+        this.addWebhookVariable(config.webhookAddRepositoryUrl, config.webhookVariableRepositoryUrl);
+        this.addWebhookVariable(config.webhookAddRepositoryDefaultBranch, config.webhookVariableRepositoryDefaultBranch);
+        
+        this.addWebhookVariable(config.webhookAddCommitShaOrId, config.webhookVariableCommitShaOrId);
+        this.addWebhookVariable(config.webhookAddCommitMessage, config.webhookVariableCommitMessage);
+        this.addWebhookVariable(config.webhookAddCommitAuthor, config.webhookVariableCommitAuthor);
+        this.addWebhookVariable(config.webhookAddCommitTimeStamp, config.webhookVariableCommitTimeStamp);
+        this.addWebhookVariable(config.webhookAddFilesChanged, config.webhookVariableFilesChanged);
+        this.addWebhookVariable(config.webhookAddDiffStatistic, config.webhookVariableDiffStatistic);
+        
+        this.addWebhookVariable(config.webhookAddBranchName, config.webhookVariableBranchName);
+        this.addWebhookVariable(config.webhookAddBaseBranch, config.webhookVariableBaseBranch);
+        this.addWebhookVariable(config.webhookAddIsDefaultBranch, config.webhookVariableIsDefaultBranch);
+        
+        this.addWebhookVariable(config.webhookAddEventType, config.webhookVariableEventType);
+        this.addWebhookVariable(config.webhookAddEventId, config.webhookVariableEventId);
+        this.addWebhookVariable(config.webhookAddEventTriggeredWorkflowOrPipelineName, config.webhookVariableEventTriggeredWorkflowOrPipelineName);
+        
+        this.addWebhookVariable(config.webhookAddPullOrMergeNumberOrId, config.webhookVariablePullOrMergeNumberOrId);
+        this.addWebhookVariable(config.webhookAddPullOrMergeTitle, config.webhookVariablePullOrMergeTitle);
+        this.addWebhookVariable(config.webhookAddPullOrMergeDescription, config.webhookVariablePullOrMergeDescription);
+        this.addWebhookVariable(config.webhookAddPullOrMergeState, config.webhookVariablePullOrMergeState);
+        this.addWebhookVariable(config.webhookAddPullOrMergeLabels, config.webhookVariablePullOrMergeLabels);
+        this.addWebhookVariable(config.webhookAddPullOrMergeReviewers, config.webhookVariablePullOrMergeReviewers);
+        this.addWebhookVariable(config.webhookAddPullOrMergeApprovialCount, config.webhookVariablePullOrMergeApprovialCount);
+        
+        this.addWebhookVariable(config.webhookAddTagName, config.webhookVariableTagName);
+        this.addWebhookVariable(config.webhookAddTagMessage, config.webhookVariableTagMessage);
+        this.addWebhookVariable(config.webhookAddTagNameAndEmail, config.webhookVariableTagNameAndEmail);
+        
+        this.addWebhookVariable(config.webhookAddTriggeredUsername, config.webhookVariableTriggeredUsername);
+        this.addWebhookVariable(config.webhookAddTriggeredUserEmail, config.webhookVariableTriggeredUserEmail);
+        this.addWebhookVariable(config.webhookAddTriggeredUserPermissionOrRole, config.webhookVariableTriggeredUserPermissionOrRole);
+        
+        this.cacheWebhookConfig = structuredClone(config);
+      }
+    }
+  }
+
+  private addWebhookVariable(condition: boolean, variableName: string) {
+    if(condition && variableName) {
+      this.webhookEnvironmentVariables[variableName] = `Git-sourced value (or ${this.item.webhookConfig.webhookDefaultEmptyValue})`;
+      this.webhookEnvironmentVariableList.push(`Git-sourced value (or ${this.item.webhookConfig.webhookDefaultEmptyValue})`)
+    }
   }
 }

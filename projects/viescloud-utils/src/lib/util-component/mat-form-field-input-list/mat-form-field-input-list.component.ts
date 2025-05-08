@@ -49,6 +49,14 @@ export class MatFormFieldInputListComponent extends MatFormFieldComponent {
 
   override ngOnInit() {
     super.ngOnInit();
+
+    if(this.readonly) {
+      this.showSizeInput = false;
+      this.showRemoveItemButton = false;
+      this.showAddItemButton = false;
+      this.validForm = true;
+    }
+
     this.listLength = this.value.length;
     this.updateBlankObjectType();
   }

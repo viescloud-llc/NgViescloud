@@ -50,7 +50,7 @@
         [value]="item" (valueChange)="value[i] = $event"
         styleWidth="100%"
         [required]="required"
-        customIconLabel="remove_circle"
+        [customIconLabel]="readonly ? '' : 'remove_circle'"
         (onCustomIconClick)="remove(i)"
         [readonly]="readonly"
         ></app-mat-form-field-input>
