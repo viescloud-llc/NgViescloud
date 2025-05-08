@@ -22,23 +22,19 @@ export class EnsibleItemShellComponent extends EnsibleItemComponent<EnsibleShell
   @ViewChild('codeEditorRef')
   codeEditor?: CodeEditorComponent;
 
-  blankItem: EnsibleShellItem = new EnsibleShellItem();
+  override blankItem: EnsibleShellItem = new EnsibleShellItem();
 
   typeOptions = ViesUtils.enumValuesToMatOptions<string>(EnsibleExecuteOptions);
 
   constructor(
-    ensibleItemService: EnsibleShellItemService,
+    public ensibleItemService: EnsibleShellItemService,
     ensibleFsService: EnsibleFsService,
     rxjsUtils: RxJSUtils,
     dialogUtils: DialogUtils,
     router: Router,
     ensibleDockerContainerTemplateService: EnsibleDockerContainerTemplateService
   ) { 
-    super(ensibleItemService, ensibleFsService, rxjsUtils, dialogUtils, router, ensibleDockerContainerTemplateService);
-  }
-
-  override getSuffix(): string {
-    return 'shells';
+    super(ensibleFsService, rxjsUtils, dialogUtils, router, ensibleDockerContainerTemplateService);
   }
 
   forceResizeEditor() {

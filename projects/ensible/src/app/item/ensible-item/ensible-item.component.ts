@@ -1,6 +1,6 @@
-import { EnsibleDockerContainerTemplate, EnsibleItem, EnsiblePlaybookItem, EnsibleShellItem } from './../../model/ensible.model';
+import { EnsibleDockerContainerTemplate, EnsibleItem } from './../../model/ensible.model';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
-import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { AfterContentChecked, Component, ContentChildren, EventEmitter, Input, OnChanges, OnInit, Output, QueryList, SimpleChanges } from '@angular/core';
 import { VERPOSITY_OPTIONS } from '../../model/ensible.model';
 import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
@@ -16,22 +16,35 @@ import { ReflectionUtils } from 'projects/viescloud-utils/src/lib/util/Reflectio
 import { EnsibleFsService } from '../../service/ensible-fs/ensible-fs.service';
 import { EnsibleItemService, EnsiblePlaybookItemService, EnsibleShellItemService } from '../../service/ensible-item/ensible-item.service';
 import { EnsibleItemServiceType, EnsibleItemType } from '../ensible-item-tab/ensible-item-tab.component';
+import { MatFormFieldComponent } from 'projects/viescloud-utils/src/lib/util-component/mat-form-field/mat-form-field.component';
 
 @Component({
   selector: 'app-ensible-item',
   templateUrl: './ensible-item.component.html',
   styleUrls: ['./ensible-item.component.scss']
 })
-export class EnsibleItemComponent<T extends EnsibleItem> implements OnChanges, OnInit {
+export class EnsibleItemComponent<T extends EnsibleItem> implements OnChanges, OnInit, AfterContentChecked {
 
   @Input()
   item!: T;
 
+  @Input()
+  blankItem!: T;
+
+  @Input()
+  itemService!: EnsibleItemService<T>;
+
+  @Input()
+  suffix!: string;
+  
   @Output()
   itemChange: EventEmitter<T> = new EventEmitter();
 
   @Output()
   isEditing: EventEmitter<boolean> = new EventEmitter<boolean>();
+
+  @Output()
+  onRevert: EventEmitter<void> = new EventEmitter<void>();
 
   itemCopy!: T;
 
@@ -46,8 +59,11 @@ export class EnsibleItemComponent<T extends EnsibleItem> implements OnChanges, O
 
   private CLONE_ITEM = "clone_item";
 
+  @ContentChildren(MatFormFieldComponent, { descendants: true }) 
+  contentChildrens!: QueryList<MatFormFieldComponent>;
+  contentChildrensValidForms: boolean[] = [];
+
   constructor(
-    private itemService: EnsibleItemService<T>,
     public ensibleFsService: EnsibleFsService,
     private rxjsUtils: RxJSUtils,
     private dialogUtils: DialogUtils,
@@ -55,12 +71,21 @@ export class EnsibleItemComponent<T extends EnsibleItem> implements OnChanges, O
     private ensibleDockerContainerTemplateService: EnsibleDockerContainerTemplateService
   ) { }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    this.ngOnInit();
+  ngAfterContentChecked(): void {
+    let childrens = this.contentChildrens.toArray();
+
+    if(this.contentChildrensValidForms.length > childrens.length) {
+      this.contentChildrensValidForms = [];
+    }
+
+    for(let i = 0; i < childrens.length; i ++) {
+      let matInput = childrens[i];
+      this.contentChildrensValidForms[i] = matInput.isValidInput();
+    }
   }
 
-  getSuffix() {
-    return '';
+  ngOnChanges(changes: SimpleChanges): void {
+    this.ngOnInit();
   }
 
   ngOnInit(): void {
@@ -111,7 +136,7 @@ export class EnsibleItemComponent<T extends EnsibleItem> implements OnChanges, O
     this.itemService.postOrPut(this.item.id, this.item).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
       next: res => {
         if(this.item.id === 0) {
-          this.router.navigate(['item', this.getSuffix(), res.id]);
+          this.router.navigate(['item', this.suffix, res.id]);
         }
 
         this.itemChange.emit(res);
@@ -124,6 +149,7 @@ export class EnsibleItemComponent<T extends EnsibleItem> implements OnChanges, O
 
   revert() {
     this.item = structuredClone(this.itemCopy);
+    this.onRevert.emit();
   }
 
   async deleteItem() {
@@ -133,7 +159,7 @@ export class EnsibleItemComponent<T extends EnsibleItem> implements OnChanges, O
 
     this.itemService.delete(this.item.id).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
       next: () => {
-        this.router.navigate(['item', this.getSuffix(), 'all']);
+        this.router.navigate(['item', this.suffix, 'all']);
       },
       error: err => {
         this.dialogUtils.openErrorMessageFromError(err, 'Deleting Error', 'Error deleting item, please try again or refresh the page if the error persists');
@@ -173,6 +199,10 @@ export class EnsibleItemComponent<T extends EnsibleItem> implements OnChanges, O
 
   clone() {
     FileUtils.localStorageSetItem(this.CLONE_ITEM, this.item);
-    this.router.navigate(['item', this.getSuffix(), 0]);
+    this.router.navigate(['item', this.suffix, 0]);
+  }
+
+  isValidForm() {
+    return this.validForm && this.contentChildrensValidForms.every(e => e === true);
   }
 }

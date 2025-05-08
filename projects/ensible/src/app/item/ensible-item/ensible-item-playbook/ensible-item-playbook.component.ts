@@ -16,20 +16,16 @@ import { EnsiblePlaybookItem } from '../../../model/ensible.model';
 })
 export class EnsibleItemPlaybookComponent extends EnsibleItemComponent<EnsiblePlaybookItem> {
 
-  blankItem: EnsiblePlaybookItem = new EnsiblePlaybookItem();
+  override blankItem: EnsiblePlaybookItem = new EnsiblePlaybookItem();
 
   constructor(
-    ensibleItemService: EnsiblePlaybookItemService,
+    public ensibleItemService: EnsiblePlaybookItemService,
     ensibleFsService: EnsibleFsService,
     rxjsUtils: RxJSUtils,
     dialogUtils: DialogUtils,
     router: Router,
     ensibleDockerContainerTemplateService: EnsibleDockerContainerTemplateService
   ) { 
-    super(ensibleItemService, ensibleFsService, rxjsUtils, dialogUtils, router, ensibleDockerContainerTemplateService);
-  }
-
-  override getSuffix(): string {
-    return 'playbooks';
+    super(ensibleFsService, rxjsUtils, dialogUtils, router, ensibleDockerContainerTemplateService);
   }
 }
