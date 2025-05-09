@@ -218,6 +218,7 @@ export class EnsibleItemComponent<T extends EnsibleItem> implements OnChanges, O
   checkWebhookVariables() {
     if(this.item.webhookConfig) {
       let config = this.item.webhookConfig;
+
       if(!this.cacheWebhookConfig || DataUtils.isSimpleNotEqual(this.cacheWebhookConfig, config)) {
         this.webhookEnvironmentVariables = {} as Record<string, string>;
         this.webhookEnvironmentVariableList = [];
@@ -268,5 +269,9 @@ export class EnsibleItemComponent<T extends EnsibleItem> implements OnChanges, O
       this.webhookEnvironmentVariables[variableName] = `Git-sourced value (or ${this.item.webhookConfig.webhookDefaultEmptyValue})`;
       this.webhookEnvironmentVariableList.push(`Git-sourced value (or ${this.item.webhookConfig.webhookDefaultEmptyValue})`)
     }
+  }
+
+  formatVariableName(name: string) {
+    return name.replace(/\s+/g, '_');
   }
 }
