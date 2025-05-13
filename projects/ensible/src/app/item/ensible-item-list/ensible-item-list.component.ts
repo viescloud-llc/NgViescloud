@@ -77,11 +77,12 @@ export class EnsibleItemListComponent<T extends EnsibleItem> extends FixChangeDe
     });
   }
 
+  onPathChange(path: string) {
+    this.currentPath = path
+  }
+
   onLazyPathChange(path: string) {
-    if(this.currentPath !== path) {
-      this.currentPath = path;
-      this.init();
-    }
+    this.init();
   }
 
   addItem() {

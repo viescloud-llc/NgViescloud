@@ -48,6 +48,7 @@
     [savePathToLocalStorage]="true"
     [unixStyleBack]="true"
     [readonlyPathInput]="true"
+    (onPathChange)="onPathChange($event)"
     (onLazyPathChange)="onLazyPathChange($event)"
     ></app-mat-table-path-lazy>
   </li>

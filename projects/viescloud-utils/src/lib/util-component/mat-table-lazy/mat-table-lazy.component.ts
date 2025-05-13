@@ -35,6 +35,7 @@ export class MatTableLazyComponent<T extends object> extends MatTableComponent<T
   sendPageIndexChangeSubjectSubscription?: any;
 
   ngOnDestroy(): void {
+    this.fixSizeMap.clear();
     if(this.sendPageIndexChangeSubjectSubscription) {
       this.sendPageIndexChangeSubjectSubscription.unsubscribe();
     }

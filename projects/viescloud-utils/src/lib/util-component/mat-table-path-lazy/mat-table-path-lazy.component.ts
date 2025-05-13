@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, Output, SimpleChanges } from '@angular/core';
 import { MatTablePathComponent } from '../mat-table-path/mat-table-path.component';
 import { Observable } from 'rxjs';
 import { FixedSizeMap } from '../../model/DataStructure.model';
@@ -8,7 +8,7 @@ import { FixedSizeMap } from '../../model/DataStructure.model';
   templateUrl: '../mat-table-path/mat-table-path.component.html',
   styleUrls: ['../mat-table-path/mat-table-path.component.scss']
 })
-export class MatTablePathLazyComponent<T> extends MatTablePathComponent<T> {
+export class MatTablePathLazyComponent<T> extends MatTablePathComponent<T> implements OnDestroy {
 
   @Input()
   maxCachePath: number = 20;
@@ -30,6 +30,10 @@ export class MatTablePathLazyComponent<T> extends MatTablePathComponent<T> {
       this.fixSizeMap.set(this.currentPath, structuredClone(this.value));
     }
     super.ngOnChanges(changes);
+  }
+
+  ngOnDestroy(): void {
+    this.fixSizeMap.clear();
   }
 
   override checkValidPath(): void {
