@@ -4,6 +4,7 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatColumn, MatTableSettingType } from '../../model/Mat.model';
 import { DataUtils } from '../../util/Data.utils';
+import { SelectionModel } from '@angular/cdk/collections';
 
 @Component({
   selector: 'app-mat-table',
@@ -30,6 +31,9 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
   showPagination: boolean = false;
 
   @Input()
+  showMultipleRowSelection: boolean = false;
+
+  @Input()
   initSort?: {key: string, order: 'asc' | 'desc' };
 
   @Input()
@@ -37,7 +41,7 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
 
   @Input()
   showMatTooltip: boolean = false;
-
+  prefixColumns: string[] = ['multipleRowSelection'];
   extraColumns: string[] = [];
 
   @Output()
@@ -49,11 +53,16 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
   @Output()
   onPageIndexChange: EventEmitter<number> = new EventEmitter<number>();
 
+  @Output()
+  onMultipleRowSelected: EventEmitter<T[]> = new EventEmitter<T[]>();
+
   displayedColumns: string[] = [];
 
   dataSource = new MatTableDataSource(this.matRows);
 
   filter?: string;
+
+  multipleRowSelected = new SelectionModel<T>(true, []);
 
   @ViewChild(MatPaginator)
   paginator!: MatPaginator;
@@ -161,8 +170,9 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
   }
 
   private fillColumns(): void {
+    let index = 0;
+
     if (this.matRows.length > 0) {
-      let index = 0;
       for (const [key, value] of Object.entries(this.matRows[0])) {
         this.matColumns.push({
           key: key.toString(),
@@ -175,12 +185,17 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
   }
 
   private filterColumns() {
+    if(this.showMultipleRowSelection) {
+      this.displayedColumns.push(this.prefixColumns[0]);
+    }
+    
     if (this.matColumns) {
       this.matColumns = this.matColumns.sort((a, b) => a.index - b.index);
       this.matColumns.forEach(e => {
         this.displayedColumns.push(e.key);
       });
     }
+
     if (this.extraColumns) {
       this.extraColumns.forEach(e => {
         if(e) {
@@ -232,17 +247,8 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
   }
 
   getColumnSetting(label: string): MatColumn {
-    let index = 0;
-    let matColumn: MatColumn;
-    this.displayedColumns.forEach(e => {
-      if (e === label) {
-        matColumn = this.matColumns[index];
-        return;
-      }
-      index++;
-    })
-
-    return matColumn!;
+    let index = this.matColumns.findIndex(e => e.label === label);
+    return this.matColumns[index];
   }
 
   getLabel(label: string): string {
@@ -262,9 +268,42 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
 
   onPageIndexChangeEmit(event: PageEvent) {
     this.onPageIndexChange.emit(event.pageIndex);
+    this.multipleRowSelected.clear();
+    this.onMultipleRowSelectedEmit();
   }
 
-  getManageColumns() {
-    return this.displayedColumns.filter(e => !this.extraColumns.includes(e));
+  getAutoManageColumns() {
+    return this.displayedColumns.filter(e => !this.extraColumns.includes(e) && !this.prefixColumns.includes(e));
+  }
+
+  isAllSelected() {
+    const numSelected = this.multipleRowSelected.selected.length;
+    const numRows = this.dataSource.data.length;
+    return numSelected === numRows;
+  }
+
+  toggleAllRows() {
+    if (this.isAllSelected()) {
+      this.multipleRowSelected.clear();
+      return;
+    }
+
+    this.multipleRowSelected.select(...this.dataSource.data);
+  }
+
+  checkboxLabel(row?: T): string {
+    if (!row) {
+      return `${this.isAllSelected() ? 'deselect' : 'select'} all`;
+    }
+    return `${this.multipleRowSelected.isSelected(row) ? 'deselect' : 'select'} row ${this.matRows.indexOf(row) + 1}`;
+  }
+
+  onMultipleRowSelectedEmit() {
+    if(this.multipleRowSelected.hasValue()) {
+      this.onMultipleRowSelected.emit(this.multipleRowSelected.selected);
+    }
+    else {
+      this.onMultipleRowSelected.emit([]);
+    }
   }
 }

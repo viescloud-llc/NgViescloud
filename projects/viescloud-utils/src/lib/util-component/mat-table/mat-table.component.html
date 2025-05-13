@@ -11,7 +11,25 @@
 <ng-container>
     <table mat-table [dataSource]="dataSource" matSort class="full-width-table">
 
-        <ng-container *ngFor="let column of getManageColumns()" [matColumnDef]="column">
+        <ng-container [matColumnDef]="prefixColumns[0]" *ngIf="showMultipleRowSelection">
+            <th mat-header-cell *matHeaderCellDef>
+                <mat-checkbox (click)="onMultipleRowSelectedEmit()"
+                              (change)="$event ? toggleAllRows() : null"
+                              [checked]="multipleRowSelected.hasValue() && isAllSelected()"
+                              [indeterminate]="multipleRowSelected.hasValue() && !isAllSelected()"
+                              [aria-label]="checkboxLabel()">
+                </mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let element">
+                <mat-checkbox (click)="$event.stopPropagation(); onMultipleRowSelectedEmit()"
+                                (change)="$event ? multipleRowSelected.toggle(element) : null"
+                                [checked]="multipleRowSelected.isSelected(element)"
+                                [aria-label]="checkboxLabel(element)">
+                </mat-checkbox>
+            </td>
+        </ng-container>
+
+        <ng-container *ngFor="let column of getAutoManageColumns()" [matColumnDef]="column">
             <th mat-header-cell *matHeaderCellDef mat-sort-header [sortActionDescription]="'Sort by ' + column">
             {{getLabel(column)}}
             </th>

@@ -186,5 +186,7 @@ export class EnsibleItemListComponent<T extends EnsibleItem> extends FixChangeDe
     this.dialogUtils.openErrorMessage("Error", "Error when restoring items (invalid or corrupted file)");
   }
 
-  
+  onMultipleRowSelected(items: T[]) {
+    console.log(items);
+  }
 }

@@ -15,6 +15,8 @@ label="Current Path"
 <app-mat-table
 [matRows]="customRows"
 [blankObject]="blankRow"
+[showMultipleRowSelection]="showMultipleRowSelection"
 (onEditRow)="selectedRow($event)"
 (onMiddleClickRow)="middleClickItem($event)"
+(onMultipleRowSelected)="onMultipleRowSelectedEmit($event)"
 ></app-mat-table>

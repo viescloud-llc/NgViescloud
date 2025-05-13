@@ -32,9 +32,11 @@
     (onMiddleClickRow)="selectItemInNewTab($event)"
     [showFilter]="true"
     [showPagination]="true"
+    [showMultipleRowSelection]="false" 
     [pageSizeOptions]="[10, 20, 50, 100, 500]"
     (onLazyPageChange)="onLazyPageChange($event)"
     [sendPageIndexChangeSubject]="sendPageIndexChangeSubject"
+    (onMultipleRowSelected)="onMultipleRowSelected($event)"
     ></app-mat-table-lazy>
   </li>
 
@@ -48,8 +50,10 @@
     [savePathToLocalStorage]="true"
     [unixStyleBack]="true"
     [readonlyPathInput]="true"
+    [showMultipleRowSelection]="false" 
     (onPathChange)="onPathChange($event)"
     (onLazyPathChange)="onLazyPathChange($event)"
+    (onMultipleRowSelected)="onMultipleRowSelected($event)"
     ></app-mat-table-path-lazy>
   </li>
 </ul>

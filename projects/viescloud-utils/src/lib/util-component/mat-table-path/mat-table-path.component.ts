@@ -45,6 +45,9 @@ export class MatTablePathComponent<T> extends FixChangeDetection implements OnIn
   @Input()
   unixStyleBack = false;
 
+  @Input()
+  showMultipleRowSelection: boolean = false;
+
   @Output()
   onPathChange: EventEmitter<string> = new EventEmitter<string>();
 
@@ -53,6 +56,9 @@ export class MatTablePathComponent<T> extends FixChangeDetection implements OnIn
 
   @Output()
   onMiddleClickItem: EventEmitter<T> = new EventEmitter<T>();
+
+  @Output()
+  onMultipleRowSelected: EventEmitter<T[]> = new EventEmitter<T[]>();
 
   currentPath: string = '/';
 
@@ -256,5 +262,9 @@ export class MatTablePathComponent<T> extends FixChangeDetection implements OnIn
 
   onPathChangeEmit(path: string) {
     this.onPathChange.emit(path);
+  }
+
+  onMultipleRowSelectedEmit(elements: customRow<T>[]) {
+    this.onMultipleRowSelected.emit(elements.filter(e => e.type !== this.savePathKeyName && e.value).map(e => e.value!));
   }
 }
