@@ -207,6 +207,9 @@ export class EnsibleProcessLogger {
   @MatTableHide()
   topic: string = '';
 
+  @MatTableDisplayLabel('Trigger by', (value: EnsibleProcessLogger) => value.triggerBy ?? value.webhookLog?.webhookCommitAuthor ?? 'Unkown')
+  triggerBy: string = '';
+
   @MatTableHide()
   webhookLog: EnsibleWebhookLog = new EnsibleWebhookLog();
 

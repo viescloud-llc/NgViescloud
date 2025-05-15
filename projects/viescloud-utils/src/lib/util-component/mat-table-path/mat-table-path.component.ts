@@ -78,11 +78,11 @@ export class MatTablePathComponent<T> extends FixChangeDetection implements OnIn
 
   ngOnInit(): void {
     if(this.savePathToLocalStorage) {
-      this.currentPath = FileUtils.localStorageGetItem<string>(this.savePathKeyName) ?? '/';
+      this.changeCurrentPath(FileUtils.localStorageGetItem<string>(this.savePathKeyName) ?? '/');
     }
 
     if(this.savePathToParam) {
-      this.currentPath = RouteUtils.getDecodedQueryParam(this.savePathKeyName) ?? '/';
+      this.changeCurrentPath(RouteUtils.getDecodedQueryParam(this.savePathKeyName) ?? '/');
     }
 
     this.parseTableMap();
@@ -91,7 +91,7 @@ export class MatTablePathComponent<T> extends FixChangeDetection implements OnIn
   }
 
   checkValidPath() {
-    this.currentPath = this.formatDash(this.currentPath);
+    this.changeCurrentPath(this.formatDash(this.currentPath));
 
     if(this.customRowsMap.has(this.currentPath))
       this.addHistory(this.currentPath);
@@ -214,7 +214,7 @@ export class MatTablePathComponent<T> extends FixChangeDetection implements OnIn
       else {
         let split = this.currentPath.split('/');
         split.pop();
-        this.currentPath = split.join('/') + this.formatDash(customRow.name);
+        this.changeCurrentPath(split.join('/') + this.formatDash(customRow.name));
       }
     } else if(customRow.type === this.itemLabel) {
       this.onItemSelected.emit(customRow.value);
@@ -230,7 +230,7 @@ export class MatTablePathComponent<T> extends FixChangeDetection implements OnIn
   goBackAPath() {
     let split = this.currentPath.split('/');
     split.pop();
-    this.currentPath = split.join('/');
+    this.changeCurrentPath(split.join('/'));
   }
 
   goBack() {
@@ -243,7 +243,7 @@ export class MatTablePathComponent<T> extends FixChangeDetection implements OnIn
       this.pathHistory.pop();
     }
 
-    this.currentPath = this.pathHistory.pop() ?? '/';
+    this.changeCurrentPath(this.pathHistory.pop() ?? '/');
   }
 
   async addHistory(path: string) {
@@ -258,6 +258,11 @@ export class MatTablePathComponent<T> extends FixChangeDetection implements OnIn
 
       this.onPathChangeEmit(path);
     }
+  }
+
+  changeCurrentPath(path: string) {
+    this.currentPath = path;
+    this.onPathChangeEmit(path);
   }
 
   onPathChangeEmit(path: string) {
