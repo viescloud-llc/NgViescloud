@@ -1,10 +1,7 @@
-import { AfterContentChecked, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, forwardRef, inject } from '@angular/core';
-import { ThemePalette } from '@angular/material/core';
-import { MatFormFieldAppearance } from '@angular/material/form-field';
+import { Component, EventEmitter, Input, Output, SimpleChanges, forwardRef } from '@angular/core';
 import { MatFormFieldComponent } from '../mat-form-field/mat-form-field.component';
 import { Observable, map, startWith } from 'rxjs';
 import { FormControl, ValidatorFn, Validators } from '@angular/forms';
-import { FixChangeDetection } from '../../directive/FixChangeDetection';
 
 @Component({
   selector: 'app-mat-form-field-input',
@@ -13,7 +10,6 @@ import { FixChangeDetection } from '../../directive/FixChangeDetection';
   providers: [{ provide: MatFormFieldComponent, useExisting: forwardRef(() => MatFormFieldInputComponent) }]
 })
 export class MatFormFieldInputComponent extends MatFormFieldComponent {
-
   @Input()
   options: string[] = [];
 

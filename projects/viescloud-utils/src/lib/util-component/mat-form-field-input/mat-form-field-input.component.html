@@ -18,6 +18,7 @@
   [formControl]="formControl"
   [matAutocomplete]="auto"
   [readonly]="readonly">
+
   <mat-error>{{getFormControlError()}}</mat-error>
   <mat-hint *ngIf="error" style="color: red;" align="start">{{error}}</mat-hint>
   <mat-hint *ngIf="manuallyEmitValue && isValueChange()" style="color: goldenrod;" align="start">{{manuallyEmitValueHint}}</mat-hint>
@@ -33,15 +34,20 @@
   <button *ngIf="customIconLabel" matSuffix mat-icon-button (click)="emitCustomIcon()">
     <mat-icon [style.color]="getCustomIconLabelColor()">{{customIconLabel}}</mat-icon>
   </button>
-  <button *ngIf="manuallyEmitValue && isValueChange()" matSuffix mat-icon-button (click)="emitValue()">
+  <button *ngIf="manuallyEmitValue && isValueChange()" matSuffix mat-icon-button (click)="emitValue()" [matTooltip]="'Apply ' + label">
     <mat-icon>check_circle_outline</mat-icon>
   </button>
-  <button *ngIf="showClearIcon && value && !disable && !readonly" matSuffix mat-icon-button (click)="clear()">
+  <button *ngIf="showClearIcon && value && !disable && !readonly" matSuffix mat-icon-button (click)="clear()" [matTooltip]="'Clear ' + label">
     <mat-icon>close</mat-icon>
   </button>
-  <button *ngIf="value && !disable && showGoto" matSuffix mat-icon-button (click)="openLink(value.toString())">
+  <button *ngIf="value && !disable && showGoto" matSuffix mat-icon-button (click)="openLink(value.toString())" [matTooltip]="'Go to ' + label">
     <mat-icon>public</mat-icon>
   </button>
+
+  <ng-content matSuffix select="button"></ng-content>
+  <ng-content select="mat-hint"></ng-content>
+  <ng-content select="mat-error"></ng-content>
+
   <app-input-type-switch *ngIf="showVisibleSwitch && !disable" matSuffix [switch]="switchVisibility" [htmlInputElement]="input" [trueValue]="defaultType" [falseValue]="switchType" [onIcon]="onIcon" [offIcon]="offIcon"></app-input-type-switch>
   <app-copy-to-clipboard-util *ngIf="showCopyToClipboard && !disable" matSuffix [copyValue]="value.toString()" [displayMessage]="copyDisplayMessage"></app-copy-to-clipboard-util>
 

@@ -1,8 +1,7 @@
-import { Component, EventEmitter, Input, OnInit, Output, forwardRef } from '@angular/core';
+import { Component, EventEmitter, Input, Output, forwardRef } from '@angular/core';
 import { MatFormFieldComponent } from '../mat-form-field/mat-form-field.component';
-import { MatList } from '../../model/Mat.model';
-import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialog } from '../../dialog/confirm-dialog/confirm-dialog.component';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-mat-form-field-input-list',
@@ -27,6 +26,9 @@ export class MatFormFieldInputListComponent extends MatFormFieldComponent {
 
   @Input()
   showAddItemButton: boolean = true;
+
+  @Input()
+  showDragAndDropButton: boolean = true;
 
   @Input()
   maxSize: number = 100;
@@ -55,6 +57,7 @@ export class MatFormFieldInputListComponent extends MatFormFieldComponent {
       this.showRemoveItemButton = false;
       this.showAddItemButton = false;
       this.validForm = true;
+      this.showDragAndDropButton = false;
     }
 
     this.listLength = this.value.length;
@@ -146,6 +149,10 @@ export class MatFormFieldInputListComponent extends MatFormFieldComponent {
       this.blankObjectType = 'object';
     else
       this.blankObjectType = typeof this.blankObject;
+  }
+
+  drop(event: CdkDragDrop<any[]>) {
+    moveItemInArray(this.value, event.previousIndex, event.currentIndex);
   }
 }
 
