@@ -206,9 +206,14 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
     this.onGoingRequest.push(sub);
   }
 
+  unsubscribeAll() {
+    this.onGoingRequest.forEach(sub => sub.unsubscribe());
+    this.onGoingRequest.length = 0;
+    this.subscribeTopic?.unsubscribe();
+  }
+
   stop() {
     let topic = RouteUtils.getDecodedQueryParam('topic');
-    this.onGoingRequest.forEach(sub => sub.unsubscribe());
 
     if(topic) {
       this.ensibleProcessService.stopProcessByTopic(topic).subscribe({
@@ -218,8 +223,7 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
 
     this.cleanParams();
     this.isRunning = false;
-    this.subscribeTopic?.unsubscribe();
-    this.onGoingRequest.length = 0;
+    this.unsubscribeAll();
   }
 
   cleanParams() {
@@ -232,6 +236,8 @@ export class EnsibleItemRunComponent implements OnChanges, OnDestroy, OnInit {
     this.cleanParams();
     this.runOutput = '';
     this.itemLogger = undefined;
+    this.isRunning = false;
+    this.unsubscribeAll();
     this.ngOnInit();
   }
 

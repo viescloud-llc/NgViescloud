@@ -41,8 +41,8 @@
         </mat-icon>
       </button>
 
-      <button *ngIf="logId" mat-icon-button [matTooltip]="'Clean log'" (click)="clean()" [disabled]="isRunning">
-        <mat-icon>delete</mat-icon>
+      <button *ngIf="runOutput" mat-icon-button [matTooltip]="'Clean Run'" (click)="clean()">
+        <mat-icon>refresh</mat-icon>
       </button>
     </mat-toolbar>
   </li>
