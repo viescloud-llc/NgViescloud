@@ -1,5 +1,13 @@
 <br>
-<button mat-icon-button color="primary" (click)="ngOnInit()" [matTooltip]="'Refresh'"><mat-icon>refresh</mat-icon></button>
+<button mat-icon-button color="primary" (click)="ngOnInit()" [matTooltip]="'Refresh'">
+    <mat-icon>refresh</mat-icon>
+</button>
+<button mat-icon-button color="primary" (click)="showMultipleSelection = !showMultipleSelection" [matTooltip]="'Edit'">
+    <mat-icon>edit</mat-icon>
+</button>
+<button *ngIf="showMultipleSelection && selectedLogs.length > 0" mat-icon-button color="primary" (click)="removeSelectedLogs()" [matTooltip]="'Delete selected run history'">
+    <mat-icon>delete</mat-icon>
+</button>
 <hr>
 <app-mat-table-lazy
 [matRowsPage]="pageLogs"
@@ -8,10 +16,12 @@
 [blankObject]="blankLog"
 [pageSizeOptions]="[10, 20, 50, 200, 1000]"
 [initSort]="{key: 'runNumber', order: 'desc'}"
+[sendPageIndexChangeSubject]="sendPageIndexChangeSubject"
+[showMultipleRowSelection]="showMultipleSelection"
 (onEditRow)="selectLog($event)"
 (onMiddleClickRow)="selectLogInNewTab($event)"
 (onLazyPageChange)="onLazyPageChange($event)"
-[sendPageIndexChangeSubject]="sendPageIndexChangeSubject"
+(onMultipleRowSelected)="selectedLogs = $event"
 >
     <ng-container matColumnDef="menu">
         <th mat-header-cell *matHeaderCellDef></th>

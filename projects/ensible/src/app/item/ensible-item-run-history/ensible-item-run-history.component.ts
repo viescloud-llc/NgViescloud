@@ -33,6 +33,8 @@ export class EnsibleItemRunHistoryComponent implements OnChanges {
   pageLogs!: Pageable<EnsibleItemloggerType>;
   blankLog!: EnsibleItemloggerType;
   sendPageIndexChangeSubject = new Subject<void>();
+  showMultipleSelection = false;
+  selectedLogs: EnsibleItemloggerType[] = [];
 
   constructor(
     private rxjsUtils: RxJSUtils,
@@ -111,5 +113,18 @@ export class EnsibleItemRunHistoryComponent implements OnChanges {
       return log.webhookLog.webhookCommitAuthor;
     else
       return "Cron job";
+  }
+
+  async removeSelectedLogs() {
+
+    if(this.selectedLogs.length > 0) {
+      let confirm = await this.dialogUtils.openConfirmDialog(`Delete ${this.selectedLogs.length} selected run history`, `Are you sure you want to delete ${this.selectedLogs.length} selected run history\nThis action can't be reverse`).catch(err => false); 
+      
+      if(confirm) {
+        this.selectedLogs.forEach(log => {
+          this.removeLog(log);
+        });
+      }
+    }
   }
 }

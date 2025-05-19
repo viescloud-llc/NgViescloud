@@ -112,6 +112,10 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
 
   ngOnChanges(changes: SimpleChanges): void {
     if(changes['matRows']) {
+      this.multipleRowSelected.clear();
+    }
+    
+    if(changes['matRows'] || changes['showMultipleRowSelection']) {
       this.ngOnInit();
     }
   }
@@ -171,8 +175,6 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
 
   private fillColumns(): void {
     let index = 0;
-
-    
 
     if (this.matRows.length > 0) {
       for (const [key, value] of Object.entries(this.matRows[0])) {

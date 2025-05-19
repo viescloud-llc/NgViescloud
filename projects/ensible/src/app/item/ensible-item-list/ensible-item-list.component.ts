@@ -35,6 +35,9 @@ export class EnsibleItemListComponent<T extends EnsibleItem> extends FixChangeDe
 
   currentPath = '/';
 
+  showMultipleSelection = false;
+  selectedItems: T[] = [];
+
   constructor(
     public ensibleItemService: EnsibleItemService<T>,
     private rxjsUtils: RxJSUtils,
@@ -106,6 +109,10 @@ export class EnsibleItemListComponent<T extends EnsibleItem> extends FixChangeDe
   }
 
   async modifyCurrentPathUserAccess() {
+    this.modifyUserAccess(this.items);
+  }
+
+  async modifyUserAccess(items: T[]) {
     let userAcess = await this.dialogUtils.openEnsibleUserAccessDialog(
       DataUtils.purgeValue(new UserAccess()),
       [UserAccessInputType.SHARED_USERS, UserAccessInputType.SHARED_GROUPS, UserAccessInputType.SHARED_OTHERS],
@@ -117,7 +124,7 @@ export class EnsibleItemListComponent<T extends EnsibleItem> extends FixChangeDe
       let sharedUsers = userAcess.sharedUsers;
       let sharedGroups = userAcess.sharedGroups;
       let sharedOthers = userAcess.sharedOthers;
-      this.items.forEach(item => {
+      items.forEach(item => {
         if(item.path === this.currentPath) {
           item.sharedUsers = sharedUsers;
           item.sharedGroups = sharedGroups;
@@ -136,13 +143,17 @@ export class EnsibleItemListComponent<T extends EnsibleItem> extends FixChangeDe
     }
   }
 
-  backupItems() {
+  backupItemsDynamic() {
     if(this.useTable && this.pageItems) {
       FileUtils.saveFile('itemsBackup.json', 'application/json', JSON.stringify(this.pageItems.content));
     }
     else {
       FileUtils.saveFile('itemsBackup.json', 'application/json', JSON.stringify(this.items.filter(item => item.path === this.currentPath)));
     }
+  }
+
+  backupItems(items: T[]) {
+    FileUtils.saveFile('itemsBackup.json', 'application/json', JSON.stringify(items));
   }
 
   async restoreItems() {
@@ -187,6 +198,6 @@ export class EnsibleItemListComponent<T extends EnsibleItem> extends FixChangeDe
   }
 
   onMultipleRowSelected(items: T[]) {
-    console.log(items);
+    this.selectedItems = items;
   }
 }

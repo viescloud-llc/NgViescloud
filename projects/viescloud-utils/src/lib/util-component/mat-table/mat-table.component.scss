@@ -13,3 +13,12 @@
 .mat-header-row, .mat-row {
     display: table-row; // Adjust if necessary based on your material theme
 }
+
+.mat-column-checkbox {
+    width: 48px;
+    max-width: 48px;
+    border-right: 1px solid currentColor;
+    text-align: center;
+    padding: 0;
+}
+  

@@ -66,8 +66,8 @@ export class MatTablePathComponent<T> extends FixChangeDetection implements OnIn
 
   customRows: customRow<T>[] = [];
   blankRow: customRow<T> = new customRow<T>();
-
   pathHistory: string[] = [];
+  pathType = 'path';
 
   ngOnChanges(changes: SimpleChanges): void {
     if(changes['value']) {
@@ -119,7 +119,7 @@ export class MatTablePathComponent<T> extends FixChangeDetection implements OnIn
         if(splitPath[i + 1]) {
           this.addCustomRowToMap(path, {
             name: splitPath[i + 1],
-            type: 'path'
+            type: this.pathType
           })
         }
       }
@@ -132,7 +132,7 @@ export class MatTablePathComponent<T> extends FixChangeDetection implements OnIn
     if(!this.customRowsMap.has(path))
       this.customRowsMap.set(path, []);
 
-    if (row.type !== 'path') {
+    if (row.type !== this.pathType) {
       row = this.increaseCounter(path, row);
     }
 
@@ -176,13 +176,13 @@ export class MatTablePathComponent<T> extends FixChangeDetection implements OnIn
       tempPath = splits.join('/');
       tempPath = this.formatDash(tempPath);
 
-      newCustomRows = this.customRowsMap.get(tempPath)?.filter(e => e.type === 'path' && this.isPartOfPath(this.currentPath, e.name)) ?? [];
+      newCustomRows = this.customRowsMap.get(tempPath)?.filter(e => e.type === this.pathType && this.isPartOfPath(this.currentPath, e.name)) ?? [];
     }
 
     if(this.unixStyleBack && this.currentPath !== '/' && !newCustomRows.some(e => e.name === '..')) {
       newCustomRows.push({
         name: '..',
-        type: 'path'
+        type: this.pathType
       })
     }
 
@@ -202,7 +202,7 @@ export class MatTablePathComponent<T> extends FixChangeDetection implements OnIn
   }
 
   selectedRow(customRow: customRow<T>) {
-    if(customRow.type === 'path') {
+    if(customRow.type === this.pathType) {
       if(this.unixStyleBack && customRow.name === '..') {
         this.goBackAPath();
         return;
@@ -270,6 +270,6 @@ export class MatTablePathComponent<T> extends FixChangeDetection implements OnIn
   }
 
   onMultipleRowSelectedEmit(elements: customRow<T>[]) {
-    this.onMultipleRowSelected.emit(elements.filter(e => e.type !== this.savePathKeyName && e.value).map(e => e.value!));
+    this.onMultipleRowSelected.emit(elements.filter(e => e.type !== this.pathType && e.value).map(e => e.value!));
   }
 }
