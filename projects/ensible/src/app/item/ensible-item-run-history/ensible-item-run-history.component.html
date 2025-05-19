@@ -13,13 +13,6 @@
 (onLazyPageChange)="onLazyPageChange($event)"
 [sendPageIndexChangeSubject]="sendPageIndexChangeSubject"
 >
-    <ng-container matColumnDef="trigger">
-        <th mat-header-cell *matHeaderCellDef>Trigger by</th>
-        <td mat-cell *matCellDef="let element" [matTooltip]="getAuthor(element)">
-            {{getAuthor(element)}}
-        </td>
-    </ng-container>
-
     <ng-container matColumnDef="menu">
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let element">

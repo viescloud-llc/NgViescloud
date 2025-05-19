@@ -172,6 +172,8 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
   private fillColumns(): void {
     let index = 0;
 
+    
+
     if (this.matRows.length > 0) {
       for (const [key, value] of Object.entries(this.matRows[0])) {
         this.matColumns.push({
@@ -247,7 +249,7 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
   }
 
   getColumnSetting(label: string): MatColumn {
-    let index = this.matColumns.findIndex(e => e.label === label);
+    let index = this.matColumns.findIndex(e => e.key === label || e.label === label);
     return this.matColumns[index];
   }
 
