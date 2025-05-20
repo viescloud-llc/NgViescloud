@@ -44,9 +44,15 @@
     <mat-icon>public</mat-icon>
   </button>
 
-  <ng-content matSuffix select="button"></ng-content>
-  <ng-content select="mat-hint"></ng-content>
-  <ng-content select="mat-error"></ng-content>
+  <span matSuffix viescloudClickStopPropagation>
+    <ng-content select="button"></ng-content>
+  </span>
+  <mat-hint style="color: yellow;" align="start">
+    <ng-content select="[matHint]"></ng-content>
+  </mat-hint>
+  <mat-hint style="color: yellow;" align="end">
+    <ng-content select="[matHintEnd]"></ng-content>
+  </mat-hint>
 
   <app-input-type-switch *ngIf="showVisibleSwitch && !disable" matSuffix [switch]="switchVisibility" [htmlInputElement]="input" [trueValue]="defaultType" [falseValue]="switchType" [onIcon]="onIcon" [offIcon]="offIcon"></app-input-type-switch>
   <app-copy-to-clipboard-util *ngIf="showCopyToClipboard && !disable" matSuffix [copyValue]="value.toString()" [displayMessage]="copyDisplayMessage"></app-copy-to-clipboard-util>

@@ -57,10 +57,12 @@
             [value]="item" (valueChange)="value[i] = $event"
             styleWidth="100%"
             [required]="required"
-            [customIconLabel]="readonly ? '' : 'remove_circle'"
-            (onCustomIconClick)="remove(i)"
-            [readonly]="readonly"
-            >
+            [readonly]="readonly">
+            
+              <button *ngIf="!readonly" matSuffix mat-icon-button [matTooltip]="'remove this ' + label + ' item'" (click)="remove(i)" style="color: red;">
+                <mat-icon>remove_circle</mat-icon>
+              </button>
+
               <button *ngIf="showDragAndDropButton" matSuffix mat-icon-button cdkDragHandle [matTooltip]="'rearrange this ' + label + ' item'">
                 <mat-icon>drag_indicator</mat-icon>
               </button>

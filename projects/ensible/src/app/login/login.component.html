@@ -5,7 +5,8 @@
     [(value)]="username"
     [required]="true"
     styleWidth="50%"
-    ></app-mat-form-field-input>
+    [showGoto]="true">
+  </app-mat-form-field-input>
   </li>
   <li>
     <app-mat-form-field-input
@@ -13,8 +14,8 @@
     [(value)]="password"
     [required]="true"
     styleWidth="50%"
-    [showVisibleSwitch]="true"
-    ></app-mat-form-field-input>
+    [showVisibleSwitch]="true">
+  </app-mat-form-field-input>
   </li>
   <li>
     <button #loginButton [style.width]="'50%'" mat-raised-button color="primary" (click)="login()" [disabled]="!validForm">Login</button>
