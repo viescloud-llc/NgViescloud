@@ -45,6 +45,9 @@ export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges
   @Output()
   onExtraToolbarButtonClick = new EventEmitter<{uuid: string, label: string, icon?: string}>();
 
+  @Input()
+  isAnsibleLintableFile = false;
+
   layers: string[] = [];
   fileName: string = ''; //layer0
   fileNameCopy: string = '';
@@ -355,5 +358,12 @@ export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges
 
   private navigate(path: string) {
     this.router.navigate([path]);
+  }
+
+  isAnsibleLintableFileFn() {
+    return this.isAnsibleLintableFile || 
+           this.fileType === FileType.INVENTORY ||
+           this.fileType === FileType.PLAYBOOK ||
+           this.fileType === FileType.ROLE;
   }
 }
