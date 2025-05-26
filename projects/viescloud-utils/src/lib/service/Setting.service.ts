@@ -58,10 +58,11 @@ export class SettingService {
 
   init(prefix: string, authenticatorService?: AuthenticatorService) {
     this.subscribeToSubject(prefix, authenticatorService);
-
     this.prefix = prefix;
 
     let setting = FileUtils.localStorageGetItem<GeneralSetting>(this.GENERAL_SETTING_KEY);
+
+    this.applySetting();
 
     if (!setting || setting.initAutoFetchGeneralSetting) {
       this.syncFromServer(prefix);
