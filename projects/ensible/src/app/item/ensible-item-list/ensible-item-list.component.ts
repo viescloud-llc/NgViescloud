@@ -168,24 +168,24 @@ export class EnsibleItemListComponent<T extends EnsibleItem> extends FixChangeDe
         // if already exist and override
         if (index > -1 && override) {
           let currentItem = this.items[index];
-          this.ensibleItemService.put(currentItem.id, item).subscribe({
-            next: res => {
-              this.snackBarUtils.openSnackBarDynamicString('Item ' + item.name + ' has been restored (updated/override)');
-            },
-            error: err => {
-              this.snackBarUtils.openSnackBarDynamicString(`Error restoring item ${item.name}`);
-            }
+
+          await firstValueFrom(this.ensibleItemService.put(currentItem.id, item))
+          .then(res => {
+            this.snackBarUtils.openSnackBarDynamicString('Item ' + item.name + ' has been restored (updated/override)');
+          })
+          .catch(err => {
+            this.snackBarUtils.openSnackBarDynamicString(`Error restoring item ${item.name}`);
           });
         }
         else if (index === -1) {
           item.id = 0;
-          this.ensibleItemService.post(item).subscribe({
-            next: res => {
-              this.snackBarUtils.openSnackBarDynamicString('Item ' + item.name + ' has been restored (created)');
-            },
-            error: err => {
-              this.snackBarUtils.openSnackBarDynamicString(`Error restoring item ${item.name}`);
-            }
+
+          await firstValueFrom(this.ensibleItemService.post(item))
+          .then(res => {
+            this.snackBarUtils.openSnackBarDynamicString('Item ' + item.name + ' has been restored (created)');
+          })
+          .catch(err => {
+            this.snackBarUtils.openSnackBarDynamicString(`Error restoring item ${item.name}`);
           })
         }
       }
