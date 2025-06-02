@@ -3,398 +3,6 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "wrap": {
-      "projectType": "application",
-      "schematics": {
-        "@schematics/angular:component": {
-          "style": "scss"
-        }
-      },
-      "root": "projects/wrap",
-      "sourceRoot": "projects/wrap/src",
-      "prefix": "app",
-      "architect": {
-        "build": {
-          "builder": "@angular-devkit/build-angular:browser",
-          "options": {
-            "outputPath": "dist/wrap",
-            "index": "projects/wrap/src/index.html",
-            "main": "projects/wrap/src/main.ts",
-            "polyfills": [
-              "zone.js"
-            ],
-            "tsConfig": "projects/wrap/tsconfig.app.json",
-            "inlineStyleLanguage": "scss",
-            "assets": [
-              "projects/wrap/src/favicon.ico",
-              "projects/wrap/src/assets",
-              { "glob": "**/*", "input": "node_modules/monaco-editor", "output": "/assets/monaco/" }
-            ],
-            "styles": [
-              "projects/wrap/src/styles.scss"
-            ],
-            "scripts": []
-          },
-          "configurations": {
-            "production": {
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "999mb",
-                  "maximumError": "999mb"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "999mb",
-                  "maximumError": "999mb"
-                }
-              ],
-              "outputHashing": "all"
-            },
-            "development": {
-              "buildOptimizer": false,
-              "optimization": false,
-              "vendorChunk": true,
-              "extractLicenses": false,
-              "sourceMap": true,
-              "namedChunks": true
-            }
-          },
-          "defaultConfiguration": "production"
-        },
-        "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
-          "configurations": {
-            "production": {
-              "browserTarget": "wrap:build:production"
-            },
-            "development": {
-              "browserTarget": "wrap:build:development"
-            }
-          },
-          "defaultConfiguration": "development"
-        },
-        "extract-i18n": {
-          "builder": "@angular-devkit/build-angular:extract-i18n",
-          "options": {
-            "browserTarget": "wrap:build"
-          }
-        },
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ],
-            "tsConfig": "projects/wrap/tsconfig.spec.json",
-            "inlineStyleLanguage": "scss",
-            "assets": [
-              "projects/wrap/src/favicon.ico",
-              "projects/wrap/src/assets"
-            ],
-            "styles": [
-              "projects/wrap/src/styles.scss"
-            ],
-            "scripts": []
-          }
-        }
-      }
-    },
-    "vmk": {
-      "projectType": "application",
-      "schematics": {
-        "@schematics/angular:component": {
-          "style": "scss"
-        }
-      },
-      "root": "projects/vmk",
-      "sourceRoot": "projects/vmk/src",
-      "prefix": "app",
-      "architect": {
-        "build": {
-          "builder": "@angular-devkit/build-angular:browser",
-          "options": {
-            "outputPath": "dist/vmk",
-            "index": "projects/vmk/src/index.html",
-            "main": "projects/vmk/src/main.ts",
-            "polyfills": [
-              "zone.js"
-            ],
-            "tsConfig": "projects/vmk/tsconfig.app.json",
-            "inlineStyleLanguage": "scss",
-            "assets": [
-              "projects/vmk/src/favicon.ico",
-              "projects/vmk/src/assets",
-              { "glob": "**/*", "input": "node_modules/monaco-editor", "output": "/assets/monaco/" }
-            ],
-            "styles": [
-              "projects/vmk/src/styles.scss"
-            ],
-            "scripts": []
-          },
-          "configurations": {
-            "production": {
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "999mb",
-                  "maximumError": "999mb"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "999mb",
-                  "maximumError": "999mb"
-                }
-              ],
-              "outputHashing": "all"
-            },
-            "development": {
-              "buildOptimizer": false,
-              "optimization": false,
-              "vendorChunk": true,
-              "extractLicenses": false,
-              "sourceMap": true,
-              "namedChunks": true
-            }
-          },
-          "defaultConfiguration": "production"
-        },
-        "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
-          "configurations": {
-            "production": {
-              "browserTarget": "vmk:build:production"
-            },
-            "development": {
-              "browserTarget": "vmk:build:development"
-            }
-          },
-          "defaultConfiguration": "development"
-        },
-        "extract-i18n": {
-          "builder": "@angular-devkit/build-angular:extract-i18n",
-          "options": {
-            "browserTarget": "vmk:build"
-          }
-        },
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ],
-            "tsConfig": "projects/vmk/tsconfig.spec.json",
-            "inlineStyleLanguage": "scss",
-            "assets": [
-              "projects/vmk/src/favicon.ico",
-              "projects/vmk/src/assets"
-            ],
-            "styles": [
-              "projects/vmk/src/styles.scss"
-            ],
-            "scripts": []
-          }
-        }
-      }
-    },
-    "v-console": {
-      "projectType": "application",
-      "schematics": {
-        "@schematics/angular:component": {
-          "style": "scss"
-        }
-      },
-      "root": "projects/v-console",
-      "sourceRoot": "projects/v-console/src",
-      "prefix": "app",
-      "architect": {
-        "build": {
-          "builder": "@angular-devkit/build-angular:browser",
-          "options": {
-            "outputPath": "dist/v-console",
-            "index": "projects/v-console/src/index.html",
-            "main": "projects/v-console/src/main.ts",
-            "polyfills": [
-              "zone.js"
-            ],
-            "tsConfig": "projects/v-console/tsconfig.app.json",
-            "inlineStyleLanguage": "scss",
-            "assets": [
-              "projects/v-console/src/favicon.ico",
-              "projects/v-console/src/assets",
-              { "glob": "**/*", "input": "node_modules/monaco-editor", "output": "/assets/monaco/" }
-            ],
-            "styles": [
-              "projects/v-console/src/styles.scss"
-            ],
-            "scripts": []
-          },
-          "configurations": {
-            "production": {
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "999mb",
-                  "maximumError": "999mb"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "999mb",
-                  "maximumError": "999mb"
-                }
-              ],
-              "outputHashing": "all"
-            },
-            "development": {
-              "buildOptimizer": false,
-              "optimization": false,
-              "vendorChunk": true,
-              "extractLicenses": false,
-              "sourceMap": true,
-              "namedChunks": true
-            }
-          },
-          "defaultConfiguration": "production"
-        },
-        "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
-          "configurations": {
-            "production": {
-              "browserTarget": "v-console:build:production"
-            },
-            "development": {
-              "browserTarget": "v-console:build:development"
-            }
-          },
-          "defaultConfiguration": "development"
-        },
-        "extract-i18n": {
-          "builder": "@angular-devkit/build-angular:extract-i18n",
-          "options": {
-            "browserTarget": "v-console:build"
-          }
-        },
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ],
-            "tsConfig": "projects/v-console/tsconfig.spec.json",
-            "inlineStyleLanguage": "scss",
-            "assets": [
-              "projects/v-console/src/favicon.ico",
-              "projects/v-console/src/assets"
-            ],
-            "styles": [
-              "projects/v-console/src/styles.scss"
-            ],
-            "scripts": []
-          }
-        }
-      }
-    },
-    "v-service": {
-      "projectType": "application",
-      "schematics": {
-        "@schematics/angular:component": {
-          "style": "scss"
-        }
-      },
-      "root": "projects/v-service",
-      "sourceRoot": "projects/v-service/src",
-      "prefix": "app",
-      "architect": {
-        "build": {
-          "builder": "@angular-devkit/build-angular:browser",
-          "options": {
-            "outputPath": "dist/v-service",
-            "index": "projects/v-service/src/index.html",
-            "main": "projects/v-service/src/main.ts",
-            "polyfills": [
-              "zone.js"
-            ],
-            "tsConfig": "projects/v-service/tsconfig.app.json",
-            "inlineStyleLanguage": "scss",
-            "assets": [
-              "projects/v-service/src/favicon.ico",
-              "projects/v-service/src/assets",
-              { "glob": "**/*", "input": "node_modules/monaco-editor", "output": "/assets/monaco/" }
-            ],
-            "styles": [
-              "projects/v-service/src/styles.scss"
-            ],
-            "scripts": []
-          },
-          "configurations": {
-            "production": {
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "999mb",
-                  "maximumError": "999mb"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "999mb",
-                  "maximumError": "999mb"
-                }
-              ],
-              "outputHashing": "all"
-            },
-            "development": {
-              "buildOptimizer": false,
-              "optimization": false,
-              "vendorChunk": true,
-              "extractLicenses": false,
-              "sourceMap": true,
-              "namedChunks": true
-            }
-          },
-          "defaultConfiguration": "production"
-        },
-        "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
-          "configurations": {
-            "production": {
-              "browserTarget": "v-service:build:production"
-            },
-            "development": {
-              "browserTarget": "v-service:build:development"
-            }
-          },
-          "defaultConfiguration": "development"
-        },
-        "extract-i18n": {
-          "builder": "@angular-devkit/build-angular:extract-i18n",
-          "options": {
-            "browserTarget": "v-service:build"
-          }
-        },
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ],
-            "tsConfig": "projects/v-service/tsconfig.spec.json",
-            "inlineStyleLanguage": "scss",
-            "assets": [
-              "projects/v-service/src/favicon.ico",
-              "projects/v-service/src/assets"
-            ],
-            "styles": [
-              "projects/v-service/src/styles.scss"
-            ],
-            "scripts": []
-          }
-        }
-      }
-    },
     "viescloud-utils": {
       "projectType": "library",
       "root": "projects/viescloud-utils",
@@ -428,35 +36,35 @@
         }
       }
     },
-    "ensible": {
+    "dns-manager": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
           "style": "scss"
         }
       },
-      "root": "projects/ensible",
-      "sourceRoot": "projects/ensible/src",
+      "root": "projects/dns-manager",
+      "sourceRoot": "projects/dns-manager/src",
       "prefix": "app",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/ensible",
-            "index": "projects/ensible/src/index.html",
-            "main": "projects/ensible/src/main.ts",
+            "outputPath": "dist/dns-manager",
+            "index": "projects/dns-manager/src/index.html",
+            "main": "projects/dns-manager/src/main.ts",
             "polyfills": [
               "zone.js"
             ],
-            "tsConfig": "projects/ensible/tsconfig.app.json",
+            "tsConfig": "projects/dns-manager/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
-              "projects/ensible/src/favicon.ico",
-              "projects/ensible/src/assets",
+              "projects/dns-manager/src/favicon.ico",
+              "projects/dns-manager/src/assets",
               { "glob": "**/*", "input": "node_modules/monaco-editor", "output": "/assets/monaco/" }
             ],
             "styles": [
-              "projects/ensible/src/styles.scss"
+              "projects/dns-manager/src/styles.scss"
             ],
             "scripts": []
           },
@@ -491,10 +99,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "ensible:build:production"
+              "browserTarget": "dns-manager:build:production"
             },
             "development": {
-              "browserTarget": "ensible:build:development"
+              "browserTarget": "dns-manager:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -502,7 +110,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "ensible:build"
+            "browserTarget": "dns-manager:build"
           }
         },
         "test": {
@@ -512,14 +120,14 @@
               "zone.js",
               "zone.js/testing"
             ],
-            "tsConfig": "projects/ensible/tsconfig.spec.json",
+            "tsConfig": "projects/dns-manager/tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
             "assets": [
-              "projects/ensible/src/favicon.ico",
-              "projects/ensible/src/assets"
+              "projects/dns-manager/src/favicon.ico",
+              "projects/dns-manager/src/assets"
             ],
             "styles": [
-              "projects/ensible/src/styles.scss"
+              "projects/dns-manager/src/styles.scss"
             ],
             "scripts": []
           }
