@@ -16,7 +16,7 @@ export class DnsManagerService extends ViesService {
     }
 
     protected override getPrefixes(): string[] {
-        return ['dns-manager', 'dns'];
+        return ['skeleton', 'dns'];
     }
 
     public getAllDnsRecords(): Observable<DnsRecord[]> {

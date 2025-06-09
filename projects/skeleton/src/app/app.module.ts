@@ -6,8 +6,8 @@ import { AppComponent } from './app.component';
 import { ViescloudUtilsModule } from 'projects/viescloud-utils/src/lib/viescloud-utils.module';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { SettingService } from 'projects/viescloud-utils/src/lib/service/Setting.service';
-import { DnsManagerSettingService } from './service/dns-manager.setting.service';
-import { DnsManagerAuthInterceptor } from './guard/dns-manager-auth.interceptor';
+import { DnsManagerSettingService } from './service/skeleton.setting.service';
+import { DnsManagerAuthInterceptor } from './guard/skeleton-auth.interceptor';
 
 const LIST = [
   AppComponent
