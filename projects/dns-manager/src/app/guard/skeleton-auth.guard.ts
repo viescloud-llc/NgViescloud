@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class DnsManagerAuthGuard {
+export class SkeletonManagerAuthGuard {
 
   constructor(
     private router: Router,

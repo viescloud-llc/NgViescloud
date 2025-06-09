@@ -6,8 +6,8 @@ import { AppComponent } from './app.component';
 import { ViescloudUtilsModule } from 'projects/viescloud-utils/src/lib/viescloud-utils.module';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { SettingService } from 'projects/viescloud-utils/src/lib/service/Setting.service';
-import { DnsManagerSettingService } from './service/dns-manager.setting.service';
-import { DnsManagerAuthInterceptor } from './guard/dns-manager-auth.interceptor';
+import { SkeletonManagerSettingService } from './service/skeleton.setting.service';
+import { SkeletonManagerAuthInterceptor } from './guard/skeleton-auth.interceptor';
 
 const LIST = [
   AppComponent
@@ -24,12 +24,12 @@ const LIST = [
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
-      useClass: DnsManagerAuthInterceptor,
+      useClass: SkeletonManagerAuthInterceptor,
       multi: true
     },
     {
       provide: SettingService,
-      useClass: DnsManagerSettingService
+      useClass: SkeletonManagerSettingService
     },
     // {
     //   provide: S3StorageServiceV1,

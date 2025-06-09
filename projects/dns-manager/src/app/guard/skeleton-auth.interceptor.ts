@@ -7,7 +7,7 @@ const headers = new HttpHeaders().set('content-type', 'application/json');
 @Injectable({
   providedIn: 'root'
 })
-export class DnsManagerAuthInterceptor implements HttpInterceptor
+export class SkeletonManagerAuthInterceptor implements HttpInterceptor
 {
   constructor(
     // private ensibleAuthenticator: EnsibleAuthenticatorService
