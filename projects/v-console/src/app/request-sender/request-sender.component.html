@@ -1,0 +1,42 @@
+<ul>
+  <li><h1>Request Sender</h1></li>
+  <li>
+    <mat-form-field appearance="fill">
+      <mat-label>Choose an option</mat-label>
+      <mat-select required [(ngModel)]="request">
+        <mat-option value="GET" default>GET</mat-option>
+        <mat-option value="POST">POST</mat-option>
+        <mat-option value="PUT">PUT</mat-option>
+        <mat-option value="PATCH">PATCH</mat-option>
+        <mat-option value="DELETE">DELETE</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <app-mat-form-field-input
+    label="URL"
+    [value]="url" (valueOutput)="url = $event.toString()">
+    </app-mat-form-field-input>
+    <button mat-raised-button color="primary">Send</button>
+  </li>
+  <li>
+    <mat-tab-group>
+      <mat-tab label="Params">
+        <ul>
+          <li>
+            <h3 style="text-align: left;">Query Params</h3>
+            <input type="number">
+          </li>
+        </ul>
+
+      </mat-tab>
+      <mat-tab label="Headers"> Content 2 </mat-tab>
+      <mat-tab label="Body"> Content 3 </mat-tab>
+    </mat-tab-group>
+  </li>
+  <li>
+    <mat-tab-group>
+      <mat-tab label="Body"> Content 1 </mat-tab>
+      <mat-tab label="Cookies"> Content 2 </mat-tab>
+      <mat-tab label="Headers"> Content 3 </mat-tab>
+    </mat-tab-group>
+  </li>
+</ul>

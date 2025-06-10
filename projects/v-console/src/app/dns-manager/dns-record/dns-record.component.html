@@ -1,0 +1,384 @@
+<mat-tab-group style="width: 100%;" *ngIf="dnsRecord" appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
+  <mat-tab label="Details">
+    <ul class="margin-center">
+      <li class="flex-row-container">
+        <app-mat-form-field-input-list *ngFor="let record of nginxRecords; let i = index; trackBy: trackByIndex;"
+        [label]="getNameByIndex(i)"
+        [(value)]="record.domain_names"
+        [blankObject]="''"
+        [showSizeInput]="false"
+        styleWidth="100%"
+        [maxSize]="10"
+        style="width: 48%; height: 100%;"
+        [required]="true"
+        ></app-mat-form-field-input-list>
+      </li>
+      <hr>
+
+      <li>
+        <app-mat-form-field-input-option
+        [(value)]="uriDetails.protocol"
+        label="Scheme"
+        noneLabel=""
+        [options]="[{value: ForwardScheme.HTTP, valueLabel: 'http'}, {value: ForwardScheme.HTTPS, valueLabel: 'https'}]"
+        [required]="true"
+        (onValueChange)="syncUriDetails()"
+        ></app-mat-form-field-input-option>
+
+        <app-mat-form-field-input-dynamic
+        label="Host"
+        [(value)]="uriDetails.host"
+        [required]="true"
+        (onValueChange)="syncUriDetails()"
+        ></app-mat-form-field-input-dynamic>
+
+        <app-mat-form-field-input-dynamic
+        label="Port"
+        [(value)]="uriDetails.port"
+        [required]="true"
+        (onValueChange)="syncUriDetails()"
+        ></app-mat-form-field-input-dynamic>
+      </li>
+      <li>
+        <app-mat-form-field-input-dynamic
+        label="Sync Details Setting"
+        [(value)]="duplicateDetailsSetting"
+        [isSlideToggle]="true"
+        (onValueChange)="syncDetailsSetting()"
+        ></app-mat-form-field-input-dynamic>
+      </li>
+      <br>
+      <li *ngIf="duplicateDetailsSetting; else ElseDetails" class="flex-row-container">
+        <app-mat-form-field-input-dynamic
+        label="Cache Assets"
+        [(value)]="duplicateDetails.caching_enabled"
+        [isSlideToggle]="true"
+        (onValueChange)="syncDetailsSetting()"
+        ></app-mat-form-field-input-dynamic>
+
+        <app-mat-form-field-input-dynamic
+        label="Block Common Exploits"
+        [(value)]="duplicateDetails.block_exploits"
+        [isSlideToggle]="true"
+        (onValueChange)="syncDetailsSetting()"
+        ></app-mat-form-field-input-dynamic>
+
+        <app-mat-form-field-input-dynamic
+        label="Websockets Support"
+        [(value)]="duplicateDetails.allow_websocket_upgrade"
+        [isSlideToggle]="true"
+        (onValueChange)="syncDetailsSetting()"
+        ></app-mat-form-field-input-dynamic>
+      </li>
+      <ng-template #ElseDetails>
+        <div *ngFor="let item of nginxRecords; let i = index; trackBy: trackByIndex">
+          <li>
+            <h4>{{getNameByIndex(i)}}</h4>
+          </li>
+          <li class="flex-row-container">
+            <app-mat-form-field-input-dynamic
+            label="Cache Assets"
+            [(value)]="item.caching_enabled"
+            [isSlideToggle]="true"
+            ></app-mat-form-field-input-dynamic>
+  
+            <app-mat-form-field-input-dynamic
+            label="Block Common Exploits"
+            [(value)]="item.block_exploits"
+            [isSlideToggle]="true"
+            ></app-mat-form-field-input-dynamic>
+  
+            <app-mat-form-field-input-dynamic
+            label="Websockets Support"
+            [(value)]="item.allow_websocket_upgrade"
+            [isSlideToggle]="true"
+            ></app-mat-form-field-input-dynamic>
+          </li>
+          <br>
+        </div>
+      </ng-template>
+    </ul>
+  </mat-tab>
+
+  <mat-tab label="Custom Location">
+    <ul class="margin-center">
+      <li>
+        <app-mat-form-field-input-dynamic
+        label="Sync Location Setting"
+        [(value)]="duplicateCustomLocationSetting"
+        [isSlideToggle]="true"
+        (onValueChange)="syncLocationSetting()"
+        ></app-mat-form-field-input-dynamic>
+      </li>
+      <br>
+
+      <li *ngIf="duplicateCustomLocationSetting; else ElseLocation">
+        <ul *ngFor="let location of duplicateCustomLocations; let e = index; trackBy: trackByIndex" [style.width]="'100%'">
+          <li>
+            <app-mat-form-field-input-dynamic
+            label="Location"
+            placeholder="/path"
+            [(value)]="location.path"
+            styleWidth="100%"
+            [required]="true"
+            (onValueChange)="syncLocationSetting()"
+            ></app-mat-form-field-input-dynamic>
+          </li>
+          <li class="flex-row-container">
+            <app-mat-form-field-input-option
+            label="Scheme"
+            noneLabel=""
+            [(value)]="location.forward_scheme"
+            [options]="[{value: ForwardScheme.HTTP, valueLabel: 'http'}, {value: ForwardScheme.HTTPS, valueLabel: 'https'}]"
+            [required]="true"
+            styleWidth="100%"
+            style="width: 20%;"
+            (onValueChange)="syncLocationSetting()"
+            ></app-mat-form-field-input-option>
+
+            <app-mat-form-field-input-dynamic
+            label="Host"
+            [(value)]="location.forward_host"
+            [required]="true"
+            styleWidth="100%"
+            style="width: 50%;"
+            (onValueChange)="syncLocationSetting()"
+            ></app-mat-form-field-input-dynamic>
+
+            <app-mat-form-field-input-dynamic
+            label="Port"
+            [(value)]="location.forward_port"
+            [required]="true"
+            styleWidth="100%"
+            style="width: 20%;"
+            (onValueChange)="syncLocationSetting()"
+            ></app-mat-form-field-input-dynamic>
+          </li>
+          <li>
+            <app-mat-form-field-input-text-area
+            label="Custom Nginx Configuration"
+            [(value)]="location.advanced_config"
+            styleWidth="100%"
+            (onValueChange)="syncLocationSetting()"
+            ></app-mat-form-field-input-text-area>
+          </li>
+          <li>
+            <button class="text-center" mat-raised-button color="primary" (click)="removeLocation(duplicateCustomLocations, e)">Delete</button>
+          </li>
+          <hr>
+        </ul>
+        <button mat-raised-button color="primary" (click)="addLocation(duplicateCustomLocations)" [style.width]="'100%'">Add Location</button>
+      </li>
+
+      <ng-template #ElseLocation>
+        <li class="flex-row-container">
+          <div *ngFor="let record of nginxRecords; let i = index; trackBy: trackByIndex" style="width: 48%;">
+            <h4 class="text-center">{{getNameByIndex(i)}}</h4>
+            <ul *ngFor="let location of record.locations; let e = index; trackBy: trackByIndex">
+              <li>
+                <app-mat-form-field-input-dynamic
+                label="Location"
+                placeholder="/path"
+                [(value)]="location.path"
+                styleWidth="100%"
+                [required]="true"
+                ></app-mat-form-field-input-dynamic>
+              </li>
+              <li class="flex-row-container">
+                <app-mat-form-field-input-option
+                label="Scheme"
+                noneLabel=""
+                [(value)]="location.forward_scheme"
+                [options]="[{value: ForwardScheme.HTTP, valueLabel: 'http'}, {value: ForwardScheme.HTTPS, valueLabel: 'https'}]"
+                [required]="true"
+                styleWidth="100%"
+                style="width: 20%;"
+                ></app-mat-form-field-input-option>
+  
+                <app-mat-form-field-input-dynamic
+                label="Host"
+                [(value)]="location.forward_host"
+                [required]="true"
+                styleWidth="100%"
+                style="width: 50%;"
+                ></app-mat-form-field-input-dynamic>
+  
+                <app-mat-form-field-input-dynamic
+                label="Port"
+                [(value)]="location.forward_port"
+                [required]="true"
+                styleWidth="100%"
+                style="width: 20%;"
+                ></app-mat-form-field-input-dynamic>
+              </li>
+              <li>
+                <app-mat-form-field-input-text-area
+                label="Custom Nginx Configuration"
+                [(value)]="location.advanced_config"
+                styleWidth="100%"
+                ></app-mat-form-field-input-text-area>
+              </li>
+              <li>
+                <button class="text-center" mat-raised-button color="primary" (click)="removeLocation(record.locations, e)">Delete</button>
+              </li>
+              <hr>
+            </ul>
+            <button mat-raised-button color="primary" (click)="addLocation(record.locations, record)" [style.width]="'100%'">Add Location</button>
+          </div>
+        </li>
+      </ng-template>
+    </ul>
+  </mat-tab>
+
+  <mat-tab label="SSL">
+    <ul class="margin-center">
+      <li class="flex-row-container">
+        <app-mat-form-field-input-option
+        *ngFor="let item of CertificateOptions; let i = index; trackBy: trackByIndex;"
+        [label]="getNameByIndex(i) + ' SSL Certificate'"
+        [(value)]="nginxRecords[i].certificate_id"
+        [options]="item"
+        noneLabel=""
+        styleWidth="100%"
+        style="width: 48%;"
+        [required]="nginxRecords[i].domain_names.length > 0"
+        ></app-mat-form-field-input-option>
+      </li>
+      <li>
+        <app-mat-form-field-input-dynamic
+        label="Sync SSL Setting"
+        [(value)]="duplicateCertificateSetting"
+        [isSlideToggle]="true"
+        (onValueChange)="syncCertificateSetting()"
+        ></app-mat-form-field-input-dynamic>
+      </li>
+      <br>
+      <li *ngIf="duplicateCertificateSetting; else ElseSSL" class="flex-row-container">
+        <app-mat-form-field-input-dynamic
+        label="Force SSL"
+        [(value)]="duplicateCertificate.ssl_forced"
+        [isSlideToggle]="true"
+        (onValueChange)="syncCertificateSetting()"
+        ></app-mat-form-field-input-dynamic>
+
+        <app-mat-form-field-input-dynamic
+        label="HTTP/2 Support"
+        [(value)]="duplicateCertificate.http2_support"
+        [isSlideToggle]="true"
+        (onValueChange)="syncCertificateSetting()"
+        ></app-mat-form-field-input-dynamic>
+
+        <app-mat-form-field-input-dynamic
+        label="HSTS Enabled"
+        [(value)]="duplicateCertificate.hsts_enabled"
+        [isSlideToggle]="true"
+        (onValueChange)="syncCertificateSetting()"
+        ></app-mat-form-field-input-dynamic>
+
+        <app-mat-form-field-input-dynamic
+        label="HSTS Subdomains"
+        [(value)]="duplicateCertificate.hsts_subdomains"
+        [isSlideToggle]="true"
+        (onValueChange)="syncCertificateSetting()"
+        ></app-mat-form-field-input-dynamic>
+      </li>
+
+      <ng-template #ElseSSL>
+        <div *ngFor="let item of nginxRecords; let i = index; trackBy: trackByIndex">
+          <li>
+            <h4>{{getNameByIndex(i)}}</h4>
+          </li>
+          <li class="flex-row-container">
+            <app-mat-form-field-input-dynamic
+            label="Force SSL"
+            [(value)]="item.ssl_forced"
+            [isSlideToggle]="true"
+            ></app-mat-form-field-input-dynamic>
+  
+            <app-mat-form-field-input-dynamic
+            label="HTTP/2 Support"
+            [(value)]="item.http2_support"
+            [isSlideToggle]="true"
+            ></app-mat-form-field-input-dynamic>
+  
+            <app-mat-form-field-input-dynamic
+            label="HSTS Enabled"
+            [(value)]="item.hsts_enabled"
+            [isSlideToggle]="true"
+            ></app-mat-form-field-input-dynamic>
+  
+            <app-mat-form-field-input-dynamic
+            label="HSTS Subdomains"
+            [(value)]="item.hsts_subdomains"
+            [isSlideToggle]="true"
+            ></app-mat-form-field-input-dynamic>
+          </li>
+        </div>
+      </ng-template>
+    </ul>
+  </mat-tab>
+
+  <mat-tab label="Advanced">
+    <ul class="margin-center">
+      <li>
+        <pre>These proxy details are available as nginx variables:
+
+        * $server Forward Hostname / IP
+        * $port Forward Port
+        * $forward_scheme Scheme</pre>
+      </li>
+      <li><h4>Custom Nginx Configuration</h4></li>
+      <li><button mat-raised-button color="primary" (click)="autoFillAuthentikSetting()">Auto fill Authentik proxy protection</button></li>
+      <li>
+        <app-mat-form-field-input-dynamic
+        label="Sync Advanced Setting"
+        [(value)]="duplicateAdvancedSetting"
+        [isSlideToggle]="true"
+        (onValueChange)="syncAdvancedSetting()"
+        ></app-mat-form-field-input-dynamic>
+      </li>
+
+      <li *ngIf="duplicateAdvancedSetting; else ElseAdvanced">
+        <app-mat-form-field-input-text-area
+        label="Sync Custom Nginx Configuration"
+        [(value)]="duplicateAdvanced.advanced_config"
+        (onValueChange)="syncAdvancedSetting()"
+        styleWidth="100%"
+        style="width: 100%;"
+        ></app-mat-form-field-input-text-area>
+      </li>
+
+      <ng-template #ElseAdvanced >
+        <li class="flex-row-container">
+          <app-mat-form-field-input-text-area
+          *ngFor="let item of nginxRecords; let i = index; trackBy: trackByIndex"
+          [label]="getNameByIndex(i) + ' Custom Nginx Configuration'"
+          [(value)]="item.advanced_config"
+          styleWidth="100%"
+          style="width: 48%; height: 100%;"
+          ></app-mat-form-field-input-text-area>
+        </li>
+      </ng-template>
+    </ul>
+  </mat-tab>
+
+</mat-tab-group>
+
+<hr>
+<ul>
+  <li class="flex-row-container">
+    <button mat-raised-button color="primary" [disabled]="!isValueChange() || !validForm" (click)="save()">Save</button>
+    <button mat-raised-button color="warn" (click)="onEdit.emit(undefined)">Cancel</button>
+    <button mat-raised-button color="warn" (click)="remove()">Delete</button>
+  </li>
+  <br>
+  <li class="flex-row-container">
+    <button mat-raised-button color="primary" (click)="gotoUri(this.dnsRecord.uri)">Go to {{this.dnsRecord.uri}}</button>
+  
+    <button mat-raised-button color="primary" 
+    *ngFor="let item of getAllDomainNames()"
+    (click)="gotoUri(item)">
+      Go to {{item}}
+    </button>
+  </li>
+</ul>

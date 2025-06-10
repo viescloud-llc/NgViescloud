@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start_skeleton": "ng serve --project skeleton",
-    "build_skeleton": "ng build --project skeleton",
+    "start_v-console": "ng serve --project v-console",
+    "build_v-console": "ng build --project v-console",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },

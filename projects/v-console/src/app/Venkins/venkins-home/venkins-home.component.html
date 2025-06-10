@@ -1,0 +1,40 @@
+<ul class="margin-center">
+  <li><h1 class="text-center">VK.json builder</h1></li>
+  <hr>
+  <li><h2 class="text-center">Config Map</h2></li>
+  <li class="flex-row-container">
+    <ng-container *ngFor="let model of configModels" >
+      <button mat-raised-button color="primary" (click)="updateBuildModel(model)">{{model.name}}</button>
+    </ng-container>
+  </li>
+  <hr>
+  <li><h2 class="text-center">Possible replacement variable</h2></li>
+  <li>
+    <app-mat-form-field-input-dynamic
+    [(value)]="jobRequest"
+    styleWidth="100%"
+    ></app-mat-form-field-input-dynamic>
+  </li>
+  <hr>
+  <li>
+    <app-mat-form-field-input-text-area
+    styleWidth="100%"
+    [value]="getJsonJobRequest()"
+    (valueChange)="onJsonJobRequestChange($event)"
+    ></app-mat-form-field-input-text-area>
+  </li>
+  <hr>
+  <li class="flex-row-container">
+    <button mat-raised-button color="primary" style="margin-bottom: 10px;" (click)="addToList()">Add to list</button>
+    <button [disabled]="jobRequests.length == 0" mat-raised-button color="primary" style="margin-bottom: 10px;" (click)="removeFirst()">Remove First</button>    
+    <button [disabled]="jobRequests.length == 0" mat-raised-button color="primary" style="margin-bottom: 10px;" (click)="removeLast()">Remove Last</button>    
+    <button [disabled]="undoJobRequests.length == 0" mat-raised-button color="primary" style="margin-bottom: 10px;" (click)="undo()">Undo</button>    
+    <button [disabled]="jobRequests.length == 0" mat-raised-button color="warn" style="margin-bottom: 10px;" (click)="clearList()">Clear List</button>
+  <li>
+    <app-mat-form-field-input-text-area
+    styleWidth="100%"
+    [value]="getJsonJobRequests()"
+    (valueChange)="onJsonJobRequestsChange($event)"
+    ></app-mat-form-field-input-text-area>
+  </li>
+</ul>

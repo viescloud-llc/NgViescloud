@@ -1,0 +1,15 @@
+<div class="margin-center">
+  <ul>
+    <li><h1 class="text-center">Question table</h1></li>
+    <li>
+      <app-mat-table
+      [matRows]="questionRows"
+      (onEditRow)="editQuestion($event)"
+      [showFilter]="true"
+      [showPagination]="true"
+      ></app-mat-table>
+    </li>
+    <br>
+    <li><button mat-raised-button style="width: 100%;" color="primary" (click)="addNewQuestion()">Add new question</button></li>
+  </ul>
+</div>
