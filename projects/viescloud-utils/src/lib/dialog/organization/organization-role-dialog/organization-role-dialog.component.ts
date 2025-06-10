@@ -2,8 +2,8 @@ import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { ObjectDialog, ObjectDialogData } from '../../object-dialog/object-dialog.component';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { first } from 'rxjs';
-import { Organization, Role } from '../../../model/Organization.model';
-import { OrganizationService } from '../../../service/Organization.service';
+import { Organization, Role } from '../../../model/organization.model';
+import { OrganizationService } from '../../../service/organization.service';
 
 @Component({
   selector: 'app-organization-role-dialog',

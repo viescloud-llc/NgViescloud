@@ -1,7 +1,7 @@
 import { AfterViewChecked, AfterViewInit, ChangeDetectorRef, Component, Inject, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { AuthenticatorService } from '../../service/Authenticator.service';
-import { User, UserProfile, UserRole } from '../../model/Authenticator.model';
+import { AuthenticatorService } from '../../service/authenticator.service';
+import { User, UserProfile, UserRole } from '../../model/authenticator.model';
 import { first, isEmpty } from 'rxjs';
 import { MatFormFieldInputComponent } from '../../util-component/mat-form-field-input/mat-form-field-input.component';
 import { MatFormFieldGroupDirective } from '../../directive/mat-form-field-group.directive';

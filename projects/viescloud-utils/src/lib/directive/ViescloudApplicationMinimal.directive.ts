@@ -1,7 +1,7 @@
 import { Directive, HostListener, OnInit, ViewChild } from '@angular/core';
-import { OpenIdService } from '../service/OpenId.service';
-import { SettingService } from '../service/Setting.service';
-import { KeyCaptureService } from '../service/KeyCapture.service';
+import { OpenIdService } from '../service/open-id.service';
+import { SettingService } from '../service/setting.service';
+import { KeyCaptureService } from '../service/key-capture.service';
 import { MatDialog } from '@angular/material/dialog';
 
 @Directive({

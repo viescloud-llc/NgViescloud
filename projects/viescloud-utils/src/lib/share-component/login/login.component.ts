@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { first } from 'rxjs';
-import { AuthenticatorService } from '../../service/Authenticator.service';
-import { OpenIdService } from '../../service/OpenId.service';
+import { AuthenticatorService } from '../../service/authenticator.service';
+import { OpenIdService } from '../../service/open-id.service';
 
 @Component({
   selector: 'viescloud-login',

@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { first } from 'rxjs';
-import { OpenIdService } from '../../service/OpenId.service';
-import { AuthenticatorService } from '../../service/Authenticator.service';
-import { OpenIdRequest } from '../../model/Authenticator.model';
+import { OpenIdService } from '../../service/open-id.service';
+import { AuthenticatorService } from '../../service/authenticator.service';
+import { OpenIdRequest } from '../../model/authenticator.model';
 
 @Component({
   selector: 'viescloud-openId',

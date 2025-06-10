@@ -1,4 +1,4 @@
-import { MatOption } from "../model/Mat.model";
+import { MatOption } from "../model/mat.model";
 import { DataUtils } from "./Data.utils";
 
 export class ViesUtils {

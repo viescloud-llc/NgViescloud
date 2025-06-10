@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnDestroy, Output, SimpleChanges } from '@angular/core';
 import { MatTablePathComponent } from '../mat-table-path/mat-table-path.component';
 import { Observable } from 'rxjs';
-import { FixedSizeMap } from '../../model/DataStructure.model';
+import { FixedSizeMap } from '../../model/data-structure.model';
 
 @Component({
   selector: 'app-mat-table-path-lazy',

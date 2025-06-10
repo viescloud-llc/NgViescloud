@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
-import { ViesRestService, ViesService } from "./Rest.service";
-import { DnsRecord, NginxCertificate } from "../model/DnsManager.model";
+import { ViesRestService, ViesService } from "./rest.service";
+import { DnsRecord, NginxCertificate } from "../model/dns-manager.model";
 import { Observable } from "rxjs";
 import { HttpClient, HttpParams } from "@angular/common/http";
 
@@ -10,13 +10,13 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 export class DnsManagerService extends ViesService {
 
     constructor(
-        private httpClient: HttpClient
+        httpClient: HttpClient
     ) {
-        super();
+        super(httpClient);
     }
 
     protected override getPrefixes(): string[] {
-        return ['skeleton', 'dns'];
+        return ['dns-manager', 'dns'];
     }
 
     public getAllDnsRecords(): Observable<DnsRecord[]> {

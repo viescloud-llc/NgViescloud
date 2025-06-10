@@ -1,5 +1,5 @@
 import { ReflectionUtils } from "../util/Reflection.utils";
-import { MatColumn, MatInputDisable, MatInputHide, MatTableHide, MatTableDisplayLabel, DateTime } from "./Mat.model";
+import { MatColumn, MatInputDisable, MatInputHide, MatTableHide, MatTableDisplayLabel, DateTime } from "./mat.model";
 
 export enum AccessPermission {
     READ = "READ",

@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { ViesRestService } from './Rest.service';
-import { TTS } from '../model/AI.model';
+import { ViesRestService } from './rest.service';
+import { TTS } from '../model/ai.model';
 import { HttpClient } from '@angular/common/http';
-import { AuthenticatorService } from './Authenticator.service';
-import { UtilsService } from './Utils.service';
+import { AuthenticatorService } from './authenticator.service';
+import { UtilsService } from './utils.service';
 import { first } from 'rxjs';
 
 @Injectable({

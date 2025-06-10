@@ -1,9 +1,9 @@
 import { AfterContentInit, AfterViewInit, Directive, HostListener, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { KeyCaptureService } from '../service/KeyCapture.service';
-import { SettingService } from '../service/Setting.service';
-import { AuthenticatorService } from '../service/Authenticator.service';
-import { OpenIdService } from '../service/OpenId.service';
+import { KeyCaptureService } from '../service/key-capture.service';
+import { SettingService } from '../service/setting.service';
+import { AuthenticatorService } from '../service/authenticator.service';
+import { OpenIdService } from '../service/open-id.service';
 
 @Directive({
   selector: '[appViescloudApplication]'

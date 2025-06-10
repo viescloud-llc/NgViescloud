@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MatOption } from '../../../model/Mat.model';
+import { MatOption } from '../../../model/mat.model';
 
 export enum ProductImageSwapType {
   UPLOAD = 'upload',

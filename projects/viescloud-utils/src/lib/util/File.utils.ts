@@ -1,4 +1,4 @@
-import { VFile } from '../service/Utils.service';
+import { VFile } from '../service/utils.service';
 
 export class FileUtils {
   private constructor() {}

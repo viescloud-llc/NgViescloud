@@ -1,4 +1,4 @@
-import { MatTableHide, MatTableDisplayLabel } from "./Mat.model";
+import { MatTableHide, MatTableDisplayLabel } from "./mat.model";
 
 export class DnsRecord {
 

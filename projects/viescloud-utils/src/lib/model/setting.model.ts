@@ -1,5 +1,5 @@
 import { ReflectionUtils } from "../util/Reflection.utils";
-import { MatInputDisplayLabel, MatInputEnum, MatInputHide, MatInputIndex, MatInputItemSetting, MatInputOptions, MatItemSettingType } from "./Mat.model";
+import { MatInputDisplayLabel, MatInputEnum, MatInputHide, MatInputIndex, MatInputItemSetting, MatInputOptions, MatItemSettingType } from "./mat.model";
 import { MatTheme } from "./theme.model";
 
 export class GeneralSetting {

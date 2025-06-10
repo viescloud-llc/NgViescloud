@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { ViesRestService } from './Rest.service';
-import { AiReaderGenerateWavRequest } from '../model/AI.model';
+import { ViesRestService } from './rest.service';
+import { AiReaderGenerateWavRequest } from '../model/ai.model';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable, first } from 'rxjs';
-import { AuthenticatorService } from './Authenticator.service';
+import { AuthenticatorService } from './authenticator.service';
 
 @Injectable({
   providedIn: 'root'

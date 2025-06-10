@@ -1,9 +1,9 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { UserAccessInputType } from '../../util-component/mat-form-field-input-user-access/mat-form-field-input-user-access.component';
-import { MatOption } from '../../model/Mat.model';
+import { MatOption } from '../../model/mat.model';
 import { Observable } from 'rxjs';
-import { UserAccess, SharedUser, SharedGroup, AccessPermission } from '../../model/Authenticator.model';
+import { UserAccess, SharedUser, SharedGroup, AccessPermission } from '../../model/authenticator.model';
 import { RxJSUtils } from '../../util/RxJS.utils';
 import { FixChangeDetection } from '../../directive/FixChangeDetection';
 import { DataUtils } from '../../util/Data.utils';

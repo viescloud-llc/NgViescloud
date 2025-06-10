@@ -1,10 +1,10 @@
 import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
-import { Organization, Role, User, UserProfile } from '../../../model/Organization.model';
-import { OrganizationService } from '../../../service/Organization.service';
+import { Organization, Role, User, UserProfile } from '../../../model/organization.model';
+import { OrganizationService } from '../../../service/organization.service';
 import { ObjectDialog, ObjectDialogData } from '../../object-dialog/object-dialog.component';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { first } from 'rxjs';
-import { MatOption } from '../../../model/Mat.model';
+import { MatOption } from '../../../model/mat.model';
 
 export interface OrganizationUserDialogData {
   user: User,

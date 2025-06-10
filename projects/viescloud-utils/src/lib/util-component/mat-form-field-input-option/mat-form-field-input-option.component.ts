@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges, forwardRef } from '@angular/core';
 import { MatFormFieldComponent } from '../mat-form-field/mat-form-field.component';
-import { MatOption } from '../../model/Mat.model';
+import { MatOption } from '../../model/mat.model';
 import { MatSelectChange } from '@angular/material/select';
-import { UtilsService } from '../../service/Utils.service';
+import { UtilsService } from '../../service/utils.service';
 import { DataUtils } from '../../util/Data.utils';
 
 @Component({

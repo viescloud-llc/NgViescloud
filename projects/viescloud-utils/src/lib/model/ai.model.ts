@@ -1,4 +1,4 @@
-import { DateTime } from "./Mat.model";
+import { DateTime } from "./mat.model";
 
 export interface AiReaderGenerateWavRequest {
     text: string;

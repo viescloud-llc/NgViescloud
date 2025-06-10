@@ -3,7 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, finalize, first, of, pipe, switchMap, tap } from 'rxjs';
 import { LoadingDialog } from '../dialog/loading-dialog/loading-dialog.component';
-import { MatOption, MatSnackBarHorizontalPosition, MatSnackBarVerticalPosition } from '../model/Mat.model';
+import { MatOption, MatSnackBarHorizontalPosition, MatSnackBarVerticalPosition } from '../model/mat.model';
 import { MatSnackBar, MatSnackBarRef } from '@angular/material/snack-bar';
 import { StringSnackBar } from '../snack/string-snack-bar/string-snack-bar.component';
 

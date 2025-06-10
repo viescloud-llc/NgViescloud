@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import HttpClientUtils from '../model/HttpClientUtils.model';
+import HttpClientUtils from '../model/http-client-utils.model';
 import { HttpClient } from '@angular/common/http';
-import { SettingService } from './Setting.service';
-import { ConfigModel } from '../model/Venkins.model';
+import { SettingService } from './setting.service';
+import { ConfigModel } from '../model/venkins.model';
 
 @Injectable({
   providedIn: 'root'

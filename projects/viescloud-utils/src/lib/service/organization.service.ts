@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Organization, OrganizationJoinRequest } from '../model/Organization.model';
+import { Organization, OrganizationJoinRequest } from '../model/organization.model';
 import { HttpClient } from '@angular/common/http';
-import { ViesRestService } from './Rest.service';
+import { ViesRestService } from './rest.service';
 
 @Injectable({
   providedIn: 'root'

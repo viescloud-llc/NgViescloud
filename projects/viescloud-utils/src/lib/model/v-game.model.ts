@@ -1,5 +1,5 @@
-import { User, UserProfile, UserRole } from "./Authenticator.model";
-import { MatColumn } from "./Mat.model";
+import { User, UserProfile, UserRole } from "./authenticator.model";
+import { MatColumn } from "./mat.model";
 
 export interface Question {
     id?: number;

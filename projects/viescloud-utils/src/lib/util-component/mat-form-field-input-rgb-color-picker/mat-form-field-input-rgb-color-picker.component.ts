@@ -1,7 +1,7 @@
 import { Component, EventEmitter, forwardRef, Input, OnInit, Output } from '@angular/core';
 import { MatFormFieldComponent } from '../mat-form-field/mat-form-field.component';
-import { MatOption } from '../../model/Mat.model';
-import { RgbColor, SampleRgbOptions } from '../../model/Rgb.model';
+import { MatOption } from '../../model/mat.model';
+import { RgbColor, SampleRgbOptions } from '../../model/rgb.model';
 
 @Component({
   selector: 'app-mat-form-field-input-rgb-color-picker',
