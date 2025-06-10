@@ -1,15 +1,14 @@
 import { Observable, first, firstValueFrom, map } from "rxjs";
-import HttpClientUtils from "../model/http-client-utils.model";
 import { HttpClient } from "@angular/common/http";
 import { UtilsService } from "./utils.service";
 import { environment } from "projects/environments/environment.prod";
-import { Pageable, PropertyMatcherEnum } from "../model/mat.model";
 import { MatDialog } from "@angular/material/dialog";
 import { ObjectDialog, ObjectDialogData } from "../dialog/object-dialog/object-dialog.component";
 import { Injectable } from "@angular/core";
 import { RxJSUtils } from "../util/RxJS.utils";
 import { HttpParamsBuilder } from "../model/utils.model";
 import { RouteUtils } from "../util/Route.utils";
+import { MatchByEnum, MatchCaseEnum, Pageable } from "../model/vies.model";
 
 export abstract class ViesService {
 
@@ -60,16 +59,47 @@ export abstract class ViesRestService<T extends Object> extends ViesService {
         super(httpClient);
     }
 
-    public getAll(): Observable<T[]> {
-        return this.httpClient.get<T[]>(`${this.getPrefixUri()}`).pipe(map(data => data ?? [])).pipe(first());
+    public getAll(matchBy?: MatchByEnum, matchCase?: MatchCaseEnum, matchTo?: T): Observable<T[]> {
+        if(matchBy && matchCase && matchTo) {
+            return this.complexMatch(matchBy, matchCase, matchTo);
+        }
+        else {
+            return this.httpClient.get<T[]>(`${this.getPrefixUri()}`).pipe(map(data => data ?? [])).pipe(first());
+        }
     }
 
-    public getAllPageable(page: number, size: number, sort?: string): Observable<Pageable<T>> {
+    public getAllPageable(page: number, size: number, sort?: string, matchBy?: MatchByEnum, matchCase?: MatchCaseEnum, matchTo?: T): Observable<Pageable<T>> {
         let params = new HttpParamsBuilder();
         params.set('page', page);
         params.set('size', size);
         params.setIfValid('sort', sort);
-        return this.httpClient.get<Pageable<T>>(`${this.getPrefixUri()}`, {params: params.build()}).pipe(map(data => data ?? [])).pipe(first());
+
+        if(matchBy && matchCase && matchTo) {
+            return this.complexMatchPageable(matchBy, matchCase, matchTo, page, size, sort);
+        }
+
+        return this.httpClient.get<Pageable<T>>(`${this.getPrefixUri()}`, {params: params.build()}).pipe(first());
+    }
+
+    public getAllPageableNoSort(page: number, size: number, matchBy?: MatchByEnum, matchCase?: MatchCaseEnum, matchTo?: T): Observable<Pageable<T>> {
+        return this.getAllPageable(page, size, "", matchBy, matchCase, matchTo);
+    }
+
+    public complexMatch(matchBy: MatchByEnum, matchCase: MatchCaseEnum, matchTo: T): Observable<T[]> {
+        let params = new HttpParamsBuilder();
+        params.set("matchBy", matchBy);
+        params.set("matchCase", matchCase);
+        return this.httpClient.post<T[]>(`${this.getPrefixUri()}/matches`, matchTo, {params: params.build()}).pipe(first());
+    }
+
+    public complexMatchPageable(matchBy: MatchByEnum, matchCase: MatchCaseEnum, matchTo: T, page: number, size: number, sort?: string): Observable<Pageable<T>> {
+        let params = new HttpParamsBuilder();
+        params.set("matchBy", matchBy);
+        params.set("matchCase", matchCase);
+        params.set('page', page);
+        params.set('size', size);
+        params.setIfValid('sort', sort);
+        return this.httpClient.post<Pageable<T>>(`${this.getPrefixUri()}/matches`, matchTo, {params: params.build()}).pipe(first());
     }
 
     public get(id: any): Observable<T> {

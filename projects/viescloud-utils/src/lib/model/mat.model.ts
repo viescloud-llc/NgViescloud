@@ -62,30 +62,6 @@ export enum MatSnackBarVerticalPosition {
     BOTTOM = "bottom"
 }
 
-export enum PathNodeType {
-    ITEM = "ITEM",
-    PATH = "PATH"
-}
-
-export class Pageable<T> {
-    content: T[] = [];
-    _metadata: PageableMetadata<T> = new PageableMetadata();
-}
-
-export class PageableMetadata<T> {
-    pageNumber: number = 0;
-    pageSize: number = 0;
-    totalPage: number = 0;
-    totalElement: number = 0;
-    filters?: T;
-}
-
-export class PathNode<T> {
-    value?: T;
-    path!: string;
-    type!: PathNodeType;
-}
-
 export class MatItemSetting {
     type: MatItemSettingType | string;
     value: any;
