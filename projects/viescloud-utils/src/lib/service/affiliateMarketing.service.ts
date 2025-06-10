@@ -121,9 +121,9 @@ export class PinterestOathTokenService extends ViesRestService<PinterestOathToke
 export class ViesPinterestService extends ViesService {
 
   constructor(
-    private httpClient: HttpClient
+    httpClient: HttpClient
   ) {
-    super();
+    super(httpClient);
   }
 
   protected override getPrefixes(): string[] {

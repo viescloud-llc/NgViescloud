@@ -10,9 +10,9 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 export class DnsManagerService extends ViesService {
 
     constructor(
-        private httpClient: HttpClient
+        httpClient: HttpClient
     ) {
-        super();
+        super(httpClient);
     }
 
     protected override getPrefixes(): string[] {
