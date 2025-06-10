@@ -1,0 +1,11 @@
+<ngx-extended-pdf-viewer
+  [(src)]="aiReaderService.loadedSrc"
+  [textLayer]="true"
+  [showHandToolButton]="true"
+  [showToolbar]="aiReaderService.showToolBar"
+  showBookModeButton="always-visible"
+  showVerticalScrollButton="always-visible"
+  (textLayerRendered)="aiReaderService.onTextLayerRendered($event);"
+  (pageChange)="aiReaderService.onPageChange($event)"
+  >
+</ngx-extended-pdf-viewer>

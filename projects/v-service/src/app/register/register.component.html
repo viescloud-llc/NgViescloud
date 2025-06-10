@@ -1,0 +1,51 @@
+<ul class="margin-center" appMatFormFieldGroup (onFormSummit)="register()" (onAllInputCheck)="validForm = $event">
+  <li *ngIf="error" class="text-center" style="color: red;">
+    {{error}}
+    <hr>
+  </li>
+  <li>
+    <app-mat-form-field-input
+    [value]="alias" (valueOutput)="alias = $event.toString()"
+    [required]="true"
+    label="alias"
+    placeholder="some alias"
+    styleWidth="100%"
+    ></app-mat-form-field-input>
+  </li>
+  <li>
+    <app-mat-form-field-input
+    [value]="username" (valueOutput)="username = $event.toString()"
+    [required]="true"
+    [error]="usernameError" (onValueChange)="validateUsernameFn()"
+    label="Username"
+    placeholder="some username"
+    styleWidth="100%">
+    </app-mat-form-field-input>
+  </li>
+  <li>
+    <app-mat-form-field-input
+    [value]="password" (valueOutput)="password = $event.toString()"
+    [required]="true"
+    (onValueChange)="validateRetypePassword()"
+    label="password"
+    placeholder="some password"
+    styleWidth="100%"
+    [showVisibleSwitch]="true"
+    ></app-mat-form-field-input>
+  </li>
+  <li>
+    <app-mat-form-field-input
+    [value]="retypePassword" (valueOutput)="retypePassword = $event.toString()"
+    [required]="true"
+    [error]="retypePasswordError" (onValueChange)="validateRetypePassword()"
+    label="retype password"
+    placeholder="some password"
+    styleWidth="100%"
+    [showVisibleSwitch]="true"
+    ></app-mat-form-field-input>
+  </li>
+  <li>
+    <button mat-raised-button color="primary" style="width: 100%;" [disabled]="!validForm" (click)="register()">Register</button>
+  </li>
+  <h3>Need to <a routerLink="/login">login</a> ?</h3>
+</ul>

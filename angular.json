@@ -36,35 +36,35 @@
         }
       }
     },
-    "skeleton": {
+    "v-service": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
           "style": "scss"
         }
       },
-      "root": "projects/skeleton",
-      "sourceRoot": "projects/skeleton/src",
+      "root": "projects/v-service",
+      "sourceRoot": "projects/v-service/src",
       "prefix": "app",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/skeleton",
-            "index": "projects/skeleton/src/index.html",
-            "main": "projects/skeleton/src/main.ts",
+            "outputPath": "dist/v-service",
+            "index": "projects/v-service/src/index.html",
+            "main": "projects/v-service/src/main.ts",
             "polyfills": [
               "zone.js"
             ],
-            "tsConfig": "projects/skeleton/tsconfig.app.json",
+            "tsConfig": "projects/v-service/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
-              "projects/skeleton/src/favicon.ico",
-              "projects/skeleton/src/assets",
+              "projects/v-service/src/favicon.ico",
+              "projects/v-service/src/assets",
               { "glob": "**/*", "input": "node_modules/monaco-editor", "output": "/assets/monaco/" }
             ],
             "styles": [
-              "projects/skeleton/src/styles.scss"
+              "projects/v-service/src/styles.scss"
             ],
             "scripts": []
           },
@@ -99,10 +99,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "skeleton:build:production"
+              "browserTarget": "v-service:build:production"
             },
             "development": {
-              "browserTarget": "skeleton:build:development"
+              "browserTarget": "v-service:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -110,7 +110,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "skeleton:build"
+            "browserTarget": "v-service:build"
           }
         },
         "test": {
@@ -120,14 +120,14 @@
               "zone.js",
               "zone.js/testing"
             ],
-            "tsConfig": "projects/skeleton/tsconfig.spec.json",
+            "tsConfig": "projects/v-service/tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
             "assets": [
-              "projects/skeleton/src/favicon.ico",
-              "projects/skeleton/src/assets"
+              "projects/v-service/src/favicon.ico",
+              "projects/v-service/src/assets"
             ],
             "styles": [
-              "projects/skeleton/src/styles.scss"
+              "projects/v-service/src/styles.scss"
             ],
             "scripts": []
           }
