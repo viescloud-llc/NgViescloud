@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { WrapWorkspace } from 'projects/viescloud-utils/src/lib/model/Wrap.model';
+import { WrapWorkspace } from 'projects/viescloud-utils/src/lib/model/wrap.model';
 
 @Component({
   selector: 'app-wrap-json',

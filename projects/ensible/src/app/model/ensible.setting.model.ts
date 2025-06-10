@@ -1,5 +1,5 @@
-import { MatInputItemSetting, MatItemSettingType, MatInputDisplayLabel, MatInputIndex } from "projects/viescloud-utils/src/lib/model/Mat.model";
-import { GeneralSetting } from "projects/viescloud-utils/src/lib/model/Setting.model";
+import { MatInputItemSetting, MatItemSettingType, MatInputDisplayLabel, MatInputIndex } from "projects/viescloud-utils/src/lib/model/mat.model";
+import { GeneralSetting } from "projects/viescloud-utils/src/lib/model/setting.model";
 import { ReflectionUtils } from "projects/viescloud-utils/src/lib/util/Reflection.utils";
 
 export class EnsibleSetting extends GeneralSetting {

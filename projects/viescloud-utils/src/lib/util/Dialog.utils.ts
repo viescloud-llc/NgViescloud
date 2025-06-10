@@ -6,8 +6,8 @@ import {
   ProductImageSwapDialog,
   ProductImageSwapDialogRespondData,
 } from '../dialog/marketing/product-image-swap-dialog/product-image-swap-dialog.component';
-import { MatOption } from '../model/Mat.model';
-import { NotAuthenticatedError, ViesErrorResponse } from '../model/Error.model';
+import { MatOption } from '../model/mat.model';
+import { NotAuthenticatedError, ViesErrorResponse } from '../model/error.model';
 import { InputDialog } from '../dialog/input-dialog/input-dialog.component';
 import { DataUtils } from './Data.utils';
 import { Observable } from 'rxjs';
@@ -16,7 +16,7 @@ import {
   SharedUser,
   SharedGroup,
   AccessPermission,
-} from '../model/Authenticator.model';
+} from '../model/authenticator.model';
 import { UserAccessInputType } from '../util-component/mat-form-field-input-user-access/mat-form-field-input-user-access.component';
 import { UserAccessDialog } from '../dialog/user-access-dialog/user-access-dialog.component';
 

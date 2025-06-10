@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
-import { Route, UserRole } from 'projects/viescloud-utils/src/lib/model/Authenticator.model';
-import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
+import { Route, UserRole } from 'projects/viescloud-utils/src/lib/model/authenticator.model';
+import { MatOption } from 'projects/viescloud-utils/src/lib/model/mat.model';
 import { AuthenticatorService } from 'projects/viescloud-utils/src/lib/service/authenticator.service';
 import { first } from 'rxjs';
 

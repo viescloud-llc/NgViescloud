@@ -1,7 +1,7 @@
 import { AfterContentChecked, ChangeDetectorRef, Component, EventEmitter, HostListener, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { RouteChangeSubcribe } from 'projects/viescloud-utils/src/lib/directive/RouteChangeSubcribe.directive';
-import { MonacoLanguage } from 'projects/viescloud-utils/src/lib/model/MonacoEditor.model';
+import { MonacoLanguage } from 'projects/viescloud-utils/src/lib/model/monaco-editor.model';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';

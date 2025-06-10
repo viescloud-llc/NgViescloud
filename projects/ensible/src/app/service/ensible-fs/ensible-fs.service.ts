@@ -4,7 +4,7 @@ import { EnsibleFsStatusResponse, FSNode, FSTree, FsWriteMode } from '../../mode
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { first, Observable, Subject } from 'rxjs';
 import { EnsibleFs, EnsibleFsDir, EnsibleRole, EnsibleWorkSpace } from '../../model/ensible.parser.model';
-import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
+import { MatOption } from 'projects/viescloud-utils/src/lib/model/mat.model';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 

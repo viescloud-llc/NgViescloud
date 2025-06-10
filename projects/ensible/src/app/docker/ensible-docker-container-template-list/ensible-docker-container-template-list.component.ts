@@ -7,7 +7,7 @@ import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 import { EnsibleSettingService } from '../../service/ensible-setting/ensible-setting.service';
 import { Subject } from 'rxjs';
-import { Pageable } from 'projects/viescloud-utils/src/lib/model/Mat.model';
+import { Pageable } from 'projects/viescloud-utils/src/lib/model/mat.model';
 import { RestUtils } from 'projects/viescloud-utils/src/lib/util/Rest.utils';
 import { LazyPageChange } from 'projects/viescloud-utils/src/lib/util-component/mat-table-lazy/mat-table-lazy.component';
 

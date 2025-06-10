@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { Product } from 'projects/viescloud-utils/src/lib/model/AffiliateMarketing.model';
+import { Product } from 'projects/viescloud-utils/src/lib/model/affiliate-marketing.model';
 import { ProductService } from 'projects/viescloud-utils/src/lib/service/affiliateMarketing.service';
 import { UtilsService } from 'projects/viescloud-utils/src/lib/service/utils.service';
 

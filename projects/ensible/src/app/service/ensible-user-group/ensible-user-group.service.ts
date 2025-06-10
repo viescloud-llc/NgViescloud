@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { EnsibleRestService } from '../ensible/ensible.service';
 import { EnsibleUserGroup } from '../../model/ensible.model';
 import { map, reduce } from 'rxjs';
-import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
+import { MatOption } from 'projects/viescloud-utils/src/lib/model/mat.model';
 
 @Injectable({
   providedIn: 'root'

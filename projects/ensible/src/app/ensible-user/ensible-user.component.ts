@@ -5,7 +5,7 @@ import { EnsibleAuthenticatorService } from '../service/ensible-authenticator/en
 import { EnsibleUserService } from '../service/ensible-user/ensible-user.service';
 import { EnsibleUser, EnsibleUserGroup } from '../model/ensible.model';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
-import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
+import { MatOption } from 'projects/viescloud-utils/src/lib/model/mat.model';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 
 @Component({

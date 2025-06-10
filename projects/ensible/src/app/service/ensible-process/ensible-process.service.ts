@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { EnsibleService } from '../ensible/ensible.service';
 import { HttpParams } from '@angular/common/http';
-import { HttpParamsBuilder } from 'projects/viescloud-utils/src/lib/model/Utils.model';
+import { HttpParamsBuilder } from 'projects/viescloud-utils/src/lib/model/utils.model';
 
 @Injectable({
   providedIn: 'root'

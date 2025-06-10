@@ -1,14 +1,14 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { Wrap, WrapWorkspace } from '../model/Wrap.model';
+import { Wrap, WrapWorkspace } from '../model/wrap.model';
 import { S3StorageServiceV1 } from './object-storage-manager.service';
 import { UtilsService, VFile } from './utils.service';
 import { MatDialog } from '@angular/material/dialog';
-import { Tuple } from '../model/Mat.model';
+import { Tuple } from '../model/mat.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { RxJSUtils } from '../util/RxJS.utils';
 import { AuthenticatorService } from './authenticator.service';
 import { SettingService } from './setting.service';
-import { WrapSetting } from '../model/Setting.model';
+import { WrapSetting } from '../model/setting.model';
 
 @Injectable({
   providedIn: 'root'

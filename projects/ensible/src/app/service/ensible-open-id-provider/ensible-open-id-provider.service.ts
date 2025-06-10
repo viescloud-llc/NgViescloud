@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { EnsibleRestService } from '../ensible/ensible.service';
 import { EnsibleOpenIDProvider } from '../../model/ensible.model';
 import { HttpParams } from '@angular/common/http';
-import { OpenIdWellKnown } from 'projects/viescloud-utils/src/lib/model/OpenId.model';
+import { OpenIdWellKnown } from 'projects/viescloud-utils/src/lib/model/open-id.model';
 
 @Injectable({
   providedIn: 'root'

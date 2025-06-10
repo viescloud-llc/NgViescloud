@@ -3,11 +3,11 @@ import { Injectable } from '@angular/core';
 import { environment } from 'projects/environments/environment.prod';
 import { first, Observable, pipe, UnaryFunction } from 'rxjs';
 import { UtilsService, VFile } from './utils.service';
-import { Metadata } from '../model/ObjectStorageManager.model';
+import { Metadata } from '../model/object-storage-manager.model';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { RxJSUtils } from '../util/RxJS.utils';
-import { PopupType } from '../model/Popup.model';
+import { PopupType } from '../model/popup.model';
 
 @Injectable({
   providedIn: 'root'

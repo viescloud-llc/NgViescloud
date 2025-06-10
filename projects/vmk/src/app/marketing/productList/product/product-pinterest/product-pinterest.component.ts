@@ -1,8 +1,8 @@
 import { ChangeDetectorRef, Component, Inject, OnInit, SimpleChanges } from '@angular/core';
 import { ProductBasicComponent } from '../product-basic/product-basic.component';
-import { Image, MediaSource, MediaSourceImageUrl, MediaSourceMultipleImage, MediaSourceType, MediaSourceVideo, PinRequest, PinResponse, PinterestPinData, RegisterMediaResponse } from 'projects/viescloud-utils/src/lib/model/AffiliateMarketing.model';
+import { Image, MediaSource, MediaSourceImageUrl, MediaSourceMultipleImage, MediaSourceType, MediaSourceVideo, PinRequest, PinResponse, PinterestPinData, RegisterMediaResponse } from 'projects/viescloud-utils/src/lib/model/affiliate-marketing.model';
 import { UtilsService, VFile } from 'projects/viescloud-utils/src/lib/service/utils.service';
-import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
+import { MatOption } from 'projects/viescloud-utils/src/lib/model/mat.model';
 import { firstValueFrom } from 'rxjs';
 import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
 import { PinterestOathTokenService, ProductService, ViesPinterestService } from 'projects/viescloud-utils/src/lib/service/affiliateMarketing.service';

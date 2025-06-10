@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { QuestionDialog } from 'projects/viescloud-utils/src/lib/dialog/question-dialog/question-dialog.component';
-import { QuestionRow } from 'projects/viescloud-utils/src/lib/model/VGame.model';
+import { QuestionRow } from 'projects/viescloud-utils/src/lib/model/v-game.model';
 import { VGameService } from 'projects/viescloud-utils/src/lib/service/v-game.service';
 import { first } from 'rxjs';
 

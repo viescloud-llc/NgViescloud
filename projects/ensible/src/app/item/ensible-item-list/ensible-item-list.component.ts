@@ -8,13 +8,13 @@ import { EnsibleSetting } from '../../model/ensible.setting.model';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 import { EnsibleDialogUtilsService } from '../../util/ensible-dialog-utils/ensible-dialog-utils.service';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
-import { UserAccess } from 'projects/viescloud-utils/src/lib/model/Authenticator.model';
+import { UserAccess } from 'projects/viescloud-utils/src/lib/model/authenticator.model';
 import { UserAccessInputType } from 'projects/viescloud-utils/src/lib/util-component/mat-form-field-input-user-access/mat-form-field-input-user-access.component';
 import { FixChangeDetection } from 'projects/viescloud-utils/src/lib/directive/FixChangeDetection';
 import { FileUtils } from 'projects/viescloud-utils/src/lib/util/File.utils';
 import { SnackBarUtils } from 'projects/viescloud-utils/src/lib/util/SnackBar.utils';
 import { firstValueFrom, Subject } from 'rxjs';
-import { Pageable } from 'projects/viescloud-utils/src/lib/model/Mat.model';
+import { Pageable } from 'projects/viescloud-utils/src/lib/model/mat.model';
 import { LazyPageChange } from 'projects/viescloud-utils/src/lib/util-component/mat-table-lazy/mat-table-lazy.component';
 import { RestUtils } from 'projects/viescloud-utils/src/lib/util/Rest.utils';
 

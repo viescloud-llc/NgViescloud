@@ -4,7 +4,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { UserDialog } from 'projects/viescloud-utils/src/lib/dialog/user-dialog/user-dialog.component';
-import UserRow, { User } from 'projects/viescloud-utils/src/lib/model/Authenticator.model';
+import UserRow, { User } from 'projects/viescloud-utils/src/lib/model/authenticator.model';
 import { AuthenticatorService } from 'projects/viescloud-utils/src/lib/service/authenticator.service';
 import { UtilsService } from 'projects/viescloud-utils/src/lib/service/utils.service';
 import { first } from 'rxjs';

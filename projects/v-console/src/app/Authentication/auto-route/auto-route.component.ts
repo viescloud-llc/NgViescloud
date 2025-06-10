@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { first } from 'rxjs';
 import { RouteDialog, RouteDialogData } from './route-dialog/route-dialog.component';
-import { Route, SwaggerMethodName, SwaggerPath, Swaggers, UserRole } from 'projects/viescloud-utils/src/lib/model/Authenticator.model';
+import { Route, SwaggerMethodName, SwaggerPath, Swaggers, UserRole } from 'projects/viescloud-utils/src/lib/model/authenticator.model';
 import { AuthenticatorService } from 'projects/viescloud-utils/src/lib/service/authenticator.service';
 import { UtilsService } from 'projects/viescloud-utils/src/lib/service/utils.service';
 import { InputDialog } from 'projects/viescloud-utils/src/lib/dialog/input-dialog/input-dialog.component';

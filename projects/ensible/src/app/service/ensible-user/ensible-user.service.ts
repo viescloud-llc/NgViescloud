@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { EnsibleRestService, EnsibleService } from '../ensible/ensible.service';
 import { EnsibleUser } from '../../model/ensible.model';
-import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
+import { MatOption } from 'projects/viescloud-utils/src/lib/model/mat.model';
 import { map } from 'rxjs';
 
 @Injectable({

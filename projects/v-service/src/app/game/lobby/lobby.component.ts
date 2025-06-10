@@ -3,7 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { first } from 'rxjs';
 import { LobbyDialog } from 'projects/viescloud-utils/src/lib/dialog/lobby-dialog/lobby-dialog.component';
-import { Lobby, LobbyRow } from 'projects/viescloud-utils/src/lib/model/VGame.model';
+import { Lobby, LobbyRow } from 'projects/viescloud-utils/src/lib/model/v-game.model';
 import { VGameService } from 'projects/viescloud-utils/src/lib/service/v-game.service';
 
 @Component({

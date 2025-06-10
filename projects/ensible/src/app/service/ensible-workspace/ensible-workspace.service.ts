@@ -7,8 +7,8 @@ import { first, firstValueFrom, Observable, Subject } from 'rxjs';
 import { FSNode, FSTree } from '../../model/ensible.model';
 import { EnsibleFs, EnsibleRole, EnsibleFsDir, EnsibleWorkSpace } from '../../model/ensible.parser.model';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
-import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
-import { HttpParamsBuilder } from 'projects/viescloud-utils/src/lib/model/Utils.model';
+import { MatOption } from 'projects/viescloud-utils/src/lib/model/mat.model';
+import { HttpParamsBuilder } from 'projects/viescloud-utils/src/lib/model/utils.model';
 
 @Injectable({
   providedIn: 'root'

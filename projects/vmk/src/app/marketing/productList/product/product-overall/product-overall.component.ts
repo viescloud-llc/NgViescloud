@@ -5,7 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ProductService } from 'projects/viescloud-utils/src/lib/service/affiliateMarketing.service';
 import { SmbService } from 'projects/viescloud-utils/src/lib/service/smb.service';
-import { PinResponse } from 'projects/viescloud-utils/src/lib/model/AffiliateMarketing.model';
+import { PinResponse } from 'projects/viescloud-utils/src/lib/model/affiliate-marketing.model';
 import { QuickSideDrawerMenuService } from 'projects/viescloud-utils/src/lib/service/quick-side-drawer-menu.service';
 import { S3StorageServiceV1 } from 'projects/viescloud-utils/src/lib/service/object-storage-manager.service';
 import { MatSnackBar } from '@angular/material/snack-bar';

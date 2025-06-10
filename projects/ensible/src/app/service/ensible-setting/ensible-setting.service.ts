@@ -3,7 +3,7 @@ import { EnsibleDatabaseObjectStorageService } from './../ensible-database-objec
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { GeneralSetting } from 'projects/viescloud-utils/src/lib/model/Setting.model';
+import { GeneralSetting } from 'projects/viescloud-utils/src/lib/model/setting.model';
 import { S3StorageServiceV1 } from 'projects/viescloud-utils/src/lib/service/object-storage-manager.service';
 import { OpenIdService } from 'projects/viescloud-utils/src/lib/service/open-id.service';
 import { SettingService } from 'projects/viescloud-utils/src/lib/service/setting.service';

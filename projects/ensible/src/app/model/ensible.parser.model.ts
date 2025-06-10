@@ -1,4 +1,4 @@
-import { MatTableDisplayLabel, MatTableHide } from 'projects/viescloud-utils/src/lib/model/Mat.model';
+import { MatTableDisplayLabel, MatTableHide } from 'projects/viescloud-utils/src/lib/model/mat.model';
 import { FSMetadata } from './ensible.model';
 import { StringUtils } from 'projects/viescloud-utils/src/lib/util/String.utils';
 export class EnsibleWorkSpace {

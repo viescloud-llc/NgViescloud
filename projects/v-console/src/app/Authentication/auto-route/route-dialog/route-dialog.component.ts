@@ -1,7 +1,7 @@
 import { AfterContentChecked, ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Route, SwaggerPath, UserRole } from 'projects/viescloud-utils/src/lib/model/Authenticator.model';
-import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
+import { Route, SwaggerPath, UserRole } from 'projects/viescloud-utils/src/lib/model/authenticator.model';
+import { MatOption } from 'projects/viescloud-utils/src/lib/model/mat.model';
 
 export interface RouteDialogData {
   selectedRoutes: Route[];

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ViesRestService } from './rest.service';
-import { AiReaderGenerateWavRequest } from '../model/AI.model';
+import { AiReaderGenerateWavRequest } from '../model/ai.model';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable, first } from 'rxjs';
 import { AuthenticatorService } from './authenticator.service';

@@ -1,4 +1,4 @@
-import { Jwt } from './../../../../../viescloud-utils/src/lib/model/Authenticator.model';
+import { Jwt } from '../../../../../viescloud-utils/src/lib/model/authenticator.model';
 import { Injectable, OnInit } from '@angular/core';
 import { EnsibleService } from '../ensible/ensible.service';
 import { HttpClient } from '@angular/common/http';

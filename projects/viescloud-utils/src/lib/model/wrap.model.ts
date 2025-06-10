@@ -1,5 +1,5 @@
-import { MatInputDisplayLabel, MatInputEnum, MatInputHide, MatInputItemSetting, MatInputListSetting, MatInputOptions, MatInputRequire, MatInputTextArea, MatItemSettingType } from "./Mat.model";
-import { RgbColor } from "./Rgb.model";
+import { MatInputDisplayLabel, MatInputEnum, MatInputHide, MatInputItemSetting, MatInputListSetting, MatInputOptions, MatInputRequire, MatInputTextArea, MatItemSettingType } from "./mat.model";
+import { RgbColor } from "./rgb.model";
 
 export enum WrapType {
     GROUP = "GROUP",

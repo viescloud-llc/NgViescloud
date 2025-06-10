@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ConfigModel, JobRequest } from 'projects/viescloud-utils/src/lib/model/Venkins.model';
+import { ConfigModel, JobRequest } from 'projects/viescloud-utils/src/lib/model/venkins.model';
 import { UtilsService } from 'projects/viescloud-utils/src/lib/service/utils.service';
 import { VenkinsService } from 'projects/viescloud-utils/src/lib/service/venkins.service';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';

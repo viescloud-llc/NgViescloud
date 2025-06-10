@@ -4,7 +4,7 @@ import { EnsiblePlaybookLoggerService, EnsibleShellLoggerService } from '../../s
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 import { EnsibleItemLoggerServiceType, EnsibleItemloggerType, EnsibleItemType } from '../ensible-item-tab/ensible-item-tab.component';
-import { Pageable } from 'projects/viescloud-utils/src/lib/model/Mat.model';
+import { Pageable } from 'projects/viescloud-utils/src/lib/model/mat.model';
 import { RestUtils } from 'projects/viescloud-utils/src/lib/util/Rest.utils';
 import { LazyPageChange } from 'projects/viescloud-utils/src/lib/util-component/mat-table-lazy/mat-table-lazy.component';
 import { Subject } from 'rxjs';

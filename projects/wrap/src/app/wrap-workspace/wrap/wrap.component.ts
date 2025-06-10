@@ -1,12 +1,12 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { Wrap, WrapWorkspace } from 'projects/viescloud-utils/src/lib/model/Wrap.model';
+import { Wrap, WrapWorkspace } from 'projects/viescloud-utils/src/lib/model/wrap.model';
 import { WrapMode } from '../wrap-workspace.component';
 import { TrackByIndex } from 'projects/viescloud-utils/src/lib/directive/TrackByIndex';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
 import { WrapService } from 'projects/viescloud-utils/src/lib/service/wrap.service';
 import { SettingService } from 'projects/viescloud-utils/src/lib/service/setting.service';
-import { WrapSetting } from 'projects/viescloud-utils/src/lib/model/Setting.model';
+import { WrapSetting } from 'projects/viescloud-utils/src/lib/model/setting.model';
 
 @Component({
   selector: 'app-wrap',

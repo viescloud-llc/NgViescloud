@@ -5,8 +5,8 @@ import { first } from 'rxjs';
 import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
 import { InputDialog } from 'projects/viescloud-utils/src/lib/dialog/input-dialog/input-dialog.component';
 import { LobbyDialog } from 'projects/viescloud-utils/src/lib/dialog/lobby-dialog/lobby-dialog.component';
-import { Player, User } from 'projects/viescloud-utils/src/lib/model/Authenticator.model';
-import { Lobby, Message } from 'projects/viescloud-utils/src/lib/model/VGame.model';
+import { Player, User } from 'projects/viescloud-utils/src/lib/model/authenticator.model';
+import { Lobby, Message } from 'projects/viescloud-utils/src/lib/model/v-game.model';
 import { AuthenticatorService } from 'projects/viescloud-utils/src/lib/service/authenticator.service';
 import { VGameService } from 'projects/viescloud-utils/src/lib/service/v-game.service';
 

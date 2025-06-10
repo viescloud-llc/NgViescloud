@@ -4,7 +4,7 @@ import { EnsibleService } from '../ensible/ensible.service';
 import { firstValueFrom } from 'rxjs';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { EnsibleDockerContainer, EnsibleItemTypeEnum } from '../../model/ensible.model';
-import { HttpParamsBuilder } from 'projects/viescloud-utils/src/lib/model/Utils.model';
+import { HttpParamsBuilder } from 'projects/viescloud-utils/src/lib/model/utils.model';
 
 @Injectable({
   providedIn: 'root'

@@ -1,5 +1,5 @@
 import { AfterContentInit, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { Category, FileLink, PinRequest, Product } from 'projects/viescloud-utils/src/lib/model/AffiliateMarketing.model';
+import { Category, FileLink, PinRequest, Product } from 'projects/viescloud-utils/src/lib/model/affiliate-marketing.model';
 import { UtilsService, VFile } from 'projects/viescloud-utils/src/lib/service/utils.service';
 import { ProductData } from '../data/product-data.service';
 import { firstValueFrom } from 'rxjs';

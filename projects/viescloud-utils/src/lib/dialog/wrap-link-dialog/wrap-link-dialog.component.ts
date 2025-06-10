@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Link, Wrap } from '../../model/Wrap.model';
+import { Link, Wrap } from '../../model/wrap.model';
 
 @Component({
   selector: 'app-wrap-link-dialog',

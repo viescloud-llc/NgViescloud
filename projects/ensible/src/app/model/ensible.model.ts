@@ -1,5 +1,5 @@
-import { SharedGroup, SharedUser, UserAccess } from "projects/viescloud-utils/src/lib/model/Authenticator.model";
-import { DateTime, MatInputDisable, MatInputDisplayLabel, MatInputEnum, MatInputHide, MatInputItemSetting, MatInputReadOnly, MatInputRecord, MatInputRequire, MatInputSetting, MatItemSettingType, MatOption, MatTableDisplayLabel, MatTableHide } from "projects/viescloud-utils/src/lib/model/Mat.model";
+import { SharedGroup, SharedUser, UserAccess } from "projects/viescloud-utils/src/lib/model/authenticator.model";
+import { DateTime, MatInputDisable, MatInputDisplayLabel, MatInputEnum, MatInputHide, MatInputItemSetting, MatInputReadOnly, MatInputRecord, MatInputRequire, MatInputSetting, MatItemSettingType, MatOption, MatTableDisplayLabel, MatTableHide } from "projects/viescloud-utils/src/lib/model/mat.model";
 import { DataUtils } from "projects/viescloud-utils/src/lib/util/Data.utils";
 import { ReflectionUtils } from "projects/viescloud-utils/src/lib/util/Reflection.utils";
 

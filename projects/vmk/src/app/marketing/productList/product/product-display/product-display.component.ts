@@ -1,7 +1,7 @@
 import { Component, DoCheck, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
-import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
+import { MatOption } from 'projects/viescloud-utils/src/lib/model/mat.model';
 import { UtilsService, VFile } from 'projects/viescloud-utils/src/lib/service/utils.service';
 import { ProductData } from '../data/product-data.service';
 import { SmbService } from 'projects/viescloud-utils/src/lib/service/smb.service';

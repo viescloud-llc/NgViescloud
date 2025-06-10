@@ -2,7 +2,7 @@ import { EnsibleAuthenticatorService } from './../service/ensible-authenticator/
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
-import { GeneralSetting } from 'projects/viescloud-utils/src/lib/model/Setting.model';
+import { GeneralSetting } from 'projects/viescloud-utils/src/lib/model/setting.model';
 import { MatTheme } from 'projects/viescloud-utils/src/lib/model/theme.model';
 import { SettingService } from 'projects/viescloud-utils/src/lib/service/setting.service';
 import { ApplicationSettingComponent } from 'projects/viescloud-utils/src/lib/share-component/application-setting/application-setting.component';

@@ -4,10 +4,10 @@ import { EnsibleOpenIDProvider, EnsibleUserGroup } from '../model/ensible.model'
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 import { FileUtils } from 'projects/viescloud-utils/src/lib/util/File.utils';
-import { OpenIdWellKnown } from 'projects/viescloud-utils/src/lib/model/OpenId.model';
+import { OpenIdWellKnown } from 'projects/viescloud-utils/src/lib/model/open-id.model';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
-import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
+import { MatOption } from 'projects/viescloud-utils/src/lib/model/mat.model';
 import { EnsibleUserGroupService } from '../service/ensible-user-group/ensible-user-group.service';
 import { FixChangeDetection } from 'projects/viescloud-utils/src/lib/directive/FixChangeDetection';
 

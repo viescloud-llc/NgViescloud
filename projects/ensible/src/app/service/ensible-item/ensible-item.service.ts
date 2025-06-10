@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { EnsibleRestService } from '../ensible/ensible.service';
 import { EnsibleItem, EnsiblePlaybookItem, EnsibleShellItem } from '../../model/ensible.model';
-import { PathNode } from 'projects/viescloud-utils/src/lib/model/Mat.model';
-import { HttpParamsBuilder } from 'projects/viescloud-utils/src/lib/model/Utils.model';
+import { PathNode } from 'projects/viescloud-utils/src/lib/model/mat.model';
+import { HttpParamsBuilder } from 'projects/viescloud-utils/src/lib/model/utils.model';
 import { first, map, retry } from 'rxjs';
 
 @Injectable({

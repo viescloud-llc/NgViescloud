@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ViesRestService } from './rest.service';
-import { TTS } from '../model/AI.model';
+import { TTS } from '../model/ai.model';
 import { HttpClient } from '@angular/common/http';
 import { AuthenticatorService } from './authenticator.service';
 import { UtilsService } from './utils.service';

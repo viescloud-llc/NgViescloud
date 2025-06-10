@@ -2,7 +2,7 @@ import { Component, ElementRef, Input, AfterViewInit, Output, EventEmitter, View
 import { EditorComponent } from 'ngx-monaco-editor-v2';
 import { SettingService } from '../../service/setting.service';
 import { KeyCaptureEvent, KeyCaptureService } from '../../service/key-capture.service';
-import { MonacoLanguage } from '../../model/MonacoEditor.model';
+import { MonacoLanguage } from '../../model/monaco-editor.model';
 
 @Component({
   selector: 'app-code-editor',

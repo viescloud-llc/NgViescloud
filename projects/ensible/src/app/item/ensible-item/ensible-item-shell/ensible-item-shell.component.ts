@@ -8,7 +8,7 @@ import { EnsibleFsService } from '../../../service/ensible-fs/ensible-fs.service
 import { EnsibleExecuteOptions, EnsibleShellItem } from '../../../model/ensible.model';
 import { EnsibleItemService, EnsibleShellItemService } from '../../../service/ensible-item/ensible-item.service';
 import { CodeEditorComponent } from 'projects/viescloud-utils/src/lib/util-component/code-editor/code-editor.component';
-import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
+import { MatOption } from 'projects/viescloud-utils/src/lib/model/mat.model';
 import { ViesUtils } from 'projects/viescloud-utils/src/lib/util/Vies.utils';
 
 @Component({

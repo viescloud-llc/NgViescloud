@@ -2,8 +2,8 @@ import { AfterViewChecked, ChangeDetectorRef, Component, Inject, OnInit } from '
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { AuthenticatorService } from '../../service/authenticator.service';
 import { VGameService } from '../../service/v-game.service';
-import { Lobby } from '../../model/VGame.model';
-import { User } from '../../model/Authenticator.model';
+import { Lobby } from '../../model/v-game.model';
+import { User } from '../../model/authenticator.model';
 import { first } from 'rxjs';
 
 @Component({

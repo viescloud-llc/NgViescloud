@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { EnsibleRestService } from '../ensible/ensible.service';
 import { EnsiblePlaybookLogger, EnsibleProcessLogger, EnsibleShellLogger } from '../../model/ensible.model';
-import { HttpParamsBuilder } from 'projects/viescloud-utils/src/lib/model/Utils.model';
-import { Pageable } from 'projects/viescloud-utils/src/lib/model/Mat.model';
+import { HttpParamsBuilder } from 'projects/viescloud-utils/src/lib/model/utils.model';
+import { Pageable } from 'projects/viescloud-utils/src/lib/model/mat.model';
 import { Observable } from 'rxjs';
 
 @Injectable({

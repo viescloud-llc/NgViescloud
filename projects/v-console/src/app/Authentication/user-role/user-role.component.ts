@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
-import { UserRole } from 'projects/viescloud-utils/src/lib/model/Authenticator.model';
+import { UserRole } from 'projects/viescloud-utils/src/lib/model/authenticator.model';
 import { AuthenticatorService } from 'projects/viescloud-utils/src/lib/service/authenticator.service';
 import { UtilsService } from 'projects/viescloud-utils/src/lib/service/utils.service';
 import { first } from 'rxjs';

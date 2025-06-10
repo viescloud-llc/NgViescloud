@@ -1,15 +1,15 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { WrapMode } from '../wrap-workspace.component';
-import { Link, Wrap, WrapHotKey, WrapType } from 'projects/viescloud-utils/src/lib/model/Wrap.model';
+import { Link, Wrap, WrapHotKey, WrapType } from 'projects/viescloud-utils/src/lib/model/wrap.model';
 import { TrackByIndex } from 'projects/viescloud-utils/src/lib/directive/TrackByIndex';
 import { MatDialog } from '@angular/material/dialog';
 import { WrapDialog } from 'projects/viescloud-utils/src/lib/dialog/wrap-dialog/wrap-dialog.component';
 import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
 import { WrapLinkDialog } from 'projects/viescloud-utils/src/lib/dialog/wrap-link-dialog/wrap-link-dialog.component';
-import { RgbColor } from 'projects/viescloud-utils/src/lib/model/Rgb.model';
+import { RgbColor } from 'projects/viescloud-utils/src/lib/model/rgb.model';
 import { KeyCaptureService } from 'projects/viescloud-utils/src/lib/service/key-capture.service';
 import { Subscription } from 'rxjs';
-import { ExpiableMap } from 'projects/viescloud-utils/src/lib/model/ExpirableMap.model';
+import { ExpiableMap } from 'projects/viescloud-utils/src/lib/model/expirable-map.model';
 import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 
 @Component({

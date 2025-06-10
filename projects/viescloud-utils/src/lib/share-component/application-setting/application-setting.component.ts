@@ -1,6 +1,6 @@
 import { AfterContentChecked, AfterContentInit, AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { SettingService } from '../../service/setting.service';
-import { GeneralSetting } from '../../model/Setting.model';
+import { GeneralSetting } from '../../model/setting.model';
 import { AuthenticatorService } from '../../service/authenticator.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialog } from '../../dialog/confirm-dialog/confirm-dialog.component';

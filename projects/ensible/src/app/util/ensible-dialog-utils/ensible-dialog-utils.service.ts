@@ -3,8 +3,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 import { EnsibleUserGroupService } from '../../service/ensible-user-group/ensible-user-group.service';
 import { EnsibleUserService } from '../../service/ensible-user/ensible-user.service';
-import { UserAccess, SharedUser, SharedGroup, AccessPermission } from 'projects/viescloud-utils/src/lib/model/Authenticator.model';
-import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
+import { UserAccess, SharedUser, SharedGroup, AccessPermission } from 'projects/viescloud-utils/src/lib/model/authenticator.model';
+import { MatOption } from 'projects/viescloud-utils/src/lib/model/mat.model';
 import { UserAccessInputType } from 'projects/viescloud-utils/src/lib/util-component/mat-form-field-input-user-access/mat-form-field-input-user-access.component';
 import { Observable } from 'rxjs';
 

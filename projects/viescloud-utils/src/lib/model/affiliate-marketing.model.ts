@@ -1,5 +1,5 @@
-import { SharedUser } from "./Authenticator.model";
-import { MatInputDisable, MatInputDisplayLabel, MatInputHide, MatInputIndex, MatInputItemSetting, MatInputRequire, MatInputTextArea, MatItemSettingType, MatTableHide } from "./Mat.model";
+import { SharedUser } from "./authenticator.model";
+import { MatInputDisable, MatInputDisplayLabel, MatInputHide, MatInputIndex, MatInputItemSetting, MatInputRequire, MatInputTextArea, MatItemSettingType, MatTableHide } from "./mat.model";
 
 export class MediaResponse {
     media_id: string = '';

@@ -1,4 +1,4 @@
-import { MatColumn, addGetPrototype, MatInputDisable, MatInputHide, MatInputRequire, MatInputSetting, MatTableHide, MatTableIndex, MatTableDisplayLabel, MatInputDisableAll } from "./Mat.model";
+import { MatColumn, addGetPrototype, MatInputDisable, MatInputHide, MatInputRequire, MatInputSetting, MatTableHide, MatTableIndex, MatTableDisplayLabel, MatInputDisableAll } from "./mat.model";
 
 export class Organization {
     id?:                  string;

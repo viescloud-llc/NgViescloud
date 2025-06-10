@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
 import { ObjectDialogData, ObjectDialog } from 'projects/viescloud-utils/src/lib/dialog/object-dialog/object-dialog.component';
-import { Category } from 'projects/viescloud-utils/src/lib/model/AffiliateMarketing.model';
+import { Category } from 'projects/viescloud-utils/src/lib/model/affiliate-marketing.model';
 import { ProductCategoryService } from 'projects/viescloud-utils/src/lib/service/affiliateMarketing.service';
 
 @Component({

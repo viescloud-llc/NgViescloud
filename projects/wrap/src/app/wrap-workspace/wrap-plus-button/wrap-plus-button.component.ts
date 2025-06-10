@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { WrapDialog } from 'projects/viescloud-utils/src/lib/dialog/wrap-dialog/wrap-dialog.component';
-import { Wrap, WrapType } from 'projects/viescloud-utils/src/lib/model/Wrap.model';
+import { Wrap, WrapType } from 'projects/viescloud-utils/src/lib/model/wrap.model';
 import { UtilsService } from 'projects/viescloud-utils/src/lib/service/utils.service';
 
 @Component({

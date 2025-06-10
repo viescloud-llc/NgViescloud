@@ -1,6 +1,6 @@
 import { AfterContentInit, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, forwardRef } from '@angular/core';
 import { MatFormFieldComponent } from '../mat-form-field/mat-form-field.component';
-import { DateTime } from '../../model/Mat.model';
+import { DateTime } from '../../model/mat.model';
 import { AuthenticatorService } from '../../service/authenticator.service';
 import { ThemePalette } from '@angular/material/core';
 import { DialogUtils } from '../../util/Dialog.utils';

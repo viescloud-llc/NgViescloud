@@ -3,7 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { first } from 'rxjs';
 import { Router } from '@angular/router';
 import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
-import { User } from 'projects/viescloud-utils/src/lib/model/Authenticator.model';
+import { User } from 'projects/viescloud-utils/src/lib/model/authenticator.model';
 import { AuthenticatorService } from 'projects/viescloud-utils/src/lib/service/authenticator.service';
 
 @Component({

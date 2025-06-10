@@ -1,7 +1,7 @@
 import { Component, Input, forwardRef, OnInit, Output, EventEmitter } from '@angular/core';
 import { MatFormFieldInputListComponent } from '../mat-form-field-input-list/mat-form-field-input-list.component';
 import { MatFormFieldComponent } from '../mat-form-field/mat-form-field.component';
-import { MatOption } from '../../model/Mat.model';
+import { MatOption } from '../../model/mat.model';
 import { UtilsService } from '../../service/utils.service';
 import { DataUtils } from '../../util/Data.utils';
 import { NumberUtils } from '../../util/Number.utils';

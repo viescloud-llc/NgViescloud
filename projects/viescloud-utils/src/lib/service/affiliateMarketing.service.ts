@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Category, Product, PinterestOathToken, RegisterMediaResponse, MediaResponse } from '../model/AffiliateMarketing.model';
+import { Category, Product, PinterestOathToken, RegisterMediaResponse, MediaResponse } from '../model/affiliate-marketing.model';
 import { HttpClient } from '@angular/common/http';
 import { ViesRestService, ViesService } from './rest.service';
 import { Observable, first } from 'rxjs';
