@@ -1,0 +1,81 @@
+<ul class="margin-center">
+  <li>
+    <mat-toolbar class="flex-row-container-max-content">
+      <span>{{item.name}}</span>
+      <span class="spacer"></span>
+      <span *ngIf="logId">Run Number: {{itemLogger?.runNumber}} </span>
+      <span *ngIf="isRunning">Running...</span>
+      <span>
+        <app-mat-form-field-input-dynamic
+        label="Auto Scroll"
+        [(value)]="autoScroll"
+        [isSlideToggle]="true"
+        ></app-mat-form-field-input-dynamic>
+      </span>
+      <span>Verbose: {{getVerboseLabel()}}</span>
+      <button mat-icon-button [matTooltip]="'Run'" (click)="run()" [disabled]="isRunning">
+        <mat-icon>play_arrow</mat-icon>
+      </button>
+      <button mat-icon-button [matTooltip]="'Stop'" (click)="stop()" [disabled]="!isRunning">
+        <mat-icon>stop</mat-icon>
+      </button>
+
+      <button *ngIf="dockerReady && item.dockerContainerTemplate && item.dockerContainerTemplate.id" [disabled]="isRunning" mat-icon-button [matTooltip]="'Remove container'" (click)="removeContainer()">
+        <mat-icon>
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor">
+            <path d="M0 0h24v24H0z" fill="none"/>
+            <path d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1zM18 7H6v12h12V7z"/>
+          </svg>
+        </mat-icon>
+      </button>
+
+      <button *ngIf="dockerReady && item.dockerContainerTemplate && item.dockerContainerTemplate.id" [disabled]="isRunning" mat-icon-button [matTooltip]="'Ready container'" (click)="readyContainer()">
+        <mat-icon>
+          update icon
+        </mat-icon>
+      </button>
+
+      <button mat-icon-button [disabled]="!runOutput" [matTooltip]="'Copy logs to clipboard'" appCopyToClipboard [copyToClipboardValue]="runOutput" [copyMessage]="'Run logs copied to clipboard'">
+        <mat-icon>
+          content_copy
+        </mat-icon>
+      </button>
+
+      <button *ngIf="runOutput" mat-icon-button [matTooltip]="'Clean Run'" (click)="clean()">
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </mat-toolbar>
+  </li>
+  <li *ngIf="itemLogger">
+    <details>
+      <summary style="color: yellow;">Detail Log Info</summary>
+      <ul>
+        <li>Run number: {{ itemLogger.runNumber }}</li>
+        <li>Run status: {{ itemLogger.status }}</li>
+        <li>Triggered: {{ itemLogger.triggerDateTime.dateTime }} {{ itemLogger.triggerDateTime.zoneId ?? 'EST' }}</li>
+        <li>
+          Run Command: {{ itemLogger.executedCommand }}
+        </li>
+        <li>
+          <button mat-icon-button [disabled]="!runOutput" [matTooltip]="'Copy run command'" appCopyToClipboard [copyToClipboardValue]="itemLogger.executedCommand" [copyMessage]="'Ansible execute command copied to clipboard'">
+            <mat-icon>
+              content_copy
+            </mat-icon>
+          </button>
+        </li>
+      </ul>
+    </details>
+  </li>
+  <hr>
+  <li>
+    <app-mat-form-field-input-text-area
+    [showClearIcon]="false"
+    [value]="runOutput"
+    [styleWidth]="'100%'"
+    [rows]="'20'"
+    [autoScrollToBottom]="autoScroll"
+    [showResizeVerticalButton]="true"
+    [readonly]="true"
+    ></app-mat-form-field-input-text-area>
+  </li>
+</ul>

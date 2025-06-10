@@ -2,10 +2,6 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { LoadingDialog } from '../dialog/loading-dialog/loading-dialog.component';
 import { ConfirmDialog } from '../dialog/confirm-dialog/confirm-dialog.component';
 import { Injectable } from '@angular/core';
-import {
-  ProductImageSwapDialog,
-  ProductImageSwapDialogRespondData,
-} from '../dialog/marketing/product-image-swap-dialog/product-image-swap-dialog.component';
 import { MatOption } from '../model/mat.model';
 import { NotAuthenticatedError, ViesErrorResponse } from '../model/error.model';
 import { InputDialog } from '../dialog/input-dialog/input-dialog.component';
@@ -226,48 +222,6 @@ export class DialogUtils {
           multipleLine: multipleLine,
           input: input,
           placeholder: placeholder,
-        },
-        width: width,
-      });
-
-      dialog.afterClosed().subscribe({
-        next: (result) => {
-          if (result) resolve(result);
-          else reject(result);
-        },
-        error: (error) => {
-          reject(error);
-        },
-      });
-    });
-  }
-
-  // -------------------------PRODUCT SERVICE-------------------------
-
-  openProductImageSwapDialog(
-    fileOptions: MatOption<string>[],
-    width: string = '100%',
-    disableClose: boolean = false
-  ) {
-    return DialogUtils.openProductImageSwapDialog(
-      this.matDialog,
-      fileOptions,
-      width,
-      disableClose
-    );
-  }
-
-  static openProductImageSwapDialog(
-    matDialog: MatDialog,
-    fileOptions: MatOption<string>[],
-    width: string = '100%',
-    disableClose: boolean = false
-  ) {
-    return new Promise<ProductImageSwapDialogRespondData>((resolve, reject) => {
-      let dialog = matDialog.open(ProductImageSwapDialog, {
-        disableClose: disableClose,
-        data: {
-          fileOptions: fileOptions,
         },
         width: width,
       });

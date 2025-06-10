@@ -6,7 +6,6 @@ import { Observable } from 'rxjs';
 import { UserAccess, SharedUser, SharedGroup, AccessPermission } from '../../model/authenticator.model';
 import { RxJSUtils } from '../../util/RxJS.utils';
 import { FixChangeDetection } from '../../directive/FixChangeDetection';
-import { DataUtils } from '../../util/Data.utils';
 
 @Component({
   selector: 'app-user-access-dialog',

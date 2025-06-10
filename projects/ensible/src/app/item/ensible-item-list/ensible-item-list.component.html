@@ -1,0 +1,62 @@
+<ul class="margin-center">
+  <li class="flex-row-container">
+    <app-mat-form-field-input-dynamic
+    label="Table"
+    [(value)]="useTable"
+    [isSlideToggle]="true"
+    (onValueChange)="init()"
+    ></app-mat-form-field-input-dynamic>
+    <button mat-icon-button color="primary" (click)="init()" [matTooltip]="'Refresh'">
+      <mat-icon>refresh</mat-icon>
+    </button>
+    <button mat-icon-button color="primary" (click)="addItem()" [matTooltip]="'Add new item'">
+      <mat-icon>add_box</mat-icon>
+    </button>
+    <button mat-icon-button color="primary" (click)="showMultipleSelection = !showMultipleSelection" [matTooltip]="'Edit'">
+      <mat-icon>edit</mat-icon>
+    </button>
+    <button *ngIf="showMultipleSelection && selectedItems.length > 0" mat-icon-button color="primary" (click)="modifyUserAccess(selectedItems)" [matTooltip]="'Modify user access of all selected item'">
+      <mat-icon>lock</mat-icon>
+    </button>
+    <button *ngIf="showMultipleSelection && selectedItems.length > 0" mat-icon-button color="primary" (click)="backupItems(selectedItems)" [matTooltip]="'Backup all selected item'">
+      <mat-icon>backup</mat-icon>
+    </button>
+    <button *ngIf="showMultipleSelection" mat-icon-button color="primary" (click)="restoreItems()" [matTooltip]="'Restore items'">
+      <mat-icon>restore</mat-icon>
+    </button>
+  </li>
+  <hr>
+
+  <li *ngIf="useTable">
+    <app-mat-table-lazy
+    [matRowsPage]="pageItems"
+    [blankObject]="blankItem"
+    (onEditRow)="selectItem($event)"
+    (onMiddleClickRow)="selectItemInNewTab($event)"
+    [showFilter]="true"
+    [showPagination]="true"
+    [showMultipleRowSelection]="showMultipleSelection" 
+    [pageSizeOptions]="[10, 20, 50, 100, 500]"
+    (onLazyPageChange)="onLazyPageChange($event)"
+    [sendPageIndexChangeSubject]="sendPageIndexChangeSubject"
+    (onMultipleRowSelected)="onMultipleRowSelected($event)"
+    ></app-mat-table-lazy>
+  </li>
+
+  <li *ngIf="!useTable">
+    <app-mat-table-path-lazy
+    [value]="items"
+    [getPathFn]="getPath"
+    [getLabelFn]="getLabel"
+    (onItemSelected)="selectItem($event)"
+    (onMiddleClickItem)="selectItemInNewTab($event)"
+    [savePathToLocalStorage]="true"
+    [unixStyleBack]="true"
+    [readonlyPathInput]="true"
+    [showMultipleRowSelection]="showMultipleSelection" 
+    (onPathChange)="onPathChange($event)"
+    (onLazyPathChange)="onLazyPathChange($event)"
+    (onMultipleRowSelected)="onMultipleRowSelected($event)"
+    ></app-mat-table-path-lazy>
+  </li>
+</ul>

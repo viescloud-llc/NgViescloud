@@ -1,0 +1,88 @@
+<ul class="margin-center" *ngIf="!selectedOpenIdProvider">
+  <li>
+    <button mat-icon-button color="primary" (click)="ngOnInit()" [matTooltip]="'Refresh'"><mat-icon>refresh</mat-icon></button>
+    <button mat-icon-button color="primary" (click)="addNewProvider()" [matTooltip]="'Add new provider'"><mat-icon>add_box</mat-icon></button>
+  </li>
+  <hr>
+  <li>
+    <app-mat-table
+    [matRows]="openIdProviders"
+    [blankObject]="blankOpenIdProvider"
+    (onEditRow)="selectOpenIdProvider($event)"
+    ></app-mat-table>
+  </li>
+</ul>
+
+<ng-container *ngIf="selectedOpenIdProvider">
+  <ul class="margin-center" appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
+    <li>
+      <app-mat-form-field-input
+      label="Open ID Configuration URL"
+      placeholder="e.g https://accounts.google.com/.well-known/openid-configuration"
+      [(value)]="configurationURL"
+      styleWidth="100%"
+      ></app-mat-form-field-input>
+    </li>
+    <li class="flex-row-container-auto">
+      <button mat-raised-button color="primary" (click)="autoFill(false)">Auto fill missing</button>
+      <button mat-raised-button color="primary" (click)="autoFill(true)">Auto fill all</button>
+    </li>
+    <hr>
+    <li>
+      <app-mat-form-field-input-dynamic
+      [(value)]="selectedOpenIdProvider"
+      [blankObject]="blankOpenIdProvider"
+      [styleWidth]="'100%'"
+      [indent]="false"
+      ></app-mat-form-field-input-dynamic>
+    </li>
+    <li>
+      <app-mat-form-field-input
+      label="Map new user (username)"
+      placeholder="e.g username, preferred_username"
+      [(value)]="selectedOpenIdProvider.usernameMapping"
+      [options]="claimSupporteds"
+      [styleWidth]="'100%'"
+      ></app-mat-form-field-input>
+    </li>
+    <li>
+      <app-mat-form-field-input
+      label="Map new user (email)"
+      placeholder="e.g email"
+      [(value)]="selectedOpenIdProvider.emailMapping"
+      [options]="claimSupporteds"
+      [styleWidth]="'100%'"
+      ></app-mat-form-field-input>
+    </li>
+    <li>
+      <app-mat-form-field-input
+      label="Map new user (alias)"
+      placeholder="e.g name, nickname, preferred_username"
+      [(value)]="selectedOpenIdProvider.aliasMapping"
+      [options]="claimSupporteds"
+      [styleWidth]="'100%'"
+      ></app-mat-form-field-input>
+    </li>
+    <li>
+      <app-mat-form-field-input-list-option
+      label="User Groups"
+      [(value)]="selectedOpenIdProvider.groupMappings"
+      [options]="userGroupsOptions"
+      [styleWidth]="'100%'"
+      [showSizeInput]="false"
+      [required]="true"
+      [minSize]="1"
+      [uniqueValue]="true"
+      ></app-mat-form-field-input-list-option>
+      <br>
+    </li>
+
+    <li class="flex-row-container-auto">
+      <button mat-raised-button color="primary" (click)="save()" [disabled]="!validForm || !isValueChange()">Save</button>
+      <button mat-raised-button color="primary" (click)="selectOpenIdProvider(undefined)">Cancel</button>
+      <button mat-raised-button color="warn" (click)="revert()" [disabled]="!isValueChange()">Revert</button>
+      <button *ngIf="selectedOpenIdProvider && selectedOpenIdProvider.id" mat-raised-button color="warn" (click)="deleteProvider()">Delete</button>
+      <button mat-raised-button color="primary" (click)="addUserGroup()">Add new user group</button>
+    </li>
+  </ul>
+</ng-container>

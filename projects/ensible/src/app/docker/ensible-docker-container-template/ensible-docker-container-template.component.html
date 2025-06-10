@@ -1,0 +1,50 @@
+<ul class="margin-center" appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
+  <li *ngIf="!dockerReady">
+    <h6 style="color: yellow;">Docker is not avaiable on the server side (docker within docker will not be working/avaiable)</h6>
+  </li>
+  <ng-container *ngIf="dockerReady">
+    <details>
+      <summary style="color: yellow;">Instructions</summary>
+      <pre>Make sure image it self have:
+  1. ansible (required)
+  2. bash, sh or any other shell (required)
+  2. python3 (recommended)
+  3. python3-pip or pip3 (recommended)
+      </pre>
+      <pre>if the image entry point does not keep it container running after start
+  please do the following:
+  1. add extra parameter: -it
+  2. add post argument: bash, sh or any other shell
+      </pre>
+      <p>Skip run if docker is not running = false or Skip run if container not ready = false will instead run on the server side host machine (becareful if playbook script is making change to local machine) if docker engine or container can't be in ready state</p>
+      <p>Rebuild container for each run will remove and create a new container for each run (fresh environement for each run)</p>
+      <p>Bind docker container will bind -v /var/run/docker.sock:/var/run/docker.sock to container</p>
+      <p>Execute with will be the entry point shell to execute the playbook command</p>
+      <p>Retristry url is to just keep note of where the docker image is hosted</p>
+    </details>
+  </ng-container>
+  <hr>
+  <li>
+    <app-ensible-user-access
+    [(value)]="ensibleDockerContainerTemplate"
+    styleWidth="100%"
+    [inputType]="[UserAccessInputType.SHARED_USERS, UserAccessInputType.SHARED_GROUPS]"
+    ></app-ensible-user-access>
+    <br>
+  </li>
+  <li>
+    <app-mat-form-field-input-dynamic
+    [(value)]="ensibleDockerContainerTemplate"
+    [blankObject]="blankEnsibleDockerContainerTemplate"
+    [styleWidth]="'100%'"
+    [indent]="false"
+    ></app-mat-form-field-input-dynamic>
+  </li>
+  <li class="flex-row-container-auto">
+    <button mat-raised-button color="primary" (click)="save()" [disabled]="!validForm || !isValueChange()">Save</button>
+    <button mat-raised-button color="warn" (click)="revert()" [disabled]="!isValueChange()">Revert</button>
+    <button mat-raised-button color="primary" (click)="pullImage()" [disabled]="!validForm || !dockerReady">Pull image</button>
+    <button *ngIf="ensibleDockerContainerTemplate && ensibleDockerContainerTemplate.id" mat-raised-button color="warn" (click)="deleteContainerTemplate()">Delete container template</button>
+  </li>
+
+</ul>

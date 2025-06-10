@@ -1,0 +1,19 @@
+<mat-drawer-container style="height: 100%; width: 100%;" autosize>
+  <mat-drawer #drawer mode="side">
+    <viescloud-quick-side-drawer-menu
+    [menu]="menu"
+    ></viescloud-quick-side-drawer-menu>
+  </mat-drawer>
+  <mat-drawer-content [ngStyle]="getBackgroundImageNgStyle()">
+    <viescloud-header-minimal
+    [drawer]="drawer"
+    imageSrc="assets/images/logo-no-background.png"
+    imageLink="https://hub.docker.com/r/viescloud/ensible-fullstack"
+    [alias]="getUserAlias()"
+    [isLogin]="ensibleAuthenticatorService.isLogin()"
+    (onLogout)="ensibleAuthenticatorService.logout()"
+    (onLogin)="router.navigate(['login'])"
+    ></viescloud-header-minimal>
+    <router-outlet></router-outlet>
+  </mat-drawer-content>
+</mat-drawer-container>

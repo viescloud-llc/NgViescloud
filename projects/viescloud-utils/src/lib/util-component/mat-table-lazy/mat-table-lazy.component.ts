@@ -2,9 +2,9 @@ import { Component, EventEmitter, Input, OnDestroy, Output, SimpleChanges } from
 import { MatTableComponent } from '../mat-table/mat-table.component';
 import { merge, Observable } from 'rxjs';
 import { PageEvent } from '@angular/material/paginator';
-import { Pageable } from '../../model/mat.model';
 import { DataUtils } from '../../util/Data.utils';
 import { FixedSizeMap } from '../../model/data-structure.model';
+import { Pageable } from '../../model/vies.model';
 
 export interface LazyPageChange {
   pageIndex: number;

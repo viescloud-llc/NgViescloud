@@ -1,0 +1,14 @@
+<h1 mat-dialog-title>Pulling Image {{data.imageName}}</h1>
+<div mat-dialog-content>
+  <app-mat-form-field-input-text-area
+  [label]="'std output'"
+  [value]="output"
+  styleWidth="100%"
+  [autoScrollToBottom]="true"
+  [rows]="'30'"
+  [readonly]="true"
+  ></app-mat-form-field-input-text-area>
+</div>
+<div mat-dialog-actions>
+  <button mat-raised-button color="primary" mat-dialog-close cdkFocusInitial>{{finish ? 'Close' : 'Close (not recommended since pulling not finish)'}}</button>
+</div>

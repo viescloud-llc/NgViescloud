@@ -1,0 +1,83 @@
+<app-ensible-item
+[blankItem]="blankItem"
+[item]="item"
+[suffix]="'shells'"
+[itemService]="ensibleItemService"
+(itemChange)="itemChange.emit($event)"
+(isEditing)="isEditing.emit($event)"
+(onRevert)="revert()"
+>
+  <div optionContent>
+    <li>
+      <app-mat-form-field-input-option
+      label="Run Shell with"
+      [(value)]="item.type"
+      [options]="typeOptions"
+      [noneLabel]="''"
+      [required]="true"
+      styleWidth="100%"
+      ></app-mat-form-field-input-option>
+    </li>
+  </div>
+
+  <div bodyContent>
+    <li>
+      <details open>
+        <summary>Code</summary>
+        <ul>
+          <li>
+            <app-mat-form-field-input-dynamic
+            label="Use code from file"
+            [(value)]="item.runCodeFilePath"
+            styleWidth="100%"
+            [isSlideToggle]="true"
+            [blankObject]="false"
+            ></app-mat-form-field-input-dynamic>
+          </li>
+  
+          <hr>
+  
+          <li *ngIf="!item.runCodeFilePath">
+            <button mat-icon-button color="primary" (click)="forceResizeEditor()" [matTooltip]="'Refresh Editor'">
+              <mat-icon>refresh</mat-icon>
+            </button>
+          </li>
+          
+          <li *ngIf="!item.runCodeFilePath">
+            <app-code-editor
+            #codeEditorRef
+            [(value)]="item.code"
+            [language]="'shell'"
+            ></app-code-editor>
+          </li>
+  
+          <li *ngIf="item.runCodeFilePath">
+            <app-mat-form-field-input-option
+            label="Shell code file"
+            [(value)]="item.codeFilePath"
+            [options]="ensibleFsService.shellsFileOptions"
+            [noneLabel]="'None'"
+            [required]="true"
+            styleWidth="100%"
+            ></app-mat-form-field-input-option>
+          </li>
+  
+          <li *ngIf="item.runCodeFilePath && ensibleFsService.shellsFileOptions.length">
+            <details>
+              <summary>Quick Edit</summary>
+              <app-ensible-fs
+              [fsPath]="item.codeFilePath"
+              (isEditing)="isFsEditing[0] = $event"
+              ></app-ensible-fs>
+            </details>
+          </li>
+  
+          <li *ngIf="item.runCodeFilePath && !ensibleFsService.shellsFileOptions.length">
+            <p class="text-center" style="color: red;">Unable to load files or no file exist under Shells (you can add new file on left side under Shells category)</p>
+          </li>
+        </ul>
+      </details>
+      <br>
+    </li>
+  </div>
+</app-ensible-item>

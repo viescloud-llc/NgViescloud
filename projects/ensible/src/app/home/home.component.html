@@ -1,0 +1,82 @@
+<ul class="margin-center-li-center">
+  <li>
+    <h1>Wellcome to Ensible 👋</h1>
+  </li>
+  <li>
+    <h2>CICD automation tool with Ansible and Docker</h2>
+  </li>
+  <li *ngIf="!ensibleAuthenticatorService.isLogin()">
+    <h3>Please login to do more!</h3>
+  </li>
+</ul>
+
+<ng-container *ngIf="ensibleAuthenticatorService.isLogin()">
+  <div class="container">
+    <h1>Introduction to Ansible</h1>
+
+    <p>Ansible is a powerful tool for automating IT tasks such as configuration management, application deployment, and task automation. This guide provides a quick start to Ansible by creating an inventory file, a playbook, and learning about roles, variables, and secrets.</p>
+    <p>Refer to 👉 <a href="https://docs.ansible.com" target="_blank">Ansible doc</a> for detail usage if needed</p>
+    <h2>1. Creating an Inventory File</h2>
+    <p>The inventory file lists the hosts and groups Ansible will manage. Here is an example:</p>
+    <pre><code>[webservers]
+192.168.1.10
+192.168.1.11
+
+[dbservers]
+192.168.1.20 ansible_user=root ansible_ssh_private_key_file=~/.ssh/id_rsa</code></pre>
+
+    <h2>2. Writing a Simple Playbook</h2>
+    <p>A playbook is a YAML file that defines tasks to be executed. Here's an example:</p>
+    <pre><code>- name: Deploy web servers
+hosts: webservers
+become: yes
+tasks:
+- name: Install Nginx
+  apt:
+    name: nginx
+    state: present
+
+- name: Start Nginx
+  service:
+    name: nginx
+    state: started</code></pre>
+
+    <h2>3. Using Roles</h2>
+    <p>Roles help organize tasks, files, and variables. Create a directory structure like this:</p>
+    <pre><code>roles/
+tasks/
+  main.yml
+templates/
+  nginx.conf.j2
+vars/
+  main.yml</code></pre>
+
+    <p>Include the role in your playbook:</p>
+    <pre><code>- name: Configure web servers
+hosts: webservers
+roles:
+- webserver</code></pre>
+
+    <h2>4. Group Variables and Host Variables</h2>
+    <p>Define group variables in the <code>group_vars</code> directory:</p>
+    <pre><code>group_vars/webservers.yml
+---
+nginx_port: 80</code></pre>
+
+    <p>Define host-specific variables in the <code>host_vars</code> directory:</p>
+    <pre><code>host_vars/192.168.1.10.yml
+---
+database_password: secret123</code></pre>
+
+    <h2>5. Managing Secrets</h2>
+    <p>Ensible use <a href="https://docs.ansible.com/ansible/latest/user_guide/vault.html" target="_blank">Ansible Vault</a> to encrypt sensitive data</p>
+
+    <h2>6. Item</h2>
+    <p>Create item to run and see the result and log</p>
+    <p>ensible also support webhook and cron job run job</p>
+
+    <h2>7. Docker container template (run environment)</h2>
+    <p>Create Docker container template to run item job within it (require docker to be setup and running on the server)</p>
+    <p>Refer to 👉 <a href="https://www.docker.com/resources/what-container/" target="_blank">Docker ducument here</a> for more information about docker</p>
+</div>
+</ng-container>

@@ -1,0 +1,96 @@
+<p *ngIf="error">
+  {{error}}
+</p>
+
+<ul *ngIf="!error" class="margin-center" appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
+  <ng-container *ngIf="!fsPath">
+    <!-- <li>
+      <app-mat-form-field-input-dynamic
+      label="Easy Mode (still in development)"
+      [isSlideToggle]="true"
+      [(value)]="easyMode"
+      ></app-mat-form-field-input-dynamic>
+    </li> -->
+    <li>
+      <p>
+        <b>File Metadata</b>
+        <br>
+        <span>File name: {{fileName}}</span>
+        <br>
+        <span>File path: {{getFullPath()}}</span>
+      </p>
+    </li>
+    <li>
+      <app-mat-form-field-input
+      label="File Name"
+      [(value)]="fileName"
+      [placeholder]="'e.g file.txt, local.ini, secrets.yaml'"
+      [required]="true"
+      [styleWidth]="'100%'"
+      ></app-mat-form-field-input>
+    </li>
+  </ng-container>
+
+  <ng-container *ngIf="isSecretFile() && (newFile || !vaultDectypted)">
+    <hr>
+    <li>
+      <app-mat-form-field-input-dynamic
+      [label]="getVaultTypeLabel() + ' with password?' + (getVaultTypeLabel() == 'Encrypt' ? ' (not recommended)' : '')"
+      [(value)]="vaultCrtyptionWithPassword"
+      [isSlideToggle]="true"
+      (onValueChange)="vaultSecret = ''"
+      ></app-mat-form-field-input-dynamic>
+    </li>
+    <li class="flex-row-container-max-content">
+      <app-mat-form-field-input
+      *ngIf="vaultCrtyptionWithPassword"
+      [label]="getVaultTypeLabel() + ' with password'"
+      [(value)]='vaultSecret'
+      [required]="true"
+      ></app-mat-form-field-input>
+
+      <app-mat-form-field-input-option
+      *ngIf="!vaultCrtyptionWithPassword"
+      [label]="getVaultTypeLabel() + ' with password file'"
+      (selectionChange)="vaultSecret = $event"
+      [options]="ensibleFsService.passwordFileOptions"
+      [required]="true"
+      ></app-mat-form-field-input-option>
+
+      <button *ngIf="!newFile" mat-raised-button color="primary" (click)="decryptFileContent()">{{getVaultTypeLabel()}}</button>
+    </li>
+  </ng-container>
+
+  <li>
+    <button mat-icon-button color="primary" (click)="forceResizeEditor()" [matTooltip]="'Refresh Editor'">
+      <mat-icon>refresh</mat-icon>
+    </button>
+
+    <ng-container *ngFor="let item of extraToolbarButton" mat-raised-button color="primary">
+      <button *ngIf="item.icon" mat-icon-button color="primary" (click)="onExtraToolbarButtonClick.emit(item)" [matTooltip]="item.label">
+        <mat-icon>{{item.icon}}</mat-icon>
+      </button>
+
+      <button *ngIf="!item.icon" (click)="onExtraToolbarButtonClick.emit(item)">{{item.label}}</button>
+    </ng-container>
+  </li>
+
+  <hr>
+  <li *ngIf="!easyMode">
+    <app-code-editor
+    #codeEditor
+    [language]="getLanguageType()"
+    [(value)]="fileContent"
+    styleWidth="100%"
+    (onKeyCaptureEvent)="onKeyCaptureEvent($event)"
+    ></app-code-editor>
+    <br>
+  </li>
+  <li class="flex-row-container-auto">
+    <button *ngIf="!isSecretFile()" mat-raised-button color="primary" (click)="save()" [disabled]="!isValueChange() || !validForm">Save</button>
+    <button *ngIf="isSecretFile()" mat-raised-button color="primary" (click)="saveSecrets()" [disabled]="!isValueChange() || !validForm">Save secret</button>
+
+    <button mat-raised-button color="warn" (click)="revert()" [disabled]="!isValueChange() || !validForm">Revert</button>
+    <button *ngIf="!fsPath" mat-raised-button color="warn" (click)="deleteFile()">Delete</button>
+  </li>
+</ul>

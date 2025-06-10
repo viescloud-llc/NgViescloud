@@ -1,0 +1,25 @@
+<ng-container *ngIf="ensibleFsDir; else Else">
+  <ul class="margin-center">
+    <li>
+      <button mat-icon-button color="primary" (click)="onRouteChange()" [matTooltip]="'Refresh'"><mat-icon>refresh</mat-icon></button>
+      <button mat-icon-button color="primary" (click)="addNewFs()" [matTooltip]="'Add new file'"><mat-icon>add_box</mat-icon></button>
+    </li>
+    <hr>
+    <li>
+      <app-mat-table
+      [matRows]="ensibleFsDir.child"
+      [blankObject]="blankEnsibleFs"
+      [showFilter]="true"
+      [showPagination]="true"
+      (onEditRow)="onEditFs($event)"
+      (onMiddleClickRow)="onEditFsInNewTab($event)"
+      [pageSizeOptions]="[50, 100, 200, 500]"
+      ></app-mat-table>
+    </li>
+    <br>
+  </ul>
+</ng-container>
+
+<ng-template #Else>
+  <h1 class="text-center" style="color: red;">Unable to load files</h1>
+</ng-template>
