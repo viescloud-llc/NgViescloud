@@ -1,0 +1,67 @@
+<ul class="margin-center" appMatFormFieldGroup (onAllInputCheck)="validInput = $event">
+  <li *ngIf="!vFileContainVideo()">
+    <app-product-display
+    [files]="vFiles"
+    [(selectedIndex)]="selectedFileIndex"
+    [fileOptions]="fileOptions"
+    (onUploadFile)="onUploadFile()"
+    (onFetchFile)="onFetchFile($event)"
+    (onRemoveFile)="onRemoveFile($event)"
+    (onSelectFileOption)="onSelectFileOptions($event)"
+    [disabled]="disableProductDisplay"
+    [maxNumImage]="maxNumImage"
+    [maxNumVideo]="0"
+    ></app-product-display>
+  </li>
+  <li *ngIf="vFileContainVideo()">
+    <app-product-display-video
+    [files]="vFiles"
+    [fileOptions]="fileOptions"
+    [(selectedIndex)]="selectedFileIndex"
+    (onRemoveVideo)="onRemoveFile($event)"
+    (onSwitchCoverImage)="onSwitchFile($event)"
+    [disabled]="disableProductDisplay"
+    ></app-product-display-video>
+  </li>
+  <ng-container *ngIf="pinRequest.media_source">
+    <hr>
+    <li>
+      <app-mat-form-field-input-dynamic
+      [(value)]="pinRequest.media_source"
+      [blankObject]="getMediaSourceBlankObject()"
+      styleWidth="100%"
+      ></app-mat-form-field-input-dynamic>
+    </li>
+  </ng-container>
+  <hr>
+  <li *ngIf="!disableProductDisplay">
+    <button mat-raised-button color="primary" style="width: 100%;" (click)="autoFillInformation()">Auto Fill Information</button>
+  </li>
+  <br>
+  <li>
+    <app-mat-form-field-input-option
+    label="Board Name (from categories)"
+    [(value)]="pinRequest.boardName"
+    [options]="boardNameOptions"
+    noneLabel="Please select a board name"
+    [required]="true"
+    styleWidth="100%"
+    blankObject="Please select a board name"
+    ></app-mat-form-field-input-option>
+  </li>
+  <li>
+    <app-mat-form-field-input-dynamic
+    [(value)]="pinRequest"
+    [blankObject]="blankPinRequest"
+    styleWidth="100%"
+    ></app-mat-form-field-input-dynamic>
+  </li>
+
+  <li>
+    <button mat-raised-button *ngIf="pinRequest.media_source" color="primary" style="width: 100%;" (click)="uploadProduct()" [disabled]="isProductChange() || !validInput">{{pinResponse ? 'Modify Pin in Pinterest' : 'Upload Pin to Pinterest'}}</button>
+  </li>
+  <li>
+    <button mat-raised-button color="primary" style="width: 50%;" [disabled]="!isProductChange() || !validInput" (click)="save()">{{product.id ? 'Modify' : 'Add'}}</button>
+    <button mat-raised-button color="warn" style="width: 50%;" [disabled]="!isProductChange()" (click)="reverse()">Undo Change</button>
+  </li>
+</ul>

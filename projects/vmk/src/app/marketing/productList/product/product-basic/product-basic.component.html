@@ -1,0 +1,41 @@
+<ul class="margin-center" appMatFormFieldGroup (onAllInputCheck)="validInput = $event">
+  <li>
+    <app-product-display
+    [files]="vFiles"
+    [(selectedIndex)]="selectedFileIndex"
+    (onUploadFile)="onUploadFile()"
+    (onFetchFile)="onFetchFile($event)"
+    (onRemoveFile)="onRemoveFile($event)"
+    [disabled]="disableProductDisplay"
+    ></app-product-display>
+  </li>
+  <hr>
+  <li>
+    <button mat-raised-button color="primary" (click)="data.addNewCategory()">Add new categories</button>
+  </li>
+  <li>
+    <app-mat-form-field-input-option
+    label="Product Category"
+    [(value)]="product.category"
+    [options]="data.productCategoriesOptions"
+    noneLabel=""
+    [required]="true"
+    styleWidth="100%"
+    ></app-mat-form-field-input-option>
+  </li>
+  <hr>
+  <li>
+    <app-mat-form-field-input-dynamic
+    label="Product"
+    objectLabel="Product"
+    [(value)]="product"
+    [blankObject]="blankProduct"
+    styleWidth="100%"
+    objectLabel=""
+    ></app-mat-form-field-input-dynamic>
+  </li>
+  <li>
+    <button mat-raised-button color="primary" style="width: 50%;" [disabled]="!isProductChange() || !validInput" (click)="save()">{{product.id ? 'Modify' : 'Add'}}</button>
+    <button mat-raised-button color="warn" style="width: 50%;" [disabled]="!isProductChange()" (click)="reverse()">Undo Change</button>
+  </li>
+</ul>
