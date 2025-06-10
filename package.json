@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start_skeleton": "ng serve --project skeleton",
-    "build_skeleton": "ng build --project skeleton",
+    "start_wrap": "ng serve --project wrap",
+    "build_wrap": "ng build --project wrap",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },

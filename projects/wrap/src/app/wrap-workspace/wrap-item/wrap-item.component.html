@@ -1,0 +1,93 @@
+<ng-container *ngIf="wrap.type === WrapType.ITEM; else Else" >
+  <mat-card appearance="outlined" class="cursor-hover" (click)="open(wrap)" [ngStyle]="getNgStyle(wrap)">
+    <mat-card-header>
+      <img mat-card-avatar [src]="wrap.icon" alt="!?"/>
+      <mat-card-title>{{wrap.title}}</mat-card-title>
+      <mat-card-subtitle *ngIf="wrap.hotKey !== WrapHotKey.NONE">Hot Key: {{wrap.hotKey}}</mat-card-subtitle>
+      <mat-icon (click)="displayItemTooltip(wrap)" [matTooltip]="getItemTooltip(wrap)" matTooltipClass="tooltip-multiline" matTooltipPosition="above" viescloudClickStopPropagation>
+        info
+      </mat-icon>
+    </mat-card-header>
+    <mat-card-content>
+
+      <!-- TODO find a better link status check althernative -->
+      <!-- <ng-container *ngIf="wrap.links && wrap.links.length > 0">
+        <ng-container *ngFor="let link of wrap.links">
+          <mat-icon 
+          (click)="openLink(link)"
+          *ngIf="link.enableStatusCheck && link.statusCheckUrl" 
+          [ngStyle]="getNgStyleLinkCheck(link)"
+          [matTooltip]="statusUrlMap.get(link.statusCheckUrl) + ' ' + link.serviceUrl"
+          matTooltipClass="tooltip-multiline" 
+          matTooltipPosition="above" 
+          viescloudClickStopPropagation>
+            lens
+          </mat-icon>
+        </ng-container>
+      </ng-container> -->
+
+      <p class="multiline">{{wrap.description}}</p>
+    </mat-card-content>
+    <mat-card-footer *ngIf="mode === Mode.EDIT">
+      <mat-chip-set>
+        <mat-chip matTooltip="Move Left" (click)="onMoveLeft.emit()"viescloudClickStopPropagation><mat-icon>keyboard_arrow_left</mat-icon></mat-chip>
+        <mat-chip matTooltip="Edit"(click)="edit(wrap)" viescloudClickStopPropagation><mat-icon>edit</mat-icon></mat-chip>
+        <mat-chip matTooltip="Edit"(click)="onDelete.emit()" viescloudClickStopPropagation><mat-icon>delete</mat-icon></mat-chip>
+        <mat-chip matTooltip="Move Right"(click)="onMoveRight.emit()"viescloudClickStopPropagation><mat-icon>keyboard_arrow_right</mat-icon></mat-chip>
+      </mat-chip-set>
+    </mat-card-footer>
+  </mat-card>
+</ng-container>
+
+<ng-template #Else>
+  <mat-expansion-panel hideToggle [expanded]="true" #panel [ngStyle]="getNgStyle(wrap)">
+    <mat-expansion-panel-header>
+      <mat-panel-title>{{wrap.title}}</mat-panel-title>
+      <mat-panel-description *ngIf="mode === Mode.VIEW"> 
+        {{wrap.description.replaceAll('\n', ', ')}}
+      </mat-panel-description>
+      <mat-icon (click)="displayGroupTooltip(wrap)" [matTooltip]="getGroupTooltip(wrap)" matTooltipClass="tooltip-multiline" matTooltipPosition="above" viescloudClickStopPropagation>
+        info_outline
+      </mat-icon>
+      <mat-panel-description *ngIf="mode === Mode.EDIT"> 
+        <button mat-raised-button color="primary" matTooltip="Move Left" (click)="onMoveLeft.emit()" viescloudClickStopPropagation><mat-icon>keyboard_arrow_left</mat-icon></button>
+        <button mat-raised-button color="primary" matTooltip="Edit" (click)="edit(wrap)" viescloudClickStopPropagation><mat-icon>edit</mat-icon></button>
+        <button mat-raised-button color="primary" matTooltip="Delete" (click)="onDelete.emit()" viescloudClickStopPropagation><mat-icon>delete</mat-icon></button>
+        <button mat-raised-button color="primary" matTooltip="Move Right" (click)="onMoveRight.emit()" viescloudClickStopPropagation><mat-icon>keyboard_arrow_right</mat-icon></button>
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+    <div class="flex-row-container">
+
+      <ng-container *ngIf="wrap.children;">
+        <ng-container *ngFor="let item of wrap.children; let i = index; trackBy: trackByIndex;">
+
+          <app-wrap-plus-button
+          *ngIf="mode === Mode.EDIT"
+          matTooltip="Add new Wrap Here"
+          (onNewWrap)="wrap.children.splice(i, 0, $event)"
+          [adviceWrapType]="WrapType.ITEM"
+          ></app-wrap-plus-button>
+
+          <app-wrap-item 
+          [wrap]="item" 
+          (wrapChange)="wrap.children[i] = $event" 
+          [(mode)]="mode"
+          [corsProxyUrl]="corsProxyUrl"
+          (onMoveLeft)="moveLeft(i)"
+          (onMoveRight)="moveRight(i)"
+          (onDelete)="deleteWrap(i)"
+          ></app-wrap-item>
+
+        </ng-container>
+      </ng-container>
+  
+      <app-wrap-plus-button
+      *ngIf="mode === Mode.EDIT"
+      matTooltip="Add new Wrap Here"
+      (onNewWrap)="wrap.children.push($event)"
+      [adviceWrapType]="WrapType.ITEM"
+      ></app-wrap-plus-button>
+      
+    </div>
+  </mat-expansion-panel>
+</ng-template>

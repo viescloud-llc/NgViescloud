@@ -1,0 +1,60 @@
+<ul class = "margin-center">
+  <li>
+    <app-mat-form-field-input-option
+    [value]="currentWorkspace"
+    (valueChange)="onSelectWorkspace($event)"
+    [options]="options"
+    [noneLabel]="getNoneLabel()"
+    styleWidth="50%"
+    ></app-mat-form-field-input-option>
+
+    <app-mat-form-field-input-option
+    [value]="mode"
+    (valueChange)="onSelectMode($event)"
+    label="Mode"
+    noneLabel=""
+    [options]="modeOptions"
+    styleWidth="50%"
+    ></app-mat-form-field-input-option>
+  </li>
+  <li *ngIf="mode !== Mode.VIEW && currentWorkSpaceIndex >= 0">
+    <button mat-raised-button color="warn" (click)="removeThisWorkspace()">Remove this workspace</button>
+    <button mat-raised-button color="primary" (click)="changeWorkspaceName()">Change Workspace name</button>
+    <!-- <button mat-raised-button color="primary" (click)="changeWorkspaceCorsProxyUrl()">Change Workspace Cors Proxy URL</button> -->
+  </li>
+  <li *ngIf="mode !== Mode.VIEW">
+    <br>
+    <button mat-raised-button color="primary" (click)="changeBackgroundUrl()">Change background</button>
+    <button mat-raised-button color="primary" (click)="uploadBackgroundImage()" [disabled]="!authenticatorService.isLoginB">Upload background</button>
+  </li>
+  <li *ngIf="mode !== Mode.VIEW">
+    <br>
+    <button mat-raised-button color="warn" (click)="wrapService.revert()" [disabled]="!wrapService.isValueChange()">Revert</button>
+    <button mat-raised-button color="warn" (click)="reSync()" [disabled]="!authenticatorService.isLoginB">Re Sync</button>
+    <button mat-raised-button color="primary" (click)="saveLocally()" [disabled]="!wrapService.isValueChange()">Save locally</button>
+    <button mat-raised-button color="primary" (click)="saveToServer()" [disabled]="!authenticatorService.isLoginB">Save to Server</button>
+  </li>
+  <li *ngIf="mode === Mode.TREE">
+    <br>
+    <button mat-raised-button color="primary" (click)="toggleExpandAllTree()">{{expandAllTree ? 'Collapse All' : 'Expand All'}}</button>
+  </li>
+  <br>
+  <li *ngIf="mode === Mode.VIEW || mode === Mode.EDIT">
+    <app-wrap
+    *ngIf="currentWorkSpaceIndex >= 0"
+    [(wrapWorkspace)]="wrapService.wrapWorkspaces[currentWorkSpaceIndex]"
+    [(mode)]="mode"
+    ></app-wrap>
+  </li>
+  <li *ngIf="mode === Mode.JSON">
+    <app-wrap-json
+    [(wrapWorkspace)]="wrapService.wrapWorkspaces[currentWorkSpaceIndex]"
+    ></app-wrap-json>
+  </li>
+  <li *ngIf="mode === Mode.TREE">
+    <app-wrap-tree
+    [(wrapWorkspace)]="wrapService.wrapWorkspaces[currentWorkSpaceIndex]"
+    [expandAll]="expandAllTree"
+    ></app-wrap-tree>
+  </li>
+</ul>

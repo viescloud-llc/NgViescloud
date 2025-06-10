@@ -1,0 +1,76 @@
+/* Color palette */
+$primary-color: #3399ff;    /* Brighter blue for headings */
+$secondary-color: #6c757d;  /* Lighter gray for text */
+$accent-color: #20c997;     /* Bright teal accent */
+$border-color: #e0e0e0;     /* Very light gray for borders */
+$text-light: #adb5bd;       /* Light gray for text */
+
+/* Global styles */
+.policy-container {
+  width: 100%;              /* Full width */
+  max-width: 1200px;        /* Optional: to prevent overly wide content */
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  color: $secondary-color;
+  border-left: 1px solid $border-color;
+  border-right: 1px solid $border-color;
+
+  h1 {
+    font-size: 2.5rem;
+    color: $accent-color;
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  h2 {
+    font-size: 1.75rem;
+    color: $primary-color;
+    margin-top: 20px;
+    border-bottom: 2px solid $border-color;
+    padding-bottom: 10px;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+    color: $accent-color;
+    margin-top: 15px;
+  }
+
+  p {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: $secondary-color;
+    margin-bottom: 15px;
+  }
+
+  ul {
+    padding-left: 20px;
+    margin-bottom: 15px;
+
+    li {
+      margin-bottom: 10px;
+      font-size: 1rem;
+      color: $secondary-color;
+    }
+  }
+
+  a {
+    color: $primary-color;
+    text-decoration: underline;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
+  .policy-section {
+    margin-bottom: 30px;
+    padding: 15px;
+    border-top: 1px solid $border-color;
+    border-bottom: 1px solid $border-color;
+    &:first-of-type {
+      border-top: none;
+    }
+  }
+}
