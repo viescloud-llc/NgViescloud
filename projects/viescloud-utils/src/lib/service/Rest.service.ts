@@ -9,10 +9,16 @@ import { ObjectDialog, ObjectDialogData } from "../dialog/object-dialog/object-d
 import { Injectable } from "@angular/core";
 import { RxJSUtils } from "../util/RxJS.utils";
 import { HttpParamsBuilder } from "../model/Utils.model";
+import { RouteUtils } from "../util/Route.utils";
 
 export abstract class ViesService {
+
+    constructor(protected httpClient: HttpClient) {
+
+    }
+
     protected getURI(): string {
-        return environment.gateway_api;
+        return ViesService.getUri();
     }
 
     protected abstract getPrefixes(): string[];
@@ -29,6 +35,20 @@ export abstract class ViesService {
     public getPrefixUri(): string {
         return `${this.getURI()}${this.getPrefixPath()}`;
     }
+
+    static getParseUri() {
+        if(environment.gateway_detection === 'static')
+            return RouteUtils.parseUrl(environment.gateway_api);
+        else
+            return RouteUtils.getCurrentSchemasHostPortParsed();    
+    }
+
+    static getUri() {
+        if(environment.gateway_detection === 'static')
+            return environment.gateway_api;
+        else
+            return RouteUtils.getCurrentSchemasHostPort();
+    }
 }
 
 @Injectable({
@@ -36,8 +56,8 @@ export abstract class ViesService {
 })
 export abstract class ViesRestService<T extends Object> extends ViesService {
 
-    constructor(protected httpClient: HttpClient) {
-        super();
+    constructor(httpClient: HttpClient) {
+        super(httpClient);
     }
 
     public getAnyMatch(object: T): Observable<T[]> {

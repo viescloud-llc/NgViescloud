@@ -10,23 +10,23 @@ import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 export abstract class EnsibleService extends ViesService {
 
   constructor(
-    protected httpClient: HttpClient
+    httpClient: HttpClient
   ) {
-    super();
+    super(httpClient);
   }
 
   protected override getURI(): string {
     return EnsibleService.getUri();
   }
 
-  static getParseUri() {
+  static override getParseUri() {
     if(ensibleEnvironment.env === 'prod')
       return RouteUtils.getCurrentSchemasHostPortParsed();
     else
       return RouteUtils.parseUrl(ensibleEnvironment.api);
   }
 
-  static getUri() {
+  static override getUri() {
     if(ensibleEnvironment.env === 'prod')
       return RouteUtils.getCurrentSchemasHostPort();
     else
