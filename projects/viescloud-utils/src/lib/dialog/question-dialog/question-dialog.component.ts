@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { VGameService } from '../../service/VGame.service';
+import { VGameService } from '../../service/v-game.service';
 import { Question } from '../../model/VGame.model';
 import { first } from 'rxjs';
 

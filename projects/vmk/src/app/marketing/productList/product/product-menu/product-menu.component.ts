@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { UtilsService } from 'projects/viescloud-utils/src/lib/service/Utils.service';
+import { UtilsService } from 'projects/viescloud-utils/src/lib/service/utils.service';
 import { QuickSideDrawerMenu } from 'projects/viescloud-utils/src/lib/share-component/quick-side-drawer-menu/quick-side-drawer-menu.component';
 import { ProductData } from '../data/product-data.service';
-import { PinterestOathTokenService } from 'projects/viescloud-utils/src/lib/service/AffiliateMarketing.service';
+import { PinterestOathTokenService } from 'projects/viescloud-utils/src/lib/service/affiliateMarketing.service';
 
 @Component({
   selector: 'app-product-menu',

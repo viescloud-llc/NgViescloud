@@ -7,8 +7,8 @@ import { InputDialog } from 'projects/viescloud-utils/src/lib/dialog/input-dialo
 import { LobbyDialog } from 'projects/viescloud-utils/src/lib/dialog/lobby-dialog/lobby-dialog.component';
 import { Player, User } from 'projects/viescloud-utils/src/lib/model/Authenticator.model';
 import { Lobby, Message } from 'projects/viescloud-utils/src/lib/model/VGame.model';
-import { AuthenticatorService } from 'projects/viescloud-utils/src/lib/service/Authenticator.service';
-import { VGameService } from 'projects/viescloud-utils/src/lib/service/VGame.service';
+import { AuthenticatorService } from 'projects/viescloud-utils/src/lib/service/authenticator.service';
+import { VGameService } from 'projects/viescloud-utils/src/lib/service/v-game.service';
 
 @Component({
   selector: 'app-lobby-detail',

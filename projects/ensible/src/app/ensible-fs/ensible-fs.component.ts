@@ -13,7 +13,7 @@ import { EnsibleWorkSpace } from '../model/ensible.parser.model';
 import { CodeEditorComponent } from 'projects/viescloud-utils/src/lib/util-component/code-editor/code-editor.component';
 import { CanDeactivateGuard, ComponentCanDeactivate } from 'projects/viescloud-utils/src/lib/guards/auth.guard';
 import { firstValueFrom, Observable } from 'rxjs';
-import { KeyCaptureEvent, KeyCaptureService } from 'projects/viescloud-utils/src/lib/service/KeyCapture.service';
+import { KeyCaptureEvent, KeyCaptureService } from 'projects/viescloud-utils/src/lib/service/key-capture.service';
 
 enum FileType {
   INVENTORY = 'inventory',

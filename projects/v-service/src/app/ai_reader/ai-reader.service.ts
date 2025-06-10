@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { NgxExtendedPdfViewerService, TextLayerRenderedEvent} from 'ngx-extended-pdf-viewer';
-import { RaphaelTTSServiceV1 } from 'projects/viescloud-utils/src/lib/service/Raphael.service';
-import { UtilsService } from 'projects/viescloud-utils/src/lib/service/Utils.service';
+import { RaphaelTTSServiceV1 } from 'projects/viescloud-utils/src/lib/service/raphael.service';
+import { UtilsService } from 'projects/viescloud-utils/src/lib/service/utils.service';
 
 export class Speak {
   sentence: string = '';

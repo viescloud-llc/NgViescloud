@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'projects/environments/environment.prod';
 import { first, Observable, pipe, UnaryFunction } from 'rxjs';
-import { UtilsService, VFile } from './Utils.service';
+import { UtilsService, VFile } from './utils.service';
 import { Metadata } from '../model/ObjectStorageManager.model';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';

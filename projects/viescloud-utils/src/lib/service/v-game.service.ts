@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Lobby, Message, Question } from '../model/VGame.model';
-import { SettingService } from './Setting.service';
+import { SettingService } from './setting.service';
 import HttpClientUtils from '../model/HttpClientUtils.model';
 
 @Injectable({

@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfigModel, JobRequest } from 'projects/viescloud-utils/src/lib/model/Venkins.model';
-import { UtilsService } from 'projects/viescloud-utils/src/lib/service/Utils.service';
-import { VenkinsService } from 'projects/viescloud-utils/src/lib/service/Venkins.service';
+import { UtilsService } from 'projects/viescloud-utils/src/lib/service/utils.service';
+import { VenkinsService } from 'projects/viescloud-utils/src/lib/service/venkins.service';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 import { PopupUtils } from 'projects/viescloud-utils/src/lib/util/Popup.utils';
 import { ReflectionUtils } from 'projects/viescloud-utils/src/lib/util/Reflection.utils';

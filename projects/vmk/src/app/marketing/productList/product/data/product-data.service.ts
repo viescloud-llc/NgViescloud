@@ -4,9 +4,9 @@ import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-d
 import { ObjectDialogData, ObjectDialog } from 'projects/viescloud-utils/src/lib/dialog/object-dialog/object-dialog.component';
 import { Product, Category, FileLink } from 'projects/viescloud-utils/src/lib/model/AffiliateMarketing.model';
 import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
-import { ProductService, ProductCategoryService } from 'projects/viescloud-utils/src/lib/service/AffiliateMarketing.service';
-import { SmbService } from 'projects/viescloud-utils/src/lib/service/Smb.service';
-import { VFile, UtilsService } from 'projects/viescloud-utils/src/lib/service/Utils.service';
+import { ProductService, ProductCategoryService } from 'projects/viescloud-utils/src/lib/service/affiliateMarketing.service';
+import { SmbService } from 'projects/viescloud-utils/src/lib/service/smb.service';
+import { VFile, UtilsService } from 'projects/viescloud-utils/src/lib/service/utils.service';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 import { firstValueFrom } from 'rxjs';
 

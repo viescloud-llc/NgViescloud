@@ -1,7 +1,7 @@
 import { Component, EventEmitter, OnInit, Output, forwardRef } from '@angular/core';
-import { AuthenticatorService } from 'projects/viescloud-utils/src/lib/service/Authenticator.service';
-import { SettingService } from 'projects/viescloud-utils/src/lib/service/Setting.service';
-import { OpenIdService } from 'projects/viescloud-utils/src/lib/service/OpenId.service';
+import { AuthenticatorService } from 'projects/viescloud-utils/src/lib/service/authenticator.service';
+import { SettingService } from 'projects/viescloud-utils/src/lib/service/setting.service';
+import { OpenIdService } from 'projects/viescloud-utils/src/lib/service/open-id.service';
 import { SideDrawerMenuComponent } from 'projects/viescloud-utils/src/lib/share-component/side-drawer-menu/side-drawer-menu.component';
 
 @Component({

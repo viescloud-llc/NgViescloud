@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Category, Product, PinterestOathToken, RegisterMediaResponse, MediaResponse } from '../model/AffiliateMarketing.model';
 import { HttpClient } from '@angular/common/http';
-import { ViesRestService, ViesService } from './Rest.service';
+import { ViesRestService, ViesService } from './rest.service';
 import { Observable, first } from 'rxjs';
 import { environment } from 'projects/environments/environment.prod';
 import { DataUtils } from '../util/Data.utils';
 import { StringUtils } from '../util/String.utils';
 import { Router } from '@angular/router';
-import { VFile } from './Utils.service';
+import { VFile } from './utils.service';
 
 @Injectable({
   providedIn: 'root'

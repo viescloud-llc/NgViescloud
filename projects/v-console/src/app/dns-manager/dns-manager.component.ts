@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DnsRecord, NginxCertificate } from 'projects/viescloud-utils/src/lib/model/DnsManager.model';
-import { DnsManagerService } from 'projects/viescloud-utils/src/lib/service/DnsManager.service';
+import { DnsManagerService } from 'projects/viescloud-utils/src/lib/service/dns-manager.service';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';

@@ -1,7 +1,7 @@
 import { HttpEvent, HttpHandler, HttpHeaders, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AuthenticatorService } from '../service/Authenticator.service';
+import { AuthenticatorService } from '../service/authenticator.service';
 import { environment } from 'projects/environments/environment.prod';
 
 const headers = new HttpHeaders().set('content-type', 'application/json');

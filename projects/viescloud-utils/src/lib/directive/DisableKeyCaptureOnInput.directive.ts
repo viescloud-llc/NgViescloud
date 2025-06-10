@@ -1,5 +1,5 @@
 import { Directive, ElementRef, HostListener, OnDestroy } from '@angular/core';
-import { KeyCaptureService } from '../service/KeyCapture.service';
+import { KeyCaptureService } from '../service/key-capture.service';
 
 @Directive({
   selector: '[appDisableKeyCaptureOnInput]'

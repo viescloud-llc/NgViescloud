@@ -17,9 +17,9 @@ import { EnsibleItemRunComponent } from './item/ensible-item-run/ensible-item-ru
 import { EnsibleItemRunHistoryComponent } from './item/ensible-item-run-history/ensible-item-run-history.component';
 import { EnsibleItemTabComponent } from './item/ensible-item-tab/ensible-item-tab.component';
 import { EnsibleAnsibleCfgComponent } from './ensible-ansible-cfg/ensible-ansible-cfg.component';
-import { SettingService } from 'projects/viescloud-utils/src/lib/service/Setting.service';
+import { SettingService } from 'projects/viescloud-utils/src/lib/service/setting.service';
 import { EnsibleSettingService } from './service/ensible-setting/ensible-setting.service';
-import { S3StorageServiceV1 } from 'projects/viescloud-utils/src/lib/service/ObjectStorageManager.service';
+import { S3StorageServiceV1 } from 'projects/viescloud-utils/src/lib/service/object-storage-manager.service';
 import { EnsibleDatabaseObjectStorageService } from './service/ensible-database-object-storage/ensible-database-object-storage.service';
 import { EnsibleFsListComponent } from './ensible-fs-list/ensible-fs-list.component';
 import { EnsibleUserSettingComponent } from './ensible-user-setting/ensible-user-setting.component';

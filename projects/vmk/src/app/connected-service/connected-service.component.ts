@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
-import { PinterestOathTokenService } from 'projects/viescloud-utils/src/lib/service/AffiliateMarketing.service';
+import { PinterestOathTokenService } from 'projects/viescloud-utils/src/lib/service/affiliateMarketing.service';
 
 @Component({
   selector: 'app-connected-service',

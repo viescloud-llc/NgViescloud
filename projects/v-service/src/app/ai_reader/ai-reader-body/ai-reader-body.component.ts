@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AiReaderService } from '../ai-reader.service';
-import { SettingService } from 'projects/viescloud-utils/src/lib/service/Setting.service';
+import { SettingService } from 'projects/viescloud-utils/src/lib/service/setting.service';
 import { NgxExtendedPdfViewerService, pdfDefaultOptions } from 'ngx-extended-pdf-viewer';
 
 @Component({

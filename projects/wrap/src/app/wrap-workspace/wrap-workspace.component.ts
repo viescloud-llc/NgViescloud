@@ -8,11 +8,11 @@ import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
 import { PopupType } from 'projects/viescloud-utils/src/lib/model/Popup.model';
 import { WrapSetting } from 'projects/viescloud-utils/src/lib/model/Setting.model';
 import { WrapWorkspace } from 'projects/viescloud-utils/src/lib/model/Wrap.model';
-import { AuthenticatorService } from 'projects/viescloud-utils/src/lib/service/Authenticator.service';
-import { S3StorageServiceV1 } from 'projects/viescloud-utils/src/lib/service/ObjectStorageManager.service';
-import { SettingService } from 'projects/viescloud-utils/src/lib/service/Setting.service';
-import { UtilsService } from 'projects/viescloud-utils/src/lib/service/Utils.service';
-import { WrapService } from 'projects/viescloud-utils/src/lib/service/Wrap.service';
+import { AuthenticatorService } from 'projects/viescloud-utils/src/lib/service/authenticator.service';
+import { S3StorageServiceV1 } from 'projects/viescloud-utils/src/lib/service/object-storage-manager.service';
+import { SettingService } from 'projects/viescloud-utils/src/lib/service/setting.service';
+import { UtilsService } from 'projects/viescloud-utils/src/lib/service/utils.service';
+import { WrapService } from 'projects/viescloud-utils/src/lib/service/wrap.service';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 

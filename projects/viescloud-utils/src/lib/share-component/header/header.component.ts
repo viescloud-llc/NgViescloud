@@ -2,9 +2,9 @@ import { Component, Input, OnInit } from '@angular/core';
 import { MatDrawer } from '@angular/material/sidenav';
 import { first } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
-import { OpenIdService } from '../../service/OpenId.service';
-import { AuthenticatorService } from '../../service/Authenticator.service';
-import { SettingService } from '../../service/Setting.service';
+import { OpenIdService } from '../../service/open-id.service';
+import { AuthenticatorService } from '../../service/authenticator.service';
+import { SettingService } from '../../service/setting.service';
 
 export enum DRAWER_STATE {
   OPEN = 'open',

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { first } from 'rxjs';
 import { Question } from 'projects/viescloud-utils/src/lib/model/VGame.model';
-import { VGameService } from 'projects/viescloud-utils/src/lib/service/VGame.service';
+import { VGameService } from 'projects/viescloud-utils/src/lib/service/v-game.service';
 
 @Component({
   selector: 'app-general-questions',

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthenticatorService } from 'projects/viescloud-utils/src/lib/service/Authenticator.service';
-import { OpenIdService } from 'projects/viescloud-utils/src/lib/service/OpenId.service';
+import { AuthenticatorService } from 'projects/viescloud-utils/src/lib/service/authenticator.service';
+import { OpenIdService } from 'projects/viescloud-utils/src/lib/service/open-id.service';
 
 @Component({
   selector: 'app-side-drawer',

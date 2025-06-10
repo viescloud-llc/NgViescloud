@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { FixChangeDetection } from 'projects/viescloud-utils/src/lib/directive/FixChangeDetection';
 import { ConfigModel, MatConfigModel } from 'projects/viescloud-utils/src/lib/model/Venkins.model';
-import { UtilsService } from 'projects/viescloud-utils/src/lib/service/Utils.service';
-import { VenkinsService } from 'projects/viescloud-utils/src/lib/service/Venkins.service';
+import { UtilsService } from 'projects/viescloud-utils/src/lib/service/utils.service';
+import { VenkinsService } from 'projects/viescloud-utils/src/lib/service/venkins.service';
 import { first } from 'rxjs';
 
 @Component({

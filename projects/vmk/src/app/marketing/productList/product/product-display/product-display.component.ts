@@ -2,10 +2,10 @@ import { Component, DoCheck, EventEmitter, Input, OnChanges, OnInit, Output, Sim
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
 import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
-import { UtilsService, VFile } from 'projects/viescloud-utils/src/lib/service/Utils.service';
+import { UtilsService, VFile } from 'projects/viescloud-utils/src/lib/service/utils.service';
 import { ProductData } from '../data/product-data.service';
-import { SmbService } from 'projects/viescloud-utils/src/lib/service/Smb.service';
-import { SmbStorageServiceV1 } from 'projects/viescloud-utils/src/lib/service/ObjectStorageManager.service';
+import { SmbService } from 'projects/viescloud-utils/src/lib/service/smb.service';
+import { SmbStorageServiceV1 } from 'projects/viescloud-utils/src/lib/service/object-storage-manager.service';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 
 @Component({

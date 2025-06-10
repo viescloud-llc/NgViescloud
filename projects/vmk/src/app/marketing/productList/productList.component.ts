@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { Product } from 'projects/viescloud-utils/src/lib/model/AffiliateMarketing.model';
-import { ProductService } from 'projects/viescloud-utils/src/lib/service/AffiliateMarketing.service';
-import { UtilsService } from 'projects/viescloud-utils/src/lib/service/Utils.service';
+import { ProductService } from 'projects/viescloud-utils/src/lib/service/affiliateMarketing.service';
+import { UtilsService } from 'projects/viescloud-utils/src/lib/service/utils.service';
 
 @Component({
   selector: 'app-productList',

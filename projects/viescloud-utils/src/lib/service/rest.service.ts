@@ -1,7 +1,7 @@
 import { Observable, first, firstValueFrom, map } from "rxjs";
 import HttpClientUtils from "../model/HttpClientUtils.model";
 import { HttpClient } from "@angular/common/http";
-import { UtilsService } from "./Utils.service";
+import { UtilsService } from "./utils.service";
 import { environment } from "projects/environments/environment.prod";
 import { Pageable, PropertyMatcherEnum } from "../model/Mat.model";
 import { MatDialog } from "@angular/material/dialog";
@@ -60,25 +60,25 @@ export abstract class ViesRestService<T extends Object> extends ViesService {
         super(httpClient);
     }
 
-    public getAnyMatch(object: T): Observable<T[]> {
-        let params = HttpClientUtils.toHttpParams(object);
-        return this.httpClient.get<T[]>(`${this.getPrefixUri()}/match_any`, { params: params }).pipe(map(data => data ?? [])).pipe(first());
-    }
+    // public getAnyMatch(object: T): Observable<T[]> {
+    //     let params = HttpClientUtils.toHttpParams(object);
+    //     return this.httpClient.get<T[]>(`${this.getPrefixUri()}/match_any`, { params: params }).pipe(map(data => data ?? [])).pipe(first());
+    // }
 
-    public getAllMatch(object: T): Observable<T[]> {
-        let params = HttpClientUtils.toHttpParams(object);
-        return this.httpClient.get<T[]>(`${this.getPrefixUri()}/match_all`, { params: params }).pipe(map(data => data ?? [])).pipe(first());
-    }
+    // public getAllMatch(object: T): Observable<T[]> {
+    //     let params = HttpClientUtils.toHttpParams(object);
+    //     return this.httpClient.get<T[]>(`${this.getPrefixUri()}/match_all`, { params: params }).pipe(map(data => data ?? [])).pipe(first());
+    // }
 
-    public getAnyMatchWithMatchCase(object: T, matchCase: string | PropertyMatcherEnum): Observable<T[]> {
-        let params = HttpClientUtils.toHttpParams(object);
-        return this.httpClient.get<T[]>(`${this.getPrefixUri()}/match_any/${matchCase}`, { params: params }).pipe(first());
-    }
+    // public getAnyMatchWithMatchCase(object: T, matchCase: string | PropertyMatcherEnum): Observable<T[]> {
+    //     let params = HttpClientUtils.toHttpParams(object);
+    //     return this.httpClient.get<T[]>(`${this.getPrefixUri()}/match_any/${matchCase}`, { params: params }).pipe(first());
+    // }
 
-    public getAllMatchWithMatchCase(object: T, matchCase: string | PropertyMatcherEnum): Observable<T[]> {
-        let params = HttpClientUtils.toHttpParams(object);
-        return this.httpClient.get<T[]>(`${this.getPrefixUri()}/match_all/${matchCase}`, { params: params }).pipe(first());
-    }
+    // public getAllMatchWithMatchCase(object: T, matchCase: string | PropertyMatcherEnum): Observable<T[]> {
+    //     let params = HttpClientUtils.toHttpParams(object);
+    //     return this.httpClient.get<T[]>(`${this.getPrefixUri()}/match_all/${matchCase}`, { params: params }).pipe(first());
+    // }
 
     public getAll(): Observable<T[]> {
         return this.httpClient.get<T[]>(`${this.getPrefixUri()}`).pipe(map(data => data ?? [])).pipe(first());

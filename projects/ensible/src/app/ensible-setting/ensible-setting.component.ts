@@ -4,7 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
 import { GeneralSetting } from 'projects/viescloud-utils/src/lib/model/Setting.model';
 import { MatTheme } from 'projects/viescloud-utils/src/lib/model/theme.model';
-import { SettingService } from 'projects/viescloud-utils/src/lib/service/Setting.service';
+import { SettingService } from 'projects/viescloud-utils/src/lib/service/setting.service';
 import { ApplicationSettingComponent } from 'projects/viescloud-utils/src/lib/share-component/application-setting/application-setting.component';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';

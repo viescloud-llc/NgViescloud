@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ensibleEnvironment } from 'projects/environments/ensible-environment.prod';
-import { ViesRestService, ViesService } from 'projects/viescloud-utils/src/lib/service/Rest.service';
+import { ViesRestService, ViesService } from 'projects/viescloud-utils/src/lib/service/rest.service';
 import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 
 @Injectable({

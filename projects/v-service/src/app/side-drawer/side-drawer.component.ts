@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { SettingService } from 'projects/viescloud-utils/src/lib/service/Setting.service';
+import { SettingService } from 'projects/viescloud-utils/src/lib/service/setting.service';
 
 @Component({
   selector: 'app-side-drawer',

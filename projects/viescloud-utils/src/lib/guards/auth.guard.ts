@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, CanActivateChild, CanDeactivate, CanLoad, Route, Router, RouterStateSnapshot, UrlSegment, UrlTree } from '@angular/router';
 import { Observable, filter, map } from 'rxjs';
-import { AuthenticatorService } from '../service/Authenticator.service';
+import { AuthenticatorService } from '../service/authenticator.service';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogUtils } from '../util/Dialog.utils';
 

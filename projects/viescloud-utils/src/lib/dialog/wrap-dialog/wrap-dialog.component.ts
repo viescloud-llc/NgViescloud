@@ -1,7 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Wrap, WrapType } from '../../model/Wrap.model';
-import { UtilsService } from '../../service/Utils.service';
+import { UtilsService } from '../../service/utils.service';
 import { MatOption } from '../../model/Mat.model';
 import { FixChangeDetection } from '../../directive/FixChangeDetection';
 

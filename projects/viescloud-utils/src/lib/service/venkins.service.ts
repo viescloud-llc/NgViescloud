@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import HttpClientUtils from '../model/HttpClientUtils.model';
 import { HttpClient } from '@angular/common/http';
-import { SettingService } from './Setting.service';
+import { SettingService } from './setting.service';
 import { ConfigModel } from '../model/Venkins.model';
 
 @Injectable({

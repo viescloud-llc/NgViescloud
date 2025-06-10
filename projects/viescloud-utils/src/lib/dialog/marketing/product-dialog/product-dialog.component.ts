@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { Product, Category } from '../../../model/AffiliateMarketing.model';
-import { ProductCategoryService, ProductService } from '../../../service/AffiliateMarketing.service';
+import { ProductCategoryService, ProductService } from '../../../service/affiliateMarketing.service';
 import { ObjectDialog, ObjectDialogData } from '../../object-dialog/object-dialog.component';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatOption } from '../../../model/Mat.model';

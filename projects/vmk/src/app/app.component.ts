@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { AuthenticatorService } from 'projects/viescloud-utils/src/lib/service/Authenticator.service';
-import { KeyCaptureService } from 'projects/viescloud-utils/src/lib/service/KeyCapture.service';
-import { OpenIdService } from 'projects/viescloud-utils/src/lib/service/OpenId.service';
-import { SettingService } from 'projects/viescloud-utils/src/lib/service/Setting.service';
+import { AuthenticatorService } from 'projects/viescloud-utils/src/lib/service/authenticator.service';
+import { KeyCaptureService } from 'projects/viescloud-utils/src/lib/service/key-capture.service';
+import { OpenIdService } from 'projects/viescloud-utils/src/lib/service/open-id.service';
+import { SettingService } from 'projects/viescloud-utils/src/lib/service/setting.service';
 import { QuickSideDrawerMenu } from 'projects/viescloud-utils/src/lib/share-component/quick-side-drawer-menu/quick-side-drawer-menu.component';
 import { ViescloudApplication } from 'projects/viescloud-utils/src/lib/directive/ViescloudApplication.directive';
 import { ProductMenuComponent } from './marketing/productList/product/product-menu/product-menu.component';

@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Jwt, OpenIdRequest, Route, Swaggers, User, UserRole } from '../model/Authenticator.model';
-import { SettingService } from './Setting.service';
+import { SettingService } from './setting.service';
 import { Observable, Subject, first, interval } from 'rxjs';
 import { UsernameExistResponse } from '../model/Response.model';
 import { DateTime } from '../model/Mat.model';

@@ -7,7 +7,7 @@ import { SnackBarUtils } from "./SnackBar.utils";
 import { forwardRef, Inject, Injectable } from "@angular/core";
 import { PopupUtils } from "./Popup.utils";
 import { OverlayRef } from "@angular/cdk/overlay";
-import { AuthenticatorService } from "../service/Authenticator.service";
+import { AuthenticatorService } from "../service/authenticator.service";
 import { NotAuthenticatedError } from "../model/Error.model";
 
 @Injectable({

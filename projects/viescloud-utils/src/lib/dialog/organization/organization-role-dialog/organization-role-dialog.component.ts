@@ -3,7 +3,7 @@ import { ObjectDialog, ObjectDialogData } from '../../object-dialog/object-dialo
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { first } from 'rxjs';
 import { Organization, Role } from '../../../model/Organization.model';
-import { OrganizationService } from '../../../service/Organization.service';
+import { OrganizationService } from '../../../service/organization.service';
 
 @Component({
   selector: 'app-organization-role-dialog',

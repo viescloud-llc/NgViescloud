@@ -3,8 +3,8 @@ import { Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { InputDialog } from 'projects/viescloud-utils/src/lib/dialog/input-dialog/input-dialog.component';
 import { Route, UserRole } from 'projects/viescloud-utils/src/lib/model/Authenticator.model';
-import { AuthenticatorService } from 'projects/viescloud-utils/src/lib/service/Authenticator.service';
-import { UtilsService } from 'projects/viescloud-utils/src/lib/service/Utils.service';
+import { AuthenticatorService } from 'projects/viescloud-utils/src/lib/service/authenticator.service';
+import { UtilsService } from 'projects/viescloud-utils/src/lib/service/utils.service';
 import { first } from 'rxjs';
 
 interface RecommendPath {

@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { ViesRestService, ViesService } from "./Rest.service";
+import { ViesRestService, ViesService } from "./rest.service";
 import { DnsRecord, NginxCertificate } from "../model/DnsManager.model";
 import { Observable } from "rxjs";
 import { HttpClient, HttpParams } from "@angular/common/http";

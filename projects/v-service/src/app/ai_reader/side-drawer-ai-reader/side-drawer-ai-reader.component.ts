@@ -1,7 +1,7 @@
 import { Component, forwardRef } from '@angular/core';
 import { AiReaderService } from '../ai-reader.service';
-import { UtilsService } from 'projects/viescloud-utils/src/lib/service/Utils.service';
-import { RaphaelTTSServiceV1 } from 'projects/viescloud-utils/src/lib/service/Raphael.service';
+import { UtilsService } from 'projects/viescloud-utils/src/lib/service/utils.service';
+import { RaphaelTTSServiceV1 } from 'projects/viescloud-utils/src/lib/service/raphael.service';
 import { SideDrawerMenuComponent } from 'projects/viescloud-utils/src/lib/share-component/side-drawer-menu/side-drawer-menu.component';
 
 @Component({

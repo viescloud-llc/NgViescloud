@@ -7,13 +7,13 @@ import { ObjectDialog, ObjectDialogData } from 'projects/viescloud-utils/src/lib
 import { FixChangeDetection } from 'projects/viescloud-utils/src/lib/directive/FixChangeDetection';
 import { FileLink, Product, Category, PinRequest, PinterestPinData } from 'projects/viescloud-utils/src/lib/model/AffiliateMarketing.model';
 import { MatOption } from 'projects/viescloud-utils/src/lib/model/Mat.model';
-import { ProductCategoryService, ProductService } from 'projects/viescloud-utils/src/lib/service/AffiliateMarketing.service';
-import { SmbService } from 'projects/viescloud-utils/src/lib/service/Smb.service';
-import { VFile, UtilsService } from 'projects/viescloud-utils/src/lib/service/Utils.service';
+import { ProductCategoryService, ProductService } from 'projects/viescloud-utils/src/lib/service/affiliateMarketing.service';
+import { SmbService } from 'projects/viescloud-utils/src/lib/service/smb.service';
+import { VFile, UtilsService } from 'projects/viescloud-utils/src/lib/service/utils.service';
 import { ProductData } from './data/product-data.service';
 import { LoadingDialog } from 'projects/viescloud-utils/src/lib/dialog/loading-dialog/loading-dialog.component';
 import { QuickSideDrawerMenu } from 'projects/viescloud-utils/src/lib/share-component/quick-side-drawer-menu/quick-side-drawer-menu.component';
-import { QuickSideDrawerMenuService } from 'projects/viescloud-utils/src/lib/service/QuickSideDrawerMenu.service';
+import { QuickSideDrawerMenuService } from 'projects/viescloud-utils/src/lib/service/quick-side-drawer-menu.service';
 import { ProductMenuComponent } from './product-menu/product-menu.component';
 
 @Component({

@@ -7,7 +7,7 @@ import { WrapDialog } from 'projects/viescloud-utils/src/lib/dialog/wrap-dialog/
 import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
 import { WrapLinkDialog } from 'projects/viescloud-utils/src/lib/dialog/wrap-link-dialog/wrap-link-dialog.component';
 import { RgbColor } from 'projects/viescloud-utils/src/lib/model/Rgb.model';
-import { KeyCaptureService } from 'projects/viescloud-utils/src/lib/service/KeyCapture.service';
+import { KeyCaptureService } from 'projects/viescloud-utils/src/lib/service/key-capture.service';
 import { Subscription } from 'rxjs';
 import { ExpiableMap } from 'projects/viescloud-utils/src/lib/model/ExpirableMap.model';
 import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';

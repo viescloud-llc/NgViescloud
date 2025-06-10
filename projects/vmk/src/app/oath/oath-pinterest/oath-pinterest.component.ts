@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { PinterestOathTokenService } from 'projects/viescloud-utils/src/lib/service/AffiliateMarketing.service';
-import { UtilsService } from 'projects/viescloud-utils/src/lib/service/Utils.service';
+import { PinterestOathTokenService } from 'projects/viescloud-utils/src/lib/service/affiliateMarketing.service';
+import { UtilsService } from 'projects/viescloud-utils/src/lib/service/utils.service';
 
 @Component({
   selector: 'app-oath-pinterest',

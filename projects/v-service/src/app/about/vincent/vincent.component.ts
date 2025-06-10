@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { SettingService } from 'projects/viescloud-utils/src/lib/service/Setting.service';
+import { SettingService } from 'projects/viescloud-utils/src/lib/service/setting.service';
 
 @Component({
   selector: 'app-vincent',

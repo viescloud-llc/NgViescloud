@@ -1,12 +1,12 @@
 import { AfterContentInit, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { Category, FileLink, PinRequest, Product } from 'projects/viescloud-utils/src/lib/model/AffiliateMarketing.model';
-import { UtilsService, VFile } from 'projects/viescloud-utils/src/lib/service/Utils.service';
+import { UtilsService, VFile } from 'projects/viescloud-utils/src/lib/service/utils.service';
 import { ProductData } from '../data/product-data.service';
 import { firstValueFrom } from 'rxjs';
-import { ProductService, ProductCategoryService } from 'projects/viescloud-utils/src/lib/service/AffiliateMarketing.service';
+import { ProductService, ProductCategoryService } from 'projects/viescloud-utils/src/lib/service/affiliateMarketing.service';
 import { Router } from '@angular/router';
-import { QuickSideDrawerMenuService } from 'projects/viescloud-utils/src/lib/service/QuickSideDrawerMenu.service';
-import { S3StorageServiceV1 } from 'projects/viescloud-utils/src/lib/service/ObjectStorageManager.service';
+import { QuickSideDrawerMenuService } from 'projects/viescloud-utils/src/lib/service/quick-side-drawer-menu.service';
+import { S3StorageServiceV1 } from 'projects/viescloud-utils/src/lib/service/object-storage-manager.service';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';

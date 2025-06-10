@@ -1,5 +1,5 @@
 import { EnsibleService } from '../ensible/ensible.service';
-import { DatabaseStorageServiceV1 } from './../../../../../viescloud-utils/src/lib/service/ObjectStorageManager.service';
+import { DatabaseStorageServiceV1 } from '../../../../../viescloud-utils/src/lib/service/object-storage-manager.service';
 import { Injectable } from '@angular/core';
 
 @Injectable({
