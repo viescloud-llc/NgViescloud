@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, CanActivateChild, CanDeactivate, CanLoad, Route, Router, RouterStateSnapshot, UrlSegment, UrlTree } from '@angular/router';
-import { Observable, filter, map, take } from 'rxjs';
+import { Observable, delay, filter, map, of, race, switchMap, take, tap, timer } from 'rxjs';
 import { AuthenticatorService } from '../service/authenticator.service';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogUtils } from '../util/Dialog.utils';
@@ -11,14 +11,32 @@ import { environment } from 'projects/environments/environment.prod';
 })
 export class AuthGuard /*, CanActivateChild, CanDeactivate<unknown>, CanLoad */
 {
+  firstStarted = true;
+  
   constructor(
     private authenticatorService: AuthenticatorService, 
     private router: Router,
     private dialogUtils: DialogUtils
   ){}
 
+  delayUntilEither<T>(
+    cancel$: Observable<any>,
+    maxDelayMs: number
+  ) {
+    return (source: Observable<T>) => source.pipe(
+      switchMap(value =>
+        race([
+          timer(maxDelayMs),
+          cancel$
+        ]).pipe(switchMap(() => of(value)))
+      )
+    );
+  }
+
   isLogin(): Observable<boolean> | Promise<boolean> | boolean {
     return this.authenticatorService.isAuthenticated.pipe(
+      this.delayUntilEither(this.authenticatorService.isAuthenticated, this.firstStarted ? 5000 : 0),
+      tap(() => this.firstStarted = false),
       take(1),
       map(isAuthenticated => {
         if (!isAuthenticated) {
@@ -31,16 +49,7 @@ export class AuthGuard /*, CanActivateChild, CanDeactivate<unknown>, CanLoad */
   }
 
   isChildLogin(): Observable<boolean> | Promise<boolean> | boolean {
-    return this.authenticatorService.isAuthenticated.pipe(
-      take(1),
-      map(isAuthenticated => {
-        if (!isAuthenticated) {
-          this.router.navigate([environment.endpoint_login]);
-          return false;
-        }
-        return true;
-      })
-    );
+    return this.isLogin();
   }
 
   isLoginWithRole(role: string): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
