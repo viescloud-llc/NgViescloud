@@ -4,7 +4,6 @@ import { GeneralSetting } from '../../model/setting.model';
 import { AuthenticatorService } from '../../service/authenticator.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialog } from '../../dialog/confirm-dialog/confirm-dialog.component';
-import { UtilsService } from '../../service/utils.service';
 import { DataUtils } from '../../util/Data.utils';
 
 @Component({

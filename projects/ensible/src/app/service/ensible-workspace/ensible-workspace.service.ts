@@ -1,19 +1,20 @@
-import { RxJSUtils } from './../../../../../viescloud-utils/src/lib/util/RxJS.utils';
 import { EnsibleItemTrigger, EnsiblePlaybookLogger, EnsiblePlayBookTrigger, EnsibleProcessLogger, EnsibleShellLogger, EnsibleShellTrigger } from './../../model/ensible.model';
 import { Injectable } from '@angular/core';
-import { EnsibleService } from '../ensible/ensible.service';
-import { HttpClient, HttpParams } from '@angular/common/http';
 import { first, firstValueFrom, Observable, Subject } from 'rxjs';
 import { FSNode, FSTree } from '../../model/ensible.model';
-import { EnsibleFs, EnsibleRole, EnsibleFsDir, EnsibleWorkSpace } from '../../model/ensible.parser.model';
-import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
-import { MatOption } from 'projects/viescloud-utils/src/lib/model/mat.model';
 import { HttpParamsBuilder } from 'projects/viescloud-utils/src/lib/model/utils.model';
+import { ViesService } from 'projects/viescloud-utils/src/lib/service/rest.service';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
-export abstract class EnsibleWorkspaceService<T extends EnsibleItemTrigger, PL extends EnsibleProcessLogger> extends EnsibleService {
+export abstract class EnsibleWorkspaceService<T extends EnsibleItemTrigger, PL extends EnsibleProcessLogger> extends ViesService {
+  
+  constructor(httpClient: HttpClient) {
+    super(httpClient);
+  }
+
   abstract runCommand(itemTrigger: T): Observable<string>;
   runCommandAndGetLog(itemTrigger: T):  Observable<PL> {
     let params = new HttpParamsBuilder();

@@ -1,5 +1,5 @@
-import { EnsibleAuthenticatorService } from './../service/ensible-authenticator/ensible-authenticator.service';
 import { Component } from '@angular/core';
+import { AuthenticatorService } from 'projects/viescloud-utils/src/lib/service/authenticator.service';
 
 @Component({
   selector: 'app-home',
@@ -8,6 +8,6 @@ import { Component } from '@angular/core';
 })
 export class HomeComponent {
   constructor(
-    public ensibleAuthenticatorService: EnsibleAuthenticatorService
+    public ensibleAuthenticatorService: AuthenticatorService
   ) { }
 }

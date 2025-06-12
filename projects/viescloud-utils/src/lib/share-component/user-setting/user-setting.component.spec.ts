@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { EnsibleUserComponent } from './ensible-user.component';
+import { UserSettingComponent } from './user-setting.component';
 
-describe('ensibleuser Component', () => {
-  let component: EnsibleUserComponent;
-  let fixture: ComponentFixture<EnsibleUserComponent>;
+describe('UserSetting Component', () => {
+  let component: UserSettingComponent;
+  let fixture: ComponentFixture<UserSettingComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ EnsibleUserComponent ]
+      declarations: [ UserSettingComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(EnsibleUserComponent);
+    fixture = TestBed.createComponent(UserSettingComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

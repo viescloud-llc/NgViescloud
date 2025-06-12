@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { EnsibleUserAccessComponent } from './ensible-user-access.component';
+import { UserGroupListComponent } from './user-group-list.component';
 
-describe('EnsibleUserAccess Component', () => {
-  let component: EnsibleUserAccessComponent;
-  let fixture: ComponentFixture<EnsibleUserAccessComponent>;
+describe('UserGroupList Component', () => {
+  let component: UserGroupListComponent;
+  let fixture: ComponentFixture<UserGroupListComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ EnsibleUserAccessComponent ]
+      declarations: [ UserGroupListComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(EnsibleUserAccessComponent);
+    fixture = TestBed.createComponent(UserGroupListComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

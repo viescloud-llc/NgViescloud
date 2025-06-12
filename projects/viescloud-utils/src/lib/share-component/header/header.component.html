@@ -11,6 +11,6 @@
   [copyValue]="getURL()"
   matIcon="share"
   ></app-copy-to-clipboard-util>
-  <span *ngIf="!authenticatorService.isLoginB" style="cursor: pointer;" (click)="openIdService.authorizeFlow()">Login</span>
-  <span *ngIf="authenticatorService.isLoginB" style="cursor: pointer;" (click)="logout()">Logout</span>
+  <span *ngIf="!authenticatorService.isAuthenticatedSync()" style="cursor: pointer;" (click)="login()">Login</span>
+  <span *ngIf="authenticatorService.isAuthenticatedSync()" style="cursor: pointer;" (click)="logout()">Logout</span>
 </mat-toolbar>

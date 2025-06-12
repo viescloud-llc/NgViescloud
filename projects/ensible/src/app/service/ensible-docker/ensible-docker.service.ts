@@ -1,15 +1,15 @@
 import { RxJSUtils } from './../../../../../viescloud-utils/src/lib/util/RxJS.utils';
 import { Injectable } from '@angular/core';
-import { EnsibleService } from '../ensible/ensible.service';
 import { firstValueFrom } from 'rxjs';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { EnsibleDockerContainer, EnsibleItemTypeEnum } from '../../model/ensible.model';
 import { HttpParamsBuilder } from 'projects/viescloud-utils/src/lib/model/utils.model';
+import { ViesService } from 'projects/viescloud-utils/src/lib/service/rest.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class EnsibleDockerService extends EnsibleService {
+export class EnsibleDockerService extends ViesService {
 
   constructor(
     httpClient: HttpClient,

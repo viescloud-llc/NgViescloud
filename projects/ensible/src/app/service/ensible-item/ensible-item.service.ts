@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
-import { EnsibleRestService } from '../ensible/ensible.service';
 import { EnsibleItem, EnsiblePlaybookItem, EnsibleShellItem } from '../../model/ensible.model';
 import { HttpParamsBuilder } from 'projects/viescloud-utils/src/lib/model/utils.model';
 import { first, map, retry } from 'rxjs';
 import { PathNode } from 'projects/viescloud-utils/src/lib/model/vies.model';
+import { ViesRestService } from 'projects/viescloud-utils/src/lib/service/rest.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export abstract class EnsibleItemService<T extends EnsibleItem> extends EnsibleRestService<T> {
+export abstract class EnsibleItemService<T extends EnsibleItem> extends ViesRestService<T> {
   abstract newEmptyItem(): T;
 
   getItemByPath(path: string) {

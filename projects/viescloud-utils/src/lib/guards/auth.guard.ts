@@ -1,59 +1,54 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, CanActivateChild, CanDeactivate, CanLoad, Route, Router, RouterStateSnapshot, UrlSegment, UrlTree } from '@angular/router';
-import { Observable, filter, map } from 'rxjs';
+import { Observable, filter, map, take } from 'rxjs';
 import { AuthenticatorService } from '../service/authenticator.service';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogUtils } from '../util/Dialog.utils';
+import { environment } from 'projects/environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthGuard /*, CanActivateChild, CanDeactivate<unknown>, CanLoad */
 {
-  constructor(private authenticatorService: AuthenticatorService, private router: Router){}
+  constructor(
+    private authenticatorService: AuthenticatorService, 
+    private router: Router,
+    private dialogUtils: DialogUtils
+  ){}
 
   isLogin(): Observable<boolean> | Promise<boolean> | boolean {
-    if(!this.authenticatorService.getJwt())
-      return false;
-
-    return this.authenticatorService.getCurrentLoginUser().pipe(
-    map(user => {
-      return user ? true : false;
-    }));
+    return this.authenticatorService.isAuthenticated.pipe(
+      take(1),
+      map(isAuthenticated => {
+        if (!isAuthenticated) {
+          this.router.navigate([environment.endpoint_login]);
+          return false;
+        }
+        return true;
+      })
+    );
   }
 
   isChildLogin(): Observable<boolean> | Promise<boolean> | boolean {
-    if(!this.authenticatorService.getJwt())
-      return false;
-
-    return this.authenticatorService.getCurrentLoginUser().pipe(
-    map(user => {
-      return user ? true : false;
-    }));
+    return this.authenticatorService.isAuthenticated.pipe(
+      take(1),
+      map(isAuthenticated => {
+        if (!isAuthenticated) {
+          this.router.navigate([environment.endpoint_login]);
+          return false;
+        }
+        return true;
+      })
+    );
   }
 
   isLoginWithRole(role: string): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-    if(!this.authenticatorService.getJwt())
-      return false;
-
-    return this.authenticatorService.getCurrentLoginUser().pipe(
-    map(user => {
-      let isLogin = user ? true : false;
-      let matchUserRole = this.authenticatorService.currentUser!.userRoles!.some(u => u.name?.toUpperCase() === role.toUpperCase());
-      return isLogin && matchUserRole;
-    }));
+    return this.authenticatorService.isAuthenticatedWithUserGroup$(role);
   }
 
   isChildLoginWithRole(role: string): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-    if(!this.authenticatorService.getJwt())
-    return false;
-
-    return this.authenticatorService.getCurrentLoginUser().pipe(
-    map(user => {
-      let isLogin = user ? true : false;
-      let matchUserRole = this.authenticatorService.currentUser!.userRoles!.some(u => u.name?.toUpperCase() === role.toUpperCase());
-      return isLogin && matchUserRole;
-    }));
+    return this.authenticatorService.isAuthenticatedWithUserGroup$(role);
   }
 
   canActivate(

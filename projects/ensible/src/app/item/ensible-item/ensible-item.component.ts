@@ -6,17 +6,15 @@ import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 import { Router } from '@angular/router';
-import { EnsibleService } from '../../service/ensible/ensible.service';
 import { StringUtils } from 'projects/viescloud-utils/src/lib/util/String.utils';
 import { EnsibleDockerContainerTemplateService } from '../../service/ensible-docker-container-template/ensible-docker-container-template.service';
 import { MatOption } from 'projects/viescloud-utils/src/lib/model/mat.model';
 import { UserAccessInputType } from 'projects/viescloud-utils/src/lib/util-component/mat-form-field-input-user-access/mat-form-field-input-user-access.component';
 import { FileUtils } from 'projects/viescloud-utils/src/lib/util/File.utils';
-import { ReflectionUtils } from 'projects/viescloud-utils/src/lib/util/Reflection.utils';
 import { EnsibleFsService } from '../../service/ensible-fs/ensible-fs.service';
-import { EnsibleItemService, EnsiblePlaybookItemService, EnsibleShellItemService } from '../../service/ensible-item/ensible-item.service';
-import { EnsibleItemServiceType, EnsibleItemType } from '../ensible-item-tab/ensible-item-tab.component';
+import { EnsibleItemService } from '../../service/ensible-item/ensible-item.service';
 import { MatFormFieldComponent } from 'projects/viescloud-utils/src/lib/util-component/mat-form-field/mat-form-field.component';
+import { ViesService } from 'projects/viescloud-utils/src/lib/service/rest.service';
 
 @Component({
   selector: 'app-ensible-item',
@@ -183,15 +181,15 @@ export class EnsibleItemComponent<T extends EnsibleItem> implements OnChanges, O
   }
 
   getGithubWebhookUrl() {
-    return EnsibleService.getUri() + '/api/v1/webhooks/github';
+    return ViesService.getUri() + '/api/v1/webhooks/github';
   }
 
   getGitlabWebhookUrl() {
-    return EnsibleService.getUri() + '/api/v1/webhooks/gitlab';
+    return ViesService.getUri() + '/api/v1/webhooks/gitlab';
   }
 
   getBuildStatusUrl() {
-    return `<iframe src="${EnsibleService.getUri()}/api/v1/playbook/loggers/item/${this.item.id}/status/html" width="100%" ></iframe>`;
+    return `<iframe src="${ViesService.getUri()}/api/v1/playbook/loggers/item/${this.item.id}/status/html" width="100%" ></iframe>`;
   }
 
   formatValidPath(path: string) {

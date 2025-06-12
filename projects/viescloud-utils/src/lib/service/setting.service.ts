@@ -9,7 +9,6 @@ import { MatTheme } from '../model/theme.model';
 import { AuthenticatorService } from './authenticator.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConfirmDialog } from '../dialog/confirm-dialog/confirm-dialog.component';
-import { OpenIdService } from './open-id.service';
 import { PopupType } from '../model/popup.model';
 import { RxJSUtils } from '../util/RxJS.utils';
 import { DataUtils } from '../util/Data.utils';
@@ -18,6 +17,7 @@ import { StringUtils } from '../util/String.utils';
 import { Subject } from 'rxjs';
 import { RouteUtils } from '../util/Route.utils';
 import { HeaderMinimalComponent } from '../share-component/header-minimal/header-minimal.component';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -44,10 +44,10 @@ export class SettingService {
   matThemeOptions = DataUtils.getEnumMatOptions(MatTheme);
 
   constructor(
-    private s3StorageService: S3StorageServiceV1,
+    protected s3StorageService: S3StorageServiceV1,
     protected matDialog: MatDialog,
     protected snackBar: MatSnackBar,
-    private openIdService: OpenIdService
+    protected router: Router
   ) { }
 
   initMinimal(prefix: string) {
@@ -84,20 +84,20 @@ export class SettingService {
       this.authenticatorService = authenticatorService;
 
       if(this.onLoginSubscription == null) {
-        this.onLoginSubscription = authenticatorService.onLogin$.subscribe({
-          next: () => {
+        this.onLoginSubscription = authenticatorService.onLogin(
+          () => {
             this.syncFromServer(prefix);
           }
-        });
+        );
       }
 
       if(this.onTimeoutLogoutSubscription == null) {
-        this.onTimeoutLogoutSubscription = authenticatorService.onTimeoutLogout$.subscribe({
-          next: () => {
+        this.onTimeoutLogoutSubscription = authenticatorService.onTimeoutLogout(
+          () => {
             if(this.generalSetting.promptLoginWhenTimeoutLogout)
               this.promptLoginWhenTimeoutLogout();
           }
-        });
+        );
       }
     }
   }
@@ -210,7 +210,7 @@ export class SettingService {
     dialog.afterClosed().subscribe({
       next: res => {
         if(res) {
-          this.openIdService.authorizeFlow();
+          this.router.navigate([environment.endpoint_login])
         }
       }
     })

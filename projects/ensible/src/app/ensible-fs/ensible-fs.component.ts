@@ -14,6 +14,7 @@ import { CodeEditorComponent } from 'projects/viescloud-utils/src/lib/util-compo
 import { CanDeactivateGuard, ComponentCanDeactivate } from 'projects/viescloud-utils/src/lib/guards/auth.guard';
 import { firstValueFrom, Observable } from 'rxjs';
 import { KeyCaptureEvent, KeyCaptureService } from 'projects/viescloud-utils/src/lib/service/key-capture.service';
+import { environment } from 'projects/environments/environment.prod';
 
 enum FileType {
   INVENTORY = 'inventory',
@@ -281,7 +282,7 @@ export class EnsibleFsComponent extends RouteChangeSubcribe implements OnChanges
       this.ensibleFsService.deleteFile(this.getFullPath()).pipe(this.rxJSUtils.waitLoadingDialog()).subscribe({
         next: () => {
           this.ensibleFsService.triggerFetchWorkspace();
-          this.navigate('home');
+          this.navigate(environment.endpoint_home);
         },
         error: (err) => {
           this.dialogUtils.openErrorMessage("Error", "Error when deleting file");

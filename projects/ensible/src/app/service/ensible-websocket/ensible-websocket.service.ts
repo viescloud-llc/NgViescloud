@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
 import { RxStomp, RxStompConfig } from '@stomp/rx-stomp';
-import { ensibleEnvironment } from 'projects/environments/ensible-environment.prod';
-import { EnsibleAuthenticatorService } from '../ensible-authenticator/ensible-authenticator.service';
-import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
-import { EnsibleService } from '../ensible/ensible.service';
+import { AuthenticatorService } from 'projects/viescloud-utils/src/lib/service/authenticator.service';
+import { ViesService } from 'projects/viescloud-utils/src/lib/service/rest.service';
 
 export const defaultRxStompConfig: RxStompConfig = {
   // Which server?
@@ -40,7 +38,7 @@ export class EnsibleWebsocketService extends RxStomp {
   private topicPrefix = '/api/v1/topic'
 
   constructor(
-    private ensibleAuthenticator: EnsibleAuthenticatorService
+    private ensibleAuthenticator: AuthenticatorService
   ) {
     super();
   }
@@ -50,10 +48,10 @@ export class EnsibleWebsocketService extends RxStomp {
       return;
     }
 
-    let uri = EnsibleService.getParseUri();
+    let uri = ViesService.getParseUri();
     let config = structuredClone(defaultRxStompConfig);
     // config.brokerURL = `ws://${uri?.host}${uri?.port ? `:${uri?.port}` : ''}/api/v1/ws`;
-    config.brokerURL = `${uri.schema === 'http' ? 'ws' : 'wss'}://${uri?.host}${uri?.port ? `:${uri?.port}` : ''}/api/v1/ws?token=${this.ensibleAuthenticator.getToken()}`;
+    config.brokerURL = `${uri.schema === 'http' ? 'ws' : 'wss'}://${uri?.host}${uri?.port ? `:${uri?.port}` : ''}/api/v1/ws?token=${this.ensibleAuthenticator.currentJwtToken}`;
     // config.connectHeaders = {
     //   'Authorization': `Bearer ${this.ensibleAuthenticator.getToken()}`
     // }

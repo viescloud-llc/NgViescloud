@@ -1,4 +1,3 @@
-import { EnsibleAuthenticatorService } from './../service/ensible-authenticator/ensible-authenticator.service';
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialog } from 'projects/viescloud-utils/src/lib/dialog/confirm-dialog/confirm-dialog.component';
@@ -11,6 +10,7 @@ import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils'
 import { EnsibleSetting } from '../model/ensible.setting.model';
 import { EnsibleSettingService } from '../service/ensible-setting/ensible-setting.service';
 import { EnsibleFsService } from '../service/ensible-fs/ensible-fs.service';
+import { AuthenticatorService } from 'projects/viescloud-utils/src/lib/service/authenticator.service';
 
 @Component({
   selector: 'app-ensible-setting',
@@ -25,7 +25,7 @@ export class EnsibleSettingComponent implements OnInit {
 
   constructor(
     public settingService: EnsibleSettingService,
-    public ensibleAuthenticatorService: EnsibleAuthenticatorService,
+    public ensibleAuthenticatorService: AuthenticatorService,
     private matDialog: MatDialog,
     private ensibleFsService: EnsibleFsService
   ) {

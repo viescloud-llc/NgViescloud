@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { EnsibleService } from '../ensible/ensible.service';
 import { EnsibleFsStatusResponse, FSNode, FSTree, FsWriteMode } from '../../model/ensible.model';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { first, Observable, Subject } from 'rxjs';
@@ -7,11 +6,12 @@ import { EnsibleFs, EnsibleFsDir, EnsibleRole, EnsibleWorkSpace } from '../../mo
 import { MatOption } from 'projects/viescloud-utils/src/lib/model/mat.model';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
+import { ViesService } from 'projects/viescloud-utils/src/lib/service/rest.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class EnsibleFsService extends EnsibleService {
+export class EnsibleFsService extends ViesService {
 
   private onFetchWorkspaceSubject = new Subject<EnsibleWorkSpace>();
   onFetchWorkspace$ = this.onFetchWorkspaceSubject.asObservable();

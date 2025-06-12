@@ -1,14 +1,14 @@
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
-import { EnsibleAuthenticatorService } from './../service/ensible-authenticator/ensible-authenticator.service';
 import { Component, OnInit } from '@angular/core';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
+import { AuthenticatorService } from 'projects/viescloud-utils/src/lib/service/authenticator.service';
 
 @Component({
-  selector: 'app-ensible-user-setting',
-  templateUrl: './ensible-user-setting.component.html',
-  styleUrls: ['./ensible-user-setting.component.scss']
+  selector: 'app-user-setting',
+  templateUrl: './user-setting.component.html',
+  styleUrls: ['./user-setting.component.scss']
 })
-export class EnsibleUserSettingComponent implements OnInit {
+export class UserSettingComponent implements OnInit {
 
   currentPassword = '';
   newPassword = '';
@@ -20,7 +20,7 @@ export class EnsibleUserSettingComponent implements OnInit {
   validForm2 = false;
 
   constructor(
-    private ensibleAuthenticatorService: EnsibleAuthenticatorService,
+    private ensibleAuthenticatorService: AuthenticatorService,
     private rxjsUtils: RxJSUtils,
     private dialogUtils: DialogUtils
   ) { }
@@ -29,7 +29,7 @@ export class EnsibleUserSettingComponent implements OnInit {
     this.currentPassword = '';
     this.newPassword = '';
     this.reNewPassword = '';
-    this.alias = this.ensibleAuthenticatorService.user?.alias ?? '';
+    this.alias = this.ensibleAuthenticatorService.getCurrentUserAliasOrUsername();
 
     this.error = '';
     this.validForm = false;
@@ -48,7 +48,7 @@ export class EnsibleUserSettingComponent implements OnInit {
 
   changePassword() {
     if(this.isValidForm()) {
-      this.ensibleAuthenticatorService.changeCurrentLoginUserPassword(this.currentPassword, this.newPassword).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+      this.ensibleAuthenticatorService.updatePassword({currentPassword: this.currentPassword, newPassword: this.newPassword}).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
         next: res => {
           this.ngOnInit();
           this.dialogUtils.openConfirmDialog('Success', 'Password changed!\nNext time you login, please use new password', 'Ok', '');
@@ -62,9 +62,8 @@ export class EnsibleUserSettingComponent implements OnInit {
 
   changeAlias() {
     if(this.validForm2) {
-      this.ensibleAuthenticatorService.changeCurrentLoginUserAlias(this.alias).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+      this.ensibleAuthenticatorService.updateAlias({alias: this.alias}).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
         next: res => {
-          this.ensibleAuthenticatorService.ngOnInit();
           this.ngOnInit();
           this.dialogUtils.openConfirmDialog('Success', 'Alias changed!', 'Ok', '');
         },

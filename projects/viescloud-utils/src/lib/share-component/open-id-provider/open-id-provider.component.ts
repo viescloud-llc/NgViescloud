@@ -1,32 +1,31 @@
 import { Component, OnInit } from '@angular/core';
-import { EnsibleOpenIdProviderService } from '../service/ensible-open-id-provider/ensible-open-id-provider.service';
-import { EnsibleOpenIDProvider, EnsibleUserGroup } from '../model/ensible.model';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
-import { FileUtils } from 'projects/viescloud-utils/src/lib/util/File.utils';
-import { OpenIdWellKnown } from 'projects/viescloud-utils/src/lib/model/open-id.model';
+import { OpenIDProvider } from 'projects/viescloud-utils/src/lib/model/open-id.model';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 import { MatOption } from 'projects/viescloud-utils/src/lib/model/mat.model';
-import { EnsibleUserGroupService } from '../service/ensible-user-group/ensible-user-group.service';
 import { FixChangeDetection } from 'projects/viescloud-utils/src/lib/directive/FixChangeDetection';
+import { UserGroup } from '../../model/authenticator.model';
+import { UserGroupService } from '../../service/user-group.service';
+import { OpenIdProviderService } from '../../service/open-id-provider.service';
 
 @Component({
-  selector: 'app-ensible-open-id-provider',
-  templateUrl: './ensible-open-id-provider.component.html',
-  styleUrls: ['./ensible-open-id-provider.component.scss'],
+  selector: 'app-open-id-provider',
+  templateUrl: './open-id-provider.component.html',
+  styleUrls: ['./open-id-provider.component.scss'],
 })
-export class EnsibleOpenIdProviderComponent extends FixChangeDetection implements OnInit {
+export class OpenIdProviderComponent extends FixChangeDetection implements OnInit {
 
-  openIdProviders: EnsibleOpenIDProvider[] = [];
-  blankOpenIdProvider: EnsibleOpenIDProvider = new EnsibleOpenIDProvider();
+  openIdProviders: OpenIDProvider[] = [];
+  blankOpenIdProvider: OpenIDProvider = new OpenIDProvider();
 
-  selectedOpenIdProvider?: EnsibleOpenIDProvider;
-  selectedOpenIdProviderCopy!: EnsibleOpenIDProvider;
+  selectedOpenIdProvider?: OpenIDProvider;
+  selectedOpenIdProviderCopy!: OpenIDProvider;
 
-  userGroups: EnsibleUserGroup[] = [];
-  blankUserGroup = new EnsibleUserGroup();
-  userGroupsOptions: MatOption<EnsibleUserGroup>[] = [];
+  userGroups: UserGroup[] = [];
+  blankUserGroup = new UserGroup();
+  userGroupsOptions: MatOption<UserGroup>[] = [];
 
   configurationURL: string = "";
 
@@ -35,10 +34,10 @@ export class EnsibleOpenIdProviderComponent extends FixChangeDetection implement
   claimSupporteds: string[] = [];
 
   constructor(
-    private openIdService: EnsibleOpenIdProviderService,
+    private openIdService: OpenIdProviderService,
     private rxjsUtils: RxJSUtils,
     private dialogUtils: DialogUtils,
-    private ensibleUserGroupService: EnsibleUserGroupService
+    private UserGroupService: UserGroupService
   ) {
     super();
   }
@@ -52,7 +51,7 @@ export class EnsibleOpenIdProviderComponent extends FixChangeDetection implement
     })
   }
 
-  selectOpenIdProvider(openIdProvider: EnsibleOpenIDProvider | undefined) {
+  selectOpenIdProvider(openIdProvider: OpenIDProvider | undefined) {
     this.configurationURL = "";
     this.selectedOpenIdProvider = openIdProvider;
 
@@ -61,7 +60,7 @@ export class EnsibleOpenIdProviderComponent extends FixChangeDetection implement
   }
 
   addNewProvider() {
-    this.selectOpenIdProvider(DataUtils.purgeValue(new EnsibleOpenIDProvider()));
+    this.selectOpenIdProvider(DataUtils.purgeValue(new OpenIDProvider()));
   }
 
   isValueChange() {
@@ -140,7 +139,7 @@ export class EnsibleOpenIdProviderComponent extends FixChangeDetection implement
   }
 
   private fetchUserGroups() {
-    this.ensibleUserGroupService.getAll().pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+    this.UserGroupService.getAll().pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
       next: res => {
         this.userGroups = res;
         this.userGroupsOptions = [];
@@ -155,7 +154,7 @@ export class EnsibleOpenIdProviderComponent extends FixChangeDetection implement
   }
 
   addUserGroup() {
-    this.ensibleUserGroupService.openDialog(this.dialogUtils.matDialog, 0, this.blankUserGroup).subscribe({
+    this.UserGroupService.openDialog(this.dialogUtils.matDialog, 0, this.blankUserGroup).subscribe({
       next: res => {
         this.fetchUserGroups();
       }

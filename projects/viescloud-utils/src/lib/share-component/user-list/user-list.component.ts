@@ -1,33 +1,32 @@
-import { EnsibleUserGroupService } from './../service/ensible-user-group/ensible-user-group.service';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 import { Component, OnInit } from '@angular/core';
-import { EnsibleAuthenticatorService } from '../service/ensible-authenticator/ensible-authenticator.service';
-import { EnsibleUserService } from '../service/ensible-user/ensible-user.service';
-import { EnsibleUser, EnsibleUserGroup } from '../model/ensible.model';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 import { MatOption } from 'projects/viescloud-utils/src/lib/model/mat.model';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
+import { User, UserGroup } from '../../model/authenticator.model';
+import { UserGroupService } from '../../service/user-group.service';
+import { UserService } from '../../service/user.service';
 
 @Component({
-  selector: 'app-ensible-user',
-  templateUrl: './ensible-user.component.html',
-  styleUrls: ['./ensible-user.component.scss']
+  selector: 'app-user-list',
+  templateUrl: './user-list.component.html',
+  styleUrls: ['./user-list.component.scss']
 })
-export class EnsibleUserComponent implements OnInit {
-  users: EnsibleUser[] = [];
-  blankUser = new EnsibleUser();
-  userGroups: EnsibleUserGroup[] = [];
-  blankUserGroup = new EnsibleUserGroup();
-  userGroupsOptions: MatOption<EnsibleUserGroup>[] = [];
+export class UserListComponent implements OnInit {
+  users: User[] = [];
+  blankUser = new User();
+  userGroups: UserGroup[] = [];
+  blankUserGroup = new UserGroup();
+  userGroupsOptions: MatOption<UserGroup>[] = [];
 
-  selectedUser?: EnsibleUser;
-  selectedUserCopy?: EnsibleUser;
+  selectedUser?: User;
+  selectedUserCopy?: User;
 
   validForm = false;
 
   constructor(
-    private ensibleUserService: EnsibleUserService,
-    private ensibleUserGroupService: EnsibleUserGroupService,
+    private userUserService: UserService,
+    private userGroupService: UserGroupService,
     private rxjs: RxJSUtils,
     private dialogUtils: DialogUtils
   ) { }
@@ -36,7 +35,7 @@ export class EnsibleUserComponent implements OnInit {
     this.selectedUser = undefined;
     this.selectedUserCopy = undefined;
 
-    this.ensibleUserService.getAll().pipe(this.rxjs.waitLoadingDialog()).subscribe({
+    this.userUserService.getAll().pipe(this.rxjs.waitLoadingDialog()).subscribe({
       next: res => {
         this.users = res;
       }
@@ -46,7 +45,7 @@ export class EnsibleUserComponent implements OnInit {
   }
 
   private fetchUserGroups() {
-    this.ensibleUserGroupService.getAll().pipe(this.rxjs.waitLoadingDialog()).subscribe({
+    this.userGroupService.getAll().pipe(this.rxjs.waitLoadingDialog()).subscribe({
       next: res => {
         this.userGroups = res;
         this.userGroupsOptions = [];
@@ -61,11 +60,11 @@ export class EnsibleUserComponent implements OnInit {
   }
 
   addUser() {
-    this.selectedUser = new EnsibleUser();
+    this.selectedUser = new User();
     this.selectedUserCopy = structuredClone(this.selectedUser);
   }
 
-  selectUser(user: EnsibleUser) {
+  selectUser(user: User) {
     this.selectedUser = user;
     this.selectedUserCopy = structuredClone(user);
   }
@@ -80,7 +79,7 @@ export class EnsibleUserComponent implements OnInit {
 
   save() {
     if(this.selectedUser) {
-      this.ensibleUserService.postOrPatch(this.selectedUser?.id, this.selectedUser).subscribe({
+      this.userUserService.postOrPatch(this.selectedUser?.id, this.selectedUser).subscribe({
         next: res => {
           this.ngOnInit();
         },
@@ -92,7 +91,7 @@ export class EnsibleUserComponent implements OnInit {
   }
 
   addUserGroup() {
-    this.ensibleUserGroupService.openDialog(this.dialogUtils.matDialog, 0, this.blankUserGroup).subscribe({
+    this.userGroupService.openDialog(this.dialogUtils.matDialog, 0, this.blankUserGroup).subscribe({
       next: res => {
         this.fetchUserGroups();
       }

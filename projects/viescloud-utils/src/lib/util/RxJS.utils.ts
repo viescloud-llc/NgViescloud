@@ -137,7 +137,7 @@ export class RxJSUtils {
         return <T>(source: Observable<T>) => {
           return new Observable<T>((observer) => {
             // Check if the user is logged in (replace with your actual condition)
-            const isLoggedIn = authenticatorService?.isLoginB ?? false;
+            const isLoggedIn = authenticatorService?.isAuthenticatedSync()
       
             if (!isLoggedIn) {
               // Throw custom error if not logged in

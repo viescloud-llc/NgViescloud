@@ -5,15 +5,15 @@
     ></viescloud-quick-side-drawer-menu>
   </mat-drawer>
   <mat-drawer-content [ngStyle]="getBackgroundImageNgStyle()">
-    <viescloud-header-minimal
+    <vies-eco-header-minimal
     [drawer]="drawer"
     imageSrc="assets/images/logo-no-background.png"
     imageLink="https://hub.docker.com/r/viescloud/ensible-fullstack"
     [alias]="getUserAlias()"
-    [isLogin]="ensibleAuthenticatorService.isLogin()"
+    [isLogin]="ensibleAuthenticatorService.isAuthenticatedSync()"
     (onLogout)="ensibleAuthenticatorService.logout()"
-    (onLogin)="router.navigate(['login'])"
-    ></viescloud-header-minimal>
+    (onLogin)="router.navigate([environment.endpoint_login])"
+    ></vies-eco-header-minimal>
     <router-outlet></router-outlet>
   </mat-drawer-content>
 </mat-drawer-container>

@@ -1,12 +1,18 @@
 import { Injectable } from '@angular/core';
-import { EnsibleService } from '../ensible/ensible.service';
-import { HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { HttpParamsBuilder } from 'projects/viescloud-utils/src/lib/model/utils.model';
+import { ViesService } from 'projects/viescloud-utils/src/lib/service/rest.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class EnsibleProcessService extends EnsibleService {
+export class EnsibleProcessService extends ViesService {
+
+  constructor(
+    httpClient: HttpClient
+  ) {
+    super(httpClient);
+  }
 
   protected override getPrefixes(): string[] {
     return ['api', 'v1', 'processes'];

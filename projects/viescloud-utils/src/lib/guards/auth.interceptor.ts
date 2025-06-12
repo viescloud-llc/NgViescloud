@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AuthenticatorService } from '../service/authenticator.service';
 import { environment } from 'projects/environments/environment.prod';
+import { StringUtils } from '../util/String.utils';
 
 const headers = new HttpHeaders().set('content-type', 'application/json');
 
@@ -19,16 +20,47 @@ export class AuthInterceptor implements HttpInterceptor
       return next.handle(req);
 
     let body = req.body;
-    let jwt = this.authenticatorService.getJwt();
+    let token = this.authenticatorService.currentJwtToken;
+    let change = false;
+    let httpHeader = req.headers;
 
-    if(body && typeof body === 'string')
+    if(token && !req.headers.has('Authorization')) {
+      httpHeader.set('Authorization', `Bearer ${token}`);
+      change = true;
+    }
+
+    if(body && typeof body === 'string' && StringUtils.isValidJson(body)) {
+      httpHeader.set('Content-Type', 'application/json');
+      change = true;
+    }
+
+    if(change) {
       return next.handle(req.clone({
-        headers: req.headers.set('Content-Type', 'application/json')
-                            .set('Authorization', `Bearer ${jwt}`),
+        headers: httpHeader
       }));
+    }
+    else {
+      return next.handle(req);
+    }
 
-    return next.handle(req.clone({
-      headers: req.headers.set('Authorization', `Bearer ${jwt}`),
-    }));
+
+    // if(body && typeof body === 'string')
+    //   return next.handle(req.clone({
+    //     headers: req.headers.set('Content-Type', 'application/json')
+    //                         .set('Authorization', `Bearer ${token}`),
+    //   }));
+
+    // return next.handle(req.clone({
+    //   headers: req.headers.set('Authorization', `Bearer ${jwt}`),
+    // }));
+
+    // if (token && !req.headers.has('Authorization')) {
+    //   const authReq = req.clone({
+    //     headers: req.headers.set('Authorization', `Bearer ${token}`)
+    //   });
+    //   return next.handle(authReq);
+    // }
+    
+    // return next.handle(req);
   }
 }

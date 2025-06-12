@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
-import { EnsibleRestService } from '../ensible/ensible.service';
 import { EnsiblePlaybookLogger, EnsibleProcessLogger, EnsibleShellLogger } from '../../model/ensible.model';
 import { HttpParamsBuilder } from 'projects/viescloud-utils/src/lib/model/utils.model';
 import { Observable } from 'rxjs';
 import { Pageable } from 'projects/viescloud-utils/src/lib/model/vies.model';
+import { ViesRestService } from 'projects/viescloud-utils/src/lib/service/rest.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export abstract class EnsibleProcessLoggerService<T extends EnsibleProcessLogger> extends EnsibleRestService<T> {
+export abstract class EnsibleProcessLoggerService<T extends EnsibleProcessLogger> extends ViesRestService<T> {
   getAllByItemId(itemId: number) {
     return this.httpClient.get<EnsiblePlaybookLogger[]>(`${this.getPrefixUri()}/item/${itemId}`);
   }

@@ -12,7 +12,7 @@
   <li>
     <button mat-raised-button color="warn" (click)="revert()" [disabled]="!isValueChange()">Revert</button>
     <button mat-raised-button color="primary" (click)="saveLocally()" [disabled]="!isValueChange()">Save Locally</button>
-    <button *ngIf="ensibleAuthenticatorService.isLogin()" mat-raised-button color="warn" (click)="reSync()" [disabled]="!ensibleAuthenticatorService.isLogin()">Re Sync</button>
-    <button *ngIf="ensibleAuthenticatorService.isLogin()" mat-raised-button color="primary" (click)="saveToServer()" [disabled]="!ensibleAuthenticatorService.isLogin()">Save to Server</button>
+    <button *ngIf="ensibleAuthenticatorService.isAuthenticatedSync()" mat-raised-button color="warn" (click)="reSync()" [disabled]="!ensibleAuthenticatorService.isAuthenticatedSync()">Re Sync</button>
+    <button *ngIf="ensibleAuthenticatorService.isAuthenticatedSync()" mat-raised-button color="primary" (click)="saveToServer()" [disabled]="!ensibleAuthenticatorService.isAuthenticatedSync()">Save to Server</button>
   </li>
 </ul>

@@ -1,41 +1,34 @@
-<ul class="margin-center; text-center" appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
-    <li><h1>Login</h1></li>
-    <li><h3 style="color: red;">{{error}}</h3></li>
+<ul *ngIf="!openIdLogin" class="margin-center-li-center" appMatFormFieldGroup (onAllInputCheck)="validForm = $event" [formSummitClick]="loginButton">
     <li>
-        <app-mat-form-field-input
-        label="Username"
-        placeholder="e.g some username"
-        [(value)]="username"
-        [required]="true"
-        styleWidth="500px"
-        ></app-mat-form-field-input>
+      <app-mat-form-field-input
+      label="Username"
+      [(value)]="username"
+      [required]="true"
+      styleWidth="50%">
+    </app-mat-form-field-input>
     </li>
     <li>
-        <app-mat-form-field-input
-        label="Password"
-        placeholder="e.g some password"
-        [(value)]="password"
-        [required]="true"
-        styleWidth="500px"
-        [showVisibleSwitch]="true"
-        ></app-mat-form-field-input>
+      <app-mat-form-field-input
+      label="Password"
+      [(value)]="password"
+      [required]="true"
+      styleWidth="50%"
+      [showVisibleSwitch]="true">
+    </app-mat-form-field-input>
     </li>
     <li>
-        <button
-        mat-raised-button
-        color="primary"
-        (click)="login()"
-        class="min-fit-500px"
-        [disabled]="!validForm"
-        >Login</button>
+      <button #loginButton [style.width]="'50%'" mat-raised-button color="primary" (click)="login()" [disabled]="!validForm">Login</button>
     </li>
-    <br>
-    <li>
-        <button
-        mat-raised-button
-        color="primary"
-        (click)="openIdService.authorizeFlow()"
-        class="min-fit-500px"
-        >Login With Authentik</button>
+    <li *ngFor="let provider of ensibleOpenIDProviders">
+      <br>
+      <button [style.width]="'50%'" mat-raised-button color="primary" (click)="loginWithProvider(provider)" >Login with {{provider.name}}</button>
     </li>
 </ul>
+  
+
+<ul *ngIf="openIdLogin" class="margin-center">
+    <li>
+      <h1>{{loading}}</h1>
+    </li>
+</ul>
+  

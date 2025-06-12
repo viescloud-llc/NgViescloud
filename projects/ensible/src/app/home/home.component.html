@@ -5,12 +5,12 @@
   <li>
     <h2>CICD automation tool with Ansible and Docker</h2>
   </li>
-  <li *ngIf="!ensibleAuthenticatorService.isLogin()">
+  <li *ngIf="!ensibleAuthenticatorService.isAuthenticatedSync()">
     <h3>Please login to do more!</h3>
   </li>
 </ul>
 
-<ng-container *ngIf="ensibleAuthenticatorService.isLogin()">
+<ng-container *ngIf="ensibleAuthenticatorService.isAuthenticatedSync()">
   <div class="container">
     <h1>Introduction to Ansible</h1>
 

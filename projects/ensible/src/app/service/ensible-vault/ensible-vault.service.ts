@@ -1,12 +1,17 @@
 import { Injectable } from '@angular/core';
-import { EnsibleService } from '../ensible/ensible.service';
-import { HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { ViesService } from 'projects/viescloud-utils/src/lib/service/rest.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class EnsibleVaultService extends EnsibleService {
+export class EnsibleVaultService extends ViesService {
+
+  constructor(httpClient: HttpClient) {
+    super(httpClient);
+  }
+
   protected override getPrefixes(): string[] {
     return ['api', 'v1', 'ansible', 'vaults'];
   }

@@ -1,255 +1,463 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Injectable, OnInit } from '@angular/core';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { Injectable, OnDestroy, OnInit } from '@angular/core';
+import { User, UserGroup } from '../model/authenticator.model';
+import { BehaviorSubject, Observable, Subject, Subscription, catchError, filter, first, interval, map, switchMap, tap, throwError } from 'rxjs';
+import { ViesService } from './rest.service';
+import { AliasChangeRequest, AuthEvent, AuthResponse, LoginRequest, Oauth2LoginRequest, PasswordChangeRequest, RefreshTokenRequest, RegisterRequest } from '../model/vies.model';
+import { StringUtils } from '../util/String.utils';
+import { OpenIDProvider } from '../model/open-id.model';
 import { Router } from '@angular/router';
-import { Jwt, OpenIdRequest, Route, Swaggers, User, UserRole } from '../model/authenticator.model';
-import { SettingService } from './setting.service';
-import { Observable, Subject, first, interval } from 'rxjs';
-import { UsernameExistResponse } from '../model/response.model';
-import { DateTime } from '../model/mat.model';
+import { DialogUtils } from '../util/Dialog.utils';
 
 @Injectable({
   providedIn: 'root'
 })
-export class AuthenticatorService {
-  
-  private onLoginSubject = new Subject<void>();
-  onLogin$ = this.onLoginSubject.asObservable();
-  private onLogoutSubject = new Subject<void>();
-  onLogout$ = this.onLogoutSubject.asObservable();
-  private onTimeoutLogoutSubject = new Subject<void>();
-  onTimeoutLogout$ = this.onTimeoutLogoutSubject.asObservable();
+export class AuthenticatorService extends ViesService implements OnInit, OnDestroy {
+  private readonly sessionStorageKey = 'auth_refresh_token';
 
-  jwt?: string | null;
-  currentUser?: User | null;
-  isLoginB: boolean = false;
+  // State management
+  private currentUser$ = new BehaviorSubject<User | null>(null);
+  private isAuthenticated$ = new BehaviorSubject<boolean>(false);
+  private authEvents$ = new BehaviorSubject<AuthEvent | null>(null);
+  private currentJwt: string | null = null;
+  private currentRefreshToken: string | null = null;
 
-  private prefix = "authenticator"
+  // Intervals and subscriptions
+  private userFetchInterval: Subscription | null = null;
+  private jwtRefreshInterval: Subscription | null = null;
+
+  isloginWithOauth2 = false;
+  openIdProvider?: OpenIDProvider;
 
   constructor(
-    private httpClient: HttpClient, 
+    http: HttpClient,
     private router: Router,
-    private settingService: SettingService
-  ) { 
-    this.jwt = localStorage.getItem("jwt");
-    setInterval(() => {
-      if(this.jwt !== null || this.jwt !== undefined)
-        this.isLoginCall();
-    }, 120000); //2 mins
-  }
-
-  healthCheck(): Observable<string> {
-    return this.httpClient.get<string>(`${this.settingService.getGatewayUrl()}/_status/healthz`);
-  }
-
-  // Authentication
-
-  private async updateUser(): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
-      this.httpClient.get<User>(`${this.settingService.getGatewayUrl()}/user`)
-      .pipe(first()).subscribe(
-        res => {
-          if(this.isLoginB === false && this.currentUser === null)
-            this.onLoginSubject.next();
-
-          this.currentUser = res;
-          this.isLoginB = true;
-          resolve(true);
-        },
-        error => {
-          if(this.isLoginB === true && this.currentUser !== null && this.currentUser !== undefined)
-            this.onTimeoutLogoutSubject.next();
-
-          this.currentUser = null;
-          this.isLoginB = false;
-          resolve(false);
-        }
-      );
-    });
-  }
-
-  async autoUpdateUserWithJwt(jwt: string): Promise<void> {
-    this.jwt = jwt;
-    localStorage.setItem("jwt", jwt);
-    await this.autoUpdateUser();
-  }
-
-  async autoUpdateUser(): Promise<void> {
-    await this.updateUser().then().catch();
-  }
-
-  async isLoginCall(): Promise<void> {
-    await this.updateUser().then(b => this.isLoginB = b);
-  }
-
-  async isLoginCallWithReroute(navigate?: string): Promise<void> {
-
-    let isLogin = await this.updateUser();
-    this.isLoginB = isLogin;
-
-    if(isLogin && navigate)
-      this.router.navigate([navigate]);
-    else if(!isLogin)
-      this.router.navigate(["/home"]);
-  }
-
-  logoutWithoutReroute(): void {
-    localStorage.removeItem("jwt");
-    this.isLoginB = false;
-    this.jwt = null;
-    this.currentUser = null;
-    this.httpClient.get<void>(`${this.settingService.getGatewayUrl()}/logout`).pipe(first()).subscribe(
-      res => {},
-      error => {},
-      () => {}
-    );
-    this.onLogoutSubject.next();
+    private dialogUtils: DialogUtils
+  ) {
+    super(http);
+    this.initializeService();
   }
   
-  logout(): void {
-    this.logoutWithoutReroute();
-    this.router.navigate(["/login"]);
+  ngOnInit(): void {
+    // this.initializeService();
   }
 
-  isLogout(): boolean {
-    return !(this.jwt && this.currentUser);
+  protected override getPrefixes(): string[] {
+    return ['api', 'v1', 'authenticators']
   }
 
-  getJwt(): string | null | undefined {
-    return this.jwt;
+  // Public observables for components to subscribe to
+  get user$(): Observable<User | null> {
+    return this.currentUser$.asObservable();
   }
 
-  getJwtWithReroute(): string {
-    if(this.jwt === null || this.jwt === undefined)
-      this.router.navigate(['login']);
-    return this.jwt!;
+  get isAuthenticated(): Observable<boolean> {
+    return this.isAuthenticated$.asObservable();
   }
 
-  async getTime(): Promise<DateTime> {
-    return new Promise<DateTime>((resolve, reject) => {
-      this.httpClient.get<DateTime>(`${this.settingService.getGatewayUrl()}/time/now`).pipe(first()).subscribe(
-        res => resolve(res),
-        error => reject()
-      );
-    })
+  get authEvents(): Observable<AuthEvent | null> {
+    return this.authEvents$.asObservable().pipe(
+      filter(event => event !== null)
+    );
   }
 
-  //special endpoint
-  getSwagger(): Observable<Swaggers[]> {
-    return this.httpClient.get<Swaggers[]>(`${this.settingService.getGatewayUrl()}/swaggers`);
+  get currentJwtToken(): string | null {
+    return this.currentJwt;
   }
 
-  getCurrentLoginUser(): Observable<User> {
-    return this.httpClient.get<User>(`${this.settingService.getGatewayUrl()}/user`);
+  get currentUser(): User | null {
+    return this.currentUser$.value;
   }
 
-  registerUser(user: User): Observable<User> {
-    return this.httpClient.post<User>(`${this.settingService.getGatewayUrl()}/register`, user);
+  getCurrentUserAliasOrUsername() {
+    if (this.isAuthenticatedSync()) {
+      return this.currentUser?.alias ?? this.currentUser?.username ?? '';
+    }
+    else {
+      return '';
+    }
   }
 
-  isLogin(): Observable<void> {
-    return this.httpClient.get<void>(`${this.settingService.getGatewayUrl()}/auth`);
+  // Subscription methods for login/logout events
+  onLogin(callback: (user: User) => void): Subscription {
+    return this.authEvents$.pipe(
+      filter(event => event?.type === 'login' && event.user !== undefined)
+    ).subscribe(event => callback(event!.user!));
   }
 
-  login(user: {username: string, password: string}): Observable<Jwt>{
-    return this.httpClient.post<Jwt>(`${this.settingService.getGatewayUrl()}/login`, user);
+  onLogout(callback: () => void): Subscription {
+    return this.authEvents$.pipe(
+      filter(event => event?.type === 'logout')
+    ).subscribe(() => callback());
   }
 
-  loginWithOpenId(openIdRequest: OpenIdRequest) {
-    return this.httpClient.post<Jwt>(`${this.settingService.getGatewayUrl()}/openId`, openIdRequest);
+  onTimeoutLogout(callback: () => void): Subscription {
+    return this.authEvents$.pipe(
+      filter(event => event?.type === 'timeout logout')
+    ).subscribe(() => callback());
   }
 
-  modifyCurrentUser(user: User) {
-    return this.httpClient.put<User>(`${this.settingService.getGatewayUrl()}/${this.prefix}/auth/user`, user);
+  // Synchronous authentication check methods
+  private matchUserGroup(userGroups: UserGroup[], userGroupNameOrId: string): boolean {
+    if(!userGroups) {
+      return false;
+    }
+
+    if(StringUtils.isNumber(userGroupNameOrId)) {
+      return userGroups.some(group => group.id === Number(userGroupNameOrId));
+    }
+    else {
+      return userGroups.some(group => group.name === userGroupNameOrId);
+    }
   }
 
-  patchCurrentUser(user: User) {
-    return this.httpClient.patch<User>(`${this.settingService.getGatewayUrl()}/${this.prefix}/auth/user`, user);
+  isAuthenticatedSync(): boolean {
+    return this.isAuthenticated$.value && this.currentJwt !== null;
   }
 
-  // USERs
-  public getUserWithGateway(): Observable<User> {
-    return this.httpClient.get<User>(`${this.settingService.getGatewayUrl()}/${this.prefix}/users`);
+  isAuthenticatedWithUserGroup(userGroupNameOrId: string): boolean {
+    const user = this.currentUser$.value;
+    const isAuth = this.isAuthenticatedSync();
+
+    if (!isAuth || !user || !user.userGroups) {
+      return false;
+    }
+
+    return this.matchUserGroup(user.userGroups, userGroupNameOrId);
   }
 
-  public isUsernameExist(username: string): Observable<UsernameExistResponse> {
-    return this.httpClient.get<UsernameExistResponse>(`${this.settingService.getGatewayUrl()}/${this.prefix}/users/username/${username}`);
+  hasUserGroup(userGroupNameOrId: string): boolean {
+    return this.isAuthenticatedWithUserGroup(userGroupNameOrId);
   }
 
-  public getUsers(): Observable<User[]> {
-    return this.httpClient.get<User[]>(`${this.settingService.getGatewayUrl()}/${this.prefix}/users/all`);
+  hasAnyUserGroup(userGroupNamesOrIds: string[]): boolean {
+    const user = this.currentUser$.value;
+
+    if (!this.isAuthenticatedSync() || !user || !user.userGroups) {
+      return false;
+    }
+
+    return userGroupNamesOrIds.some(groupNameOrId =>
+      this.matchUserGroup(user.userGroups, groupNameOrId)
+    );
   }
 
-  public getUser(id: number): Observable<User> {
-    return this.httpClient.get<User>(`${this.settingService.getGatewayUrl()}/${this.prefix}/users/${id}`);
+  hasAllUserGroups(userGroupNamesOrIds: string[]): boolean {
+    const user = this.currentUser$.value;
+
+    if (!this.isAuthenticatedSync() || !user || !user.userGroups) {
+      return false;
+    }
+
+    return userGroupNamesOrIds.every(groupNameOrId =>
+      this.matchUserGroup(user.userGroups, groupNameOrId)
+    );
   }
 
-  public postUser(User: User): Observable<User> {
-    return this.httpClient.post<User>(`${this.settingService.getGatewayUrl()}/${this.prefix}/users`, User);
+  getUserGroups(): UserGroup[] {
+    const user = this.currentUser$.value;
+    return user?.userGroups || [];
   }
 
-  public putUser(User: User): Observable<User> {
-    return this.httpClient.put<User>(`${this.settingService.getGatewayUrl()}/${this.prefix}/users/${User.id}`, User);
+  // Observable versions for reactive programming
+  isAuthenticatedWithUserGroup$(userGroupNameOrId: string): Observable<boolean> {
+    return this.currentUser$.pipe(
+      map(user => {
+        const isAuth = this.isAuthenticatedSync();
+
+        if (!isAuth || !user || !user.userGroups) {
+          return false;
+        }
+
+        return this.matchUserGroup(user.userGroups, userGroupNameOrId);
+      })
+    );
   }
 
-  public patchUser(User: User): Observable<User> {
-    return this.httpClient.patch<User>(`${this.settingService.getGatewayUrl()}/${this.prefix}/users/${User.id}`, User);
+  hasUserGroup$(userGroupNameOrId: string): Observable<boolean> {
+    return this.isAuthenticatedWithUserGroup$(userGroupNameOrId);
   }
 
-  public deleteUser(id: number): Observable<void> {
-    return this.httpClient.delete<void>(`${this.settingService.getGatewayUrl()}/${this.prefix}/users/${id}`);
+  hasAnyUserGroup$(userGroupNamesOrIds: string[]): Observable<boolean> {
+    return this.currentUser$.pipe(
+      map(user => {
+        if (!this.isAuthenticatedSync() || !user || !user.userGroups) {
+          return false;
+        }
+
+        return userGroupNamesOrIds.some(groupNameOrId =>
+          this.matchUserGroup(user.userGroups, groupNameOrId)
+        );
+      })
+    );
   }
 
-  //UserRoles
-  public getUserRoles(): Observable<UserRole[]> {
-    return this.httpClient.get<UserRole[]>(`${this.settingService.getGatewayUrl()}/${this.prefix}/roles`);
+  hasAllUserGroups$(userGroupNamesOrIds: string[]): Observable<boolean> {
+    return this.currentUser$.pipe(
+      map(user => {
+        if (!this.isAuthenticatedSync() || !user || !user.userGroups) {
+          return false;
+        }
+
+        return userGroupNamesOrIds.every(groupNameOrId =>
+          this.matchUserGroup(user.userGroups, groupNameOrId)
+        );
+      })
+    );
   }
 
-  public getUserRole(id: number): Observable<UserRole> {
-    return this.httpClient.get<UserRole>(`${this.settingService.getGatewayUrl()}/${this.prefix}/roles/${id}`);
+  // Initialize service - load refresh token and start intervals
+  private initializeService(): void {
+    this.loadRefreshTokenFromSession();
+
+    if (this.currentRefreshToken) {
+      this.refreshJwtToken().subscribe({
+        next: () => this.startIntervals(),
+        error: () => this.logout()
+      });
+    }
   }
 
-  public postUserRole(role: UserRole): Observable<UserRole> {
-    return this.httpClient.post<UserRole>(`${this.settingService.getGatewayUrl()}/${this.prefix}/roles`, role);
+  // Authentication methods
+  login(credentials: LoginRequest): Observable<User> {
+    return this.httpClient.post<AuthResponse>(`${this.getPrefixUri()}/login`, credentials).pipe(
+      switchMap(response => this.handleAuthSuccess(response)),
+      tap(() => this.isloginWithOauth2 = true),
+      catchError(error => this.handleError(error))
+    );
   }
 
-  public putUserRole(role: UserRole): Observable<UserRole> {
-    return this.httpClient.put<UserRole>(`${this.settingService.getGatewayUrl()}/${this.prefix}/roles/${role.id}`, role);
+  register(userData: RegisterRequest): Observable<User> {
+    return this.httpClient.post<AuthResponse>(`${this.getPrefixUri()}/register`, userData).pipe(
+      switchMap(response => this.handleAuthSuccess(response)),
+      catchError(error => this.handleError(error))
+    );
   }
 
-  public patchUserRole(role: UserRole): Observable<UserRole> {
-    return this.httpClient.patch<UserRole>(`${this.settingService.getGatewayUrl()}/${this.prefix}/roles/${role.id}`, role);
+  loginOAuth2(oauth2Data: Oauth2LoginRequest, openIdProvider?: OpenIDProvider): Observable<User> {
+    this.openIdProvider = openIdProvider;
+    return this.httpClient.post<{ jwt: string }>(`${this.getPrefixUri()}/login/oauth2`, oauth2Data).pipe(
+      tap(response => {
+        this.currentJwt = response.jwt;
+      }),
+      switchMap(() => this.fetchCurrentUser()),
+      tap(() => this.startIntervals()),
+      tap(() => this.isloginWithOauth2 = true),
+      catchError(error => this.handleError(error))
+    );
   }
 
-  public deleteUserRole(id: number): Observable<void> {
-    return this.httpClient.delete<void>(`${this.settingService.getGatewayUrl()}/${this.prefix}/roles/${id}`);
+  logout(type: 'logout' | 'timeout logout' = 'logout'): void {
+    this.stopIntervals();
+    this.currentJwt = null;
+    this.currentRefreshToken = null;
+    this.removeRefreshTokenFromSession();
+    this.currentUser$.next(null);
+    this.isAuthenticated$.next(false);
+    this.authEvents$.next({ type: type });
   }
 
-  //Routes
-  public getRoutes(): Observable<Route[]> {
-    return this.httpClient.get<Route[]>(`${this.settingService.getGatewayUrl()}/${this.prefix}/routes`);
+  logOutManually() {
+    this.logout();
+    if(this.isloginWithOauth2) {
+      this.isloginWithOauth2 = false;
+      if(this.openIdProvider && this.openIdProvider.endSessionEndpoint) {
+        this.dialogUtils.openConfirmDialog("logout", "Do you want to logout from OAuth2 provider too?", 'yes', 'no').then(res => {
+          this.router.navigate(["/"]).then(result => { window.location.href = this.openIdProvider!.endSessionEndpoint; });
+        });
+      }
+    }
   }
 
-  public getRoute(id: number): Observable<Route> {
-    return this.httpClient.get<Route>(`${this.settingService.getGatewayUrl()}/${this.prefix}/routes/${id}`);
+  // User management methods
+  getCurrentUser(): Observable<User> {
+    if (!this.currentJwt) {
+      return throwError(() => new Error('Not authenticated'));
+    }
+
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${this.currentJwt}`
+    });
+
+    return this.httpClient.get<User>(`${this.getPrefixUri()}/user`, { headers }).pipe(
+      tap(user => this.currentUser$.next(user)),
+      catchError(error => this.handleError(error))
+    );
   }
 
-  public postRoute(route: Route): Observable<Route> {
-    return this.httpClient.post<Route>(`${this.settingService.getGatewayUrl()}/${this.prefix}/routes`, route);
+  updatePassword(passwordData: PasswordChangeRequest): Observable<void> {
+    if (!this.currentJwt) {
+      return throwError(() => new Error('Not authenticated'));
+    }
+
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${this.currentJwt}`
+    });
+
+    return this.httpClient.put<void>(`${this.getPrefixUri()}/user/password`, passwordData, { headers }).pipe(
+      catchError(error => this.handleError(error))
+    );
   }
 
-  public putRoute(route: Route): Observable<Route> {
-    return this.httpClient.put<Route>(`${this.settingService.getGatewayUrl()}/${this.prefix}/routes/${route.id}`, route);
+  updateAlias(aliasData: AliasChangeRequest): Observable<void> {
+    if (!this.currentJwt) {
+      return throwError(() => new Error('Not authenticated'));
+    }
+
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${this.currentJwt}`
+    });
+
+    return this.httpClient.put<void>(`${this.getPrefixUri()}/user/alias`, aliasData, { headers }).pipe(
+      switchMap(() => this.fetchCurrentUser()),
+      map(() => void 0),
+      catchError(error => this.handleError(error))
+    );
   }
 
-  public syncRoutes(routes: Route[]): Observable<Route[]> {
-    return this.httpClient.put<Route[]>(`${this.settingService.getGatewayUrl()}/${this.prefix}/routes/sync`, routes);
+  // Validation methods
+  checkEmailExists(email: string): Observable<boolean> {
+    const params = new HttpParams().set('email', email);
+
+    return this.httpClient.get<void>(`${this.getPrefixUri()}/exist/email`, { params }).pipe(
+      map(() => false), // If no error, email doesn't exist
+      catchError(() => [true]) // If error, email exists
+    );
   }
 
-  public patchRoute(route: Route): Observable<Route> {
-    return this.httpClient.patch<Route>(`${this.settingService.getGatewayUrl()}/${this.prefix}/routes/${route.id}`, route);
+  checkUsernameExists(username: string): Observable<boolean> {
+    const params = new HttpParams().set('username', username);
+
+    return this.httpClient.get<void>(`${this.getPrefixUri()}/exist/username`, { params }).pipe(
+      map(() => false), // If no error, username doesn't exist
+      catchError(() => [true]) // If error, username exists
+    );
   }
 
-  public deleteRoute(id: number): Observable<void> {
-    return this.httpClient.delete<void>(`${this.settingService.getGatewayUrl()}/${this.prefix}/routes/${id}`);
+  // JWT refresh method
+  refreshJwtToken(): Observable<void> {
+    if (!this.currentRefreshToken) {
+      return throwError(() => new Error('No refresh token available'));
+    }
+
+    const refreshRequest: RefreshTokenRequest = {
+      refreshToken: this.currentRefreshToken
+    };
+
+    return this.httpClient.post<AuthResponse>(`${this.getPrefixUri()}/jwt/refresh`, refreshRequest).pipe(
+      tap(response => {
+        this.currentJwt = response.jwt;
+        this.currentRefreshToken = response.refreshToken;
+        this.saveRefreshTokenToSession();
+      }),
+      map(() => void 0),
+      catchError(error => {
+        this.logout('timeout logout');
+        return this.handleError(error);
+      })
+    );
+  }
+
+  // Private methods
+  private handleAuthSuccess(response: AuthResponse): Observable<User> {
+    this.currentJwt = response.jwt;
+    this.currentRefreshToken = response.refreshToken;
+    this.saveRefreshTokenToSession();
+
+    return this.fetchCurrentUser().pipe(
+      tap(() => this.startIntervals())
+    );
+  }
+
+  private fetchCurrentUser(): Observable<User> {
+    return this.getCurrentUser().pipe(
+      tap(user => {
+        this.isAuthenticated$.next(true);
+        this.authEvents$.next({ type: 'login', user });
+      }),
+      catchError(error => {
+        this.logout();
+        return throwError(() => error);
+      })
+    );
+  }
+
+  private startIntervals(): void {
+    this.stopIntervals();
+
+    // Fetch user every 3 minutes
+    this.userFetchInterval = interval(3 * 60 * 1000).pipe(
+      switchMap(() => this.getCurrentUser()),
+      catchError(error => {
+        console.error('Error fetching user:', error);
+        return [];
+      })
+    ).subscribe();
+
+    // Refresh JWT every 5 minutes
+    this.jwtRefreshInterval = interval(5 * 60 * 1000).pipe(
+      switchMap(() => this.refreshJwtToken()),
+      catchError(error => {
+        console.error('Error refreshing JWT:', error);
+        this.logout();
+        return [];
+      })
+    ).subscribe();
+  }
+
+  private stopIntervals(): void {
+    if (this.userFetchInterval) {
+      this.userFetchInterval.unsubscribe();
+      this.userFetchInterval = null;
+    }
+
+    if (this.jwtRefreshInterval) {
+      this.jwtRefreshInterval.unsubscribe();
+      this.jwtRefreshInterval = null;
+    }
+  }
+
+  private saveRefreshTokenToSession(): void {
+    if (this.currentRefreshToken && typeof sessionStorage !== 'undefined') {
+      sessionStorage.setItem(this.sessionStorageKey, this.currentRefreshToken);
+    }
+  }
+
+  private loadRefreshTokenFromSession(): void {
+    if (typeof sessionStorage !== 'undefined') {
+      const token = sessionStorage.getItem(this.sessionStorageKey);
+      if (token) {
+        this.currentRefreshToken = token;
+      }
+    }
+  }
+
+  private removeRefreshTokenFromSession(): void {
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.removeItem(this.sessionStorageKey);
+    }
+  }
+
+  private handleError(error: any): Observable<never> {
+    let errorMessage = 'An unknown error occurred';
+
+    if (error?.error?.message) {
+      errorMessage = error.error.message;
+    } else if (error?.message) {
+      errorMessage = error.message;
+    } else if (typeof error === 'string') {
+      errorMessage = error;
+    }
+
+    console.error('AuthenticationService Error:', error);
+    return throwError(() => new Error(errorMessage));
+  }
+
+  // Angular OnDestroy lifecycle
+  ngOnDestroy(): void {
+    this.stopIntervals();
+    this.currentUser$.complete();
+    this.isAuthenticated$.complete();
+    this.authEvents$.complete();
   }
 }

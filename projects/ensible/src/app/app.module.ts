@@ -6,11 +6,8 @@ import { AppComponent } from './app.component';
 import { ViescloudUtilsModule } from 'projects/viescloud-utils/src/public-api';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { HomeComponent } from './home/home.component';
-import { LoginComponent } from './login/login.component';
-import { EnsibleAuthInterceptor } from './guard/ensible-auth.interceptor';
 import { EnsibleSettingComponent } from './ensible-setting/ensible-setting.component';
 import { EnsibleFsComponent } from './ensible-fs/ensible-fs.component';
-import { EnsibleUserComponent } from './ensible-user/ensible-user.component';
 import { EnsibleItemListComponent } from './item/ensible-item-list/ensible-item-list.component';
 import { EnsibleItemComponent } from './item/ensible-item/ensible-item.component';
 import { EnsibleItemRunComponent } from './item/ensible-item-run/ensible-item-run.component';
@@ -22,25 +19,19 @@ import { EnsibleSettingService } from './service/ensible-setting/ensible-setting
 import { S3StorageServiceV1 } from 'projects/viescloud-utils/src/lib/service/object-storage-manager.service';
 import { EnsibleDatabaseObjectStorageService } from './service/ensible-database-object-storage/ensible-database-object-storage.service';
 import { EnsibleFsListComponent } from './ensible-fs-list/ensible-fs-list.component';
-import { EnsibleUserSettingComponent } from './ensible-user-setting/ensible-user-setting.component';
 import { EnsibleDockerContainerTemplateComponent } from './docker/ensible-docker-container-template/ensible-docker-container-template.component';
 import { EnsibleDockerContainerTemplateListComponent } from './docker/ensible-docker-container-template-list/ensible-docker-container-template-list.component';
-import { EnsibleOpenIdProviderComponent } from './ensible-open-id-provider/ensible-open-id-provider.component';
-import { EnsibleOpenidLoginComponent } from './ensible-openid-login/ensible-openid-login.component';
-import { EnsibleUserAccessComponent } from './ensible-user-access/ensible-user-access.component';
-import { EnsibleUserGroupListComponent } from './ensible-user-group-list/ensible-user-group-list.component';
 import { EnsibleItemListPlaybookComponent } from './item/ensible-item-list/ensible-item-list-playbook/ensible-item-list-playbook.component';
 import { EnsibleItemListShellComponent } from './item/ensible-item-list/ensible-item-list-shell/ensible-item-list-shell.component';
 import { EnsibleItemPlaybookComponent } from './item/ensible-item/ensible-item-playbook/ensible-item-playbook.component';
 import { EnsibleItemShellComponent } from './item/ensible-item/ensible-item-shell/ensible-item-shell.component';
+import { AuthInterceptor } from 'projects/viescloud-utils/src/lib/guards/auth.interceptor';
 
 const LIST = [
   AppComponent,
   HomeComponent,
-  LoginComponent,
   EnsibleSettingComponent,
   EnsibleFsComponent,
-  EnsibleUserComponent,
   EnsibleItemListComponent,
   EnsibleItemListPlaybookComponent,
   EnsibleItemListShellComponent,
@@ -52,14 +43,9 @@ const LIST = [
   EnsibleItemTabComponent,
   EnsibleAnsibleCfgComponent,
   EnsibleFsListComponent,
-  EnsibleUserSettingComponent,
   EnsibleDockerContainerTemplateComponent,
   EnsibleDockerContainerTemplateListComponent,
-  EnsiblePullImageDialog,
-  EnsibleOpenIdProviderComponent,
-  EnsibleOpenidLoginComponent,
-  EnsibleUserAccessComponent,
-  EnsibleUserGroupListComponent
+  EnsiblePullImageDialog
 ]
 
 @NgModule({
@@ -73,7 +59,7 @@ const LIST = [
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
-      useClass: EnsibleAuthInterceptor,
+      useClass: AuthInterceptor,
       multi: true
     },
     {
