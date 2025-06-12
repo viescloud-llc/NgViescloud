@@ -12,7 +12,7 @@ import { DialogUtils } from '../util/Dialog.utils';
 @Injectable({
   providedIn: 'root'
 })
-export class AuthenticatorService extends ViesService implements OnInit, OnDestroy {
+export class AuthenticatorService implements OnInit, OnDestroy {
   private readonly sessionStorageKey = 'auth_refresh_token';
 
   // State management
@@ -30,11 +30,10 @@ export class AuthenticatorService extends ViesService implements OnInit, OnDestr
   openIdProvider?: OpenIDProvider;
 
   constructor(
-    http: HttpClient,
+    private httpClient: HttpClient,
     private router: Router,
     private dialogUtils: DialogUtils
   ) {
-    super(http);
     this.initializeService();
   }
   
@@ -42,8 +41,25 @@ export class AuthenticatorService extends ViesService implements OnInit, OnDestr
     // this.initializeService();
   }
 
-  protected override getPrefixes(): string[] {
+  protected getURI(): string {
+    return ViesService.getUri();  
+  }
+
+  protected getPrefixPath(): string {
+    let prefixes = this.getPrefixes();
+    let path = "";
+    prefixes.forEach(e => {
+        path += `/${e}`;
+    });
+    return path;
+  }
+
+  protected getPrefixes(): string[] {
     return ['api', 'v1', 'authenticators']
+  }
+
+  public getPrefixUri(): string {
+    return `${this.getURI()}${this.getPrefixPath()}`;
   }
 
   // Public observables for components to subscribe to
