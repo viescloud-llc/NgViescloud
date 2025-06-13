@@ -20,30 +20,18 @@ export class AuthInterceptor implements HttpInterceptor {
       return next.handle(req);
 
     let body = req.body;
+    let token = authenticatorService.currentJwtToken;
     
-    if (authenticatorService.isAuthenticatedSync()) {
-      let token = authenticatorService.currentJwtToken;
-      if (body && typeof body === 'string' && StringUtils.isValidJson(body)) {
-        return next.handle(req.clone({
-          headers: req.headers.set('Content-Type', 'application/json')
-                              .set('Authorization', `Bearer ${token}`),
-        }));
-      }
-      else {
-        return next.handle(req.clone({
-          headers: req.headers.set('Authorization', `Bearer ${token}`),
-        }));
-      }
+    if (body && typeof body === 'string' && StringUtils.isValidJson(body)) {
+      return next.handle(req.clone({
+        headers: req.headers.set('Content-Type', 'application/json')
+                            .set('Authorization', `Bearer ${token}`),
+      }));
     }
     else {
-      if (body && typeof body === 'string' && StringUtils.isValidJson(body)) {
-        return next.handle(req.clone({
-          headers: req.headers.set('Content-Type', 'application/json')
-        }));
-      }
-      else {
-        return next.handle(req);
-      }
+      return next.handle(req.clone({
+        headers: req.headers.set('Authorization', `Bearer ${token}`),
+      }));
     }
   }
 }
