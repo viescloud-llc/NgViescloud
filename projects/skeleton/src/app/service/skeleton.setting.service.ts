@@ -1,17 +1,17 @@
 import { Injectable } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatSnackBar } from "@angular/material/snack-bar";
+import { Router } from "@angular/router";
 import { GeneralSetting } from "projects/viescloud-utils/src/lib/model/setting.model";
 import { AuthenticatorService } from "projects/viescloud-utils/src/lib/service/authenticator.service";
 import { S3StorageServiceV1 } from "projects/viescloud-utils/src/lib/service/object-storage-manager.service";
-import { OpenIdService } from "projects/viescloud-utils/src/lib/service/open-id.service";
 import { SettingService } from "projects/viescloud-utils/src/lib/service/setting.service";
 import { FileUtils } from "projects/viescloud-utils/src/lib/util/File.utils";
 
 @Injectable({
   providedIn: 'root'
 })
-export class SkeletonManagerSettingService extends SettingService {
+export class SkeletonSettingService extends SettingService {
 
   onLoginSubscribe: any = null;
   isEditing: boolean = false;
@@ -20,23 +20,23 @@ export class SkeletonManagerSettingService extends SettingService {
     s3StorageService: S3StorageServiceV1,
     matDialog: MatDialog,
     snackBar: MatSnackBar,
-    openIdService: OpenIdService,
+    router: Router,
     private ensibleAuthenticatorService: AuthenticatorService
   ) {
-    super(s3StorageService, matDialog, snackBar, openIdService);
+    super(s3StorageService, matDialog, snackBar, router);
   }
 
   override initMinimal(prefix: string): void {
 
     if(!this.onLoginSubscribe) {
-      this.ensibleAuthenticatorService.onLogin$.subscribe({
-        next: () => {
+      this.ensibleAuthenticatorService.onLogin(
+        () => {
           if(this.generalSetting.initAutoFetchGeneralSetting) {
             this.syncFromServer(prefix);
             this.onGeneralSettingChangeSubject.next();
           }
         }
-      })
+      );
     }
 
     this.prefix = prefix;
