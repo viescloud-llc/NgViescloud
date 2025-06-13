@@ -327,7 +327,7 @@ export class AuthenticatorService implements OnDestroy {
     );
   }
 
-  updatePassword(passwordData: PasswordChangeRequest): Observable<void> {
+  updatePassword(passwordData: PasswordChangeRequest): Observable<User> {
     if (!this.currentJwt) {
       return throwError(() => new Error('Not authenticated'));
     }
@@ -336,12 +336,13 @@ export class AuthenticatorService implements OnDestroy {
       'Authorization': `Bearer ${this.currentJwt}`
     });
 
-    return this.httpClient.put<void>(`${this.getPrefixUri()}/user/password`, passwordData, { headers }).pipe(
+    return this.httpClient.put<User>(`${this.getPrefixUri()}/user/password`, passwordData, { headers }).pipe(
+      tap(user => this.currentUser$.next(user)),
       catchError(error => this.handleError(error))
     );
   }
 
-  updateAlias(aliasData: AliasChangeRequest): Observable<void> {
+  updateAlias(aliasData: AliasChangeRequest): Observable<User> {
     if (!this.currentJwt) {
       return throwError(() => new Error('Not authenticated'));
     }
@@ -350,9 +351,8 @@ export class AuthenticatorService implements OnDestroy {
       'Authorization': `Bearer ${this.currentJwt}`
     });
 
-    return this.httpClient.put<void>(`${this.getPrefixUri()}/user/alias`, aliasData, { headers }).pipe(
-      switchMap(() => this.fetchCurrentUser()),
-      map(() => void 0),
+    return this.httpClient.put<User>(`${this.getPrefixUri()}/user/alias`, aliasData, { headers }).pipe(
+      tap(user => this.currentUser$.next(user)),
       catchError(error => this.handleError(error))
     );
   }
@@ -432,7 +432,6 @@ export class AuthenticatorService implements OnDestroy {
   private startIntervals(): void {
     this.stopIntervals();
 
-    // Fetch user every 3 minutes
     this.userFetchInterval = interval(this.reloadUserInterval).pipe(
       switchMap(() => this.getCurrentUser()),
       catchError(error => {
@@ -441,7 +440,6 @@ export class AuthenticatorService implements OnDestroy {
       })
     ).subscribe();
 
-    // Refresh JWT every 5 minutes
     this.jwtRefreshInterval = interval(this.reloadJwtInterval).pipe(
       switchMap(() => this.refreshJwtToken()),
       catchError(error => {

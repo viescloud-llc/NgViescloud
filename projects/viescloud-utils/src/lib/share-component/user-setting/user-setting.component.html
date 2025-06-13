@@ -45,7 +45,7 @@
 
   <ng-container appMatFormFieldGroup (onAllInputCheck)="validForm2 = $event" (onFormSummit)="changeAlias()">
     <hr>
-    <li><h4>Change Alias (not working at the moment)</h4></li>
+    <li><h4>Change Alias</h4></li>
     <li>
       <app-mat-form-field-input
       label="Alias"
@@ -53,11 +53,11 @@
       [blankObject]="''"
       [required]="true"
       styleWidth="100%"
-      [disable]="true"
+      [disable]="false"
       ></app-mat-form-field-input>
     </li>
     <li class="flex-row-container-auto">
-      <button mat-raised-button color="primary" [disabled]="!validForm2" (click)="changeAlias()">Change Alias</button>
+      <button mat-raised-button color="primary" [disabled]="!validForm2 || alias === aliasCopy" (click)="changeAlias()">Change Alias</button>
     </li>
   </ng-container>
 </ul>

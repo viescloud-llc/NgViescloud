@@ -79,7 +79,7 @@
 
     <li class="flex-row-container-auto">
       <button mat-raised-button color="primary" (click)="save()" [disabled]="!validForm || !isValueChange()">Save</button>
-      <button mat-raised-button color="primary" (click)="selectOpenIdProvider(undefined)">Cancel</button>
+      <button mat-raised-button color="primary" (click)="selectOpenIdProvider(undefined)">Cancel | Back</button>
       <button mat-raised-button color="warn" (click)="revert()" [disabled]="!isValueChange()">Revert</button>
       <button *ngIf="selectedOpenIdProvider && selectedOpenIdProvider.id" mat-raised-button color="warn" (click)="deleteProvider()">Delete</button>
       <button mat-raised-button color="primary" (click)="addUserGroup()">Add new user group</button>
