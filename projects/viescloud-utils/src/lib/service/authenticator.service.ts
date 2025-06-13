@@ -12,13 +12,16 @@ import { DialogUtils } from '../util/Dialog.utils';
 @Injectable({
   providedIn: 'root'
 })
-export class AuthenticatorService implements OnInit, OnDestroy {
+export class AuthenticatorService implements OnDestroy {
   private readonly sessionStorageKey = 'auth_refresh_token';
+  private readonly reloadJwtInterval = 5 * 60 * 1000; // 5 minutes
+  private readonly reloadUserInterval = 3 * 60 * 1000; // 3 minutes
 
   // State management
   private currentUser$ = new BehaviorSubject<User | null>(null);
   private isAuthenticated$ = new BehaviorSubject<boolean>(false);
   private authEvents$ = new BehaviorSubject<AuthEvent | null>(null);
+  private initializationComplete$ = new BehaviorSubject<boolean>(false);
   private currentJwt: string | null = null;
   private currentRefreshToken: string | null = null;
 
@@ -34,13 +37,12 @@ export class AuthenticatorService implements OnInit, OnDestroy {
     private router: Router,
     private dialogUtils: DialogUtils
   ) {
-    this.initializeService();
-  }
-  
-  ngOnInit(): void {
+    setTimeout(() => {
+      this.initializeService();
+    })
     // this.initializeService();
   }
-
+  
   protected getURI(): string {
     return ViesService.getUri();  
   }
@@ -83,6 +85,21 @@ export class AuthenticatorService implements OnInit, OnDestroy {
 
   get currentUser(): User | null {
     return this.currentUser$.value;
+  }
+
+  get initialized$(): Observable<boolean> {
+    return this.initializationComplete$.pipe(
+      filter(initialized => initialized === true),
+      first()
+    );
+  }
+
+  isInitialized(): boolean {
+    return this.initializationComplete$.value === true;
+  }
+
+  hasSessionRefreshToken(): boolean {
+    return (this.currentRefreshToken !== null) || (typeof sessionStorage !== 'undefined' && sessionStorage.getItem(this.sessionStorageKey) !== null);
   }
 
   getCurrentUserAliasOrUsername() {
@@ -228,9 +245,18 @@ export class AuthenticatorService implements OnInit, OnDestroy {
 
     if (this.currentRefreshToken) {
       this.refreshJwtToken().subscribe({
-        next: () => this.startIntervals(),
-        error: () => this.logout()
+        next: () => {
+          this.startIntervals();
+          this.initializationComplete$.next(true);
+        },
+        error: () => {
+          this.logout();
+          this.initializationComplete$.next(true);
+        }
       });
+    }
+    else {
+      this.initializationComplete$.next(true);
     }
   }
 
@@ -366,6 +392,11 @@ export class AuthenticatorService implements OnInit, OnDestroy {
         this.currentRefreshToken = response.refreshToken;
         this.saveRefreshTokenToSession();
       }),
+      tap(() => {
+        if(!this.currentUser) {
+          this.fetchCurrentUser().subscribe();
+        }
+      }),
       map(() => void 0),
       catchError(error => {
         this.logout('timeout logout');
@@ -402,7 +433,7 @@ export class AuthenticatorService implements OnInit, OnDestroy {
     this.stopIntervals();
 
     // Fetch user every 3 minutes
-    this.userFetchInterval = interval(3 * 60 * 1000).pipe(
+    this.userFetchInterval = interval(this.reloadUserInterval).pipe(
       switchMap(() => this.getCurrentUser()),
       catchError(error => {
         console.error('Error fetching user:', error);
@@ -411,7 +442,7 @@ export class AuthenticatorService implements OnInit, OnDestroy {
     ).subscribe();
 
     // Refresh JWT every 5 minutes
-    this.jwtRefreshInterval = interval(5 * 60 * 1000).pipe(
+    this.jwtRefreshInterval = interval(this.reloadJwtInterval).pipe(
       switchMap(() => this.refreshJwtToken()),
       catchError(error => {
         console.error('Error refreshing JWT:', error);

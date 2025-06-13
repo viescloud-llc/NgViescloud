@@ -5,8 +5,6 @@ import { AuthenticatorService } from '../service/authenticator.service';
 import { environment } from 'projects/environments/environment.prod';
 import { StringUtils } from '../util/String.utils';
 
-const headers = new HttpHeaders().set('content-type', 'application/json');
-
 @Injectable({
   providedIn: 'root'
 })
