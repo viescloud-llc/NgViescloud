@@ -59,7 +59,7 @@ export class LoginComponent implements OnInit {
       let stateData = LoginComponent.getState();
 
       if (stateData?.key == state) {
-        this.authenticatorService.loginOAuth2({ code: code, redirectUri: stateData.redirectUri, openIdProviderId: stateData.provider.id }).subscribe({
+        this.authenticatorService.loginOAuth2({ code: code, redirectUri: stateData.redirectUri, openIdProviderId: stateData.provider.id }, stateData.provider).subscribe({
           next: res => {
             this.router.navigate([environment.endpoint_home]);
           },

@@ -290,6 +290,10 @@ export class AuthenticatorService implements OnDestroy {
   }
 
   logout(type: 'logout' | 'timeout logout' = 'logout'): void {
+    const refreshRequest: RefreshTokenRequest = {
+      refreshToken: structuredClone(this.currentRefreshToken) ?? ''
+    };
+
     this.stopIntervals();
     this.currentJwt = null;
     this.currentRefreshToken = null;
@@ -297,6 +301,8 @@ export class AuthenticatorService implements OnDestroy {
     this.currentUser$.next(null);
     this.isAuthenticated$.next(false);
     this.authEvents$.next({ type: type });
+
+    this.httpClient.delete<void>(`${this.getPrefixUri()}/logout`, {body: refreshRequest}).subscribe();
   }
 
   logOutManually() {
