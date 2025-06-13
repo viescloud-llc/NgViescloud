@@ -55,6 +55,9 @@ export class EnsibleFsListComponent extends RouteChangeSubcribe {
         case 'host_vars':
           this.ensibleFsDir = ws.hostVars;
           break;
+        case 'shells':
+          this.ensibleFsDir = ws.shells;
+          break;
         default:
           this.ensibleFsDir = DataUtils.purgeArray(new EnsibleFsDir());
           break;
