@@ -2,7 +2,7 @@ import { ApplicationRef, ComponentFactoryResolver, ComponentRef, Injectable, Inj
 import { MessagePopup } from "../popup/message-popup/message-popup.component";
 import { Overlay, OverlayConfig, OverlayRef } from "@angular/cdk/overlay";
 import { ComponentPortal } from "@angular/cdk/portal";
-import { POPUP_DATA, POPUP_DISMISS } from "../model/Popup.model";
+import { POPUP_DATA, POPUP_DISMISS } from "../model/popup.model";
 
 @Injectable({
     providedIn: 'root'

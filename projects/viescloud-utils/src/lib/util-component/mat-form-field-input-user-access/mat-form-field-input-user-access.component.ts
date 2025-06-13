@@ -1,7 +1,7 @@
 import { Component, EventEmitter, forwardRef, Input, Output, ViewChildren } from '@angular/core';
 import { MatFormFieldComponent } from '../mat-form-field/mat-form-field.component';
-import { AccessPermission, SharedGroup, SharedUser, UserAccess } from '../../model/Authenticator.model';
-import { MatOption } from '../../model/Mat.model';
+import { AccessPermission, SharedGroup, SharedUser, UserAccess } from '../../model/authenticator.model';
+import { MatOption } from '../../model/mat.model';
 import { DataUtils } from '../../util/Data.utils';
 
 export enum UserAccessInputType {

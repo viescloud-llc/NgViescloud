@@ -2,7 +2,7 @@ import { AfterContentInit, AfterViewInit, ChangeDetectorRef, Component, ContentC
 import { MatColumnDef, MatTable, MatTableDataSource } from '@angular/material/table';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { MatColumn, MatTableSettingType } from '../../model/Mat.model';
+import { MatColumn, MatTableSettingType } from '../../model/mat.model';
 import { DataUtils } from '../../util/Data.utils';
 import { SelectionModel } from '@angular/cdk/collections';
 

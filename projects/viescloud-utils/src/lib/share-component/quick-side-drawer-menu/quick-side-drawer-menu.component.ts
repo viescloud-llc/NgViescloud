@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output, Type, ViewChild, ViewContainerRef } from '@angular/core';
 import { Router } from '@angular/router';
-import { QuickSideDrawerMenuService } from '../../service/QuickSideDrawerMenu.service';
+import { QuickSideDrawerMenuService } from '../../service/quick-side-drawer-menu.service';
 
 export class QuickSideDrawerMenu {
   title: string = '';

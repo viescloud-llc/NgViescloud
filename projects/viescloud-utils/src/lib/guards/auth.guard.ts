@@ -1,59 +1,74 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, CanActivateChild, CanDeactivate, CanLoad, Route, Router, RouterStateSnapshot, UrlSegment, UrlTree } from '@angular/router';
-import { Observable, filter, map } from 'rxjs';
-import { AuthenticatorService } from '../service/Authenticator.service';
+import { Observable, catchError, delay, filter, first, firstValueFrom, map, of, race, switchMap, take, tap, timer } from 'rxjs';
+import { AuthenticatorService } from '../service/authenticator.service';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogUtils } from '../util/Dialog.utils';
+import { environment } from 'projects/environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthGuard /*, CanActivateChild, CanDeactivate<unknown>, CanLoad */
 {
-  constructor(private authenticatorService: AuthenticatorService, private router: Router){}
+  firstStarted = true;
+  
+  constructor(
+    private authenticatorService: AuthenticatorService, 
+    private router: Router,
+    private dialogUtils: DialogUtils
+  ){}
+
+  delayUntilReadyOrTimeout(
+    readySignal$: Observable<any>,
+    maxWaitMs: number = 3000
+  ): Observable<boolean> {
+    return race(
+      timer(maxWaitMs).pipe(map(() => false)), // timeout
+      readySignal$.pipe(take(1), map(() => true)) // ready
+    ).pipe(
+      take(1)
+    );
+  }
+
+  private getAuthInitializationSignal(): Observable<any> {
+    return this.authenticatorService.authEvents;
+  }
+
+  private checkAuthentication(): Observable<boolean> {
+    if (this.authenticatorService.isAuthenticatedSync()) {
+      return of(true);
+    } else {
+      // Store the attempted URL for redirecting after login
+      // sessionStorage.setItem('redirectUrl', url);
+      this.router.navigate([environment.endpoint_login]);
+      return of(false);
+    }
+  }
 
   isLogin(): Observable<boolean> | Promise<boolean> | boolean {
-    if(!this.authenticatorService.getJwt())
-      return false;
-
-    return this.authenticatorService.getCurrentLoginUser().pipe(
-    map(user => {
-      return user ? true : false;
-    }));
+    if(this.authenticatorService.isInitialized() || !this.authenticatorService.hasSessionRefreshToken()) {
+      return this.checkAuthentication();
+    }
+    else {
+      return firstValueFrom(
+        this.delayUntilReadyOrTimeout(this.getAuthInitializationSignal(), 10000).pipe(
+          switchMap(() => this.checkAuthentication())
+        )
+      );
+    }
   }
 
   isChildLogin(): Observable<boolean> | Promise<boolean> | boolean {
-    if(!this.authenticatorService.getJwt())
-      return false;
-
-    return this.authenticatorService.getCurrentLoginUser().pipe(
-    map(user => {
-      return user ? true : false;
-    }));
+    return this.isLogin();
   }
 
   isLoginWithRole(role: string): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-    if(!this.authenticatorService.getJwt())
-      return false;
-
-    return this.authenticatorService.getCurrentLoginUser().pipe(
-    map(user => {
-      let isLogin = user ? true : false;
-      let matchUserRole = this.authenticatorService.currentUser!.userRoles!.some(u => u.name?.toUpperCase() === role.toUpperCase());
-      return isLogin && matchUserRole;
-    }));
+    return this.authenticatorService.isAuthenticatedWithUserGroup$(role);
   }
 
   isChildLoginWithRole(role: string): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-    if(!this.authenticatorService.getJwt())
-    return false;
-
-    return this.authenticatorService.getCurrentLoginUser().pipe(
-    map(user => {
-      let isLogin = user ? true : false;
-      let matchUserRole = this.authenticatorService.currentUser!.userRoles!.some(u => u.name?.toUpperCase() === role.toUpperCase());
-      return isLogin && matchUserRole;
-    }));
+    return this.authenticatorService.isAuthenticatedWithUserGroup$(role);
   }
 
   canActivate(
@@ -97,7 +112,7 @@ export interface ComponentCanDeactivate {
 export class CanDeactivateGuard implements CanDeactivate<ComponentCanDeactivate> {
 
   canDeactivate(component: ComponentCanDeactivate): Observable<boolean> | Promise<boolean> | boolean {
-      return component.canDeactivate ? component.canDeactivate() : true;
+    return component.canDeactivate ? component.canDeactivate() : true;
   }
 
   static canDeactivateDialog(isValueChange: boolean, matDialog: MatDialog | DialogUtils, errorTitle: string = 'Unsaved changes!', errorMessage: string = 'You have unsaved changes\nDo you want to discard them and leave?', yes: string = 'Yes', no: string = 'No', width: string = '100%', disableClose: boolean = false): Promise<boolean> {

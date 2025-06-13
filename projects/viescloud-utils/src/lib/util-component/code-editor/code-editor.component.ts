@@ -1,8 +1,8 @@
 import { Component, ElementRef, Input, AfterViewInit, Output, EventEmitter, ViewChild, ChangeDetectorRef, OnDestroy, HostListener } from '@angular/core';
 import { EditorComponent } from 'ngx-monaco-editor-v2';
-import { SettingService } from '../../service/Setting.service';
-import { KeyCaptureEvent, KeyCaptureService } from '../../service/KeyCapture.service';
-import { MonacoLanguage } from '../../model/MonacoEditor.model';
+import { SettingService } from '../../service/setting.service';
+import { KeyCaptureEvent, KeyCaptureService } from '../../service/key-capture.service';
+import { MonacoLanguage } from '../../model/monaco-editor.model';
 
 @Component({
   selector: 'app-code-editor',

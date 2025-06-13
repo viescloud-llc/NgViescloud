@@ -1,7 +1,7 @@
 import { Component, Input, SimpleChanges, forwardRef } from '@angular/core';
 import { MatFormFieldComponent } from '../mat-form-field/mat-form-field.component';
-import { MatFromFieldInputDynamicItem, MatItemSetting, MatItemSettingType, MatOption } from '../../model/Mat.model';
-import { UtilsService } from '../../service/Utils.service';
+import { MatFromFieldInputDynamicItem, MatItemSetting, MatItemSettingType, MatOption } from '../../model/mat.model';
+import { UtilsService } from '../../service/utils.service';
 import { DataUtils } from '../../util/Data.utils';
 
 export enum DynamicMatInputType {

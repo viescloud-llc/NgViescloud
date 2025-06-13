@@ -1,4 +1,4 @@
-import { MatItemSettingType, MatOption } from "../model/Mat.model";
+import { MatItemSettingType, MatOption } from "../model/mat.model";
 import { ReflectionUtils } from "./Reflection.utils";
 
 export class DataUtils {

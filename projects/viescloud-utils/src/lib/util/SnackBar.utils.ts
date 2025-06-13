@@ -1,6 +1,6 @@
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { StringSnackBar } from "../snack/string-snack-bar/string-snack-bar.component";
-import { MatSnackBarHorizontalPosition, MatSnackBarVerticalPosition } from "../model/Mat.model";
+import { MatSnackBarHorizontalPosition, MatSnackBarVerticalPosition } from "../model/mat.model";
 import { Injectable } from "@angular/core";
 
 @Injectable({

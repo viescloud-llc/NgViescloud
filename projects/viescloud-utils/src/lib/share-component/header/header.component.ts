@@ -2,9 +2,9 @@ import { Component, Input, OnInit } from '@angular/core';
 import { MatDrawer } from '@angular/material/sidenav';
 import { first } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
-import { OpenIdService } from '../../service/OpenId.service';
-import { AuthenticatorService } from '../../service/Authenticator.service';
-import { SettingService } from '../../service/Setting.service';
+import { AuthenticatorService } from '../../service/authenticator.service';
+import { SettingService } from '../../service/setting.service';
+import { environment } from 'projects/environments/environment.prod';
 
 export enum DRAWER_STATE {
   OPEN = 'open',
@@ -12,7 +12,7 @@ export enum DRAWER_STATE {
 }
 
 @Component({
-  selector: 'viescloud-header',
+  selector: 'vies-eco-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss']
 })
@@ -28,24 +28,23 @@ export class HeaderComponent implements OnInit {
   useLogoutFlow = false;
 
   constructor(
-    public openIdService: OpenIdService,
     public authenticatorService: AuthenticatorService, 
-    private router: Router,
-    private settingService: SettingService
+    private settingService: SettingService,
+    private router: Router
     ) { 
       settingService.header = this;
     }
 
   ngOnInit() {
     this.toggleDrawer(this.settingService.getDisplayDrawer() ? DRAWER_STATE.OPEN : DRAWER_STATE.CLOSE);
-    this.authenticatorService.isLoginCall();
+  }
+
+  login(): void {
+    this.router.navigate([environment.endpoint_login]);
   }
 
   logout(): void {
-    this.authenticatorService.logoutWithoutReroute();
-
-    if(this.useLogoutFlow)
-      this.openIdService.logoutFlow();
+    this.authenticatorService.logOutManually();
   }
 
   getURL(): string {
@@ -53,14 +52,7 @@ export class HeaderComponent implements OnInit {
   }
 
   getAlias(): string {
-    if(this.authenticatorService.currentUser?.name)
-      return this.authenticatorService.currentUser?.name;
-    else if(this.authenticatorService.currentUser?.userProfile?.alias)
-      return this.authenticatorService.currentUser?.userProfile?.alias;
-    else if(this.authenticatorService.currentUser?.userProfile?.firstName && this.authenticatorService.currentUser?.userProfile?.lastName)
-      return `${this.authenticatorService.currentUser?.userProfile?.firstName} ${this.authenticatorService.currentUser?.userProfile?.lastName}`
-    else 
-      return ""
+    return this.authenticatorService.getCurrentUserAliasOrUsername();
   }
 
   getDisplayHeader(): boolean {

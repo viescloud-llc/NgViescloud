@@ -1,7 +1,7 @@
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { Component, Inject, Input, OnInit } from '@angular/core';
-import { SettingService } from '../../service/Setting.service';
-import { POPUP_DATA, POPUP_DISMISS } from '../../model/Popup.model';
+import { SettingService } from '../../service/setting.service';
+import { POPUP_DATA, POPUP_DISMISS } from '../../model/popup.model';
 import { StringUtils } from '../../util/String.utils';
 
 @Component({

@@ -2,12 +2,12 @@ import { AfterContentChecked, ChangeDetectorRef, Component, DoCheck, EventEmitte
 import { ThemePalette } from '@angular/material/core';
 import { MatFormFieldAppearance } from '@angular/material/form-field';
 import { FixChangeDetection } from '../../directive/FixChangeDetection';
-import { UtilsService } from '../../service/Utils.service';
-import { RgbColor } from '../../model/Rgb.model';
+import { UtilsService } from '../../service/utils.service';
+import { RgbColor } from '../../model/rgb.model';
 import { DialogUtils } from '../../util/Dialog.utils';
 import { StringUtils } from '../../util/String.utils';
 import { DataUtils } from '../../util/Data.utils';
-import { MatFromFieldInputDynamicItem } from '../../model/Mat.model';
+import { MatFromFieldInputDynamicItem } from '../../model/mat.model';
 
 @Component({
   selector: 'app-mat-form-field',

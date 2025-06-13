@@ -1,14 +1,14 @@
 import { MatDialog } from "@angular/material/dialog";
 import { finalize, first, Observable, of, pipe, switchMap, tap } from "rxjs";
 import { LoadingDialog } from "../dialog/loading-dialog/loading-dialog.component";
-import { MatSnackBarHorizontalPosition, MatSnackBarVerticalPosition } from "../model/Mat.model";
+import { MatSnackBarHorizontalPosition, MatSnackBarVerticalPosition } from "../model/mat.model";
 import { MatSnackBar, MatSnackBarRef } from "@angular/material/snack-bar";
 import { SnackBarUtils } from "./SnackBar.utils";
 import { forwardRef, Inject, Injectable } from "@angular/core";
 import { PopupUtils } from "./Popup.utils";
 import { OverlayRef } from "@angular/cdk/overlay";
-import { AuthenticatorService } from "../service/Authenticator.service";
-import { NotAuthenticatedError } from "../model/Error.model";
+import { AuthenticatorService } from "../service/authenticator.service";
+import { NotAuthenticatedError } from "../model/error.model";
 
 @Injectable({
     providedIn: 'root'
@@ -137,7 +137,7 @@ export class RxJSUtils {
         return <T>(source: Observable<T>) => {
           return new Observable<T>((observer) => {
             // Check if the user is logged in (replace with your actual condition)
-            const isLoggedIn = authenticatorService?.isLoginB ?? false;
+            const isLoggedIn = authenticatorService?.isAuthenticatedSync()
       
             if (!isLoggedIn) {
               // Throw custom error if not logged in
