@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { AuthenticatorService } from '../service/authenticator.service';
 import { environment } from 'projects/environments/environment.prod';
 import { StringUtils } from '../util/String.utils';
+import { ViesService } from '../service/rest.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,8 +17,9 @@ export class AuthInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const authenticatorService = this.injector.get(AuthenticatorService);
 
-    if (!req.url.includes(environment.gateway_api))
+    if (!req.url.includes(ViesService.getUri())) {
       return next.handle(req);
+    }
 
     let body = req.body;
     
