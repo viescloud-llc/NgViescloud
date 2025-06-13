@@ -8,6 +8,8 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AuthInterceptor } from 'projects/viescloud-utils/src/lib/guards/auth.interceptor';
 import { SettingService } from 'projects/viescloud-utils/src/lib/service/setting.service';
 import { SkeletonSettingService } from './service/skeleton.setting.service';
+import { ObjectStorageService } from 'projects/viescloud-utils/src/lib/service/object-storage-manager.service';
+import { SkeletonObjectStorageService } from './service/skeleton.object.storage.service';
 
 const LIST = [
   AppComponent
@@ -31,10 +33,10 @@ const LIST = [
       provide: SettingService,
       useClass: SkeletonSettingService
     },
-    // {
-    //   provide: S3StorageServiceV1,
-    //   useClass: EnsibleDatabaseObjectStorageService
-    // }
+    {
+      provide: ObjectStorageService,
+      useClass: SkeletonObjectStorageService
+    }
   ],
   bootstrap: [AppComponent]
 })

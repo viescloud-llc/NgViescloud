@@ -5,13 +5,14 @@
     <app-mat-form-field-input-dynamic
     [(value)]="generalSetting"
     [blankObject]="blankGeneralSetting"
-    (valueChange)="settingService.changeTheme(generalSetting.theme)"
+    (onValueChange)="changeTheme()"
+    [indent]="false"
     ></app-mat-form-field-input-dynamic>
   </li>
   <li>
     <button mat-raised-button color="warn" (click)="revert()" [disabled]="!isValueChange()">Revert</button>
     <button mat-raised-button color="primary" (click)="saveLocally()" [disabled]="!isValueChange()">Save Locally</button>
-    <button mat-raised-button color="warn" (click)="reSync()" [disabled]="!authenticatorService.isAuthenticatedSync()">Re Sync</button>
-    <button mat-raised-button color="primary" (click)="saveToServer()" [disabled]="!authenticatorService.isAuthenticatedSync()">Save to Server</button>
+    <button *ngIf="authenticatorService.isAuthenticatedSync()" mat-raised-button color="warn" (click)="reSync()" [disabled]="!authenticatorService.isAuthenticatedSync()">Re Sync</button>
+    <button *ngIf="authenticatorService.isAuthenticatedSync()" mat-raised-button color="primary" (click)="saveToServer()" [disabled]="!authenticatorService.isAuthenticatedSync()">Save to Server</button>
   </li>
 </ul>

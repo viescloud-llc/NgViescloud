@@ -1,31 +1,33 @@
-import { AfterContentInit, AfterViewInit, Directive, HostListener, OnInit } from '@angular/core';
+import { Directive, HostListener, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { KeyCaptureService } from '../service/key-capture.service';
 import { SettingService } from '../service/setting.service';
 import { AuthenticatorService } from '../service/authenticator.service';
-import { OpenIdService } from '../service/open-id.service';
+import { Router } from '@angular/router';
+import { environment } from 'projects/environments/environment.prod';
 
 @Directive({
   selector: '[appViescloudApplication]'
 })
 export abstract class ViescloudApplication implements OnInit {
 
+  protected environment = environment;
+
   constructor(
     protected authenticatorService: AuthenticatorService,
-    protected openIdService: OpenIdService,
-    protected settingService: SettingService,
+    protected settingService: SettingService<any>,
     protected keyCaptureService: KeyCaptureService,
-    protected matDialog: MatDialog
+    protected matDialog: MatDialog,
+    protected router: Router,
   ) { 
     this.listenToDialogEvents();
-    this.settingService.init(this.getTitle(), this.authenticatorService);
+    // this.settingService.init(this.getTitle(), this.authenticatorService);
+    this.settingService.init();
   }
 
   ngOnInit(): void {
-    
-  }
 
-  abstract getTitle(): string;
+  }
 
   // Subscribe to MatDialog open and close events
   listenToDialogEvents() {

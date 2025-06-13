@@ -39,7 +39,7 @@ export class CodeEditorComponent implements AfterViewInit, OnDestroy {
 
   constructor(
     private cd: ChangeDetectorRef,
-    private settingService: SettingService,
+    private settingService: SettingService<any>,
     private keycaptureService?: KeyCaptureService,
   ) {
 

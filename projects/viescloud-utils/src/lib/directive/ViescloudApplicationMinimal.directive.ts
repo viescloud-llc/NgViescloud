@@ -10,12 +10,12 @@ import { MatDialog } from '@angular/material/dialog';
 export abstract class ViescloudApplicationMinimal implements OnInit {
 
   constructor(
-    protected settingService: SettingService,
+    protected settingService: SettingService<any>,
     protected keyCaptureService: KeyCaptureService,
     protected matDialog: MatDialog
   ) {
     this.listenToDialogEvents();
-    this.settingService.initMinimal(this.getTitle());
+    // this.settingService.initMinimal(this.getTitle());
   }
 
   async ngOnInit() {

@@ -31,16 +31,3 @@ export class GeneralSetting {
     @MatInputIndex(100)
     theme: MatTheme = MatTheme.CyanDeepPurpleDark;
 }
-
-export class WrapSetting extends GeneralSetting {
-
-    @MatInputItemSetting(MatItemSettingType.SLIDE_TOGGLE, true)
-    @MatInputDisplayLabel('Initial auto refetch workspace')
-    @MatInputIndex(14)
-    initAutoRefetchWorkspace: boolean = true;
-
-    constructor() {
-        super();
-        ReflectionUtils.copyAllParentPrototype(this);        
-    }
-}
