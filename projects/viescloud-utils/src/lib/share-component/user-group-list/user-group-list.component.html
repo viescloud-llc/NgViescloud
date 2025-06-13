@@ -1,0 +1,9 @@
+<br>
+<app-mat-table-dynamic
+[getAllFn]="userGroupService.getAll()"
+[addOrSaveFn]="postOrPut"
+[blankObject]="blankUserGroup"
+[service]="userGroupService"
+[showFilter]="true"
+[showPagination]="true"
+></app-mat-table-dynamic>

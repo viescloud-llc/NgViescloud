@@ -146,4 +146,23 @@ export class StringUtils {
 
     return dayMap[day] || day;
   }
+
+  public static isValidJson(str: string): boolean {
+    try {
+      JSON.parse(str);
+      return true;
+    } 
+    catch (e) {
+      return false;
+    }
+  }
+
+  public static isNumber(str: string): boolean {
+    try {
+      return !isNaN(Number(str));
+    }
+    catch (e) {
+      return false;
+    }
+  }
 }

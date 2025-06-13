@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { DRAWER_STATE, HeaderComponent } from '../header/header.component';
 
 @Component({
-  selector: 'viescloud-header-minimal',
+  selector: 'vies-eco-header-minimal',
   templateUrl: './header-minimal.component.html',
   styleUrls: ['./header-minimal.component.scss']
 })

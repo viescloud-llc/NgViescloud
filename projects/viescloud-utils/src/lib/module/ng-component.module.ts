@@ -18,7 +18,6 @@ import { MatFormFieldInputDynamicComponent } from '../util-component/mat-form-fi
 import { MatFormFieldInputListOptionComponent } from '../util-component/mat-form-field-input-list-option/mat-form-field-input-list-option.component';
 import { HeaderComponent } from '../share-component/header/header.component';
 import { LoginComponent } from '../share-component/login/login.component';
-import { OpenIdComponent } from '../share-component/openId/openId.component';
 import { SideDrawerMenuComponent } from '../share-component/side-drawer-menu/side-drawer-menu.component';
 import { QuickSideDrawerMenuComponent } from '../share-component/quick-side-drawer-menu/quick-side-drawer-menu.component';
 import { ClickStopPropagationDirective } from '../directive/ClickStopPropagation.directive';
@@ -34,6 +33,11 @@ import { MatFormFieldInputUserAccessComponent } from '../util-component/mat-form
 import { MatTableDynamicComponent } from '../util-component/mat-table-dynamic/mat-table-dynamic.component';
 import { MatTablePathLazyComponent } from '../util-component/mat-table-path-lazy/mat-table-path-lazy.component';
 import { MatTableLazyComponent } from '../util-component/mat-table-lazy/mat-table-lazy.component';
+import { OpenIdProviderComponent } from '../share-component/open-id-provider/open-id-provider.component';
+import { UserGroupListComponent } from '../share-component/user-group-list/user-group-list.component';
+import { UserListComponent } from '../share-component/user-list/user-list.component';
+import { UserSettingComponent } from '../share-component/user-setting/user-setting.component';
+import { UserAccessComponent } from '../share-component/user-access/user-access.component';
 
 const UTILS = [
   CopyToClipboardUtilComponent,
@@ -68,10 +72,14 @@ const UTILS = [
 const COMPONENTS = [
   HeaderComponent,
   LoginComponent,
-  OpenIdComponent,
+  OpenIdProviderComponent,
   SideDrawerMenuComponent,
   QuickSideDrawerMenuComponent,
-  HeaderMinimalComponent
+  HeaderMinimalComponent,
+  UserGroupListComponent,
+  UserListComponent,
+  UserSettingComponent,
+  UserAccessComponent
 ]
 
 @NgModule({

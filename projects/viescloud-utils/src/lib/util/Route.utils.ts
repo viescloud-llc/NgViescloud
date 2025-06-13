@@ -88,6 +88,12 @@ export class RouteUtils {
     window.history.pushState({}, '', newUrl);
   }
 
+  static deleteQueryParam(...params: string[]) {
+    for (let i = 0; i < params.length; i++) {
+      RouteUtils.setQueryParam(params[i], null);
+    }
+  }
+
   /**
    * Retrieves the value of a URL path variable.
    * @param variableName - The name of the path variable to retrieve.

@@ -1,17 +1,6 @@
 import { DataUtils } from "../util/Data.utils";
 import { ViesUtils } from "../util/Vies.utils";
 
-export enum PropertyMatcherEnum {
-    CASE_SENSITIVE = "CASE_SENSITIVE",
-    CONTAINS = "CONTAINS",
-    ENDS_WITH = "ENDS_WITH",
-    EXACT = "EXACT",
-    IGNORE_CASE = "IGNORE_CASE",
-    REGEX = "REGEX",
-    STARTS_WITH = "STARTS_WITH",
-    DEFAULT = "DEFAULT"
-}
-
 export enum MatType {
     OBJECT = 'object',
     ARRAY = 'array',
@@ -94,38 +83,6 @@ export interface MatOption<T> {
     value: T,
     valueLabel: string,
     disable?: boolean
-}
-
-export class DateTime {
-    year?:            number = 0;
-    month?:           number = 0;
-    day?:             number = 0;
-    hour?:            number = 0;
-    minute?:          number = 0;
-    second?:          number = 0;
-    bypassMax?:       boolean = false;
-    id?:              number = 0;
-    time?:            string = '';
-    date?:            string = '';
-    dateTime?:        string = '';
-    maxDayThisMonth?: number = 0;
-    zoneId?:           string = '';
-
-    constructor(year?: number, month?: number, day?: number, hour?: number, minute?: number, second?: number, bypassMax?: boolean, id?: number, time?: string, date?: string, dateTime?: string, maxDayThisMonth?: number, zoneId?: string) {
-        this.year = year;
-        this.month = month;
-        this.day = day;
-        this.hour = hour;
-        this.minute = minute;
-        this.second = second;
-        this.bypassMax = bypassMax;
-        this.id = id;
-        this.time = time;
-        this.date = date;
-        this.dateTime = dateTime;
-        this.maxDayThisMonth = maxDayThisMonth;
-        this.zoneId = zoneId;
-    }
 }
 
 export class MatListItem<T> {
