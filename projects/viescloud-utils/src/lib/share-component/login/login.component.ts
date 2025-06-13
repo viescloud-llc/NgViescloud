@@ -59,7 +59,7 @@ export class LoginComponent implements OnInit {
       let stateData = LoginComponent.getState();
 
       if (stateData?.key == state) {
-        this.authenticatorService.loginOAuth2({ code: code, redirectUri: stateData.redirectUri, openIdProviderId: stateData.provider.id }).subscribe({
+        this.authenticatorService.loginOAuth2({ code: code, redirectUri: stateData.redirectUri, openIdProviderId: stateData.provider.id }, stateData.provider).subscribe({
           next: res => {
             this.router.navigate([environment.endpoint_home]);
           },
@@ -87,14 +87,22 @@ export class LoginComponent implements OnInit {
   }
 
   async login() {
+    let success = false;
+
     if (this.validForm)
-      await firstValueFrom(this.authenticatorService.login({ username: this.username, password: this.password })).catch(err => {
+      await firstValueFrom(this.authenticatorService.login({ username: this.username, password: this.password }))
+      .then(res => {
+        success = true;
+      })
+      .catch(err => {
         this.dialogUtils.openErrorMessage("Login fail", "invalid username or password");
       });
     else
       this.dialogUtils.openErrorMessage("Invalid Form", "Invalid username or password")
 
-    this.router.navigate([environment.endpoint_home]);
+    if (success) {
+      this.router.navigate([environment.endpoint_home]);
+    }
   }
 
   getRedirectUri() {

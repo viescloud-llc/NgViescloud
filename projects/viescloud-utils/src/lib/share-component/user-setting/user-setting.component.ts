@@ -14,6 +14,7 @@ export class UserSettingComponent implements OnInit {
   newPassword = '';
   reNewPassword = '';
   alias = '';
+  aliasCopy = '';
 
   error = '';
   validForm = false;
@@ -30,6 +31,7 @@ export class UserSettingComponent implements OnInit {
     this.newPassword = '';
     this.reNewPassword = '';
     this.alias = this.ensibleAuthenticatorService.getCurrentUserAliasOrUsername();
+    this.aliasCopy = structuredClone(this.alias);
 
     this.error = '';
     this.validForm = false;

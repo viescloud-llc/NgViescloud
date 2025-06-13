@@ -1,7 +1,7 @@
 <ul *ngIf="!openIdLogin" class="margin-center-li-center" appMatFormFieldGroup (onAllInputCheck)="validForm = $event" [formSummitClick]="loginButton">
     <li>
       <app-mat-form-field-input
-      label="Username"
+      label="Username or email"
       [(value)]="username"
       [required]="true"
       styleWidth="50%">
