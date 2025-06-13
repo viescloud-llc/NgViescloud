@@ -3,16 +3,8 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start_v-console": "ng serve --project v-console",
-    "build_v-console": "ng build --project v-console",
-    "start_v-service": "ng serve --project v-service",
-    "build_v-service": "ng build --project v-service",
-    "start_vmk": "ng serve --project vmk",
-    "build_vmk": "ng build --project vmk",
-    "start_wrap": "ng serve --project wrap",
-    "build_wrap": "ng build --project wrap",
-    "start_ensible": "ng serve --project ensible",
-    "build_ensible": "ng build --project ensible",
+    "start_dns-manager": "ng serve --project dns-manager",
+    "build_dns-manager": "ng build --project dns-manager",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },

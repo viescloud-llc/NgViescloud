@@ -334,26 +334,8 @@ export abstract class ObjectStorage {
 @Injectable({
   providedIn: 'root'
 })
-export class SmbStorageServiceV1 extends ObjectStorage {
-  protected override getPrefixes(): string[] {
-    return ['osm', 'smb', 'v1'];
-  }
-}
-
-@Injectable({
-  providedIn: 'root'
-})
-export class S3StorageServiceV1 extends ObjectStorage {
+export class ObjectStorageService extends ObjectStorage {
   protected override getPrefixes(): string[] {
     return ['osm', 's3', 'v1'];
-  }
-}
-
-@Injectable({
-  providedIn: 'root'
-})
-export class DatabaseStorageServiceV1 extends ObjectStorage {
-  protected override getPrefixes(): string[] {
-    return ['osm', 'database', 'v1'];
   }
 }

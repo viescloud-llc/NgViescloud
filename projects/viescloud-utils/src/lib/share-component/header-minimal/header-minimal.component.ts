@@ -36,7 +36,7 @@ export class HeaderMinimalComponent {
 
   constructor(
     private router: Router,
-    private settingService: SettingService
+    private settingService: SettingService<any>
     ) {
       settingService.header = this;
     }

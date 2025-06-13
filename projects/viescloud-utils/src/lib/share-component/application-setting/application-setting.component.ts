@@ -18,7 +18,7 @@ export class ApplicationSettingComponent implements OnInit, OnDestroy {
   blankGeneralSetting: GeneralSetting = new GeneralSetting();
 
   constructor(
-    public settingService: SettingService,
+    public settingService: SettingService<any>,
     public authenticatorService: AuthenticatorService,
     private matDialog: MatDialog
   ) { 
@@ -75,5 +75,9 @@ export class ApplicationSettingComponent implements OnInit, OnDestroy {
         this.settingService.syncFromServer(this.settingService.prefix);
       }
     })
+  }
+
+  changeTheme() {
+    this.settingService.changeTheme(this.generalSetting.theme);
   }
 }
