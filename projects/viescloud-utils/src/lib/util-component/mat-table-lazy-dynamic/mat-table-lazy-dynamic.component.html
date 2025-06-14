@@ -1,0 +1,54 @@
+<ul *ngIf="!selectedRow">
+  <li>
+    <button mat-icon-button color="primary" (click)="init()" [matTooltip]="'Refresh'">
+      <mat-icon>refresh</mat-icon>
+    </button>
+    <button mat-icon-button color="primary" (click)="addNewRow()" [matTooltip]="'Add new row'">
+      <mat-icon>add_box</mat-icon>
+    </button>
+    <button *ngIf="showMultipleRowSelectionButton" mat-icon-button color="primary" (click)="showMultipleRowSelection = !showMultipleRowSelection" [matTooltip]="'Multiple Select'">
+      <mat-icon>edit</mat-icon>
+    </button>
+    <button *ngIf="showMultipleRowSelection" mat-icon-button color="primary" (click)="deleteRows(selectedRows)" [matTooltip]="'Delete All'">
+      <mat-icon>delete</mat-icon>
+    </button>
+  </li>
+  <hr>
+  <li>
+    <app-mat-table-lazy
+    [matRowsPage]="matRowsPage"
+    [sendPageIndexChangeSubject]="sendPageIndexChangeSubject"
+    [filterDisplay]="filterDisplay"
+    [initSort]="initSort"
+    [blankObject]="blankObject"
+    [pageSizeOptions]="pageSizeOptions"
+    [showFilter]="showFilter"
+    [showPagination]="showPagination"
+    [showMultipleRowSelection]="showMultipleRowSelection"
+    [showMatTooltip]="showMatTooltip"
+    [pageIndex]="pageIndex"
+    (onEditRow)="editRow($event)"
+    (onMiddleClickRow)="onMiddleClickRow.emit($event)"
+    (onMultipleRowSelected)="multipleRowSelectedFn($event)"
+    (onPageIndexChange)="pageIndexChange($event)"
+    (onLazyPageChange)="onLazyPageChange($event)"
+    ></app-mat-table-lazy>
+  </li>
+</ul>
+
+<ul *ngIf="selectedRow" appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
+  <li>
+    <app-mat-form-field-input-dynamic
+    [(value)]="selectedRow"
+    [styleWidth]="styleWidth"
+    [blankObject]="blankObject"
+    ></app-mat-form-field-input-dynamic>
+  </li>
+  <li [class]="styleWidth === '100%' ? 'flex-row-container-auto' : ''">
+    <button *ngIf="addOrSaveFn" mat-raised-button color="primary" (click)="save()" [disabled]="!isValueChange() || !validForm">Save</button>
+    <button *ngIf="addOrSaveFn" mat-raised-button color="warn" (click)="revert()" [disabled]="!isValueChange()">Revert</button>
+    <button *ngIf="!newRow && cloneFn" mat-raised-button color="primary" (click)="cloneRow()">Clone</button>
+    <button mat-raised-button color="warn" (click)="selectRow(null)">{{ !addOrSaveFn ? 'Close' : !isValueChange() ? 'Cancel | Back' : 'Discard' }}</button>
+    <button *ngIf="deleteFn && !newRow" mat-raised-button color="warn" (click)="deleteRow(selectedRow)">Delete</button>
+  </li>
+</ul>

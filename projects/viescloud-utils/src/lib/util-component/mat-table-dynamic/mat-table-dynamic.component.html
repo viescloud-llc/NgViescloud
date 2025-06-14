@@ -6,20 +6,30 @@
     <button mat-icon-button color="primary" (click)="addNewRow()" [matTooltip]="'Add new row'">
       <mat-icon>add_box</mat-icon>
     </button>
+    <button *ngIf="showMultipleRowSelectionButton" mat-icon-button color="primary" (click)="showMultipleRowSelection = !showMultipleRowSelection" [matTooltip]="'Multiple Select'">
+      <mat-icon>edit</mat-icon>
+    </button>
+    <button *ngIf="showMultipleRowSelection" mat-icon-button color="primary" (click)="deleteRows(selectedRows)" [matTooltip]="'Delete All'">
+      <mat-icon>delete</mat-icon>
+    </button>
   </li>
   <hr>
   <li>
     <app-mat-table
-    [filterDisplay]="filterDisplay"
     [matRows]="matRows"
+    [filterDisplay]="filterDisplay"
+    [initSort]="initSort"
+    [blankObject]="blankObject"
     [pageSizeOptions]="pageSizeOptions"
     [showFilter]="showFilter"
     [showPagination]="showPagination"
-    [initSort]="initSort"
-    [blankObject]="blankObject"
+    [showMultipleRowSelection]="showMultipleRowSelection"
     [showMatTooltip]="showMatTooltip"
+    [pageIndex]="pageIndex"
     (onEditRow)="editRow($event)"
-    (onPageIndexChange)="onPageIndexChange.emit($event)"
+    (onMiddleClickRow)="onMiddleClickRow.emit($event)"
+    (onMultipleRowSelected)="multipleRowSelectedFn($event)"
+    (onPageIndexChange)="pageIndexChange($event)"
     ></app-mat-table>
   </li>
 </ul>
@@ -35,7 +45,8 @@
   <li [class]="styleWidth === '100%' ? 'flex-row-container-auto' : ''">
     <button *ngIf="addOrSaveFn" mat-raised-button color="primary" (click)="save()" [disabled]="!isValueChange() || !validForm">Save</button>
     <button *ngIf="addOrSaveFn" mat-raised-button color="warn" (click)="revert()" [disabled]="!isValueChange()">Revert</button>
-    <button mat-raised-button color="warn" (click)="selectRow(null)">{{ !addOrSaveFn ? 'Close' : !isValueChange() ? 'Cancel' : 'Discard' }}</button>
-    <button *ngIf="deleteFn" mat-raised-button color="warn" (click)="deleteRow()">Delete</button>
+    <button *ngIf="!newRow && cloneFn" mat-raised-button color="primary" (click)="cloneRow()">Clone</button>
+    <button mat-raised-button color="warn" (click)="selectRow(null)">{{ !addOrSaveFn ? 'Close' : !isValueChange() ? 'Cancel | Back' : 'Discard' }}</button>
+    <button *ngIf="deleteFn && !newRow" mat-raised-button color="warn" (click)="deleteRow(selectedRow)">Delete</button>
   </li>
 </ul>

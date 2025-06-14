@@ -36,14 +36,14 @@ export abstract class ViesService {
     }
 
     static getParseUri() {
-        if(environment.gateway_detection === 'static')
+        if (environment.gateway_detection === 'static')
             return RouteUtils.parseUrl(environment.gateway_api);
         else
-            return RouteUtils.getCurrentSchemasHostPortParsed();    
+            return RouteUtils.getCurrentSchemasHostPortParsed();
     }
 
     static getUri() {
-        if(environment.gateway_detection === 'static')
+        if (environment.gateway_detection === 'static')
             return environment.gateway_api;
         else
             return RouteUtils.getCurrentSchemasHostPort();
@@ -59,8 +59,12 @@ export abstract class ViesRestService<T extends Object> extends ViesService {
         super(httpClient);
     }
 
+    abstract newBlankObject(): T;
+    abstract getIdFieldValue(object: T): any;
+    abstract setIdFieldValue(object: T, id: any): void;
+
     public getAll(matchBy?: MatchByEnum, matchCase?: MatchCaseEnum, matchTo?: T): Observable<T[]> {
-        if(matchBy && matchCase && matchTo) {
+        if (matchBy && matchCase && matchTo) {
             return this.complexMatch(matchBy, matchCase, matchTo);
         }
         else {
@@ -74,11 +78,11 @@ export abstract class ViesRestService<T extends Object> extends ViesService {
         params.set('size', size);
         params.setIfValid('sort', sort);
 
-        if(matchBy && matchCase && matchTo) {
+        if (matchBy && matchCase && matchTo) {
             return this.complexMatchPageable(matchBy, matchCase, matchTo, page, size, sort);
         }
 
-        return this.httpClient.get<Pageable<T>>(`${this.getPrefixUri()}`, {params: params.build()}).pipe(first());
+        return this.httpClient.get<Pageable<T>>(`${this.getPrefixUri()}`, { params: params.build() }).pipe(first());
     }
 
     public getAllPageableNoSort(page: number, size: number, matchBy?: MatchByEnum, matchCase?: MatchCaseEnum, matchTo?: T): Observable<Pageable<T>> {
@@ -89,7 +93,7 @@ export abstract class ViesRestService<T extends Object> extends ViesService {
         let params = new HttpParamsBuilder();
         params.set("matchBy", matchBy);
         params.set("matchCase", matchCase);
-        return this.httpClient.post<T[]>(`${this.getPrefixUri()}/matches`, matchTo, {params: params.build()}).pipe(first());
+        return this.httpClient.post<T[]>(`${this.getPrefixUri()}/matches`, matchTo, { params: params.build() }).pipe(first());
     }
 
     public complexMatchPageable(matchBy: MatchByEnum, matchCase: MatchCaseEnum, matchTo: T, page: number, size: number, sort?: string): Observable<Pageable<T>> {
@@ -99,7 +103,7 @@ export abstract class ViesRestService<T extends Object> extends ViesService {
         params.set('page', page);
         params.set('size', size);
         params.setIfValid('sort', sort);
-        return this.httpClient.post<Pageable<T>>(`${this.getPrefixUri()}/matches`, matchTo, {params: params.build()}).pipe(first());
+        return this.httpClient.post<Pageable<T>>(`${this.getPrefixUri()}/matches`, matchTo, { params: params.build() }).pipe(first());
     }
 
     public get(id: any): Observable<T> {
@@ -131,35 +135,35 @@ export abstract class ViesRestService<T extends Object> extends ViesService {
     }
 
     public openDialog(matDialog: MatDialog, id: any, blankObject: T, waitLoadingDialog?: boolean, title?: string) {
-      let objectDialogData: ObjectDialogData<T, ViesRestService<T>> = {
-          id: id,
-          service: this,
-          title: title ? title : id ? "Edit Data" : "Create New",
-          getFn: (service: ViesRestService<T>, id: any) => id ? this.getFirstValueFrom(service.get(id), matDialog, waitLoadingDialog ?? false) : structuredClone(blankObject),
-          createFn: id ? undefined : (service: ViesRestService<T>, value: T) => this.getFirstValueFrom(service.post(value), matDialog, waitLoadingDialog ?? false),
-          modifyFn: id ? (service: ViesRestService<T>, value: T) => this.getFirstValueFrom(service.put(id, value), matDialog, waitLoadingDialog ?? false) : undefined,
-          blankObject: blankObject
-      }
+        let objectDialogData: ObjectDialogData<T, ViesRestService<T>> = {
+            id: id,
+            service: this,
+            title: title ? title : id ? "Edit Data" : "Create New",
+            getFn: (service: ViesRestService<T>, id: any) => id ? this.getFirstValueFrom(service.get(id), matDialog, waitLoadingDialog ?? false) : structuredClone(blankObject),
+            createFn: id ? undefined : (service: ViesRestService<T>, value: T) => this.getFirstValueFrom(service.post(value), matDialog, waitLoadingDialog ?? false),
+            modifyFn: id ? (service: ViesRestService<T>, value: T) => this.getFirstValueFrom(service.put(id, value), matDialog, waitLoadingDialog ?? false) : undefined,
+            blankObject: blankObject
+        }
 
-      return matDialog.open(ObjectDialog, { data: objectDialogData , width: '100%'}).afterClosed();
+        return matDialog.open(ObjectDialog, { data: objectDialogData, width: '100%' }).afterClosed();
     }
 
     private getFirstValueFrom(observable: Observable<T>, matDialog: MatDialog, waitLoadingDialog: boolean): Promise<T> {
-      return waitLoadingDialog ? firstValueFrom(observable.pipe(RxJSUtils.waitLoadingDialog(matDialog))) : firstValueFrom(observable);
+        return waitLoadingDialog ? firstValueFrom(observable.pipe(RxJSUtils.waitLoadingDialog(matDialog))) : firstValueFrom(observable);
     }
 
     public postOrPut(id: any, object: T): Observable<T> {
-      return this.parseId(id) ? this.put(id, object) : this.post(object);
+        return this.parseId(id) ? this.put(id, object) : this.post(object);
     }
 
     public postOrPatch(id: any, object: T): Observable<T> {
-      return this.parseId(id) ? this.patch(id, object) : this.post(object);
+        return this.parseId(id) ? this.patch(id, object) : this.post(object);
     }
 
     private parseId(id: any) {
-      if(typeof id === 'string')
-          return parseInt(id);
-      else
-          return id;
+        if (typeof id === 'string')
+            return parseInt(id);
+        else
+            return id;
     }
 }

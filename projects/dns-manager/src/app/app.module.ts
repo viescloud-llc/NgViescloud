@@ -10,9 +10,13 @@ import { AuthInterceptor } from 'projects/viescloud-utils/src/lib/guards/auth.in
 import { SettingService } from 'projects/viescloud-utils/src/lib/service/setting.service';
 import { ObjectStorageService } from 'projects/viescloud-utils/src/lib/service/object-storage-manager.service';
 import { DnsManagerObjectStorageService } from './service/dns-manager.object.storage.service';
+import { DnsSettingListComponent } from './dns-setting-list/dns-setting-list.component';
+import { DnsRecordListComponent } from './dns-record-list/dns-record-list.component';
 
 const LIST = [
-  AppComponent
+  AppComponent,
+  DnsSettingListComponent,
+  DnsRecordListComponent
 ]
 
 @NgModule({

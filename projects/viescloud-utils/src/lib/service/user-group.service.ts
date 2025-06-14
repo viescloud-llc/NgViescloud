@@ -6,28 +6,39 @@ import { MatOption } from "../model/mat.model";
 import { map } from "rxjs";
 
 @Injectable({
-    providedIn: 'root',
+  providedIn: 'root',
 })
 export class UserGroupService extends ViesRestService<UserGroup> {
+  constructor(httpClient: HttpClient) {
+    super(httpClient);
+  }
 
-    constructor(httpClient: HttpClient) {
-        super(httpClient);
-    }
+  override newBlankObject(): UserGroup {
+    return new UserGroup();
+  }
 
-    protected override getPrefixes(): string[] {
-        return ['api', 'v1', 'user', 'groups'];
-    }
+  override getIdFieldValue(object: UserGroup) {
+    return object.id;
+  }
 
-    getAllPublicGroupIdOptions() {
-        return this.getAll().pipe(map(res => {
-          let options: MatOption<string>[] = [];
-          res.forEach(e => {
-            options.push({
-              value: e.id + '',
-              valueLabel: e.name
-            });
-          })
-          return options;
-        }))
-      }
+  override setIdFieldValue(object: UserGroup, id: any): void {
+    object.id = id;
+  }
+
+  protected override getPrefixes(): string[] {
+    return ['api', 'v1', 'user', 'groups'];
+  }
+
+  getAllPublicGroupIdOptions() {
+    return this.getAll().pipe(map(res => {
+      let options: MatOption<string>[] = [];
+      res.forEach(e => {
+        options.push({
+          value: e.id + '',
+          valueLabel: e.name
+        });
+      })
+      return options;
+    }))
+  }
 }

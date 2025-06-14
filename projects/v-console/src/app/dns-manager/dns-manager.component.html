@@ -1,0 +1,40 @@
+<ul class="margin-center" *ngIf="!selectedDnsRecord; else Else">
+  <li><h1 class="text-center">DNS Manager</h1></li>
+  <li class="flex-row-container">
+    <button mat-raised-button color="primary" (click)="ngOnInit()">Refresh</button>
+    <button mat-raised-button color="primary" (click)="clearCache()">Clear Cache</button>
+    <button mat-raised-button color="primary" (click)="addNewRecord()">Add new record</button>
+    <button mat-raised-button color="primary" (click)="cleanUnusedCloudflareCnameDns()">Clean unused DNS records</button>
+    <app-mat-form-field-input-dynamic
+    label="Auto Clean unused DNS records"
+    [(value)]="autoCleanUnusedDnsRecords"
+    [isSlideToggle]="true"
+    ></app-mat-form-field-input-dynamic>
+  </li>
+  <br>
+  <li>
+    <app-mat-table
+    [showFilter]="true"
+    [showPagination]="true"
+    [showMatTooltip]="true"
+    [matRows]="dnsRecords"
+    [blankObject]="blankDnsRecord"
+    (onEditRow)="selectedDnsRecord = $event"
+    [pageSizeOptions]="[20, 50, 100, 500]"
+    ></app-mat-table>
+  </li>
+</ul>
+
+<ng-template #Else>
+  <ul class="margin-center">
+    <li>
+      <app-dns-record
+      [dnsRecord]="selectedDnsRecord!"
+      [viescloudNginxCertificates]="viescloudNginxCertificates"
+      [vieslocalNginxCertificates]="vieslocalNginxCertificates"
+      (onEdit)="editRecord($event)"
+      (onRemove)="removeRecord()"
+      ></app-dns-record>
+    </li>
+  </ul>
+</ng-template>

@@ -1,0 +1,17 @@
+<div class="margin-center">
+  <ul>
+    <li><h1 class="text-center">User account</h1></li>
+    <li>
+      <app-mat-table
+      [matRows]="userRows"
+      [showFilter]="true"
+      [showPagination]="true"
+      (onEditRow)="editUser($event)"
+      ></app-mat-table>
+    </li>
+    <br>
+    <li>
+      <button mat-raised-button color="primary" style="width: 100%;" (click)="createNewUser()">Create new User</button>
+    </li>
+  </ul>
+</div>

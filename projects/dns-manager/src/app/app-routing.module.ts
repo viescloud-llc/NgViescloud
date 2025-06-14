@@ -8,6 +8,8 @@ import { AuthGuard } from 'projects/viescloud-utils/src/lib/guards/auth.guard';
 import { UserListComponent } from 'projects/viescloud-utils/src/lib/share-component/user-list/user-list.component';
 import { UserGroupListComponent } from 'projects/viescloud-utils/src/lib/share-component/user-group-list/user-group-list.component';
 import { OpenIdProviderComponent } from 'projects/viescloud-utils/src/lib/share-component/open-id-provider/open-id-provider.component';
+import { DnsSettingListComponent } from './dns-setting-list/dns-setting-list.component';
+import { DnsRecordListComponent } from './dns-record-list/dns-record-list.component';
 
 const routes: Routes = [
   {
@@ -17,6 +19,21 @@ const routes: Routes = [
   {
     path: "login",
     component: LoginComponent
+  },
+  {
+    path: "dns-manager",
+    canActivate: [async () => inject(AuthGuard).isLogin()],
+    canActivateChild: [async () => inject(AuthGuard).isLogin()],
+    children: [
+      {
+        path: 'record',
+        component: DnsRecordListComponent
+      },
+      {
+        path: 'setting',
+        component: DnsSettingListComponent
+      }
+    ]
   },
   {
     path: 'setting',
