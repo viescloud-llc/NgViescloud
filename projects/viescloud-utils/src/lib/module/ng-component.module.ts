@@ -38,6 +38,8 @@ import { UserGroupListComponent } from '../share-component/user-group-list/user-
 import { UserListComponent } from '../share-component/user-list/user-list.component';
 import { UserSettingComponent } from '../share-component/user-setting/user-setting.component';
 import { UserAccessComponent } from '../share-component/user-access/user-access.component';
+import { MatTableDynamicViesServiceComponent } from '../util-component/mat-table-dynamic-vies-service/mat-table-dynamic-vies-service.component';
+import { MatTableLazyDynamicComponent } from '../util-component/mat-table-lazy-dynamic/mat-table-lazy-dynamic.component';
 
 const UTILS = [
   CopyToClipboardUtilComponent,
@@ -66,7 +68,9 @@ const UTILS = [
   DisableKeyCaptureOnInputDirective,
   CodeEditorComponent,
   MatTablePathComponent,
-  MatTablePathLazyComponent
+  MatTablePathLazyComponent,
+  MatTableDynamicViesServiceComponent,
+  MatTableLazyDynamicComponent
 ]
 
 const COMPONENTS = [
