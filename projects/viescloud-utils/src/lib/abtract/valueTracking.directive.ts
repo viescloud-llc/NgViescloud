@@ -1,72 +1,78 @@
-import { Directive } from "@angular/core";
+import { Directive, EventEmitter, Input, Output } from "@angular/core";
 import { TrackByIndex } from "./TrackByIndex";
 import { FixChangeDetection } from "./FixChangeDetection";
 import { DataUtils } from "../util/Data.utils";
 import { UtilsService } from "../service/utils.service";
 import { RgbColor } from "../model/rgb.model";
 
+type Value<T> = T | null | undefined;
+
 @Directive({
     selector: '[valueTracking]'
 })
-export abstract class ValueTracking<T> extends FixChangeDetection implements TrackByIndex {
+export class ValueTracking<T> extends FixChangeDetection implements TrackByIndex {
 
-    value: T | null | undefined;
+    @Input()
+    value: Value<T>;
     valueCopy: T | null | undefined;
 
-    updateValue(value: T) {
+    @Output()
+    valueChange = new EventEmitter<T>();
+
+    public updateValue(value: Value<T>) {
         this.value = value;
         this.valueCopy = structuredClone(value);
     }
 
-    trackByIndex(index: number, obj: any): any {
+    public trackByIndex(index: number, obj: any): any {
         return index;
     }
 
-    isValueChange() {
+    public isValueChange() {
         return DataUtils.isNotEqual(this.value, this.valueCopy);
     }
 
-    isValueNotChange() {
+    public isValueNotChange() {
         return DataUtils.isEqual(this.value, this.valueCopy);
     }
 
-    isValueEnum(): boolean {
+    public isValueEnum(): boolean {
         return UtilsService.isEnum(this.value);
     }
 
-    isValueString(): boolean {
+    public isValueString(): boolean {
         return typeof this.value === 'string';
     }
 
-    isValueMultipleStringLine(): boolean {
+    public isValueMultipleStringLine(): boolean {
         return typeof this.value === 'string' && this.value.includes("\n");
     }
 
-    isValueNonMultipleStringLine(): boolean {
+    public isValueNonMultipleStringLine(): boolean {
         return typeof this.value === 'string' && !this.value.includes("\n");
     }
 
-    isValueNumber(): boolean {
+    public isValueNumber(): boolean {
         return typeof this.value === 'number';
     }
 
-    isValueBoolean(): boolean {
+    public isValueBoolean(): boolean {
         return typeof this.value === 'boolean';
     }
 
-    resetValue(): void {
+    public resetValue(): void {
         this.value = structuredClone(this.valueCopy);
     }
 
-    isValueArray(): boolean {
+    public isValueArray(): boolean {
         return Array.isArray(this.value);
     }
 
-    isValueObject(): boolean {
+    public isValueObject(): boolean {
         return typeof this.value === 'object';
     }
 
-    isValuePrimitive(): boolean {
+    public isValuePrimitive(): boolean {
         if (this.isValueArray() || this.isValueObject())
             return false;
         else

@@ -46,6 +46,9 @@ export class MatFormFieldInputListComponent extends MatFormFieldComponent {
   @Input()
   expanded: boolean = false;
 
+  @Input()
+  focusOutAutoFillFn?: (value: any, index: number) => any;
+
   @Output()
   expandedChange: EventEmitter<boolean> = new EventEmitter<boolean>();
 
@@ -153,6 +156,13 @@ export class MatFormFieldInputListComponent extends MatFormFieldComponent {
 
   drop(event: CdkDragDrop<any[]>) {
     moveItemInArray(this.value, event.previousIndex, event.currentIndex);
+  }
+
+  getFocusOutAutoFillFn(index: number) {
+    if(this.focusOutAutoFillFn)
+      return (value: any) => this.focusOutAutoFillFn!(value, index);
+    else
+      return undefined;
   }
 }
 
