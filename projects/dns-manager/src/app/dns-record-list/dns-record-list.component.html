@@ -25,7 +25,7 @@
   <li *ngIf="selectedMergeDnsRecord.value">
     <app-dns-record
     [(value)]="selectedMergeDnsRecord.value"
-    [allDnsNames]="allDnsNames"
+    [allDnsNames]="getAllDnsName(selectedMergeDnsRecord.value)"
     (onSave)="onSave($event)"
     (onDelete)="onDelete($event)"
     ></app-dns-record>

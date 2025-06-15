@@ -184,19 +184,13 @@ export class DnsRecordComponent extends ValueTracking<MergeDnsRecord> {
   autoFillDomainName(nginxRecordIndex: number) {
     let domainName = this.domainNames[nginxRecordIndex];
     return (value: string, index: number) => {
-      if(!value.endsWith(domainName)) {
+      if(!value.endsWith(domainName) && value) {
         value = `${value}.${domainName}`;
       }
 
       return value;
     };
   }
-
-  // isValueChange() {
-  //   return DataUtils.isNotEqualWith(this.dnsRecord, this.dnsRecordCopy, this.blankDnsRecord);
-  // }
-
-
 
   getNameByIndex(index: number) {
     return this.domainNames[index] ?? 'Unknown';

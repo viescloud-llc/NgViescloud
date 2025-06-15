@@ -264,4 +264,10 @@ export class DnsRecordListComponent implements OnInit {
     await this.clearCacheAndRefresh();
   }
 
+  getAllDnsName(mergeDnsRecord: MergeDnsRecord) {
+    return this.allDnsNames.filter(e => {
+      return !mergeDnsRecord.dnsRecords.some(record => record.nginxRecord?.domain_names?.some(domainName => domainName === e));
+    })
+  }
+
 }

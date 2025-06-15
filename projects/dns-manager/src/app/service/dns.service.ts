@@ -70,7 +70,7 @@ export class DnsManagerService extends ViesService {
 
     public cleanUnusedDnsRecords(dnsSettingId: number | DnsSetting): Observable<void> {
         let id = this.getSettingId(dnsSettingId);
-        return this.httpClient.delete<void>(`${this.getPrefixUri()}/clear-unused-dns}/${id}`);
+        return this.httpClient.delete<void>(`${this.getPrefixUri()}/clear-unused-dns/${id}`);
     }
 
     public deleteDnsRecord(dnsSettingId: number | DnsSetting, uri: string, cleanUnusedCloudflareCnameDns: boolean = false): Observable<void> {
