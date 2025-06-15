@@ -79,6 +79,7 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
   constructor(
     protected cd: ChangeDetectorRef
   ) { }
+  
   ngAfterContentInit(): void {
     let elements = this.columnDefs?.toArray();
     if(elements) {

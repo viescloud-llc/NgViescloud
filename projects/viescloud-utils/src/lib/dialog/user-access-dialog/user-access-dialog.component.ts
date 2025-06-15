@@ -5,7 +5,7 @@ import { MatOption } from '../../model/mat.model';
 import { Observable } from 'rxjs';
 import { UserAccess, SharedUser, SharedGroup, AccessPermission } from '../../model/authenticator.model';
 import { RxJSUtils } from '../../util/RxJS.utils';
-import { FixChangeDetection } from '../../directive/FixChangeDetection';
+import { FixChangeDetection } from '../../abtract/FixChangeDetection';
 
 @Component({
   selector: 'app-user-access-dialog',

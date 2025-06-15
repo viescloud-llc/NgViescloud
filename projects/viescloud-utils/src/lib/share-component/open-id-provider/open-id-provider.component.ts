@@ -5,7 +5,7 @@ import { OpenIDProvider } from 'projects/viescloud-utils/src/lib/model/open-id.m
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 import { MatOption } from 'projects/viescloud-utils/src/lib/model/mat.model';
-import { FixChangeDetection } from 'projects/viescloud-utils/src/lib/directive/FixChangeDetection';
+import { FixChangeDetection } from 'projects/viescloud-utils/src/lib/abtract/FixChangeDetection';
 import { UserGroup } from '../../model/authenticator.model';
 import { UserGroupService } from '../../service/user-group.service';
 import { OpenIdProviderService } from '../../service/open-id-provider.service';
