@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { environment } from 'projects/environments/environment.prod';
-import { ViescloudApplication } from 'projects/viescloud-utils/src/lib/directive/ViescloudApplication.directive';
-import { ViescloudApplicationMinimal } from 'projects/viescloud-utils/src/lib/directive/ViescloudApplicationMinimal.directive';
+import { ViescloudApplication } from 'projects/viescloud-utils/src/lib/abtract/ViescloudApplication.directive';
+import { ViescloudApplicationMinimal } from 'projects/viescloud-utils/src/lib/abtract/ViescloudApplicationMinimal.directive';
 import { QuickSideDrawerMenu } from 'projects/viescloud-utils/src/lib/share-component/quick-side-drawer-menu/quick-side-drawer-menu.component';
 
 @Component({

@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { MatTableDisplayLabel, MatTableHide } from '../../model/mat.model';
-import { FixChangeDetection } from '../../directive/FixChangeDetection';
+import { FixChangeDetection } from '../../abtract/FixChangeDetection';
 import { RouteUtils } from '../../util/Route.utils';
 import { FileUtils } from '../../util/File.utils';
 

@@ -1,3 +1,16 @@
-<p>
-  dns-record-list works!
-</p>
+<ul class="margin-center">
+  <li *ngIf="!value">
+    <app-mat-table
+    [matRows]="mergeDnsRecords"
+    [blankObject]="blankMergeDnsRecord"
+    [showMatTooltip]="true"
+    [showPagination]="true"
+    [showFilter]="true"
+    [pageSizeOptions]="[10, 20, 30, 100, 200]"
+    (onEditRow)="updateValue($event)"
+    ></app-mat-table>
+  </li>
+  <li *ngIf="value">
+    
+  </li>
+</ul>

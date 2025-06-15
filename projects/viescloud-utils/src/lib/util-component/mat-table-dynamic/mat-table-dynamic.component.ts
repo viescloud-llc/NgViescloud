@@ -205,6 +205,8 @@ export class MatTableDynamicComponent<T extends object, S> extends MatTableCompo
       for (let row of rows) {
         await this.deleteRow(row, false);
       }
+
+      this.init();
     }
   }
 

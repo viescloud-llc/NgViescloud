@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ViescloudApplication } from 'projects/viescloud-utils/src/lib/directive/ViescloudApplication.directive';
+import { ViescloudApplication } from 'projects/viescloud-utils/src/lib/abtract/ViescloudApplication.directive';
 import { QuickSideDrawerMenu } from 'projects/viescloud-utils/src/lib/share-component/quick-side-drawer-menu/quick-side-drawer-menu.component';
 
 @Component({

@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FixChangeDetection } from 'projects/viescloud-utils/src/lib/directive/FixChangeDetection';
-import { TrackByIndex } from 'projects/viescloud-utils/src/lib/directive/TrackByIndex';
+import { FixChangeDetection } from 'projects/viescloud-utils/src/lib/abtract/FixChangeDetection';
+import { TrackByIndex } from 'projects/viescloud-utils/src/lib/abtract/TrackByIndex';
 import { AuthentikConfig, DnsRecord, ForwardScheme, NginxCertificate, NginxLocation, NginxRecord } from 'projects/viescloud-utils/src/lib/model/dns-manager.model';
 import { MatOption } from 'projects/viescloud-utils/src/lib/model/mat.model';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
