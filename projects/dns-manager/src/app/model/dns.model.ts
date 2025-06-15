@@ -57,11 +57,17 @@ export class DnsRecord {
   @MatTableDisplayLabel("Service URI")
   uri: string = '';
 
-  @MatTableHide(true)
+  @MatTableHide()
   nginxRecord?: NginxRecord = new NginxRecord();
 
-  @MatTableHide(true)
+  @MatTableHide()
   cloudflareRecords: CloudflareRecord[] = [new CloudflareRecord()] as CloudflareRecord[];
+
+  @MatTableHide()
+  allNginxCertificates: NginxCertificate[] = [];
+
+  @MatTableHide()
+  dnsSetting: DnsSetting = new DnsSetting();
 }
 
 export class CloudflareRecord {

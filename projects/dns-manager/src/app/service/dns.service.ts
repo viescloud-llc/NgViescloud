@@ -52,10 +52,9 @@ export class DnsManagerService extends ViesService {
         return this.httpClient.get<DnsRecord[]>(`${this.getPrefixUri()}/${id}`);
     }
 
-    public getAllCertificate(dnsSettingId: number | DnsSetting, type: string): Observable<NginxCertificate[]> {
+    public getAllCertificate(dnsSettingId: number | DnsSetting): Observable<NginxCertificate[]> {
         let id = this.getSettingId(dnsSettingId);
-        let params = new HttpParams().set('type', type);
-        return this.httpClient.get<NginxCertificate[]>(`${this.getPrefixUri()}/nginx/certificates/${id}`, { params: params });
+        return this.httpClient.get<NginxCertificate[]>(`${this.getPrefixUri()}/nginx/certificates/${id}`);
     }
 
     public putDnsRecord(dnsSettingId: number | DnsSetting, record: DnsRecord, cleanUnusedCloudflareCnameDns: boolean = false): Observable<void> {

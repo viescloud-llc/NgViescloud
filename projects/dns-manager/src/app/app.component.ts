@@ -34,6 +34,7 @@ export class AppComponent extends ViescloudApplication {
     },
     {
       title: 'DNS Manager',
+      hideConditional: () => !this.authenticatorService.hasUserGroup('ADMIN'),
       children: [
         {
           title: 'Record',
@@ -41,8 +42,7 @@ export class AppComponent extends ViescloudApplication {
         },
         {
           title: 'Setting',
-          routerLink: '/dns-manager/setting',
-          hideConditional: () => !this.authenticatorService.hasUserGroup('ADMIN')
+          routerLink: '/dns-manager/setting'
         }
       ]
     },

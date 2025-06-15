@@ -1,5 +1,14 @@
 <ul class="margin-center">
-  <li *ngIf="!value">
+  <li *ngIf="!selectedMergeDnsRecord.value">
+    <div class="flex-row-container">
+      <button mat-raised-button color="primary" (click)="ngOnInit()">Refresh</button>
+      <button mat-raised-button color="primary" (click)="addMergeDnsRecord()">Add new</button>
+      <button mat-raised-button color="warn" (click)="clearCacheAndRefresh()">Clear cache and <img src="" alt="" sizes="" srcset="">efresh</button>
+      <button mat-raised-button color="warn" (click)="cleanUnUseDnsRecord()">Clean un-use dns record</button>
+      <button mat-raised-button color="primary" (click)="multipleSelection = !multipleSelection">Select</button>
+      <button mat-raised-button color="warn" (click)="massDelete()" *ngIf="multipleSelection && multipleSelections.length > 0">Delete all</button>
+    </div>
+    <hr>
     <app-mat-table
     [matRows]="mergeDnsRecords"
     [blankObject]="blankMergeDnsRecord"
@@ -7,10 +16,18 @@
     [showPagination]="true"
     [showFilter]="true"
     [pageSizeOptions]="[10, 20, 30, 100, 200]"
-    (onEditRow)="updateValue($event)"
+    [showMultipleRowSelection]="multipleSelection"
+    (onMultipleRowSelected)="multipleSelections = $event"
+    (onEditRow)="selectedMergeDnsRecord.updateValue($event)"
     ></app-mat-table>
   </li>
-  <li *ngIf="value">
-    
+
+  <li *ngIf="selectedMergeDnsRecord.value">
+    <app-dns-record
+    [(value)]="selectedMergeDnsRecord.value"
+    [allDnsNames]="allDnsNames"
+    (onSave)="onSave($event)"
+    (onDelete)="onDelete($event)"
+    ></app-dns-record>
   </li>
 </ul>

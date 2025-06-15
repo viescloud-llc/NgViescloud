@@ -12,11 +12,13 @@ import { ObjectStorageService } from 'projects/viescloud-utils/src/lib/service/o
 import { DnsManagerObjectStorageService } from './service/dns-manager.object.storage.service';
 import { DnsSettingListComponent } from './dns-setting-list/dns-setting-list.component';
 import { DnsRecordListComponent } from './dns-record-list/dns-record-list.component';
+import { DnsRecordComponent } from './dns-record/dns-record.component';
 
 const LIST = [
   AppComponent,
   DnsSettingListComponent,
-  DnsRecordListComponent
+  DnsRecordListComponent,
+  DnsRecordComponent
 ]
 
 @NgModule({
