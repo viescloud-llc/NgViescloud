@@ -3,7 +3,7 @@
     <div class="flex-row-container">
       <button mat-raised-button color="primary" (click)="ngOnInit()">Refresh</button>
       <button mat-raised-button color="primary" (click)="addMergeDnsRecord()">Add new</button>
-      <button mat-raised-button color="warn" (click)="clearCacheAndRefresh()">Clear cache and <img src="" alt="" sizes="" srcset="">efresh</button>
+      <button mat-raised-button color="warn" (click)="clearCacheAndRefresh()">Clear cache and refresh</button>
       <button mat-raised-button color="warn" (click)="cleanUnUseDnsRecord()">Clean un-use dns record</button>
       <button mat-raised-button color="primary" (click)="multipleSelection = !multipleSelection">Select</button>
       <button mat-raised-button color="warn" (click)="massDelete()" *ngIf="multipleSelection && multipleSelections.length > 0">Delete all</button>
