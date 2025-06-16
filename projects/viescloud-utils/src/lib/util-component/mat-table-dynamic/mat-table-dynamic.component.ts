@@ -120,6 +120,11 @@ export class MatTableDynamicComponent<T extends object, S> extends MatTableCompo
     this.newRow = true;
   }
 
+  protected pushNewRow(row: T) {
+    this.matRows.push(row);
+    this.selectRow(row);
+  }
+
   cloneRow() {
     if(this.selectedRow && this.cloneFn) {
       this.selectRow(structuredClone(this.cloneFn(this.selectedRow)));
@@ -136,8 +141,7 @@ export class MatTableDynamicComponent<T extends object, S> extends MatTableCompo
           next: res => {
             if(res != null && res != undefined) {
               if(this.newRow) {
-                this.matRows.push(res);
-                this.selectRow(res);
+                this.pushNewRow(res);
               }
               else {
                 this.updateRow(res);
