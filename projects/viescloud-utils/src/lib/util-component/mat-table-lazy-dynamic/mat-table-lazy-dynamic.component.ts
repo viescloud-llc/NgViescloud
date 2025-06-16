@@ -32,7 +32,8 @@ export class MatTableLazyDynamicComponent<T extends object, S> extends MatTableD
   }
 
   override init() {
-    this.sendPageIndexChangeSubject.next();
+    this.cd.detectChanges();
+    this.sendPageIndexChangeSubject.next(void 0);
   }
 
   onLazyPageChange(lazyPageChange: LazyPageChange) {
@@ -66,5 +67,18 @@ export class MatTableLazyDynamicComponent<T extends object, S> extends MatTableD
     if(!row) {
       this.init();
     }
+  }
+
+  protected override pushNewRow(row: T): void {
+    if(this.matRowsPage._metadata.pageNumber === this.matRowsPage._metadata.totalPage) {
+      if(this.matRowsPage.content.length < this.matRowsPage._metadata.pageSize) {
+        this.matRowsPage.content.push(row);
+      }
+      else if(this.matRowsPage.content.length === this.matRowsPage._metadata.pageSize) {
+        this.init();
+      }
+    }
+
+    this.selectRow(row);
   }
 }

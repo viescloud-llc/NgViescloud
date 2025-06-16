@@ -74,7 +74,8 @@ export class MatTableLazyComponent<T extends object> extends MatTableComponent<T
       this.sendPageIndexChangeSubjectSubscription = this.sendPageIndexChangeSubject.subscribe(() => {
         this.fixSizeMap.clear();
         // this.paginator.pageIndex = 0
-        setTimeout(() => this.sendPageIndexChangeEmit(this.paginator.pageIndex));
+        // setTimeout(() => this.sendPageIndexChangeEmit(this.paginator.pageIndex));
+        this.sendPageIndexChangeEmit(this.paginator.pageIndex)
         this.pageIndex = this.paginator.pageIndex;
       })
     }
