@@ -12,6 +12,18 @@ export class OpenIdProviderService extends ViesRestService<OpenIDProvider> {
         super(httpClient);
     }
 
+    override newBlankObject(): OpenIDProvider {
+        return new OpenIDProvider();
+    }
+
+    override getIdFieldValue(object: OpenIDProvider) {
+        return object.id;
+    }
+
+    override setIdFieldValue(object: OpenIDProvider, id: any): void {
+        object.id = id;
+    }
+
     protected override getPrefixes(): string[] {
         return ['api', 'v1', 'open', 'id', 'providers'];
     }

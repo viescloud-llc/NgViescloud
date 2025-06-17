@@ -52,5 +52,7 @@
     </table>
 </ng-container>
 <ng-container *ngIf="showPagination">
-    <mat-paginator (page)="onPageIndexChangeEmit($event)" [pageSizeOptions]="pageSizeOptions" aria-label="Select page of users"></mat-paginator>
+    <mat-paginator [pageIndex]="pageIndex" (page)="onPageIndexChangeEmit($event)" [showFirstLastButtons]="true" [pageSizeOptions]="pageSizeOptions" aria-label="Select page of users">
+        <h1>what</h1>
+    </mat-paginator>
 </ng-container>

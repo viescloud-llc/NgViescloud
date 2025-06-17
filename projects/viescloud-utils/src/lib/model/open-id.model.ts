@@ -1,5 +1,4 @@
-import { EnsibleUserGroup } from "projects/ensible/src/app/model/ensible.model";
-import { SharedUser, SharedGroup } from "./authenticator.model";
+import { SharedUser, SharedGroup, UserGroup } from "./authenticator.model";
 import { MatInputDisplayLabel, MatInputHide, MatInputItemSetting, MatInputRequire, MatItemSettingType, MatTableHide } from "./mat.model";
 
 export interface OpenIdWellKnown {
@@ -93,7 +92,7 @@ export class OpenIDProvider {
 
   @MatInputHide()
   @MatTableHide()
-  groupMappings:         EnsibleUserGroup[] = [new EnsibleUserGroup()] as EnsibleUserGroup[];
+  groupMappings:         UserGroup[] = [new UserGroup()] as UserGroup[];
 
   @MatTableHide()
   @MatInputDisplayLabel('Auto update user info on login if user exist (not recommended)')

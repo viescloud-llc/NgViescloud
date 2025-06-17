@@ -10,13 +10,13 @@ import { EnsibleDialogUtilsService } from '../../util/ensible-dialog-utils/ensib
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 import { UserAccess } from 'projects/viescloud-utils/src/lib/model/authenticator.model';
 import { UserAccessInputType } from 'projects/viescloud-utils/src/lib/util-component/mat-form-field-input-user-access/mat-form-field-input-user-access.component';
-import { FixChangeDetection } from 'projects/viescloud-utils/src/lib/directive/FixChangeDetection';
 import { FileUtils } from 'projects/viescloud-utils/src/lib/util/File.utils';
 import { SnackBarUtils } from 'projects/viescloud-utils/src/lib/util/SnackBar.utils';
 import { firstValueFrom, Subject } from 'rxjs';
 import { LazyPageChange } from 'projects/viescloud-utils/src/lib/util-component/mat-table-lazy/mat-table-lazy.component';
 import { RestUtils } from 'projects/viescloud-utils/src/lib/util/Rest.utils';
 import { Pageable } from 'projects/viescloud-utils/src/lib/model/vies.model';
+import { FixChangeDetection } from 'projects/viescloud-utils/src/lib/abtract/FixChangeDetection';
 
 @Component({
   selector: 'app-ensible-item-list',

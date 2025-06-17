@@ -8,6 +8,7 @@ import { StringUtils } from '../util/String.utils';
 import { OpenIDProvider } from '../model/open-id.model';
 import { Router } from '@angular/router';
 import { DialogUtils } from '../util/Dialog.utils';
+import { environment } from 'projects/environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
@@ -264,7 +265,7 @@ export class AuthenticatorService implements OnDestroy {
   login(credentials: LoginRequest): Observable<User> {
     return this.httpClient.post<AuthResponse>(`${this.getPrefixUri()}/login`, credentials).pipe(
       switchMap(response => this.handleAuthSuccess(response)),
-      tap(() => this.isloginWithOauth2 = true),
+      tap(() => this.isloginWithOauth2 = false),
       catchError(error => this.handleError(error))
     );
   }
@@ -278,13 +279,15 @@ export class AuthenticatorService implements OnDestroy {
 
   loginOAuth2(oauth2Data: Oauth2LoginRequest, openIdProvider?: OpenIDProvider): Observable<User> {
     this.openIdProvider = openIdProvider;
-    return this.httpClient.post<{ jwt: string }>(`${this.getPrefixUri()}/login/oauth2`, oauth2Data).pipe(
+    return this.httpClient.post<AuthResponse>(`${this.getPrefixUri()}/login/oauth2`, oauth2Data).pipe(
       tap(response => {
         this.currentJwt = response.jwt;
+        this.currentRefreshToken = response.refreshToken;
+        this.saveRefreshTokenToSession();
       }),
       switchMap(() => this.fetchCurrentUser()),
-      tap(() => this.startIntervals()),
-      tap(() => this.isloginWithOauth2 = true),
+      tap({next: () => this.startIntervals()}),
+      tap({next: () => this.isloginWithOauth2 = true}),
       catchError(error => this.handleError(error))
     );
   }
@@ -307,6 +310,7 @@ export class AuthenticatorService implements OnDestroy {
 
   logOutManually() {
     this.logout();
+    this.router.navigate([environment.endpoint_login]);
     if(this.isloginWithOauth2) {
       this.isloginWithOauth2 = false;
       if(this.openIdProvider && this.openIdProvider.endSessionEndpoint) {

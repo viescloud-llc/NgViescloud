@@ -32,12 +32,25 @@ export abstract class EnsibleItemService<T extends EnsibleItem> extends ViesRest
       return arr;
     })).pipe(first());
   }
+
+  override getIdFieldValue(object: T) {
+    return object.id;
+  }
+
+  override setIdFieldValue(object: T, id: any): void {
+    object.id = id;
+  }
+
+  override newBlankObject(): T {
+    return this.newEmptyItem();
+  }
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class EnsiblePlaybookItemService extends EnsibleItemService<EnsiblePlaybookItem> {
+
 
   protected override getPrefixes(): string[] {
     return ['api', 'v1', 'playbook', 'items']

@@ -189,17 +189,25 @@ export class RouteUtils {
     schema: string;
     host: string;
     port: string | null;
+    params: { [key: string]: string };
   } {
     const parsedUrl = new URL(url);
+  
     const port =
       parsedUrl.port ||
       DEFAULT_PORTS[parsedUrl.protocol.replace(':', '')] ||
       null;
-
+  
+    const params: { [key: string]: string } = {};
+    parsedUrl.searchParams.forEach((value, key) => {
+      params[key] = value;
+    });
+  
     return {
       schema: parsedUrl.protocol.replace(':', ''),
       host: parsedUrl.hostname,
       port,
+      params // This was missing in your original code
     };
   }
 

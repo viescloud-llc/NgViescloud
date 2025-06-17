@@ -15,8 +15,9 @@
   </li>
   <hr>
   <li>
-    <app-mat-table
-    [matRows]="matRows"
+    <app-mat-table-lazy
+    [matRowsPage]="matRowsPage"
+    [sendPageIndexChangeSubject]="sendPageIndexChangeSubject"
     [filterDisplay]="filterDisplay"
     [initSort]="initSort"
     [blankObject]="blankObject"
@@ -30,7 +31,8 @@
     (onMiddleClickRow)="onMiddleClickRow.emit($event)"
     (onMultipleRowSelected)="multipleRowSelectedFn($event)"
     (onPageIndexChange)="pageIndexChange($event)"
-    ></app-mat-table>
+    (onLazyPageChange)="onLazyPageChange($event)"
+    ></app-mat-table-lazy>
   </li>
 </ul>
 

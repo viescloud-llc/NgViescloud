@@ -45,6 +45,14 @@ export class MatTableLazyComponent<T extends object> extends MatTableComponent<T
     super.ngAfterViewInit();
     this.dataSource.paginator = null;
 
+    if(this.matRowsPage && this.matRowsPage._metadata.pageNumber) {
+      this.pageIndex = this.matRowsPage._metadata.pageNumber;
+      this.sendPageIndexChangeEmit(this.pageIndex);
+    }
+    else if(this.pageIndex) {
+      this.sendPageIndexChangeEmit(this.pageIndex);
+    }
+
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0
       this.sendPageIndexChangeEmit();
@@ -65,8 +73,10 @@ export class MatTableLazyComponent<T extends object> extends MatTableComponent<T
 
       this.sendPageIndexChangeSubjectSubscription = this.sendPageIndexChangeSubject.subscribe(() => {
         this.fixSizeMap.clear();
-        this.paginator.pageIndex = 0
-        setTimeout(() => this.sendPageIndexChangeEmit());
+        // this.paginator.pageIndex = 0
+        // setTimeout(() => this.sendPageIndexChangeEmit(this.paginator.pageIndex));
+        this.sendPageIndexChangeEmit(this.paginator.pageIndex)
+        this.pageIndex = this.paginator.pageIndex;
       })
     }
 
@@ -101,9 +111,9 @@ export class MatTableLazyComponent<T extends object> extends MatTableComponent<T
     }
   }
 
-  sendPageIndexChangeEmit() {
+  sendPageIndexChangeEmit(pageIndex = 0) {
     this.onPageIndexChangeEmit({
-      pageIndex: 0,
+      pageIndex: pageIndex,
       pageSize: this.paginator.pageSize,
       length: this.paginator.length
     })

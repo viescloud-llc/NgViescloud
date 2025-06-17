@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { ViescloudApplicationMinimal } from 'projects/viescloud-utils/src/lib/directive/ViescloudApplicationMinimal.directive';
 import { KeyCaptureService } from 'projects/viescloud-utils/src/lib/service/key-capture.service';
 import { QuickSideDrawerMenu } from 'projects/viescloud-utils/src/lib/share-component/quick-side-drawer-menu/quick-side-drawer-menu.component';
 import { EnsibleFsDir, EnsibleWorkSpace } from './model/ensible.parser.model';
@@ -13,19 +12,14 @@ import { EnsibleSetting } from './model/ensible.setting.model';
 import { EnsibleSettingService } from './service/ensible-setting/ensible-setting.service';
 import { AuthenticatorService } from 'projects/viescloud-utils/src/lib/service/authenticator.service';
 import { environment } from 'projects/environments/environment.prod';
+import { ViescloudApplication } from 'projects/viescloud-utils/src/lib/abtract/ViescloudApplication.directive';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent extends ViescloudApplicationMinimal {
-
-  environment = environment;
-
-  override getTitle(): string {
-    return 'ensible';
-  }
+export class AppComponent extends ViescloudApplication {
 
   menu: QuickSideDrawerMenu[] = [
     {
@@ -38,19 +32,19 @@ export class AppComponent extends ViescloudApplicationMinimal {
         {
           title: 'Login',
           routerLink: environment.endpoint_login,
-          hideConditional: () => this.ensibleAuthenticatorService.isAuthenticatedSync(),
+          hideConditional: () => this.authenticatorService.isAuthenticatedSync(),
         },
         {
           title: 'logout',
           routerLink: '/logout',
-          hideConditional: () => !this.ensibleAuthenticatorService.isAuthenticatedSync(),
-          click: () => this.ensibleAuthenticatorService.logout()
+          hideConditional: () => !this.authenticatorService.isAuthenticatedSync(),
+          click: () => this.authenticatorService.logout()
         }
       ]
     },
     {
       title: 'Item',
-      hideConditional: () => !this.ensibleAuthenticatorService.isAuthenticatedSync(),
+      hideConditional: () => !this.authenticatorService.isAuthenticatedSync(),
       children: [
         {
           title: 'Ansibles',
@@ -73,47 +67,47 @@ export class AppComponent extends ViescloudApplicationMinimal {
     {
       title: 'Roles',
       children: [],
-      hideConditional: () => !this.ensibleAuthenticatorService.isAuthenticatedSync()
+      hideConditional: () => !this.authenticatorService.isAuthenticatedSync()
     },
     {
       title: 'Group vars',
       children: [],
-      hideConditional: () => !this.ensibleAuthenticatorService.isAuthenticatedSync()
+      hideConditional: () => !this.authenticatorService.isAuthenticatedSync()
     },
     {
       title: 'Host vars',
       children: [],
-      hideConditional: () => !this.ensibleAuthenticatorService.isAuthenticatedSync()
+      hideConditional: () => !this.authenticatorService.isAuthenticatedSync()
     },
     {
       title: 'Inventory',
       children: [],
-      hideConditional: () => !this.ensibleAuthenticatorService.isAuthenticatedSync()
+      hideConditional: () => !this.authenticatorService.isAuthenticatedSync()
     },
     {
       title: 'Playbooks',
       children: [],
-      hideConditional: () => !this.ensibleAuthenticatorService.isAuthenticatedSync()
+      hideConditional: () => !this.authenticatorService.isAuthenticatedSync()
     },
     {
       title: 'Secrets',
       children: [],
-      hideConditional: () => !this.ensibleAuthenticatorService.isAuthenticatedSync()
+      hideConditional: () => !this.authenticatorService.isAuthenticatedSync()
     },
     {
       title: 'Passwords',
       children: [],
-      hideConditional: () => !this.ensibleAuthenticatorService.isAuthenticatedSync()
+      hideConditional: () => !this.authenticatorService.isAuthenticatedSync()
     },
     {
       title: 'Shells',
       children: [],
-      hideConditional: () => !this.ensibleAuthenticatorService.isAuthenticatedSync()
+      hideConditional: () => !this.authenticatorService.isAuthenticatedSync()
     },
     {
       title: 'Dockers',
       hideChildren: true,
-      hideConditional: () => !this.ensibleAuthenticatorService.isAuthenticatedSync(),
+      hideConditional: () => !this.authenticatorService.isAuthenticatedSync(),
       children: [
         {
           title: 'all',
@@ -136,27 +130,27 @@ export class AppComponent extends ViescloudApplicationMinimal {
         {
           title: 'Account',
           routerLink: '/setting/account',
-          hideConditional: () => !this.ensibleAuthenticatorService.isAuthenticatedSync()
+          hideConditional: () => !this.authenticatorService.isAuthenticatedSync()
         },
         {
           title: 'Users',
           routerLink: '/setting/users',
-          hideConditional: () => !this.ensibleAuthenticatorService.hasUserGroup('ADMIN')
+          hideConditional: () => !this.authenticatorService.hasUserGroup('ADMIN')
         },
         {
           title: 'User groups',
           routerLink: '/setting/user/groups',
-          hideConditional: () => !this.ensibleAuthenticatorService.hasUserGroup('ADMIN')
+          hideConditional: () => !this.authenticatorService.hasUserGroup('ADMIN')
         },
         {
           title: 'ansible.cfg',
           routerLink: '/setting/ansible.cfg',
-          hideConditional: () => !this.ensibleAuthenticatorService.hasUserGroup('ADMIN')
+          hideConditional: () => !this.authenticatorService.hasUserGroup('ADMIN')
         },
         {
           title: 'OpenId Provider',
           routerLink: '/setting/openid-provider',
-          hideConditional: () => !this.ensibleAuthenticatorService.hasUserGroup('ADMIN')
+          hideConditional: () => !this.authenticatorService.hasUserGroup('ADMIN')
         }
       ]
     },
@@ -176,18 +170,18 @@ export class AppComponent extends ViescloudApplicationMinimal {
     settingService: EnsibleSettingService,
     keyCaptureService: KeyCaptureService,
     matDialog: MatDialog,
-    public ensibleAuthenticatorService: AuthenticatorService,
-    public router: Router,
+    authenticatorService: AuthenticatorService,
+    router: Router,
     private ensibleFsService: EnsibleFsService,
     private rxjsUtils: RxJSUtils
   ) {
-    super(settingService, keyCaptureService, matDialog);
+    super(authenticatorService, settingService, keyCaptureService, matDialog, router);
 
-    ensibleAuthenticatorService.onLogout(() => {
+    authenticatorService.onLogout(() => {
       this.router.navigate([environment.endpoint_login]);
     })
 
-    ensibleAuthenticatorService.onLogin(user => {
+    authenticatorService.onLogin(user => {
       this.ensibleFsService.triggerFetchWorkspace();
     })
 
@@ -211,7 +205,7 @@ export class AppComponent extends ViescloudApplicationMinimal {
 
   override async ngOnInit() {
     super.ngOnInit();
-    // this.ensibleAuthenticatorService.ngOnInit();
+    // this.authenticatorService.ngOnInit();
     // this.ensibleFsService.triggerFetchWorkspace();
   }
 
@@ -315,7 +309,7 @@ export class AppComponent extends ViescloudApplicationMinimal {
   }
 
   getUserAlias(): string {
-    return this.ensibleAuthenticatorService.getCurrentUserAliasOrUsername();
+    return this.authenticatorService.getCurrentUserAliasOrUsername();
   }
 
   async addNewRole() {

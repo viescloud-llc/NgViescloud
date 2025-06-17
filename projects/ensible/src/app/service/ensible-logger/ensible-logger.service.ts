@@ -30,6 +30,10 @@ export abstract class EnsibleProcessLoggerService<T extends EnsibleProcessLogger
   }
 
   abstract newEmptyObject(): T;
+
+  override newBlankObject(): T {
+    return this.newEmptyObject();
+  }
 }
 
 @Injectable({
@@ -44,6 +48,14 @@ export class EnsiblePlaybookLoggerService extends EnsibleProcessLoggerService<En
   override newEmptyObject(): EnsiblePlaybookLogger {
     return new EnsiblePlaybookLogger();
   }
+
+  override getIdFieldValue(object: EnsiblePlaybookLogger) {
+    return object.id;
+  }
+
+  override setIdFieldValue(object: EnsiblePlaybookLogger, id: any): void {
+    return object.id = id;
+  }
 }
 
 @Injectable({
@@ -57,5 +69,13 @@ export class EnsibleShellLoggerService extends EnsibleProcessLoggerService<Ensib
 
   override newEmptyObject(): EnsibleShellLogger {
     return new EnsibleShellLogger();
+  }
+
+  override getIdFieldValue(object: EnsibleShellLogger) {
+    return object.id;
+  }
+
+  override setIdFieldValue(object: EnsibleShellLogger, id: any): void {
+    return object.id = id;
   }
 }

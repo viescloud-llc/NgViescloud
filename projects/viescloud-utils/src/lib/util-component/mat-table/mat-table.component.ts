@@ -44,6 +44,9 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
   prefixColumns: string[] = ['multipleRowSelection'];
   extraColumns: string[] = [];
 
+  @Input()
+  pageIndex: number = 0;
+
   @Output()
   onEditRow: EventEmitter<T> = new EventEmitter();
 
@@ -76,6 +79,7 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
   constructor(
     protected cd: ChangeDetectorRef
   ) { }
+  
   ngAfterContentInit(): void {
     let elements = this.columnDefs?.toArray();
     if(elements) {
@@ -92,6 +96,10 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
     if(this.initSort) {
       this.sort.active = this.initSort.key;
       this.sort.direction = this.initSort.order;
+    }
+
+    if(this.pageIndex) {
+      this.paginator.pageIndex = this.pageIndex;
     }
     
     this.dataSource.sort = this.sort;
@@ -271,6 +279,7 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
   }
 
   onPageIndexChangeEmit(event: PageEvent) {
+    this.pageIndex = event.pageIndex;
     this.onPageIndexChange.emit(event.pageIndex);
     this.multipleRowSelected.clear();
     this.onMultipleRowSelectedEmit();

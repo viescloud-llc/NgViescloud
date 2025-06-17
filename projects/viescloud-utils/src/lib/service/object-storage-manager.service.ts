@@ -1,359 +1,347 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'projects/environments/environment.prod';
-import { first, Observable, pipe, UnaryFunction } from 'rxjs';
-import { UtilsService, VFile } from './utils.service';
+import { first, firstValueFrom, map, Observable, of, pipe, switchMap, throwError, UnaryFunction } from 'rxjs';
+import { UtilsService } from './utils.service';
+import { VFile } from '../model/vies.model';
 import { Metadata } from '../model/object-storage-manager.model';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { RxJSUtils } from '../util/RxJS.utils';
-import { PopupType } from '../model/popup.model';
+import { PopupArgs, PopupType } from '../model/popup.model';
+import { HttpParamsBuilder } from '../model/utils.model';
+import { ViesService } from './rest.service';
+import { RouteUtils } from '../util/Route.utils';
+import { FileUtils } from '../util/File.utils';
 
 @Injectable({
   providedIn: 'root'
 })
 export abstract class ObjectStorage {
   objectUrlCache = new Map<string, string>();
-  vfileCache = new Map<string, VFile>();
+
   constructor(
-    private httpClient: HttpClient,
-    private rxjsUtils: RxJSUtils
-  ) { }
+    protected httpClient: HttpClient,
+    public rxjsUtils: RxJSUtils
+  ) {
+    
+  }
 
   protected getURI(): string {
-    return environment.gateway_api;
+    return ViesService.getUri();
   }
 
   protected abstract getPrefixes(): string[];
 
   protected getPrefixPath(): string {
-    let prefixes = this.getPrefixes();
-    let path = "";
-    prefixes.forEach(e => {
-        path += `/${e}`;
-    });
-    return path;
+      let prefixes = this.getPrefixes();
+      let path = "";
+      prefixes.forEach(e => {
+          path += `/${e}`;
+      });
+      return path;
+  }
+
+  public getPrefixUri(): string {
+      return `${this.getURI()}${this.getPrefixPath()}`;
+  }
+
+  getFile(requestParams: { id?: number, path?: string, fileName?: string, width?: number, height?: number }) {
+    let params = new HttpParamsBuilder();
+    params.setIfValid('id', requestParams.id);
+    params.setIfValid('path', requestParams.path);
+    params.setIfValid('fileName', requestParams.fileName);
+    params.setIfValid('width', requestParams.width);
+    params.setIfValid('height', requestParams.height);
+    return this.httpClient.get(`${this.getPrefixUri()}/file`, { responseType: 'blob', params: params.build() }).pipe(first());
   }
 
   getFileByPath(path: string, width?: number, height?: number): Observable<Blob> {
-    if(width && height)
-      return this.httpClient.get(`${this.getURI()}${this.getPrefixPath()}/file?path=${path}&width=${width}&height=${height}`, {responseType: 'blob'}).pipe(first());
-    else
-      return this.httpClient.get(`${this.getURI()}${this.getPrefixPath()}/file?path=${path}`, {responseType: 'blob'}).pipe(first());
+    return this.getFile({ path: path, width: width, height: height });
   }
 
   getFileByFileName(fileName: string, width?: number, height?: number): Observable<Blob> {
-    if(width && height)
-      return this.httpClient.get(`${this.getURI()}${this.getPrefixPath()}/file?fileName=${fileName}&width=${width}&height=${height}`, {responseType: 'blob'}).pipe(first());
-    else
-      return this.httpClient.get(`${this.getURI()}${this.getPrefixPath()}/file?fileName=${fileName}`, {responseType: 'blob'}).pipe(first());
+    return this.getFile({ fileName: fileName, width: width, height: height });
   }
 
   getFileById(id: number, width?: number, height?: number): Observable<Blob> {
-    if(width && height)
-      return this.httpClient.get(`${this.getURI()}${this.getPrefixPath()}/file?id=${id}&width=${width}&height=${height}`, {responseType: 'blob'}).pipe(first());
-    else
-      return this.httpClient.get(`${this.getURI()}${this.getPrefixPath()}/file?id=${id}`, {responseType: 'blob'}).pipe(first());
+    return this.getFile({ id: id, width: width, height: height });
   }
 
-  getAllFileMetadata() {
-    return this.httpClient.get<Metadata[]>(`${this.getURI()}${this.getPrefixPath()}/metadata/all`).pipe(first());
+  getAllFileMetadata(requestParams?: { path?: string, generateTemporaryDirectAccessLink?: boolean, directAccessLinkType?: 'GET' | 'POST' | 'PUT' | 'DELETE', linkDurationMinutes?: number }) {
+    let params = new HttpParamsBuilder();
+    params.setIfValid('path', requestParams?.path);
+    params.setIfValid('generateTemporaryDirectAccessLink', requestParams?.generateTemporaryDirectAccessLink);
+    params.setIfValid('directAccessLinkType', requestParams?.directAccessLinkType);
+    params.setIfValid('linkDurationMinutes', requestParams?.linkDurationMinutes);
+    return this.httpClient.get<Metadata[]>(`${this.getPrefixUri()}/metadata/all`, { params: params.build() })
+      .pipe(
+        map(metadatas => {
+          if (requestParams && requestParams.generateTemporaryDirectAccessLink) {
+            for (let metadata of metadatas) {
+              if (metadata.path && !metadata.temporaryAccessLink) {
+                metadata.temporaryAccessLink = this.generateViesLinkFromPath(metadata.path);
+              }
+            }
+          }
+          return metadatas;
+        }),
+        first()
+      );
+  }
+
+  getFileMetaData(requestParams: { id?: number, path?: string, fileName?: string, generateTemporaryDirectAccessLink?: boolean, directAccessLinkType?: 'GET' | 'POST' | 'PUT' | 'DELETE', linkDurationMinutes?: number }) {
+    let params = new HttpParamsBuilder();
+    params.setIfValid('id', requestParams.id);
+    params.setIfValid('path', requestParams.path);
+    params.setIfValid('fileName', requestParams.fileName);
+    params.setIfValid('generateTemporaryDirectAccessLink', requestParams.generateTemporaryDirectAccessLink);
+    params.setIfValid('directAccessLinkType', requestParams.directAccessLinkType);
+    params.setIfValid('linkDurationMinutes', requestParams.linkDurationMinutes);
+    return this.httpClient.get<Metadata>(`${this.getPrefixUri()}/metadata`, { params: params.build() })
+      .pipe(
+        map(metadata => {
+          if (requestParams.generateTemporaryDirectAccessLink && !metadata.temporaryAccessLink && metadata.path) {
+            metadata.temporaryAccessLink = this.generateViesLinkFromPath(metadata.path);
+          }
+          return metadata;
+        }),
+        first()
+      );
   }
 
   getFileMetadataByPath(path: string) {
-    return this.httpClient.get<Metadata>(`${this.getURI()}${this.getPrefixPath()}/metadata?path=${path}`).pipe(first());
+    return this.getFileMetaData({ path: path });
   }
 
   getFileMetadataByFileName(fileName: string) {
-    return this.httpClient.get<Metadata>(`${this.getURI()}${this.getPrefixPath()}/metadata?fileName=${fileName}`).pipe(first());
+    return this.getFileMetaData({ fileName: fileName });
   }
 
   getFileMetadataById(id: number) {
-    return this.httpClient.get<Metadata>(`${this.getURI()}${this.getPrefixPath()}/metadata?id=${id}`).pipe(first());
+    return this.getFileMetaData({ id: id });
   }
 
-  putFileById(id: number, vFile: VFile, publicity?: boolean) {
-    if(vFile.rawFile) {
+  putFile(vFile: VFile, requestParams: { id?: number, path?: string, fileName?: string, width?: number, height?: number }) {
+    let params = new HttpParamsBuilder();
+    params.setIfValid('id', requestParams.id);
+    params.setIfValid('path', requestParams.path);
+    params.setIfValid('fileName', requestParams.fileName);
+    params.setIfValid('width', requestParams.width);
+    params.setIfValid('height', requestParams.height);
+
+    if (vFile.rawFile) {
       const formData = new FormData();
       formData.append('file', vFile.rawFile, vFile.name);
-      return this.httpClient.put<Metadata>(`${this.getURI()}${this.getPrefixPath()}/file?publicity=${publicity ?? false}&id=${id}`, formData).pipe(first());
+      return this.httpClient.put<Metadata>(`${this.getPrefixUri()}/file`, formData, { params: params.build() }).pipe(first());
     }
     else
-      throw Error('File can not be null');
+      return throwError(() => new Error('File can not be null'));
   }
 
-  putFileByFileName(fileName: string, vFile: VFile, publicity?: boolean) {
-    if(vFile.rawFile) {
-      const formData = new FormData();  
-      formData.append('file', vFile.rawFile, vFile.name);
-      return this.httpClient.put<Metadata>(`${this.getURI()}${this.getPrefixPath()}/file?publicity=${publicity ?? false}&fileName=${fileName}`, formData).pipe(first());
-    }
-    else
-      throw Error('File can not be null');
+  putFileById(id: number, vFile: VFile) {
+    return this.putFile(vFile, { id: id });
   }
 
-  putFileByPath(path: string, vFile: VFile, publicity?: boolean) {
-    if(vFile.rawFile) {
+  putFileByFileName(fileName: string, vFile: VFile) {
+    return this.putFile(vFile, { fileName: fileName });
+  }
+
+  putFileByPath(path: string, vFile: VFile) {
+    return this.putFile(vFile, { path: path });
+  }
+
+  postFile(vFile: VFile) {
+    if (vFile.rawFile) {
       const formData = new FormData();
       formData.append('file', vFile.rawFile, vFile.name);
-      return this.httpClient.put<Metadata>(`${this.getURI()}${this.getPrefixPath()}/file?publicity=${publicity ?? false}&path=${path}`, formData).pipe(first());
+      return this.httpClient.post<Metadata>(`${this.getPrefixUri()}/file`, formData).pipe(first());
     }
     else
       throw Error('File can not be null');
   }
 
-  postFile(vFile: VFile, publicity?: boolean) {
-    if(vFile.rawFile) {
-      const formData = new FormData();
-      formData.append('file', vFile.rawFile, vFile.name);
-      return this.httpClient.post<Metadata>(`${this.getURI()}${this.getPrefixPath()}/file?publicity=${publicity ?? false}`, formData).pipe(first());
-    }
-    else
-      throw Error('File can not be null');
+  patchMetaData(metadata: Metadata, requestParams: { id?: number, path?: string, fileName?: string }) {
+    let params = new HttpParamsBuilder();
+    params.setIfValid('id', requestParams.id);
+    params.setIfValid('path', requestParams.path);
+    params.setIfValid('fileName', requestParams.fileName);
+    return this.httpClient.patch<Metadata>(`${this.getPrefixUri()}/metadata`, metadata, { params: params.build() }).pipe(first());
   }
 
   patchMetadataById(metadata: Metadata, id: number) {
-    return this.httpClient.patch<Metadata>(`${this.getURI()}${this.getPrefixPath()}/metadata?id=${id}`, metadata).pipe(first());
+    return this.patchMetaData(metadata, { id: id });
   }
 
   patchMetadataByFileName(metadata: Metadata, fileName: string) {
-    return this.httpClient.patch<Metadata>(`${this.getURI()}${this.getPrefixPath()}/metadata?fileName=${fileName}`, metadata).pipe(first());
+    return this.patchMetaData(metadata, { fileName: fileName });
   }
 
   patchMetadataByPath(metadata: Metadata, path: string) {
-    return this.httpClient.patch<Metadata>(`${this.getURI()}${this.getPrefixPath()}/metadata?path=${path}`, metadata).pipe(first());
+    return this.patchMetaData(metadata, { path: path });
+  }
+
+  deleteFile(requestParams: { id?: number, path?: string, fileName?: string }) {
+    let params = new HttpParamsBuilder();
+    params.setIfValid('id', requestParams.id);
+    params.setIfValid('path', requestParams.path);
+    params.setIfValid('fileName', requestParams.fileName);
+    return this.httpClient.delete<void>(`${this.getPrefixUri()}/file`, { params: params.build() }).pipe(first());
   }
 
   deleteFileById(id: number) {
-    return this.httpClient.delete<Metadata>(`${this.getURI()}${this.getPrefixPath()}/file?id=${id}`).pipe(first());
+    return this.deleteFile({ id: id });
   }
 
   deleteFileByFileName(fileName: string) {
-    return this.httpClient.delete<Metadata>(`${this.getURI()}${this.getPrefixPath()}/file?fileName=${fileName}`).pipe(first());
+    return this.deleteFile({ fileName: fileName });
   }
 
   deleteFileByPath(path: string) {
-    return this.httpClient.delete<Metadata>(`${this.getURI()}${this.getPrefixPath()}/file?path=${path}`).pipe(first());
+    return this.deleteFile({ path: path });
   }
 
   //------------------------------CUSTOM METHODS-----------------------------
 
   containViesLink(link: string) {
-    return link.startsWith(`${this.getURI()}${this.getPrefixPath()}/file`);
+    return link.startsWith(`${this.getPrefixUri()}/file`);
   }
 
   generateViesLinkFromPath(path: string) {
-    return `${this.getURI()}${this.getPrefixPath()}/file?path=${path}`
+    return `${this.getPrefixUri()}/file?path=${path}`
   }
 
-  extractExtensionFromViesLink(link: string) {
-    let lastDotIndex = link.lastIndexOf('.');
-    if(lastDotIndex === -1) {
-      return '';
-    }
-    return link.slice(lastDotIndex + 1);
-  }
-
-  extractPathFromViesLink(link: string) {
-    if(this.containViesLink(link)) {
-      let length = `${this.getURI()}${this.getPrefixPath()}/file?path=`.length;
-      return link.substring(length);
-    }
-    else
-      return link;
-  }
-
-  extractFileNameFromViesLink(link: string) {
-    if(this.containViesLink(link)) {
-      let length = `${this.getURI()}${this.getPrefixPath()}/file?fileName=`.length;
-      return link.substring(length);
-    }
-    else
-      return link;
-  }
-
-  extractIdFromViesLink(link: string) {
-    if(this.containViesLink(link)) {
-      let length = `${this.getURI()}${this.getPrefixPath()}/file?id=`.length;
-      return link.substring(length);
-    }
-    else
-      return link;
-  }
-
-  private getLoadingPipe<T>(popupType: PopupType, message: string = '', dismissLabel: string = '') {
-    switch(popupType) {
-      case PopupType.STRING_SNACKBAR:
-        return this.rxjsUtils.waitLoadingSnackBar<T>(message, dismissLabel);
-      case PopupType.DYNAMIC_STRING_SNACKBAR:
-        return this.rxjsUtils.waitLoadingDynamicStringSnackBar<T>(message, 40, dismissLabel);
-        case PopupType.LOADING_DIALOG:
-        return this.rxjsUtils.waitLoadingDialog<T>();
-      case PopupType.MESSAGE_POPUP:
-        return this.rxjsUtils.waitLoadingMessagePopup<T>(message, dismissLabel);
-      case PopupType.DYNAMIC_MESSAGE_POPUP:
-        return this.rxjsUtils.waitLoadingDynamicMessagePopup<T>(message, dismissLabel);
-      default:
-        return pipe();
-    }
-  }
-
-  putOrPostFile(vFile: VFile, publicity?: boolean, popupType: PopupType = PopupType.NONE) {
-    return new Promise<Metadata>((resolve, reject) => {
-      if(vFile.rawFile) {
-        this.getFileMetadataByFileName(vFile.name).pipe(this.getLoadingPipe(popupType, `Uploading ${vFile.name}...`, 'Dismiss')).subscribe({
-          next: (data1) => {
-            if(data1) {
-              this.putFileByFileName(vFile.name, vFile, publicity).pipe(this.getLoadingPipe(popupType, `Uploading ${vFile.name}...`, 'Dismiss')).subscribe({
-                next: (data2) => {
-                  resolve(data2);
-                },
-                error: (error) => {
-                  reject(error);
-                }
-              })
-            }
-          },
-          error: (error) => {
-            this.postFile(vFile, publicity).pipe(this.getLoadingPipe(popupType, `Uploading ${vFile.name}...`, 'Dismiss')).subscribe({
-              next: (data3) => {
-                resolve(data3);
-              },
-              error: (error) => {
-                reject(error);
-              }
-            })
-          }
-        })
+  private getLoadingPipe<T>(args?: PopupArgs) {
+    if (args) {
+      if (args.unaryFunction) {
+        return pipe(args.unaryFunction);
       }
-      else
-        reject('File can not be null');
-    })
+
+      if (args.type) {
+        switch (args.type) {
+          case PopupType.STRING_SNACKBAR:
+            return this.rxjsUtils.waitLoadingSnackBar<T>(args.message ?? '', args.dismissLabel ?? '');
+          case PopupType.DYNAMIC_STRING_SNACKBAR:
+            return this.rxjsUtils.waitLoadingDynamicStringSnackBar<T>(args.message ?? '', args.maxLength ?? 40, args.dismissLabel ?? '');
+          case PopupType.LOADING_DIALOG:
+            return this.rxjsUtils.waitLoadingDialog<T>();
+          case PopupType.MESSAGE_POPUP:
+            return this.rxjsUtils.waitLoadingMessagePopup<T>(args.message ?? '', args.dismissLabel ?? '');
+          case PopupType.DYNAMIC_MESSAGE_POPUP:
+            return this.rxjsUtils.waitLoadingDynamicMessagePopup<T>(args.message ?? '', args.dismissLabel ?? '');
+          default:
+            return pipe();
+        }
+      }
+    }
+
+    return pipe();
   }
 
-  putOrPostFileAndGetViescloudUrl(vFile: VFile, publicity?: boolean, popupType: PopupType = PopupType.NONE) {
-    return new Promise<string>((resolve, reject) => {
-      this.putOrPostFile(vFile, publicity, popupType)
-      .then((data) => {
-        resolve(this.generateViesLinkFromPath(data.path!))
-      })
-      .catch((error) => {
-        reject(error);
-      })
-    })
+  async postOrPutFile(vFile: VFile, popupArgs?: PopupArgs) {
+    if (popupArgs) {
+      popupArgs.message = popupArgs.message ?? `Uploading ${vFile.name}...`;
+    }
+
+    if (vFile.rawFile) {
+      let exist = await firstValueFrom(this.getFileMetaData({ fileName: vFile.name }).pipe(this.getLoadingPipe(popupArgs))).catch(err => null);
+
+      if (exist) {
+        return firstValueFrom(this.putFile(vFile, { fileName: vFile.name }).pipe(this.getLoadingPipe(popupArgs)));
+      }
+      else {
+        return firstValueFrom(this.postFile(vFile).pipe(this.getLoadingPipe(popupArgs)));
+      }
+    }
+    else {
+      return Promise.reject(new Error('File can not be null'));
+    }
   }
 
-  generateObjectUrlFromViescloudUrl(viescloudUrl: string, popupType: PopupType = PopupType.NONE) {
+  async putOrPostFileAndGetViescloudUrl(vFile: VFile, popupArgs?: PopupArgs) {
     return new Promise<string>((resolve, reject) => {
-      if(this.objectUrlCache.has(viescloudUrl)) {
-        UtilsService.isObjectUrlValid(this.objectUrlCache.get(viescloudUrl)!)
+      this.postOrPutFile(vFile, popupArgs)
         .then((data) => {
-          resolve(this.objectUrlCache.get(viescloudUrl)!);
+          resolve(this.generateViesLinkFromPath(data.path!))
         })
         .catch((error) => {
-          this.generateObjectUrl(viescloudUrl, popupType, resolve, reject);
+          reject(error);
         })
-      } 
-      else {
-        this.generateObjectUrl(viescloudUrl, popupType, resolve, reject);
-      }
     })
   }
 
-  private generateObjectUrl(viescloudUrl: string, popupType: PopupType = PopupType.NONE, resolve: (value: string | PromiseLike<string>) => void, reject: (reason?: any) => void) {
-    this.httpClient.get(viescloudUrl, { responseType: 'blob' })
-    .pipe(first())
-    .pipe(this.getLoadingPipe(popupType, `Loading ${viescloudUrl}`, 'Dismiss'))
-    .subscribe({
-      next: (data) => {
-        let url = URL.createObjectURL(data);
-        this.objectUrlCache.set(viescloudUrl, url);
-        resolve(url);
-      },
-      error: (error) => {
-        reject(error);
+  async fetchFileAndGenerateObjectUrl(uri: string, popupArgs?: PopupArgs) {
+    if(this.objectUrlCache.has(uri)) {
+      let objectUrl = this.objectUrlCache.get(uri);
+      let isActiveUrl = await FileUtils.isObjectUrlActive(objectUrl!).catch(err => false);
+      if(isActiveUrl) {
+        return objectUrl!;
       }
-    });
-  }
-
-  fetchFile(uri: string): Observable<VFile> {
-    return new Observable<VFile>(observer => {
-      if(this.vfileCache.has(uri)) {
-        observer.next(this.vfileCache.get(uri)!);
-        observer.complete();
-        return;
-      } 
-      else if(!this.containViesLink(uri)) {
-        UtilsService.fetchAsVFile(uri).then(file => {
-          this.vfileCache.set(uri, file);
-          observer.next(file);
-          observer.complete();
-        }).catch(err => {
-          observer.error(err);
-        })
-      } 
       else {
-        this.httpClient.get(uri, { observe: 'response', responseType: 'blob' })
-          .subscribe({
-            next: (response) => {
-              let contentType = response.headers.get('Content-Type') || '';
-              let fileName = uri.substring(uri.lastIndexOf('/') + 1);
-              let extension = '';
-  
-              if (!contentType) {
-                // If Content-Type is not provided, derive it from the file name
-                extension = fileName.split('.').pop()?.toLowerCase() || '';
-                contentType = UtilsService.mapExtensionToContentType(extension);
-              } else {
-                // If Content-Type is provided, extract extension from it
-                extension = contentType.split('/')[1];
-              }
-        
-              const vFile: VFile = {
-                name: fileName,
-                type: contentType,
-                extension: extension,
-                rawFile: response.body as Blob,
-                originalLink: uri,
-                value: ''
-              };
-  
-              this.vfileCache.set(uri, vFile);
-              observer.next(vFile);
-              observer.complete();
-            },
-            error: (error) => {
-              observer.error(error);
-            }
-          });
+        URL.revokeObjectURL(objectUrl!);
       }
+    }
+
+    let error: any;
+    let vFile = await this.fetchFile(uri, popupArgs).catch(error => {
+      error = error;
+      return null;
     });
+
+    if (vFile && vFile.rawFile) {
+      vFile.objectUrl = URL.createObjectURL(vFile.rawFile);
+      this.objectUrlCache.set(uri, vFile.objectUrl);
+      return vFile.objectUrl;
+    }
+
+    return Promise.reject(error);
+  }
+
+
+  async fetchFile(uri: string, popupArgs?: PopupArgs): Promise<VFile> {
+    if (!this.containViesLink(uri)) {
+      return UtilsService.fetchAsVFile(uri)
+    }
+    else {
+      return firstValueFrom(this.httpClient.get(uri, { observe: 'response', responseType: 'blob' })
+        .pipe(this.getLoadingPipe(popupArgs))
+        .pipe(
+          map((response) => {
+            let contentType = response.headers.get('Content-Type') || '';
+            let fileName = uri.substring(uri.lastIndexOf('/') + 1);
+            let extension = '';
+
+            if (!contentType) {
+              // If Content-Type is not provided, derive it from the file name
+              extension = fileName.split('.').pop()?.toLowerCase() || '';
+              contentType = UtilsService.mapExtensionToContentType(extension);
+            } else {
+              // If Content-Type is provided, extract extension from it
+              extension = contentType.split('/')[1];
+            }
+
+            const vFile: VFile = {
+              name: fileName,
+              type: contentType,
+              extension: extension,
+              rawFile: response.body as Blob,
+              originalLink: uri,
+              objectUrl: ''
+            };
+
+            return vFile;
+          }),
+          first()
+        ))
+    }
   }
 }
 
 @Injectable({
   providedIn: 'root'
 })
-export class SmbStorageServiceV1 extends ObjectStorage {
+export class ObjectStorageService extends ObjectStorage {
   protected override getPrefixes(): string[] {
-    return ['osm', 'smb', 'v1'];
-  }
-}
-
-@Injectable({
-  providedIn: 'root'
-})
-export class S3StorageServiceV1 extends ObjectStorage {
-  protected override getPrefixes(): string[] {
-    return ['osm', 's3', 'v1'];
-  }
-}
-
-@Injectable({
-  providedIn: 'root'
-})
-export class DatabaseStorageServiceV1 extends ObjectStorage {
-  protected override getPrefixes(): string[] {
-    return ['osm', 'database', 'v1'];
+    return ['api', 'v1', 'object', 'storages'];
   }
 }

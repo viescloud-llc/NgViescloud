@@ -16,8 +16,6 @@ import { EnsibleItemTabComponent } from './item/ensible-item-tab/ensible-item-ta
 import { EnsibleAnsibleCfgComponent } from './ensible-ansible-cfg/ensible-ansible-cfg.component';
 import { SettingService } from 'projects/viescloud-utils/src/lib/service/setting.service';
 import { EnsibleSettingService } from './service/ensible-setting/ensible-setting.service';
-import { S3StorageServiceV1 } from 'projects/viescloud-utils/src/lib/service/object-storage-manager.service';
-import { EnsibleDatabaseObjectStorageService } from './service/ensible-database-object-storage/ensible-database-object-storage.service';
 import { EnsibleFsListComponent } from './ensible-fs-list/ensible-fs-list.component';
 import { EnsibleDockerContainerTemplateComponent } from './docker/ensible-docker-container-template/ensible-docker-container-template.component';
 import { EnsibleDockerContainerTemplateListComponent } from './docker/ensible-docker-container-template-list/ensible-docker-container-template-list.component';
@@ -65,10 +63,6 @@ const LIST = [
     {
       provide: SettingService,
       useClass: EnsibleSettingService
-    },
-    {
-      provide: S3StorageServiceV1,
-      useClass: EnsibleDatabaseObjectStorageService
     }
   ],
   bootstrap: [AppComponent]

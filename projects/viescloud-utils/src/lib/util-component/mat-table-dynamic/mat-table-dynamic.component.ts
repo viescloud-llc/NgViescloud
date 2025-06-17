@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
 import { MatTableComponent } from '../mat-table/mat-table.component';
-import { Observable } from 'rxjs';
+import { firstValueFrom, Observable } from 'rxjs';
 import { FunctionUtils } from '../../util/FunctionUtils';
 import { DataUtils } from '../../util/Data.utils';
 import { RxJSUtils } from '../../util/RxJS.utils';
@@ -12,7 +12,7 @@ import { MatDialog } from '@angular/material/dialog';
   templateUrl: './mat-table-dynamic.component.html',
   styleUrls: ['./mat-table-dynamic.component.scss']
 })
-export class MatTableDynamicComponent<I, T extends object, S> extends MatTableComponent<T> {
+export class MatTableDynamicComponent<T extends object, S> extends MatTableComponent<T> {
 
   @Input()
   getAllFn?: Observable<T[]> | Promise<T[]> | T[];
@@ -27,10 +27,16 @@ export class MatTableDynamicComponent<I, T extends object, S> extends MatTableCo
   deleteFn?: (object: T, service: S) => void | Observable<T> | Promise<T> | T
 
   @Input()
+  cloneFn?: (object: T) => T
+
+  @Input()
   styleWidth: string = '100%';
 
   @Input()
-  service?: S;
+  service!: S;
+
+  @Input()
+  showMultipleRowSelectionButton = false;
 
   @Output()
   onAddOrSaveFn: EventEmitter<T> = new EventEmitter<T>();
@@ -40,20 +46,25 @@ export class MatTableDynamicComponent<I, T extends object, S> extends MatTableCo
   
   fetchSubscription?: any = null;
   selectedRow: T | null = null
+  selectedRows: T[] = [];
   selectedRowCopy: T | null = null
   validForm = false;
+  newRow = false;
 
   constructor(
     cd: ChangeDetectorRef,
-    private rxjsUtils: RxJSUtils,
-    private dialogUtils: DialogUtils
+    protected rxjsUtils: RxJSUtils,
+    protected dialogUtils: DialogUtils
   ) {
       super(cd);
   }
 
   override ngOnInit(): void {
-    super.ngOnInit();
     this.init();
+  }
+
+  override ngOnChanges(changes: SimpleChanges): void {
+    
   }
 
   init() {
@@ -67,7 +78,21 @@ export class MatTableDynamicComponent<I, T extends object, S> extends MatTableCo
     }
   }
 
+  protected updateRow(row: T) {
+    this.matRows = this.matRows.map(r => {
+      if(DataUtils.isEqual(r, this.selectedRowCopy)) {
+        return row;
+      }
+      else {
+        return r;
+      }
+    });
+
+    this.selectRow(row);
+  }
+
   selectRow(row: T | null) {
+    this.newRow = false;
     this.selectedRow = structuredClone(row);
     this.selectedRowCopy = structuredClone(this.selectedRow);
   }
@@ -76,7 +101,7 @@ export class MatTableDynamicComponent<I, T extends object, S> extends MatTableCo
     this.onEditRow.emit(row);
 
     if(this.getFn && this.service) {
-      FunctionUtils.applyObservable<T>(this.getFn(row, this.service), this.service).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+      FunctionUtils.toObservable(this.getFn, [row,  this.service]).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
         next: res => {
           this.selectRow(res);
         },
@@ -92,6 +117,19 @@ export class MatTableDynamicComponent<I, T extends object, S> extends MatTableCo
 
   addNewRow() {
     this.selectRow(DataUtils.purgeValue(this.blankObject));
+    this.newRow = true;
+  }
+
+  protected pushNewRow(row: T) {
+    this.matRows.push(row);
+    this.selectRow(row);
+  }
+
+  cloneRow() {
+    if(this.selectedRow && this.cloneFn) {
+      this.selectRow(structuredClone(this.cloneFn(this.selectedRow)));
+      this.newRow = true;
+    }
   }
 
   save() {
@@ -99,17 +137,19 @@ export class MatTableDynamicComponent<I, T extends object, S> extends MatTableCo
       this.onAddOrSaveFn.emit(this.selectedRow);
 
       if(this.addOrSaveFn && this.service) {
-        FunctionUtils.applyObservable<T | void>(this.addOrSaveFn(this.selectedRow, this.service), this.service).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+        FunctionUtils.toObservable(this.addOrSaveFn, [this.selectedRow, this.service]).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
           next: res => {
             if(res != null && res != undefined) {
-              this.matRows.push(res);
-              this.selectRow(res);
+              if(this.newRow) {
+                this.pushNewRow(res);
+              }
+              else {
+                this.updateRow(res);
+              }
             }
             else {
               this.editRow(this.selectedRow!);
             }
-
-            this.init();
           },
           error: err => {
             this.dialogUtils.openErrorMessageFromError(err, "Error saving row", "Error when saving row\nPlease try again later");
@@ -127,23 +167,60 @@ export class MatTableDynamicComponent<I, T extends object, S> extends MatTableCo
     return DataUtils.isNotEqual(this.selectedRow, this.selectedRowCopy);
   }
 
-  async deleteRow() {
-    if(this.selectedRow) {
-      this.onDeleteFn.emit(this.selectedRow);
+  protected removeRowFromTable(row: T) {
+    this.matRows = this.matRows.filter(r => DataUtils.isNotEqual(r, row));
+  }
+
+  async deleteRow(selectedRow: T, confirmation = true) {
+    if(selectedRow) {
+      this.onDeleteFn.emit(selectedRow);
 
       if(this.deleteFn && this.service) {
-        let confirm = await this.dialogUtils.openConfirmDialog("Delete", "Are you sure you want to delete this row?\nThis cannot be undone", "Yes", "No");
-      
-        if(confirm) {
-          FunctionUtils.applyObservable<T | void>(this.deleteFn(this.selectedRow, this.service), this.service).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
-            next: res => {
-              this.matRows = this.matRows.filter(row => DataUtils.isNotEqual(row, this.selectedRowCopy));
-              this.selectRow(null);
-              this.init();
-            }
-          })
+        if (confirmation) {
+          let confirm = await this.dialogUtils.openConfirmDialog("Delete", "Are you sure you want to delete this row?\nThis cannot be undone", "Yes", "No");
+        
+          if(!confirm) {
+            return;
+          }
         }
+
+        await firstValueFrom(FunctionUtils.toObservable(this.deleteFn, [selectedRow, this.service]).pipe(this.rxjsUtils.waitLoadingDialog()))
+        .then(res => {
+            this.removeRowFromTable(structuredClone(this.selectedRowCopy!));
+            this.selectRow(null);
+        })
+        .catch(err => {
+          if (confirmation) {
+            this.dialogUtils.openErrorMessageFromError(err, "Error deleting row", "Error when deleting row\nPlease try again later");
+          }
+        });
       }
     }
+  }
+
+  async deleteRows(rows: T[]) {
+    if(rows && rows.length > 0) {
+      let confirm = await this.dialogUtils.openConfirmDialog("Delete", "Are you sure you want to delete these rows?\nThis cannot be undone", "Yes", "No");
+        
+      if(!confirm) {
+        return;
+      }
+
+      for (let row of rows) {
+        await this.deleteRow(row, false);
+      }
+
+      this.init();
+    }
+  }
+
+  multipleRowSelectedFn(rows: T[]) {
+    this.onMultipleRowSelected.emit(rows);
+    this.selectedRows = rows;
+  }
+
+  pageIndexChange(pageIndex: number) {
+    this.pageIndex = pageIndex;
+    this.onPageIndexChange.emit(pageIndex);
   }
 }

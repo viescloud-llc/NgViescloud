@@ -10,8 +10,8 @@
     imageSrc="assets/images/logo-no-background.png"
     imageLink="https://hub.docker.com/r/viescloud/ensible-fullstack"
     [alias]="getUserAlias()"
-    [isLogin]="ensibleAuthenticatorService.isAuthenticatedSync()"
-    (onLogout)="ensibleAuthenticatorService.logOutManually()"
+    [isLogin]="authenticatorService.isAuthenticatedSync()"
+    (onLogout)="authenticatorService.logOutManually()"
     (onLogin)="router.navigate([environment.endpoint_login])"
     ></vies-eco-header-minimal>
     <router-outlet></router-outlet>

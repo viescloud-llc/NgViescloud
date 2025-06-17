@@ -1,6 +1,5 @@
 import { AfterContentChecked, ChangeDetectorRef, Component, EventEmitter, HostListener, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { RouteChangeSubcribe } from 'projects/viescloud-utils/src/lib/directive/RouteChangeSubcribe.directive';
 import { MonacoLanguage } from 'projects/viescloud-utils/src/lib/model/monaco-editor.model';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
@@ -15,6 +14,7 @@ import { CanDeactivateGuard, ComponentCanDeactivate } from 'projects/viescloud-u
 import { firstValueFrom, Observable } from 'rxjs';
 import { KeyCaptureEvent, KeyCaptureService } from 'projects/viescloud-utils/src/lib/service/key-capture.service';
 import { environment } from 'projects/environments/environment.prod';
+import { RouteChangeSubcribe } from 'projects/viescloud-utils/src/lib/abtract/RouteChangeSubcribe.directive';
 
 enum FileType {
   INVENTORY = 'inventory',

@@ -1,15 +1,15 @@
-import { AfterContentInit, AfterViewInit, Injectable, OnInit, Renderer2 } from '@angular/core';
+import { AfterContentInit, AfterViewInit, Injectable, Injector, OnInit, Renderer2 } from '@angular/core';
 import { environment } from 'projects/environments/environment.prod';
 import { DRAWER_STATE, HeaderComponent } from '../share-component/header/header.component';
-import { ObjectStorage, S3StorageServiceV1 } from './object-storage-manager.service';
-import { VFile } from './utils.service';
+import { ObjectStorage, ObjectStorageService } from './object-storage-manager.service';
+import { VFile } from '../model/vies.model';
 import { GeneralSetting } from '../model/setting.model';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTheme } from '../model/theme.model';
 import { AuthenticatorService } from './authenticator.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConfirmDialog } from '../dialog/confirm-dialog/confirm-dialog.component';
-import { PopupType } from '../model/popup.model';
+import { PopupArgs, PopupType } from '../model/popup.model';
 import { RxJSUtils } from '../util/RxJS.utils';
 import { DataUtils } from '../util/Data.utils';
 import { FileUtils } from '../util/File.utils';
@@ -22,13 +22,13 @@ import { Router } from '@angular/router';
 @Injectable({
   providedIn: 'root'
 })
-export class SettingService {
+export class SettingService<T extends GeneralSetting> {
   protected GENERAL_SETTING_KEY = 'generalSetting.json';
-  protected generalSetting: GeneralSetting = this.newSetting();
+  protected generalSetting: T = this.newSetting();
   protected matThemes = DataUtils.getEnumValues(MatTheme) as string[];
+  protected authenticatorService: AuthenticatorService | undefined;
   protected onLoginSubscription: any = null;
   protected onTimeoutLogoutSubscription: any = null;
-  protected authenticatorService: AuthenticatorService | undefined;
 
   protected onGeneralSettingChangeSubject = new Subject<void>();
   onGeneralSettingChange = this.onGeneralSettingChangeSubject.asObservable();
@@ -44,55 +44,49 @@ export class SettingService {
   matThemeOptions = DataUtils.getEnumMatOptions(MatTheme);
 
   constructor(
-    protected s3StorageService: S3StorageServiceV1,
+    protected objectStorageService: ObjectStorageService,
     protected matDialog: MatDialog,
     protected snackBar: MatSnackBar,
-    protected router: Router
+    protected router: Router,
+    protected injector: Injector
   ) { }
 
-  initMinimal(prefix: string) {
-    let setting = FileUtils.localStorageGetItem<GeneralSetting>(this.GENERAL_SETTING_KEY) ?? this.newSetting();
-    this.generalSetting = setting;
-    this.applySetting();
-  }
+  init() {
+    this.prefix = environment.name;
+    this.authenticatorService = this.injector.get(AuthenticatorService);
 
-  init(prefix: string, authenticatorService?: AuthenticatorService) {
-    this.subscribeToSubject(prefix, authenticatorService);
-    this.prefix = prefix;
+    this.subscribeToSubject();
 
-    let setting = FileUtils.localStorageGetItem<GeneralSetting>(this.GENERAL_SETTING_KEY);
+    let setting = FileUtils.localStorageGetItem<T>(this.GENERAL_SETTING_KEY);
 
-    this.applySetting();
-
-    if (!setting || setting.initAutoFetchGeneralSetting) {
-      this.syncFromServer(prefix);
+    if (setting) {
+      this.generalSetting = setting;
     }
     else {
-      this.generalSetting = setting;
-      this.applySetting();
+      this.generalSetting = this.newSetting();
     }
 
+    this.applySetting();
     this.onGeneralSettingChangeSubject.next();
   }
 
   protected newSetting() {
-    return new GeneralSetting();
+    return new GeneralSetting() as T;
   }
 
-  private subscribeToSubject(prefix: string, authenticatorService: AuthenticatorService | undefined) {
-    if(authenticatorService) {
-      this.authenticatorService = authenticatorService;
-
+  private subscribeToSubject() {
+    this.unsubscribeToSubject();
+    if(this.authenticatorService) {
       if(this.onLoginSubscription == null) {
-        this.onLoginSubscription = authenticatorService.onLogin(
+        this.onLoginSubscription = this.authenticatorService.onLogin(
           () => {
-            this.syncFromServer(prefix);
+            this.syncFromServer(this.prefix);
           }
         );
       }
 
       if(this.onTimeoutLogoutSubscription == null) {
-        this.onTimeoutLogoutSubscription = authenticatorService.onTimeoutLogout(
+        this.onTimeoutLogoutSubscription = this.authenticatorService.onTimeoutLogout(
           () => {
             if(this.generalSetting.promptLoginWhenTimeoutLogout)
               this.promptLoginWhenTimeoutLogout();
@@ -102,8 +96,17 @@ export class SettingService {
     }
   }
 
+  unsubscribeToSubject() {
+    if(this.onLoginSubscription) {
+      this.onLoginSubscription.unsubscribe();
+    }
+    if(this.onTimeoutLogoutSubscription) {
+      this.onTimeoutLogoutSubscription.unsubscribe();
+    }
+  }
+
   syncFromServer(prefix: string) {
-    this.s3StorageService.getFileByFileName(`${prefix}/${this.GENERAL_SETTING_KEY}`).pipe(RxJSUtils.waitLoadingDynamicStringSnackBar(this.snackBar, `Loading ${prefix}/${this.GENERAL_SETTING_KEY}`, 40, 'Dismiss', 10)).subscribe({
+    this.objectStorageService.getFileByFileName(`${prefix}/${this.GENERAL_SETTING_KEY}`).pipe(RxJSUtils.waitLoadingDynamicStringSnackBar(this.snackBar, `Loading ${prefix}/${this.GENERAL_SETTING_KEY}`, 40, 'Dismiss', 10)).subscribe({
       next: (blob) => {
         StringUtils.readBlobAsText(blob).then((data) => {
           this.generalSetting = JSON.parse(data);
@@ -113,7 +116,7 @@ export class SettingService {
         });
       },
       error: (error) => {
-        if(!FileUtils.localStorageGetItem<GeneralSetting>(this.GENERAL_SETTING_KEY)) {
+        if(!FileUtils.localStorageGetItem<T>(this.GENERAL_SETTING_KEY)) {
           this.generalSetting = this.newSetting();
           this.applySetting();
         }
@@ -126,7 +129,7 @@ export class SettingService {
     this.changeTheme(this.generalSetting.theme);
   }
 
-  getCopyOfGeneralSetting<T extends GeneralSetting>(): T {
+  getCopyOfGeneralSetting<T>(): T {
     return JSON.parse(JSON.stringify(this.generalSetting));
   }
 
@@ -163,12 +166,12 @@ export class SettingService {
     this.setDisplayDrawer(this.generalSetting.initDisplayDrawer);
   }
 
-  saveSettingLocally(generalSetting: GeneralSetting): void {
+  saveSettingLocally(generalSetting: T): void {
     FileUtils.localStorageSetItem(this.GENERAL_SETTING_KEY, generalSetting);
     this.generalSetting = generalSetting;
   }
 
-  saveSettingToServer(prefix: string, generalSetting: GeneralSetting): void {
+  saveSettingToServer(prefix: string, generalSetting: T): void {
     this.saveSettingLocally(generalSetting);
 
     let vFile: VFile = {
@@ -176,10 +179,10 @@ export class SettingService {
       type: 'application/json',
       extension: 'json',
       rawFile: new Blob([JSON.stringify(generalSetting)], {type: 'application/json'}),
-      value: JSON.stringify(generalSetting)
+      objectUrl: JSON.stringify(generalSetting)
     }
 
-    this.s3StorageService.putOrPostFile(vFile, false, PopupType.LOADING_DIALOG).then((data) => {}).catch((error) => {
+    this.objectStorageService.postOrPutFile(vFile, {type: PopupType.LOADING_DIALOG}).then((data) => {}).catch((error) => {
       window.alert(error);
     });
   }
@@ -223,10 +226,10 @@ export class SettingService {
       return 'white';
   }
 
-  loadBackgroundImage(url: string, objectStorage?: ObjectStorage, popupType: PopupType = PopupType.DYNAMIC_MESSAGE_POPUP, rememberInitialUrl: boolean = true) {
+  loadBackgroundImage(url: string, objectStorage?: ObjectStorage, popupArgs?: PopupArgs, rememberInitialUrl: boolean = true) {
     let currentRoute = RouteUtils.getCurrentUrl();
     if(url.includes(environment.gateway_api) && objectStorage) {
-      objectStorage.generateObjectUrlFromViescloudUrl(url, popupType).then(res => {
+      objectStorage.fetchFileAndGenerateObjectUrl(url, popupArgs).then(res => {
         if(rememberInitialUrl && RouteUtils.getCurrentUrl() === currentRoute)
           this.backgroundImageUrl = res;
       })

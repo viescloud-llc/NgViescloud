@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { RouteChangeSubcribe } from 'projects/viescloud-utils/src/lib/directive/RouteChangeSubcribe.directive';
+import { RouteChangeSubcribe } from 'projects/viescloud-utils/src/lib/abtract/RouteChangeSubcribe.directive';
 import { EnsibleFs, EnsibleFsDir, EnsibleWorkSpace } from '../model/ensible.parser.model';
 import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';

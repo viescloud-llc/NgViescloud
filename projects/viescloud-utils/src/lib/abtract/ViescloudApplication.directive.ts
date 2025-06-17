@@ -1,28 +1,33 @@
-import { Directive, HostListener, OnInit, ViewChild } from '@angular/core';
-import { SettingService } from '../service/setting.service';
-import { KeyCaptureService } from '../service/key-capture.service';
+import { Directive, HostListener, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { KeyCaptureService } from '../service/key-capture.service';
+import { SettingService } from '../service/setting.service';
+import { AuthenticatorService } from '../service/authenticator.service';
+import { Router } from '@angular/router';
+import { environment } from 'projects/environments/environment.prod';
 
 @Directive({
-  selector: '[libViescloudApplicationMinimal]',
-  standalone: true,
+  selector: '[appViescloudApplication]'
 })
-export abstract class ViescloudApplicationMinimal implements OnInit {
+export abstract class ViescloudApplication implements OnInit {
+
+  protected environment = environment;
 
   constructor(
-    protected settingService: SettingService,
+    protected authenticatorService: AuthenticatorService,
+    protected settingService: SettingService<any>,
     protected keyCaptureService: KeyCaptureService,
-    protected matDialog: MatDialog
-  ) {
+    protected matDialog: MatDialog,
+    protected router: Router,
+  ) { 
     this.listenToDialogEvents();
-    this.settingService.initMinimal(this.getTitle());
+    // this.settingService.init(this.getTitle(), this.authenticatorService);
+    this.settingService.init();
   }
 
-  async ngOnInit() {
+  ngOnInit(): void {
 
   }
-
-  abstract getTitle(): string;
 
   // Subscribe to MatDialog open and close events
   listenToDialogEvents() {
@@ -49,7 +54,7 @@ export abstract class ViescloudApplicationMinimal implements OnInit {
       }
       return style;
     }
-    else
+    else 
       return '';
   }
 

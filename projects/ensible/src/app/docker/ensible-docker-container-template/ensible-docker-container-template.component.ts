@@ -7,7 +7,7 @@ import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
 import { EnsiblePullImageDialog } from '../../dialog/ensible-pull-image-dialog/ensible-pull-image-dialog.component';
 import { EnsibleDockerService } from '../../service/ensible-docker/ensible-docker.service';
-import { RouteChangeSubcribe } from 'projects/viescloud-utils/src/lib/directive/RouteChangeSubcribe.directive';
+import { RouteChangeSubcribe } from 'projects/viescloud-utils/src/lib/abtract/RouteChangeSubcribe.directive';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 import { CanDeactivateGuard, ComponentCanDeactivate } from 'projects/viescloud-utils/src/lib/guards/auth.guard';
 import { Observable } from 'rxjs';

@@ -4,14 +4,13 @@ import { EnsibleItemTypeEnum, EnsiblePlaybookItem, EnsiblePlaybookLogger, Ensibl
 import { RouteUtils } from 'projects/viescloud-utils/src/lib/util/Route.utils';
 import { RxJSUtils } from 'projects/viescloud-utils/src/lib/util/RxJS.utils';
 import { DataUtils } from 'projects/viescloud-utils/src/lib/util/Data.utils';
-import { FixChangeDetection } from 'projects/viescloud-utils/src/lib/directive/FixChangeDetection';
-import { RouteChangeSubcribe } from 'projects/viescloud-utils/src/lib/directive/RouteChangeSubcribe.directive';
 import { ActivatedRoute } from '@angular/router';
 import { CanDeactivateGuard, ComponentCanDeactivate } from 'projects/viescloud-utils/src/lib/guards/auth.guard';
 import { Observable } from 'rxjs';
 import { DialogUtils } from 'projects/viescloud-utils/src/lib/util/Dialog.utils';
 import { EnsiblePlaybookLoggerService, EnsibleShellLoggerService } from '../../service/ensible-logger/ensible-logger.service';
 import { EnsibleAnsibleWorkspaceService, EnsibleShellWorkspaceService } from '../../service/ensible-workspace/ensible-workspace.service';
+import { RouteChangeSubcribe } from 'projects/viescloud-utils/src/lib/abtract/RouteChangeSubcribe.directive';
 
 class EnsibleItem {
   static PLAYBOOK = 'playbooks';

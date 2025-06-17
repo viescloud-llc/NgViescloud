@@ -1,7 +1,7 @@
 import { AfterContentChecked, ChangeDetectorRef, Component, DoCheck, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
 import { MatFormFieldAppearance } from '@angular/material/form-field';
-import { FixChangeDetection } from '../../directive/FixChangeDetection';
+import { FixChangeDetection } from '../../abtract/FixChangeDetection';
 import { UtilsService } from '../../service/utils.service';
 import { RgbColor } from '../../model/rgb.model';
 import { DialogUtils } from '../../util/Dialog.utils';

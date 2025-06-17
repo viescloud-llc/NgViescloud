@@ -29,7 +29,7 @@ export class HeaderComponent implements OnInit {
 
   constructor(
     public authenticatorService: AuthenticatorService, 
-    private settingService: SettingService,
+    private settingService: SettingService<any>,
     private router: Router
     ) { 
       settingService.header = this;
