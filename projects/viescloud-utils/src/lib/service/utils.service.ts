@@ -6,15 +6,7 @@ import { LoadingDialog } from '../dialog/loading-dialog/loading-dialog.component
 import { MatOption, MatSnackBarHorizontalPosition, MatSnackBarVerticalPosition } from '../model/mat.model';
 import { MatSnackBar, MatSnackBarRef } from '@angular/material/snack-bar';
 import { StringSnackBar } from '../snack/string-snack-bar/string-snack-bar.component';
-
-export interface VFile {
-  name: string,
-  type: string,
-  extension: string,
-  rawFile?: globalThis.File | Blob;
-  originalLink?: string;
-  value: string;
-}
+import { VFile } from '../model/vies.model';
 
 @Injectable({
   providedIn: 'root'
@@ -76,7 +68,7 @@ export class UtilsService {
         extension: extension,
         rawFile: blob,
         originalLink: uri,
-        value: ''
+        objectUrl: ''
       };
 
       return vFile;
@@ -251,7 +243,7 @@ export class UtilsService {
             name: fileName,
             type: fileType,
             rawFile: rawFile,
-            value: value,
+            objectUrl: value,
             extension: extension
           }
 

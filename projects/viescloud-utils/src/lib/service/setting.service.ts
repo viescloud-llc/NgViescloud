@@ -2,14 +2,14 @@ import { AfterContentInit, AfterViewInit, Injectable, Injector, OnInit, Renderer
 import { environment } from 'projects/environments/environment.prod';
 import { DRAWER_STATE, HeaderComponent } from '../share-component/header/header.component';
 import { ObjectStorage, ObjectStorageService } from './object-storage-manager.service';
-import { VFile } from './utils.service';
+import { VFile } from '../model/vies.model';
 import { GeneralSetting } from '../model/setting.model';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTheme } from '../model/theme.model';
 import { AuthenticatorService } from './authenticator.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConfirmDialog } from '../dialog/confirm-dialog/confirm-dialog.component';
-import { PopupType } from '../model/popup.model';
+import { PopupArgs, PopupType } from '../model/popup.model';
 import { RxJSUtils } from '../util/RxJS.utils';
 import { DataUtils } from '../util/Data.utils';
 import { FileUtils } from '../util/File.utils';
@@ -179,10 +179,10 @@ export class SettingService<T extends GeneralSetting> {
       type: 'application/json',
       extension: 'json',
       rawFile: new Blob([JSON.stringify(generalSetting)], {type: 'application/json'}),
-      value: JSON.stringify(generalSetting)
+      objectUrl: JSON.stringify(generalSetting)
     }
 
-    this.objectStorageService.putOrPostFile(vFile, false, PopupType.LOADING_DIALOG).then((data) => {}).catch((error) => {
+    this.objectStorageService.postOrPutFile(vFile, {type: PopupType.LOADING_DIALOG}).then((data) => {}).catch((error) => {
       window.alert(error);
     });
   }
@@ -226,10 +226,10 @@ export class SettingService<T extends GeneralSetting> {
       return 'white';
   }
 
-  loadBackgroundImage(url: string, objectStorage?: ObjectStorage, popupType: PopupType = PopupType.DYNAMIC_MESSAGE_POPUP, rememberInitialUrl: boolean = true) {
+  loadBackgroundImage(url: string, objectStorage?: ObjectStorage, popupArgs?: PopupArgs, rememberInitialUrl: boolean = true) {
     let currentRoute = RouteUtils.getCurrentUrl();
     if(url.includes(environment.gateway_api) && objectStorage) {
-      objectStorage.generateObjectUrlFromViescloudUrl(url, popupType).then(res => {
+      objectStorage.fetchFileAndGenerateObjectUrl(url, popupArgs).then(res => {
         if(rememberInitialUrl && RouteUtils.getCurrentUrl() === currentRoute)
           this.backgroundImageUrl = res;
       })

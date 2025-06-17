@@ -286,8 +286,8 @@ export class AuthenticatorService implements OnDestroy {
         this.saveRefreshTokenToSession();
       }),
       switchMap(() => this.fetchCurrentUser()),
-      tap(() => this.startIntervals()),
-      tap(() => this.isloginWithOauth2 = true),
+      tap({next: () => this.startIntervals()}),
+      tap({next: () => this.isloginWithOauth2 = true}),
       catchError(error => this.handleError(error))
     );
   }

@@ -115,26 +115,9 @@ export class DateTime {
     time?: string = '';
     date?: string = '';
     dateTime?: string = '';
+    offsetDayTime?: string = '';
+    zonedDayTime?: string = '';
     maxDayThisMonth?: number = 0;
-
-    constructor(id?: number, year?: number, month?: number, day?: number, hour?: number, minute?: number, second?: number, millis?: number, bypassMax?: boolean, zoneId?: string, time?: string, date?: string, dateTime?: string, maxDayThisMonth?: number) {
-        this.id = id;
-        this.year = year;
-        this.month = month;
-        this.day = day;
-        this.hour = hour;
-        this.minute = minute;
-        this.second = second;
-        this.millis = millis;
-
-        this.bypassMax = bypassMax;
-        this.zoneId = zoneId;
-
-        this.time = time;
-        this.date = date;
-        this.dateTime = dateTime;
-        this.maxDayThisMonth = maxDayThisMonth;
-    }
 
     static now(): DateTime {
         const now = new Date();
@@ -151,24 +134,33 @@ export class DateTime {
 
         const time = now.toTimeString().split(' ')[0]; // "HH:MM:SS"
         const date = now.toISOString().split('T')[0];  // "YYYY-MM-DD"
-        const dateTime = `${date}T${time}`;
+        const dateTime = `${date} | ${time}`;
 
-        return new DateTime(
-            0,
-            year,
-            month,
-            day,
-            hour,
-            minute,
-            second,
-            millis,
-            false,
-            zoneId,
-            time,
-            date,
-            dateTime,
-            maxDayThisMonth
-        );
+        let newDateTime = new DateTime();
+        newDateTime.year = year;
+        newDateTime.month = month;
+        newDateTime.day = day;
+        newDateTime.hour = hour;
+        newDateTime.minute = minute;
+        newDateTime.second = second;
+        newDateTime.millis = millis;
+        newDateTime.zoneId = zoneId;
+        newDateTime.time = time;
+        newDateTime.date = date;
+        newDateTime.dateTime = dateTime;
+        newDateTime.offsetDayTime = now.toISOString();
+        newDateTime.zonedDayTime = now.toISOString();
+        newDateTime.maxDayThisMonth = maxDayThisMonth;
+        return newDateTime;
     }
+}
+
+export interface VFile {
+  name: string;
+  type: string;
+  extension: string;
+  rawFile?: globalThis.File | Blob;
+  originalLink?: string;
+  objectUrl: string;
 }
 
