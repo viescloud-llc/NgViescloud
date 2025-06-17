@@ -243,8 +243,9 @@ export class FileUtils {
             name: fileName,
             type: fileType,
             rawFile: rawFile,
-            objectUrl: value,
+            objectUrl: '',
             extension: extension,
+            value: value
           };
 
           fileInput.remove();

@@ -129,7 +129,7 @@ export class SettingService<T extends GeneralSetting> {
     this.changeTheme(this.generalSetting.theme);
   }
 
-  getCopyOfGeneralSetting(): T {
+  getCopyOfGeneralSetting<T>(): T {
     return JSON.parse(JSON.stringify(this.generalSetting));
   }
 

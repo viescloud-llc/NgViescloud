@@ -162,5 +162,6 @@ export interface VFile {
   rawFile?: globalThis.File | Blob;
   originalLink?: string;
   objectUrl: string;
+  value?: any;
 }
 

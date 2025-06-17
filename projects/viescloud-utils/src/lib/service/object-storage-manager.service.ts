@@ -17,14 +17,33 @@ import { FileUtils } from '../util/File.utils';
 @Injectable({
   providedIn: 'root'
 })
-export abstract class ObjectStorage extends ViesService {
+export abstract class ObjectStorage {
   objectUrlCache = new Map<string, string>();
 
   constructor(
-    httpClient: HttpClient,
+    protected httpClient: HttpClient,
     public rxjsUtils: RxJSUtils
   ) {
-    super(httpClient);
+    
+  }
+
+  protected getURI(): string {
+    return ViesService.getUri();
+  }
+
+  protected abstract getPrefixes(): string[];
+
+  protected getPrefixPath(): string {
+      let prefixes = this.getPrefixes();
+      let path = "";
+      prefixes.forEach(e => {
+          path += `/${e}`;
+      });
+      return path;
+  }
+
+  public getPrefixUri(): string {
+      return `${this.getURI()}${this.getPrefixPath()}`;
   }
 
   getFile(requestParams: { id?: number, path?: string, fileName?: string, width?: number, height?: number }) {
