@@ -278,9 +278,11 @@ export class AuthenticatorService implements OnDestroy {
 
   loginOAuth2(oauth2Data: Oauth2LoginRequest, openIdProvider?: OpenIDProvider): Observable<User> {
     this.openIdProvider = openIdProvider;
-    return this.httpClient.post<{ jwt: string }>(`${this.getPrefixUri()}/login/oauth2`, oauth2Data).pipe(
+    return this.httpClient.post<AuthResponse>(`${this.getPrefixUri()}/login/oauth2`, oauth2Data).pipe(
       tap(response => {
         this.currentJwt = response.jwt;
+        this.currentRefreshToken = response.refreshToken;
+        this.saveRefreshTokenToSession();
       }),
       switchMap(() => this.fetchCurrentUser()),
       tap(() => this.startIntervals()),
