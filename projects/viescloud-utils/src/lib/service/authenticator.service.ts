@@ -8,6 +8,7 @@ import { StringUtils } from '../util/String.utils';
 import { OpenIDProvider } from '../model/open-id.model';
 import { Router } from '@angular/router';
 import { DialogUtils } from '../util/Dialog.utils';
+import { environment } from 'projects/environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
@@ -264,7 +265,7 @@ export class AuthenticatorService implements OnDestroy {
   login(credentials: LoginRequest): Observable<User> {
     return this.httpClient.post<AuthResponse>(`${this.getPrefixUri()}/login`, credentials).pipe(
       switchMap(response => this.handleAuthSuccess(response)),
-      tap(() => this.isloginWithOauth2 = true),
+      tap(() => this.isloginWithOauth2 = false),
       catchError(error => this.handleError(error))
     );
   }
@@ -309,6 +310,7 @@ export class AuthenticatorService implements OnDestroy {
 
   logOutManually() {
     this.logout();
+    this.router.navigate([environment.endpoint_login]);
     if(this.isloginWithOauth2) {
       this.isloginWithOauth2 = false;
       if(this.openIdProvider && this.openIdProvider.endSessionEndpoint) {

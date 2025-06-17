@@ -21,10 +21,16 @@ export class AuthGuard /*, CanActivateChild, CanDeactivate<unknown>, CanLoad */
 
   delayUntilReadyOrTimeout(
     readySignal$: Observable<any>,
-    maxWaitMs: number = 3000
+    maxWaitMs: number = 3000,
+    timeoutTrigger?: () => void
   ): Observable<boolean> {
     return race(
-      timer(maxWaitMs).pipe(map(() => false)), // timeout
+      timer(maxWaitMs).pipe(map(() => {
+        if(timeoutTrigger) {
+          timeoutTrigger();
+        }
+        return false
+      })), // timeout
       readySignal$.pipe(take(1), map(() => true)) // ready
     ).pipe(
       take(1)
@@ -52,7 +58,9 @@ export class AuthGuard /*, CanActivateChild, CanDeactivate<unknown>, CanLoad */
     }
     else {
       return firstValueFrom(
-        this.delayUntilReadyOrTimeout(this.getAuthInitializationSignal(), 10000).pipe(
+        this.delayUntilReadyOrTimeout(this.getAuthInitializationSignal(), 10000, () => {
+          this.router.navigate([environment.endpoint_login]);
+        }).pipe(
           switchMap(() => this.checkAuthentication())
         )
       );
