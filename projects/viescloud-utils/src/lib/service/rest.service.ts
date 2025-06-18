@@ -10,7 +10,13 @@ import { HttpParamsBuilder } from "../model/utils.model";
 import { RouteUtils } from "../util/Route.utils";
 import { MatchByEnum, MatchCaseEnum, Pageable } from "../model/vies.model";
 
+type envConfig = {
+    gateway_api: string
+}
+
 export abstract class ViesService {
+
+    private static env: envConfig | null | undefined;
 
     constructor(protected httpClient: HttpClient) {
 
@@ -36,17 +42,53 @@ export abstract class ViesService {
     }
 
     static getParseUri() {
-        if (environment.gateway_detection === 'static')
-            return RouteUtils.parseUrl(environment.gateway_api);
-        else
+        const env_gateway_api = this.loadEnvSync()?.gateway_api;
+        if (env_gateway_api) {
+            return RouteUtils.parseUrl(env_gateway_api);
+        }
+        else {
             return RouteUtils.getCurrentSchemasHostPortParsed();
+        }
     }
 
-    static getUri() {
-        if (environment.gateway_detection === 'static')
-            return environment.gateway_api;
-        else
+    static getUri(): string {
+        const env_gateway_api = this.loadEnvSync()?.gateway_api;
+        if (env_gateway_api) {
+            return env_gateway_api;
+        }
+        else {
             return RouteUtils.getCurrentSchemasHostPort();
+        }
+    }
+
+    static getGatewayApi(): string {
+        return this.getUri();
+    }
+
+    private static loadEnvSync() {
+        if (this.env || this.env === null) {
+            return this.env;
+        }
+    
+        try {
+          const xhr = new XMLHttpRequest();
+          xhr.open('GET', '/assets/env.json', false); // false = synchronous
+          xhr.send();
+    
+          if (xhr.status === 200) {
+            const config = JSON.parse(xhr.responseText);
+            this.env = config;
+            return config;
+          } else {
+            console.log(`Failed to load config synchronously: HTTP error! status: ${xhr.status}`);
+            this.env = null;
+            return this.env;
+          }
+        } catch (error) {
+          console.error('Failed to load config synchronously:', error);
+          this.env = null;
+          return this.env;
+        }
     }
 }
 
