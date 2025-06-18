@@ -1,4 +1,4 @@
-import { VFile } from '../service/utils.service';
+import { VFile } from '../model/vies.model';
 
 export class FileUtils {
   private constructor() {}
@@ -32,7 +32,7 @@ export class FileUtils {
         extension: extension,
         rawFile: blob,
         originalLink: uri,
-        value: '',
+        objectUrl: '',
       };
 
       return vFile;
@@ -243,8 +243,9 @@ export class FileUtils {
             name: fileName,
             type: fileType,
             rawFile: rawFile,
-            value: value,
+            objectUrl: '',
             extension: extension,
+            value: value
           };
 
           fileInput.remove();
@@ -282,9 +283,12 @@ export class FileUtils {
     return value;
   }
 
-  static async isObjectUrlValid(url: string): Promise<boolean> {
-    return fetch(url)
-      .then((response) => response.ok)
-      .catch(() => false);
+  static async isObjectUrlActive(objectUrl: string): Promise<boolean> {
+    try {
+      const response = await fetch(objectUrl, { method: 'HEAD' });
+      return response.ok;
+    } catch (error) {
+      return false;
+    }
   }
 }

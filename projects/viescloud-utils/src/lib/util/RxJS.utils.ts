@@ -16,9 +16,9 @@ import { NotAuthenticatedError } from "../model/error.model";
 export class RxJSUtils {
 
     constructor(
-        private snackBar: MatSnackBar,
-        private matDialog: MatDialog,
-        private popupUtils: PopupUtils,
+        public snackBar: MatSnackBar,
+        public matDialog: MatDialog,
+        public popupUtils: PopupUtils,
     ) { }
 
     static async ObservableToPromise<T>(observable: Observable<T>, nextFn?: (value: T) => void, errorFn?: (error: any) => void): Promise<T> {
@@ -130,24 +130,5 @@ export class RxJSUtils {
             finalize<T>(() => this.popupUtils.dismiss(ref)),
             first<T>()
         );
-    }
-
-    //TODO: fix this function (not working at the moment)
-    static abortIfNotLogin(authenticatorService?: AuthenticatorService) {
-        return <T>(source: Observable<T>) => {
-          return new Observable<T>((observer) => {
-            // Check if the user is logged in (replace with your actual condition)
-            const isLoggedIn = authenticatorService?.isAuthenticatedSync()
-      
-            if (!isLoggedIn) {
-              // Throw custom error if not logged in
-              observer.error(new NotAuthenticatedError());
-              return;
-            }
-      
-            // If logged in, proceed with the HTTP request
-            return source.subscribe(observer);
-          });
-        };
     }
 }
