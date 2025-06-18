@@ -42,14 +42,9 @@ export abstract class ViesService {
     }
 
     static getParseUri() {
-        if (environment.gateway_detection === 'static') {
-            const env_gateway_api = this.loadEnvSync()?.gateway_api;
-            if(env_gateway_api) {
-                return RouteUtils.parseUrl(env_gateway_api);
-            } 
-            else {
-                return RouteUtils.parseUrl(environment.gateway_api);
-            }
+        const env_gateway_api = this.loadEnvSync()?.gateway_api;
+        if (env_gateway_api) {
+            return RouteUtils.parseUrl(env_gateway_api);
         }
         else {
             return RouteUtils.getCurrentSchemasHostPortParsed();
@@ -57,14 +52,9 @@ export abstract class ViesService {
     }
 
     static getUri() {
-        if (environment.gateway_detection === 'static') {
-            const env_gateway_api = this.loadEnvSync()?.gateway_api;
-            if(env_gateway_api) {
-                return env_gateway_api;
-            }
-            else {
-                return environment.gateway_api;
-            }
+        const env_gateway_api = this.loadEnvSync()?.gateway_api;
+        if (env_gateway_api) {
+            return env_gateway_api;
         }
         else {
             return RouteUtils.getCurrentSchemasHostPort();
