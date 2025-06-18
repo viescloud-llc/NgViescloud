@@ -18,6 +18,7 @@ import { Subject } from 'rxjs';
 import { RouteUtils } from '../util/Route.utils';
 import { HeaderMinimalComponent } from '../share-component/header-minimal/header-minimal.component';
 import { Router } from '@angular/router';
+import { ViesService } from './rest.service';
 
 @Injectable({
   providedIn: 'root'
@@ -38,7 +39,7 @@ export class SettingService<T extends GeneralSetting> {
 
   prefix = '';
   currentMenu = "main";
-  apiGatewayUrl: string = environment.gateway_api;
+  apiGatewayUrl: string = ViesService.getGatewayApi();
   backgroundImageUrl: string = '';
   header?: HeaderComponent | HeaderMinimalComponent;
   matThemeOptions = DataUtils.getEnumMatOptions(MatTheme);
@@ -228,7 +229,7 @@ export class SettingService<T extends GeneralSetting> {
 
   loadBackgroundImage(url: string, objectStorage?: ObjectStorage, popupArgs?: PopupArgs, rememberInitialUrl: boolean = true) {
     let currentRoute = RouteUtils.getCurrentUrl();
-    if(url.includes(environment.gateway_api) && objectStorage) {
+    if(url.includes(ViesService.getGatewayApi()) && objectStorage) {
       objectStorage.fetchFileAndGenerateObjectUrl(url, popupArgs).then(res => {
         if(rememberInitialUrl && RouteUtils.getCurrentUrl() === currentRoute)
           this.backgroundImageUrl = res;
