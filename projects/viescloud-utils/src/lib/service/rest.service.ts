@@ -51,7 +51,7 @@ export abstract class ViesService {
         }
     }
 
-    static getUri() {
+    static getUri(): string {
         const env_gateway_api = this.loadEnvSync()?.gateway_api;
         if (env_gateway_api) {
             return env_gateway_api;
@@ -59,6 +59,10 @@ export abstract class ViesService {
         else {
             return RouteUtils.getCurrentSchemasHostPort();
         }
+    }
+
+    static getGatewayApi(): string {
+        return this.getUri();
     }
 
     private static loadEnvSync() {
