@@ -1,0 +1,15 @@
+<button mat-raised-button color="primary" (click)="upload()">Upload</button>
+<ngx-extended-pdf-viewer
+  [src]="src"
+  [textLayer]="true"
+  [showHandToolButton]="true"
+  [showToolbar]="true"
+  showBookModeButton="always-visible"
+  showVerticalScrollButton="always-visible"
+  >
+</ngx-extended-pdf-viewer>
+
+<!-- 
+  (textLayerRendered)=""
+  (pageChange)=""
+ -->

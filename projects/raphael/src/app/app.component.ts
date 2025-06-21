@@ -32,6 +32,20 @@ export class AppComponent extends ViescloudApplication {
         ]
       },
       {
+        title: 'TTS',
+        hideConditional: () => !this.authenticatorService.isAuthenticatedSync(),
+        children: [
+          {
+            title: 'Simple TTS',
+            routerLink: '/tts/simple-tts'
+          },
+          {
+            title: 'Text TTS',
+            routerLink: '/tts/text-tts'
+          }
+        ]
+      },
+      {
         title: 'Settings',
         hideChildren: true,
         children: [

@@ -7,9 +7,14 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AuthInterceptor } from 'projects/viescloud-utils/src/lib/guards/auth.interceptor';
 import { SettingService } from 'projects/viescloud-utils/src/lib/service/setting.service';
 import { RaphaelSettingService } from './service/raphael.setting.service';
+import { SimpleTtsComponent } from './tts/simple-tts/simple-tts.component';
+import { TextTtsComponent } from './tts/text-tts/text-tts.component';
+import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 
 const LIST = [
-  AppComponent
+  AppComponent,
+  SimpleTtsComponent,
+  TextTtsComponent
 ]
 
 @NgModule({
@@ -19,6 +24,7 @@ const LIST = [
   imports: [
     ViescloudUtilsModule,
     AppRoutingModule,
+    NgxExtendedPdfViewerModule
   ],
   providers: [
     {

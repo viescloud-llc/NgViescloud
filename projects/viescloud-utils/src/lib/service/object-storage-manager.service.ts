@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'projects/environments/environment.prod';
-import { first, firstValueFrom, map, Observable, of, pipe, switchMap, throwError, UnaryFunction } from 'rxjs';
+import { first, firstValueFrom, from, map, mergeMap, Observable, of, pipe, switchMap, throwError, UnaryFunction } from 'rxjs';
 import { UtilsService } from './utils.service';
 import { VFile } from '../model/vies.model';
 import { Metadata } from '../model/object-storage-manager.model';
@@ -270,6 +270,63 @@ export abstract class ObjectStorage {
     })
   }
 
+  async createObjectUrl(uri: string, rawFile: Blob) {
+    if(this.objectUrlCache.has(uri)) {
+      let objectUrl = this.objectUrlCache.get(uri);
+      let isActiveUrl = await FileUtils.isObjectUrlActive(objectUrl!).catch(err => false);
+      if(isActiveUrl) {
+        return objectUrl!;
+      }
+      else {
+        URL.revokeObjectURL(objectUrl!);
+      }
+    }
+
+    let objectUrl = URL.createObjectURL(rawFile);
+    this.objectUrlCache.set(uri, objectUrl);
+    return objectUrl;
+  }
+
+  async fetchFile(uri: string, popupArgs?: PopupArgs): Promise<VFile> {
+    if (!this.containViesLink(uri)) {
+      return UtilsService.fetchAsVFile(uri)
+    }
+    else {
+      return firstValueFrom(this.httpClient.get(uri, { observe: 'response', responseType: 'blob' })
+        .pipe(this.getLoadingPipe(popupArgs))
+        .pipe(
+          map((response) => {
+            let contentType = response.headers.get('Content-Type') || '';
+            let fileName = uri.substring(uri.lastIndexOf('/') + 1);
+            let extension = '';
+
+            if (!contentType) {
+              // If Content-Type is not provided, derive it from the file name
+              extension = fileName.split('.').pop()?.toLowerCase() || '';
+              contentType = UtilsService.mapExtensionToContentType(extension);
+            } else {
+              // If Content-Type is provided, extract extension from it
+              extension = contentType.split('/')[1];
+            }
+
+            let rawFile = response.body as Blob;
+
+            const vFile: VFile = {
+              name: fileName,
+              type: contentType,
+              extension: extension,
+              rawFile: rawFile,
+              originalLink: uri,
+              objectUrl: '',
+            };
+
+            return vFile;
+          }),
+          first()
+        ))
+    }
+  }
+
   async fetchFileAndGenerateObjectUrl(uri: string, popupArgs?: PopupArgs) {
     if(this.objectUrlCache.has(uri)) {
       let objectUrl = this.objectUrlCache.get(uri);
@@ -295,45 +352,6 @@ export abstract class ObjectStorage {
     }
 
     return Promise.reject(error);
-  }
-
-
-  async fetchFile(uri: string, popupArgs?: PopupArgs): Promise<VFile> {
-    if (!this.containViesLink(uri)) {
-      return UtilsService.fetchAsVFile(uri)
-    }
-    else {
-      return firstValueFrom(this.httpClient.get(uri, { observe: 'response', responseType: 'blob' })
-        .pipe(this.getLoadingPipe(popupArgs))
-        .pipe(
-          map((response) => {
-            let contentType = response.headers.get('Content-Type') || '';
-            let fileName = uri.substring(uri.lastIndexOf('/') + 1);
-            let extension = '';
-
-            if (!contentType) {
-              // If Content-Type is not provided, derive it from the file name
-              extension = fileName.split('.').pop()?.toLowerCase() || '';
-              contentType = UtilsService.mapExtensionToContentType(extension);
-            } else {
-              // If Content-Type is provided, extract extension from it
-              extension = contentType.split('/')[1];
-            }
-
-            const vFile: VFile = {
-              name: fileName,
-              type: contentType,
-              extension: extension,
-              rawFile: response.body as Blob,
-              originalLink: uri,
-              objectUrl: ''
-            };
-
-            return vFile;
-          }),
-          first()
-        ))
-    }
   }
 }
 

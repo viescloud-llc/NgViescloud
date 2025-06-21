@@ -8,6 +8,8 @@ import { OpenIdProviderComponent } from 'projects/viescloud-utils/src/lib/share-
 import { UserGroupListComponent } from 'projects/viescloud-utils/src/lib/share-component/user-group-list/user-group-list.component';
 import { UserListComponent } from 'projects/viescloud-utils/src/lib/share-component/user-list/user-list.component';
 import { UserSettingComponent } from 'projects/viescloud-utils/src/lib/share-component/user-setting/user-setting.component';
+import { SimpleTtsComponent } from './tts/simple-tts/simple-tts.component';
+import { TextTtsComponent } from './tts/text-tts/text-tts.component';
 
 const routes: Routes = [
   {
@@ -17,6 +19,21 @@ const routes: Routes = [
   {
     path: "login",
     component: LoginComponent
+  },
+  {
+    path: "tts",
+    canActivate: [async () => inject(AuthGuard).isLogin()],
+    canActivateChild: [async () => inject(AuthGuard).isLogin()],
+    children: [
+      {
+        path: "simple-tts",
+        component: SimpleTtsComponent
+      },
+      {
+        path: "text-tts",
+        component: TextTtsComponent
+      }
+    ]
   },
   {
     path: 'setting',

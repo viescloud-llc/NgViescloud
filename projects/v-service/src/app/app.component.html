@@ -1,0 +1,10 @@
+<router-outlet></router-outlet>
+
+<mat-drawer-container style="height: 100%; width: 100%;" autosize>
+    <mat-drawer #drawer  mode="side">
+      <app-side-drawer></app-side-drawer>
+    </mat-drawer>
+    
+    <viescloud-header [drawer]="drawer"></viescloud-header>
+    <router-outlet></router-outlet>
+</mat-drawer-container>

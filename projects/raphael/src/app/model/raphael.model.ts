@@ -8,3 +8,9 @@ export class RaphaelSetting extends GeneralSetting {
         ReflectionUtils.copyAllParentPrototype(this, 2);
     }
 }
+
+export type TTS = {
+    text: string,
+    voice?: string,
+    model?: string
+}

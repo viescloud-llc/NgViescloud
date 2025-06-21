@@ -1,0 +1,43 @@
+<ul class="margin-center" appMatFormFieldGroup (onAllInputCheck)="validForm.next($event)">
+
+  <li>
+    <app-mat-form-field-input-option
+    [(value)]="ttsService.selectedModel"
+    [options]="ttsService.modelOptions"
+    [noneLabel]="'none'"
+    [noneLabelValue]="''"
+    [styleWidth]="'100%'"
+    ></app-mat-form-field-input-option>
+  </li>
+
+  <li>
+    <app-mat-form-field-input-option
+    [(value)]="ttsService.selectedVoice"
+    [options]="ttsService.voiceOptions"
+    [noneLabel]="'none'"
+    [noneLabelValue]="''"
+    [styleWidth]="'100%'"
+    ></app-mat-form-field-input-option>
+  </li>
+
+  <li>
+    <app-mat-form-field-input-text-area
+    [(value)]="value"
+    [label]="'text to speak'"
+    [required]="true"
+    [styleWidth]="'100%'"
+    ></app-mat-form-field-input-text-area>
+  </li>
+
+  <li>
+    <button #Speak mat-raised-button color="primary" (click)="speak()" [disabled]="!isValidForm()">Speak</button>
+  </li>
+
+  <li *ngIf="generatedVfile && generatedVfile.objectUrl">
+    <br>
+    <audio controls style="width: 100%;">
+      <source [src]="generatedVfile.objectUrl">
+      Your browser does not support the audio element.
+    </audio>
+  </li>
+</ul>
