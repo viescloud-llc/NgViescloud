@@ -6,13 +6,13 @@ import { GeneralSetting } from "projects/viescloud-utils/src/lib/model/setting.m
 import { AuthenticatorService } from "projects/viescloud-utils/src/lib/service/authenticator.service";
 import { SettingService } from "projects/viescloud-utils/src/lib/service/setting.service";
 import { FileUtils } from "projects/viescloud-utils/src/lib/util/File.utils";
-import { SkeletonSetting } from "../model/skeleton.model";
+import { RaphaelSetting } from "../model/raphael.model";
 import { ObjectStorageService } from "projects/viescloud-utils/src/lib/service/object-storage-manager.service";
 
 @Injectable({
   providedIn: 'root'
 })
-export class SkeletonSettingService extends SettingService<SkeletonSetting> {
+export class RaphaelSettingService extends SettingService<RaphaelSetting> {
 
   constructor(
     objectStorageService: ObjectStorageService,
@@ -24,7 +24,7 @@ export class SkeletonSettingService extends SettingService<SkeletonSetting> {
     super(objectStorageService, matDialog, snackBar, router, injector);
   }
 
-  protected override newSetting(): SkeletonSetting {
-    return new SkeletonSetting();
+  protected override newSetting(): RaphaelSetting {
+    return new RaphaelSetting();
   }
 }
