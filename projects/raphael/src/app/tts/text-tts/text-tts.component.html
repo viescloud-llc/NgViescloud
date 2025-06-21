@@ -4,12 +4,11 @@
   [textLayer]="true"
   [showHandToolButton]="true"
   [showToolbar]="true"
+  [height]="'100%'"
+  [enableDragAndDrop]="true"
   showBookModeButton="always-visible"
   showVerticalScrollButton="always-visible"
+  (textLayerRendered)="onTextLayerRendered($event);"
+  (pageChange)="onPageChange($event)"
   >
 </ngx-extended-pdf-viewer>
-
-<!-- 
-  (textLayerRendered)=""
-  (pageChange)=""
- -->

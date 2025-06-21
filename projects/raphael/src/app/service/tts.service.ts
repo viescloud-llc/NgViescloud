@@ -125,4 +125,8 @@ export class TTSService extends ViesService {
                         first()
                     )
     }
+
+    preloadWav(tts: TTS) {
+        return this.httpClient.put<{status: string}>(`${this.getPrefixUri()}/wav/preload`, tts);
+    }
 }
