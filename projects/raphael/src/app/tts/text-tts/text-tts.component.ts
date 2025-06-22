@@ -4,6 +4,8 @@ import { FileUtils } from 'projects/viescloud-utils/src/lib/util/File.utils';
 import { TTSService } from '../../service/tts.service';
 import { StringUtils } from 'projects/viescloud-utils/src/lib/util/String.utils';
 import { pdfDefaultOptions, TextLayerRenderedEvent } from 'ngx-extended-pdf-viewer';
+import { TtsReaderService } from '../../service/tts-reader.service';
+import { TtsReaderServiceV1 } from '../../service/tts-reader-v1.service';
 
 @Component({
   selector: 'app-text-tts',
@@ -16,11 +18,13 @@ export class TextTtsComponent implements OnInit {
 
   constructor(
     private ttsService: TTSService,
-    private objectStorageService: ObjectStorageService
+    private objectStorageService: ObjectStorageService,
+    private ttsReaderService: TtsReaderService,
+    private ttsReaderServiceV1: TtsReaderServiceV1
   ) { }
 
   ngOnInit(): void {
-    pdfDefaultOptions.textLayerMode = 2;
+    pdfDefaultOptions.textLayerMode = 1;
   }
 
   async upload() {
@@ -32,10 +36,11 @@ export class TextTtsComponent implements OnInit {
   }
 
   onTextLayerRendered(textLayerRenderedEvent: TextLayerRenderedEvent) {
-
+    this.ttsReaderService.onTextLayerRendered(textLayerRenderedEvent);
+    // this.ttsReaderServiceV1.onTextLayerRendered(textLayerRenderedEvent);
   }
 
   onPageChange(pageNumber: number) {
-    //do something on page change
+    // this.ttsReaderService.onPageChange(pageNumber);
   }
 }
