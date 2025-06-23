@@ -10,11 +10,13 @@ import { RaphaelSettingService } from './service/raphael.setting.service';
 import { SimpleTtsComponent } from './tts/simple-tts/simple-tts.component';
 import { TextTtsComponent } from './tts/text-tts/text-tts.component';
 import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
+import { TextTtsPanelComponent } from './tts/text-tts/text-tts-panel/text-tts-panel.component';
 
 const LIST = [
   AppComponent,
   SimpleTtsComponent,
-  TextTtsComponent
+  TextTtsComponent,
+  TextTtsPanelComponent
 ]
 
 @NgModule({

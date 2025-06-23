@@ -6,6 +6,8 @@ import { StringUtils } from 'projects/viescloud-utils/src/lib/util/String.utils'
 import { pdfDefaultOptions, TextLayerRenderedEvent } from 'ngx-extended-pdf-viewer';
 import { TtsReaderService } from '../../service/tts-reader.service';
 import { TtsReaderServiceV1 } from '../../service/tts-reader-v1.service';
+import { QuickSideDrawerMenuService } from 'projects/viescloud-utils/src/lib/service/quick-side-drawer-menu.service';
+import { TextTtsPanelComponent } from './text-tts-panel/text-tts-panel.component';
 
 @Component({
   selector: 'app-text-tts',
@@ -17,14 +19,14 @@ export class TextTtsComponent implements OnInit {
   src = '../../../assets/pdf-test.pdf';
 
   constructor(
-    private ttsService: TTSService,
     private objectStorageService: ObjectStorageService,
     private ttsReaderService: TtsReaderService,
-    private ttsReaderServiceV1: TtsReaderServiceV1
+    private sideDrawerService: QuickSideDrawerMenuService
   ) { }
 
   ngOnInit(): void {
     pdfDefaultOptions.textLayerMode = 1;
+    this.sideDrawerService.loadComponent(TextTtsPanelComponent);
   }
 
   async upload() {
@@ -37,10 +39,11 @@ export class TextTtsComponent implements OnInit {
 
   onTextLayerRendered(textLayerRenderedEvent: TextLayerRenderedEvent) {
     this.ttsReaderService.onTextLayerRendered(textLayerRenderedEvent);
-    // this.ttsReaderServiceV1.onTextLayerRendered(textLayerRenderedEvent);
   }
 
   onPageChange(pageNumber: number) {
-    // this.ttsReaderService.onPageChange(pageNumber);
+
   }
+
+  
 }

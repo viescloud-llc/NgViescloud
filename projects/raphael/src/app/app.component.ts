@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { environment } from 'projects/environments/environment.prod';
 import { ViescloudApplication } from 'projects/viescloud-utils/src/lib/abtract/ViescloudApplication.directive';
 import { QuickSideDrawerMenu } from 'projects/viescloud-utils/src/lib/share-component/quick-side-drawer-menu/quick-side-drawer-menu.component';
+import { TextTtsPanelComponent } from './tts/text-tts/text-tts-panel/text-tts-panel.component';
 
 @Component({
   selector: 'app-root',
