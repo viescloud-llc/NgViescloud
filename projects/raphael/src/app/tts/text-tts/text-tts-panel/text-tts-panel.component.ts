@@ -24,30 +24,45 @@ export class TextTtsPanelComponent implements OnInit {
   ngOnInit(): void {
     this.ttsReaderService.onSentenceClick.subscribe({
       next: sentence => {
-        if (this.selectedSentence !== sentence && sentence) {
-          if (this.reading) {
-            this.selectedSentence?.hightLightColor.next('');
-          }
-
-          this.selectedSentence = sentence;
-
-          if (this.readOnClick) {
-            if (this.reading) {
-              this.beginReading(sentence);
-            }
-            else {
-              this.readSentence(sentence);
-            }
-          }
-        }
+        this.selectSentence(sentence);
       }
     })
   }
 
+  selectSentence(sentence?: Sentence | null) {
+    if (this.selectedSentence !== sentence && sentence) {
+      this.selectedSentence?.hightLightColor.next('');
+      this.selectedSentence = sentence;
+      sentence.hightLightColor.next(sentence.hightLightColorMain.value);
+
+      if (this.readOnClick) {
+        if (this.reading) {
+          this.beginReading(sentence);
+        }
+        else {
+          this.readSentence(sentence);
+        }
+      }
+    }
+  }
+
+  scollToSentence(sentence: Sentence) {
+    this.ttsReaderService.pdfViewerService.scrollPageIntoView(sentence.pageNumber[sentence.pageNumber.length - 1], {top: sentence.index * 50});
+  }
+
   async readSentence(sentence: Sentence) {
+
+    if(this.reading) {
+      this.scollToSentence(sentence);
+    }
+
     sentence.hightLightColor.next(sentence.hightLightColorMain.value);
-    this.ttsReaderService.preloadForwardFromSentence(sentence, this.preloadSentence);
-    this.ttsReaderService.preloadBackwardFromSentence(sentence, this.preloadSentence);
+
+    if(!this.ttsReaderService.useSpeechSyhnthesis) {
+      this.ttsReaderService.preloadForwardFromSentence(sentence, this.preloadSentence);
+      this.ttsReaderService.preloadBackwardFromSentence(sentence, this.preloadSentence);
+    }
+
     return this.ttsReaderService.playSentence(sentence);
   }
 

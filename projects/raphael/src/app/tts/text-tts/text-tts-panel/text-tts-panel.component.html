@@ -6,47 +6,70 @@
   <br>
 
   <li>
-    <app-mat-form-field-input-option
-    [label]="'Model'"
-    [(value)]="ttsReaderService.selectedModel"
-    [options]="ttsReaderService.modelOptions"
-    [noneLabel]="'none'"
-    [noneLabelValue]="''"
+    <app-mat-form-field-input-dynamic
+    [label]="'Use browser TTS'"
+    [(value)]="ttsReaderService.useSpeechSyhnthesis"
+    [isSlideToggle]="true"
     [styleWidth]="'100%'"
-    ></app-mat-form-field-input-option>
+    ></app-mat-form-field-input-dynamic>
   </li>
 
-  <li>
-    <app-mat-form-field-input-option
-    [label]="'Voice'"
-    [(value)]="ttsReaderService.selectedVoice"
-    [options]="ttsReaderService.voiceOptions"
-    [noneLabel]="'none'"
-    [noneLabelValue]="''"
-    [styleWidth]="'100%'"
-    ></app-mat-form-field-input-option>
-  </li>
+  <br>
 
-  <li>
-    <app-mat-form-field-input
-    [label]="'Text'"
-    [value]="selectedSentence?.text"
-    [readonly]="true"
-    [styleWidth]="'100%'"
-    ></app-mat-form-field-input>
-  </li>
+  <ng-container *ngIf="ttsReaderService.useSpeechSyhnthesis">
+    <li>
+      <app-mat-form-field-input-option
+      [label]="'Voices'"
+      [(value)]="ttsReaderService.selectedSpeechSynthesisVoice"
+      [options]="ttsReaderService.audioPlayer.synthVoicesOptions"
+      ></app-mat-form-field-input-option>
+    </li>
+  </ng-container>
 
-  <li>
-    <app-mat-form-field-input
-    [label]="'Preload Audio'"
-    [(value)]="preloadSentence"
-    [defaultType]="'number'"
-    [styleWidth]="'100%'"
-    [min]="'0'"
-    [focusOutAutoFillFn]="checkMin0Value"
-    ></app-mat-form-field-input>
-  </li>
-
+  <ng-container *ngIf="!ttsReaderService.useSpeechSyhnthesis">
+    <li>
+      <app-mat-form-field-input-option
+      [label]="'Model'"
+      [(value)]="ttsReaderService.selectedModel"
+      [options]="ttsReaderService.modelOptions"
+      [noneLabel]="'none'"
+      [noneLabelValue]="''"
+      [styleWidth]="'100%'"
+      ></app-mat-form-field-input-option>
+    </li>
+  
+    <li>
+      <app-mat-form-field-input-option
+      [label]="'Voice'"
+      [(value)]="ttsReaderService.selectedVoice"
+      [options]="ttsReaderService.voiceOptions"
+      [noneLabel]="'none'"
+      [noneLabelValue]="''"
+      [styleWidth]="'100%'"
+      ></app-mat-form-field-input-option>
+    </li>
+  
+    <li>
+      <app-mat-form-field-input
+      [label]="'Text'"
+      [value]="selectedSentence?.text"
+      [readonly]="true"
+      [styleWidth]="'100%'"
+      ></app-mat-form-field-input>
+    </li>
+  
+    <li>
+      <app-mat-form-field-input
+      [label]="'Preload Audio'"
+      [(value)]="preloadSentence"
+      [defaultType]="'number'"
+      [styleWidth]="'100%'"
+      [min]="'0'"
+      [focusOutAutoFillFn]="checkMin0Value"
+      ></app-mat-form-field-input>
+    </li>
+  </ng-container>
+  
   <li>
     Read speed
     <mat-slider min="0" max="2" step="0.1" showTickMarks discrete>
@@ -71,4 +94,11 @@
     <button *ngIf="!reading" mat-raised-button color="primary" (click)="beginReading(selectedSentence!)" [disabled]="!selectedSentence">Read</button>
     <button *ngIf="reading" mat-raised-button color="primary" (click)="stopReading()">Stop reading</button>
   </li>
+
+  <br>
+
+  <!-- <li class="flex-row-container-auto">
+    <button mat-raised-button color="primary" (click)="selectSentence(ttsReaderService.documentManager.getPrevSentence(selectedSentence!))" [disabled]="!selectedSentence">Previous</button>
+    <button mat-raised-button color="primary" (click)="selectSentence(ttsReaderService.documentManager.getNextSentence(selectedSentence!))" [disabled]="!selectedSentence">Next</button>
+  </li> -->
 </ul>

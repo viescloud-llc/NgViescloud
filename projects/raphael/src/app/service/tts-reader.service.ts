@@ -1,10 +1,11 @@
 import { Injectable } from "@angular/core";
 import { TTSService } from "./tts.service";
-import { TextLayerRenderedEvent } from "ngx-extended-pdf-viewer";
+import { NgxExtendedPdfViewerService, TextLayerRenderedEvent } from "ngx-extended-pdf-viewer";
 import { BehaviorSubject, firstValueFrom, retry } from "rxjs";
 import { HttpClient } from "@angular/common/http";
 import { TTS } from "../model/raphael.model";
 import { RxJSUtils } from "projects/viescloud-utils/src/lib/util/RxJS.utils";
+import { MatOption } from "projects/viescloud-utils/src/lib/model/mat.model";
 
 export type Sentence = {
     text: string,
@@ -35,7 +36,10 @@ export class TtsReaderService extends TTSService {
     selectedSentence = new BehaviorSubject<Sentence | null>(null);
     onUploadingFile: BehaviorSubject<string> = new BehaviorSubject<string>('../../../assets/pdf-test.pdf');
 
-    constructor(httpClient: HttpClient, private rxjsUtils: RxJSUtils) {
+    selectedSpeechSynthesisVoice: string = '';
+    useSpeechSyhnthesis = false;
+
+    constructor(httpClient: HttpClient, private rxjsUtils: RxJSUtils, public pdfViewerService: NgxExtendedPdfViewerService) {
         super(httpClient);
         this.documentManager = new DocumentManager(this.globalHightLightColorMain, this.globalHightLightColorHover, this.globalHhightLightOpacity, this.onSentenceClick);
 
@@ -72,20 +76,27 @@ export class TtsReaderService extends TTSService {
     }
 
     async playSentence(sentence: Sentence) {
-        let tts: TTS = {
-            text: sentence.text,
-            model: this.selectedModel,
-            voice: this.selectedVoice
+
+        if(this.useSpeechSyhnthesis && this.selectedSpeechSynthesisVoice) {
+            return this.audioPlayer.playSynthesis(sentence.text, this.selectedSpeechSynthesisVoice);
+        }
+        else {
+            let tts: TTS = {
+                text: sentence.text,
+                model: this.selectedModel,
+                voice: this.selectedVoice
+            }
+    
+            let metadata = await firstValueFrom(this.generateWavMetadata(tts).pipe(
+                this.rxjsUtils.waitLoadingSnackBar('Generating audio...'),
+                retry(10)
+            )).catch(err => null);
+    
+            if (metadata?.temporaryAccessLink) {
+                return this.audioPlayer.play(metadata.temporaryAccessLink);
+            }
         }
 
-        let metadata = await firstValueFrom(this.generateWavMetadata(tts).pipe(
-            this.rxjsUtils.waitLoadingSnackBar('Generating audio...'),
-            retry(10)
-        )).catch(err => null);
-
-        if (metadata?.temporaryAccessLink) {
-            return this.audioPlayer.play(metadata.temporaryAccessLink);
-        }
     }
 
     async preloadSentence(sentence: Sentence) {
@@ -223,8 +234,9 @@ class DocumentManager {
     getPrevSentence(sentence: Sentence) {
         let pageNumber = sentence.pageNumber[sentence.pageNumber.length - 1];
         let index = sentence.index - 1;
+        let prevPageSentenceSize = (this.sentenceMap.get(pageNumber - 1)?.length ?? 1) - 1;
 
-        return this.getSentence(pageNumber, index) ?? this.getSentence(pageNumber - 1, 0);
+        return this.getSentence(pageNumber, index) ?? this.getSentence(pageNumber - 1, prevPageSentenceSize);
     }
 
     addTextLayerFromEvent(event: TextLayerRenderedEvent) {
@@ -402,21 +414,60 @@ class DocumentManager {
     }
 }
 
-class AudioPlayer {
+export class AudioPlayer {
     private audio = new Audio();
     audioPlayerState: BehaviorSubject<'playing' | 'paused' | 'idle'> = new BehaviorSubject<'playing' | 'paused' | 'idle'>('idle');
     speed: BehaviorSubject<number> = new BehaviorSubject<number>(1);
+    synthVoices = window.speechSynthesis.getVoices();
+    synthVoicesOptions: MatOption<string>[] = []
+    private currentSpeechSynthesisUtterance: SpeechSynthesisUtterance = new SpeechSynthesisUtterance();
 
     constructor() {
         this.audio.preload = 'auto';
 
         this.speed.subscribe((speed) => {
             this.audio.playbackRate = speed;
+            this.currentSpeechSynthesisUtterance.rate = speed;
         });
+
+        window.speechSynthesis.onvoiceschanged = () => {
+            this.synthVoices = window.speechSynthesis.getVoices();
+
+            this.synthVoices.forEach((voice) => {
+                let matOption: MatOption<string> = {
+                    value: voice.name,
+                    valueLabel: voice.name
+                }
+                this.synthVoicesOptions.push(matOption);
+            })
+        }
+
+    }
+
+    async playSynthesis(text: string, voice: string): Promise<void> {
+        this.stop();
+        return new Promise((resolve, reject) => {
+            this.currentSpeechSynthesisUtterance.text = text;
+            this.currentSpeechSynthesisUtterance.voice = this.synthVoices.find((v) => v.name === voice)!;
+            this.currentSpeechSynthesisUtterance.rate = this.speed.value;
+            
+            this.currentSpeechSynthesisUtterance.onend = () => {
+                this.audioPlayerState.next('idle');
+                resolve()
+            };
+            this.currentSpeechSynthesisUtterance.onerror = () => {
+                this.audioPlayerState.next('idle');
+                reject(new Error('Speech synthesis failed'));
+            };
+
+            window.speechSynthesis.speak(this.currentSpeechSynthesisUtterance);
+            this.audioPlayerState.next('playing');
+        })
     }
 
     async play(autdioUrl: string): Promise<void> {
         this.stop();
+
         return new Promise((resolve, reject) => {
             this.audio.onended = () => resolve();
             this.audio.onerror = () => reject(new Error('Audio playback failed'));
@@ -432,18 +483,21 @@ class AudioPlayer {
     }
 
     pause(): void {
+        window.speechSynthesis.pause();
         this.audio.pause();
         this.audioPlayerState.next('paused');
     }
 
     stop(): void {
+        window.speechSynthesis.cancel();
         this.audio.pause();
         this.audio.currentTime = 0;
         this.audioPlayerState.next('idle');
     }
 
     isPlaying(): boolean {
+
         this.audioPlayerState.next(this.audio.paused ? 'paused' : 'playing');
-        return !this.audio.paused;
+        return !this.audio.paused || window.speechSynthesis.speaking;
     }
 }
