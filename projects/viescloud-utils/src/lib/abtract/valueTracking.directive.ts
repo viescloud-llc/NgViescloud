@@ -19,9 +19,15 @@ export class ValueTracking<T> extends FixChangeDetection implements TrackByIndex
     @Output()
     valueChange = new EventEmitter<T>();
 
-    public updateValue(value: Value<T>) {
-        this.value = value;
-        this.valueCopy = structuredClone(value);
+    public updateValue(value?: Value<T>) {
+        if(value) {
+            this.value = value;
+            this.valueCopy = structuredClone(value);
+        }
+        else {
+            this.value = structuredClone(this.value);
+            this.valueCopy = structuredClone(this.value);
+        }
     }
 
     public trackByIndex(index: number, obj: any): any {

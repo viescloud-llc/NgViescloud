@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, Type, ViewChild, ViewContainerRef } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, Type, ViewChild, ViewContainerRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { QuickSideDrawerMenuService } from '../../service/quick-side-drawer-menu.service';
 
@@ -47,13 +47,16 @@ export class QuickSideDrawerMenuComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    if(this.loadComponent)
+    if(this.loadComponent) {
       this.onLoadComponent(this.loadComponent);
-    else
+    }
+    else {
       this.container.clear();
+    }
 
-    if(this.isRoot && this.registerWithService)
+    if(this.isRoot && this.registerWithService) {
       this.quickSideDrawerMenuService.setMenu(this);
+    }
   }
 
   navigateUrl(url: string) {
