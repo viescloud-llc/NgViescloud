@@ -1,9 +1,10 @@
 import { Injectable } from "@angular/core";
 import { TTSService } from "./tts.service";
 import { TextLayerRenderedEvent } from "ngx-extended-pdf-viewer";
-import { BehaviorSubject, firstValueFrom } from "rxjs";
+import { BehaviorSubject, firstValueFrom, retry } from "rxjs";
 import { HttpClient } from "@angular/common/http";
 import { TTS } from "../model/raphael.model";
+import { RxJSUtils } from "projects/viescloud-utils/src/lib/util/RxJS.utils";
 
 export type Sentence = {
     text: string,
@@ -32,8 +33,9 @@ export class TtsReaderService extends TTSService {
     globalHhightLightOpacity = new BehaviorSubject<number>(30);
     onSentenceClick = new BehaviorSubject<Sentence | null>(null);
     selectedSentence = new BehaviorSubject<Sentence | null>(null);
+    onUploadingFile: BehaviorSubject<string> = new BehaviorSubject<string>('../../../assets/pdf-test.pdf');
 
-    constructor(httpClient: HttpClient) {
+    constructor(httpClient: HttpClient, private rxjsUtils: RxJSUtils) {
         super(httpClient);
         this.documentManager = new DocumentManager(this.globalHightLightColorMain, this.globalHightLightColorHover, this.globalHhightLightOpacity, this.onSentenceClick);
 
@@ -76,38 +78,39 @@ export class TtsReaderService extends TTSService {
             voice: this.selectedVoice
         }
 
-        let metadata = await firstValueFrom(this.generateWavMetadata(tts)).catch(err => null);
+        let metadata = await firstValueFrom(this.generateWavMetadata(tts).pipe(
+            this.rxjsUtils.waitLoadingSnackBar('Generating audio...'),
+            retry(10)
+        )).catch(err => null);
 
         if (metadata?.temporaryAccessLink) {
             return this.audioPlayer.play(metadata.temporaryAccessLink);
         }
     }
 
-    preloadSentence(sentence: Sentence) {
-        this.preloadWav({
+    async preloadSentence(sentence: Sentence) {
+        return firstValueFrom(this.preloadWav({
             text: sentence.text,
             model: this.selectedModel,
             voice: this.selectedVoice
-        }).subscribe({
-            next: res => { }
-        });
+        }));
     }
 
-    preloadForwardFromSentence(sentence: Sentence, count: number) {
+    async preloadForwardFromSentence(sentence: Sentence, count: number) {
         let currentSentence: Sentence | undefined = this.documentManager.getNextSentence(sentence);
         for (let i = 0; i < count; i++) {
             if (currentSentence) {
-                this.preloadSentence(currentSentence);
+                await this.preloadSentence(currentSentence);
                 currentSentence = this.documentManager.getNextSentence(currentSentence);
             }
         }
     }
 
-    preloadBackwardFromSentence(sentence: Sentence, count: number) {
+    async preloadBackwardFromSentence(sentence: Sentence, count: number) {
         let currentSentence: Sentence | undefined = this.documentManager.getPrevSentence(sentence);
         for (let i = 0; i < count; i++) {
             if (currentSentence) {
-                this.preloadSentence(currentSentence);
+                await this.preloadSentence(currentSentence);
                 currentSentence = this.documentManager.getPrevSentence(currentSentence);
             }
         }

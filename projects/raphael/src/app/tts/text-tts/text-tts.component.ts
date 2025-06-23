@@ -19,7 +19,6 @@ export class TextTtsComponent implements OnInit {
   src = '../../../assets/pdf-test.pdf';
 
   constructor(
-    private objectStorageService: ObjectStorageService,
     private ttsReaderService: TtsReaderService,
     private sideDrawerService: QuickSideDrawerMenuService
   ) { }
@@ -27,14 +26,12 @@ export class TextTtsComponent implements OnInit {
   ngOnInit(): void {
     pdfDefaultOptions.textLayerMode = 1;
     this.sideDrawerService.loadComponent(TextTtsPanelComponent);
-  }
 
-  async upload() {
-    let vfile =await FileUtils.uploadFileAsVFile('pdf').catch(err => null);
-    if(vfile && vfile.rawFile) {
-      let objectUrl = await this.objectStorageService.createObjectUrl(StringUtils.makeId(20), vfile.rawFile);
-      this.src = objectUrl;
-    }
+    this.ttsReaderService.onUploadingFile.subscribe({
+      next: objectUrl => {
+        this.src = objectUrl;
+      }
+    })
   }
 
   onTextLayerRendered(textLayerRenderedEvent: TextLayerRenderedEvent) {
@@ -44,6 +41,4 @@ export class TextTtsComponent implements OnInit {
   onPageChange(pageNumber: number) {
 
   }
-
-  
 }
