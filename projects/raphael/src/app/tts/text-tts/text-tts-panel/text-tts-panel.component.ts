@@ -15,6 +15,7 @@ export class TextTtsPanelComponent implements OnInit {
   preloadSentence: number = 10;
   readOnClick: boolean = false;
   reading: boolean = false;
+  autoScrollOnReading: boolean = true;
 
   constructor(
     public ttsReaderService: TtsReaderService,
@@ -52,7 +53,7 @@ export class TextTtsPanelComponent implements OnInit {
 
   async readSentence(sentence: Sentence) {
 
-    if(this.reading) {
+    if(this.reading && this.autoScrollOnReading) {
       this.scollToSentence(sentence);
     }
 
