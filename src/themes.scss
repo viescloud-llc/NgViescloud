@@ -1,202 +1,333 @@
-// @import '@angular/material/theming';
-@include mat-core();
+@use '@angular/material' as mat;
 
-// Dark Themes
-$indigo-pink-dark: mat-dark-theme((
+// Include the core styles for Angular Material
+@include mat.core();
+
+mat.$theme-ignore-duplication-warnings: true;
+
+// Define your color palettes using the new M3 palette system
+$indigo-palette: mat.$blue-palette;
+$pink-palette: mat.$rose-palette;
+$blue-palette: mat.$blue-palette;
+$purple-palette: mat.$violet-palette;
+$green-palette: mat.$green-palette;
+$deep-purple-palette: mat.$violet-palette;
+$amber-palette: mat.$yellow-palette;
+$teal-palette: mat.$cyan-palette;
+$orange-palette: mat.$orange-palette;
+$brown-palette: mat.$orange-palette; // Brown not available in M3, using orange as fallback
+$cyan-palette: mat.$cyan-palette;
+$red-palette: mat.$red-palette;
+$deep-orange-palette: mat.$orange-palette;
+
+// Alternative approach using M2 compatibility if you need exact M2 behavior
+// You can also use the m2- prefixed functions for backwards compatibility:
+// $indigo-palette: mat.m2-define-palette(mat.m2-$indigo-palette);
+
+// Dark Themes using new M3 theming system
+$indigo-pink-dark: mat.define-theme((
   color: (
-    primary: mat-palette($mat-indigo),
-    accent: mat-palette($mat-pink),
-    warn: mat-palette($mat-red),
-  )
+    theme-type: dark,
+    primary: $indigo-palette,
+    tertiary: $pink-palette,
+  ),
+  typography: (
+    brand-family: 'Roboto, sans-serif',
+    plain-family: 'Roboto, sans-serif',
+  ),
+  density: (
+    scale: 0,
+  ),
 ));
 
-// Existing Dark Themes
-$pink-blue-dark: mat-dark-theme((
+$pink-blue-dark: mat.define-theme((
   color: (
-    primary: mat-palette($mat-pink),
-    accent: mat-palette($mat-blue),
-    warn: mat-palette($mat-deep-orange),
-  )
+    theme-type: dark,
+    primary: $pink-palette,
+    tertiary: $blue-palette,
+  ),
+  typography: (
+    brand-family: 'Roboto, sans-serif',
+    plain-family: 'Roboto, sans-serif',
+  ),
+  density: (
+    scale: 0,
+  ),
 ));
 
-$purple-green-dark: mat-dark-theme((
+$purple-green-dark: mat.define-theme((
   color: (
-    primary: mat-palette($mat-purple),
-    accent: mat-palette($mat-green),
-    warn: mat-palette($mat-deep-orange),
-  )
+    theme-type: dark,
+    primary: $purple-palette,
+    tertiary: $green-palette,
+  ),
+  typography: (
+    brand-family: 'Roboto, sans-serif',
+    plain-family: 'Roboto, sans-serif',
+  ),
+  density: (
+    scale: 0,
+  ),
 ));
 
-$deep-purple-amber-dark: mat-dark-theme((
+$deep-purple-amber-dark: mat.define-theme((
   color: (
-    primary: mat-palette($mat-deep-purple),
-    accent: mat-palette($mat-amber),
-    warn: mat-palette($mat-red),
-  )
+    theme-type: dark,
+    primary: $deep-purple-palette,
+    tertiary: $amber-palette,
+  ),
+  typography: (
+    brand-family: 'Roboto, sans-serif',
+    plain-family: 'Roboto, sans-serif',
+  ),
+  density: (
+    scale: 0,
+  ),
 ));
 
-// New Dark Themes
-$teal-amber-dark: mat-dark-theme((
+$teal-amber-dark: mat.define-theme((
   color: (
-    primary: mat-palette($mat-teal),
-    accent: mat-palette($mat-amber),
-    warn: mat-palette($mat-red),
-  )
+    theme-type: dark,
+    primary: $teal-palette,
+    tertiary: $amber-palette,
+  ),
+  typography: (
+    brand-family: 'Roboto, sans-serif',
+    plain-family: 'Roboto, sans-serif',
+  ),
+  density: (
+    scale: 0,
+  ),
 ));
 
-$blue-orange-dark: mat-dark-theme((
+$blue-orange-dark: mat.define-theme((
   color: (
-    primary: mat-palette($mat-blue),
-    accent: mat-palette($mat-orange),
-    warn: mat-palette($mat-red),
-  )
+    theme-type: dark,
+    primary: $blue-palette,
+    tertiary: $orange-palette,
+  ),
+  typography: (
+    brand-family: 'Roboto, sans-serif',
+    plain-family: 'Roboto, sans-serif',
+  ),
+  density: (
+    scale: 0,
+  ),
 ));
 
-$brown-green-dark: mat-dark-theme((
+$brown-green-dark: mat.define-theme((
   color: (
-    primary: mat-palette($mat-brown),
-    accent: mat-palette($mat-green),
-    warn: mat-palette($mat-red),
-  )
+    theme-type: dark,
+    primary: $brown-palette,
+    tertiary: $green-palette,
+  ),
+  typography: (
+    brand-family: 'Roboto, sans-serif',
+    plain-family: 'Roboto, sans-serif',
+  ),
+  density: (
+    scale: 0,
+  ),
 ));
 
-$cyan-deep-purple-dark: mat-dark-theme((
+$cyan-deep-purple-dark: mat.define-theme((
   color: (
-    primary: mat-palette($mat-cyan),
-    accent: mat-palette($mat-deep-purple),
-    warn: mat-palette($mat-red),
-  )
+    theme-type: dark,
+    primary: $cyan-palette,
+    tertiary: $deep-purple-palette,
+  ),
+  typography: (
+    brand-family: 'Roboto, sans-serif',
+    plain-family: 'Roboto, sans-serif',
+  ),
+  density: (
+    scale: 0,
+  ),
 ));
 
 // Light Themes
-$indigo-pink-light: mat-light-theme((
+$indigo-pink-light: mat.define-theme((
   color: (
-    primary: mat-palette($mat-indigo),
-    accent: mat-palette($mat-pink),
-    warn: mat-palette($mat-red),
-  )
+    theme-type: light,
+    primary: $indigo-palette,
+    tertiary: $pink-palette,
+  ),
+  typography: (
+    brand-family: 'Roboto, sans-serif',
+    plain-family: 'Roboto, sans-serif',
+  ),
+  density: (
+    scale: 0,
+  ),
 ));
 
-// Existing Light Themes
-$pink-blue-light: mat-light-theme((
+$pink-blue-light: mat.define-theme((
   color: (
-    primary: mat-palette($mat-pink),
-    accent: mat-palette($mat-blue),
-    warn: mat-palette($mat-deep-orange),
-  )
+    theme-type: light,
+    primary: $pink-palette,
+    tertiary: $blue-palette,
+  ),
+  typography: (
+    brand-family: 'Roboto, sans-serif',
+    plain-family: 'Roboto, sans-serif',
+  ),
+  density: (
+    scale: 0,
+  ),
 ));
 
-$purple-green-light: mat-light-theme((
+$purple-green-light: mat.define-theme((
   color: (
-    primary: mat-palette($mat-purple),
-    accent: mat-palette($mat-green),
-    warn: mat-palette($mat-deep-orange),
-  )
+    theme-type: light,
+    primary: $purple-palette,
+    tertiary: $green-palette,
+  ),
+  typography: (
+    brand-family: 'Roboto, sans-serif',
+    plain-family: 'Roboto, sans-serif',
+  ),
+  density: (
+    scale: 0,
+  ),
 ));
 
-$deep-purple-amber-light: mat-light-theme((
+$deep-purple-amber-light: mat.define-theme((
   color: (
-    primary: mat-palette($mat-deep-purple),
-    accent: mat-palette($mat-amber),
-    warn: mat-palette($mat-red),
-  )
+    theme-type: light,
+    primary: $deep-purple-palette,
+    tertiary: $amber-palette,
+  ),
+  typography: (
+    brand-family: 'Roboto, sans-serif',
+    plain-family: 'Roboto, sans-serif',
+  ),
+  density: (
+    scale: 0,
+  ),
 ));
 
-// New Light Themes
-$teal-amber-light: mat-light-theme((
+$teal-amber-light: mat.define-theme((
   color: (
-    primary: mat-palette($mat-teal),
-    accent: mat-palette($mat-amber),
-    warn: mat-palette($mat-red),
-  )
+    theme-type: light,
+    primary: $teal-palette,
+    tertiary: $amber-palette,
+  ),
+  typography: (
+    brand-family: 'Roboto, sans-serif',
+    plain-family: 'Roboto, sans-serif',
+  ),
+  density: (
+    scale: 0,
+  ),
 ));
 
-$blue-orange-light: mat-light-theme((
+$blue-orange-light: mat.define-theme((
   color: (
-    primary: mat-palette($mat-blue),
-    accent: mat-palette($mat-orange),
-    warn: mat-palette($mat-red),
-  )
+    theme-type: light,
+    primary: $blue-palette,
+    tertiary: $orange-palette,
+  ),
+  typography: (
+    brand-family: 'Roboto, sans-serif',
+    plain-family: 'Roboto, sans-serif',
+  ),
+  density: (
+    scale: 0,
+  ),
 ));
 
-$brown-green-light: mat-light-theme((
+$brown-green-light: mat.define-theme((
   color: (
-    primary: mat-palette($mat-brown),
-    accent: mat-palette($mat-green),
-    warn: mat-palette($mat-red),
-  )
+    theme-type: light,
+    primary: $brown-palette,
+    tertiary: $green-palette,
+  ),
+  typography: (
+    brand-family: 'Roboto, sans-serif',
+    plain-family: 'Roboto, sans-serif',
+  ),
+  density: (
+    scale: 0,
+  ),
 ));
 
-$cyan-deep-purple-light: mat-light-theme((
+$cyan-deep-purple-light: mat.define-theme((
   color: (
-    primary: mat-palette($mat-cyan),
-    accent: mat-palette($mat-deep-purple),
-    warn: mat-palette($mat-red),
-  )
+    theme-type: light,
+    primary: $cyan-palette,
+    tertiary: $deep-purple-palette,
+  ),
+  typography: (
+    brand-family: 'Roboto, sans-serif',
+    plain-family: 'Roboto, sans-serif',
+  ),
+  density: (
+    scale: 0,
+  ),
 ));
 
-// Create separate classes for each theme
+// Dark theme classes
 .theme-indigo-pink-dark {
-  @include angular-material-theme($indigo-pink-dark);
+  @include mat.all-component-themes($indigo-pink-dark);
 }
 
 .theme-pink-blue-dark {
-  @include angular-material-theme($pink-blue-dark);
+  @include mat.all-component-themes($pink-blue-dark);
 }
 
 .theme-purple-green-dark {
-  @include angular-material-theme($purple-green-dark);
+  @include mat.all-component-themes($purple-green-dark);
 }
 
 .theme-deep-purple-amber-dark {
-  @include angular-material-theme($deep-purple-amber-dark);
+  @include mat.all-component-themes($deep-purple-amber-dark);
 }
 
 .theme-teal-amber-dark {
-  @include angular-material-theme($teal-amber-dark);
+  @include mat.all-component-themes($teal-amber-dark);
 }
 
 .theme-blue-orange-dark {
-  @include angular-material-theme($blue-orange-dark);
+  @include mat.all-component-themes($blue-orange-dark);
 }
 
 .theme-brown-green-dark {
-  @include angular-material-theme($brown-green-dark);
+  @include mat.all-component-themes($brown-green-dark);
 }
 
 .theme-cyan-deep-purple-dark {
-  @include angular-material-theme($cyan-deep-purple-dark);
+  @include mat.all-component-themes($cyan-deep-purple-dark);
 }
 
-// Light Themes
+// Light theme classes
 .theme-indigo-pink-light {
-  @include angular-material-theme($indigo-pink-light);
+  @include mat.all-component-themes($indigo-pink-light);
 }
 
 .theme-pink-blue-light {
-  @include angular-material-theme($pink-blue-light);
+  @include mat.all-component-themes($pink-blue-light);
 }
 
 .theme-purple-green-light {
-  @include angular-material-theme($purple-green-light);
+  @include mat.all-component-themes($purple-green-light);
 }
 
 .theme-deep-purple-amber-light {
-  @include angular-material-theme($deep-purple-amber-light);
+  @include mat.all-component-themes($deep-purple-amber-light);
 }
 
 .theme-teal-amber-light {
-  @include angular-material-theme($teal-amber-light);
+  @include mat.all-component-themes($teal-amber-light);
 }
 
 .theme-blue-orange-light {
-  @include angular-material-theme($blue-orange-light);
+  @include mat.all-component-themes($blue-orange-light);
 }
 
 .theme-brown-green-light {
-  @include angular-material-theme($brown-green-light);
+  @include mat.all-component-themes($brown-green-light);
 }
 
 .theme-cyan-deep-purple-light {
-  @include angular-material-theme($cyan-deep-purple-light);
+  @include mat.all-component-themes($cyan-deep-purple-light);
 }
