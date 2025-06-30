@@ -11,6 +11,7 @@ import { NumberUtils } from '../../util/Number.utils';
   templateUrl: './mat-form-field-input-list-option.component.html',
   styleUrls: ['./mat-form-field-input-list-option.component.scss'],
   providers: [{provide: MatFormFieldComponent, useExisting: forwardRef(() => MatFormFieldInputListOptionComponent)}],
+  standalone: false
 })
 export class MatFormFieldInputListOptionComponent<T> extends MatFormFieldInputListComponent {
 

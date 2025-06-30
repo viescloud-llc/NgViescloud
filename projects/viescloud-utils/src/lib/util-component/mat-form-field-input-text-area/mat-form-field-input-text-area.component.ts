@@ -6,6 +6,7 @@ import { MatFormFieldComponent } from '../mat-form-field/mat-form-field.componen
   templateUrl: './mat-form-field-input-text-area.component.html',
   styleUrls: ['./mat-form-field-input-text-area.component.scss'],
   providers: [{provide: MatFormFieldComponent, useExisting: forwardRef(() => MatFormFieldInputTextAreaComponent)}],
+  standalone: false
 })
 export class MatFormFieldInputTextAreaComponent extends MatFormFieldComponent {
 

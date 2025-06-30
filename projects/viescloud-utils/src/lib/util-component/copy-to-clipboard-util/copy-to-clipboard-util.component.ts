@@ -3,7 +3,8 @@ import { Component, Input, OnInit } from '@angular/core';
 @Component({
   selector: 'app-copy-to-clipboard-util',
   templateUrl: './copy-to-clipboard-util.component.html',
-  styleUrls: ['./copy-to-clipboard-util.component.scss']
+  styleUrls: ['./copy-to-clipboard-util.component.scss'],
+  standalone: false
 })
 export class CopyToClipboardUtilComponent implements OnInit {
 

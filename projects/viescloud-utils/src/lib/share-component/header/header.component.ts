@@ -14,7 +14,8 @@ export enum DRAWER_STATE {
 @Component({
   selector: 'vies-eco-header',
   templateUrl: './header.component.html',
-  styleUrls: ['./header.component.scss']
+  styleUrls: ['./header.component.scss'],
+  standalone: false
 })
 export class HeaderComponent implements OnInit {
 

@@ -1,5 +1,4 @@
 import { Component, ElementRef, Input, AfterViewInit, Output, EventEmitter, ViewChild, ChangeDetectorRef, OnDestroy, HostListener } from '@angular/core';
-import { EditorComponent } from 'ngx-monaco-editor-v2';
 import { SettingService } from '../../service/setting.service';
 import { KeyCaptureEvent, KeyCaptureService } from '../../service/key-capture.service';
 import { MonacoLanguage } from '../../model/monaco-editor.model';
@@ -7,7 +6,8 @@ import { MonacoLanguage } from '../../model/monaco-editor.model';
 @Component({
   selector: 'app-code-editor',
   templateUrl: './code-editor.component.html',
-  styleUrls: ['./code-editor.component.scss']
+  styleUrls: ['./code-editor.component.scss'],
+  standalone: false
 })
 export class CodeEditorComponent implements AfterViewInit, OnDestroy {
   @Input()
@@ -24,9 +24,6 @@ export class CodeEditorComponent implements AfterViewInit, OnDestroy {
 
   @Input()
   styleHeight = '500px';
-
-  @ViewChild(EditorComponent)
-  editorComponent!: EditorComponent;
 
   @Output()
   onValueChange = new EventEmitter<void>();
@@ -74,16 +71,16 @@ export class CodeEditorComponent implements AfterViewInit, OnDestroy {
   }
 
   resizeEditor(): void {
-    // const containerWidth = (document.querySelector('.resizable-container') as HTMLElement).offsetWidth;
-    if (this.editorComponent) {
-      // this.editorComponent._editorContainer.nativeElement.style.width.ch = containerWidth + 'px';
-      // this.editorComponent.insideNg = true;
-      // this.cd.detectChanges();
+    // // const containerWidth = (document.querySelector('.resizable-container') as HTMLElement).offsetWidth;
+    // if (this.editorComponent) {
+    //   // this.editorComponent._editorContainer.nativeElement.style.width.ch = containerWidth + 'px';
+    //   // this.editorComponent.insideNg = true;
+    //   // this.cd.detectChanges();
 
-      //this work
-      this.editorComponent.insideNg = !this.editorComponent.insideNg;
-      this.editorComponent.insideNg = !this.editorComponent.insideNg;
-    }
+    //   //this work
+    //   this.editorComponent.insideNg = !this.editorComponent.insideNg;
+    //   this.editorComponent.insideNg = !this.editorComponent.insideNg;
+    // }
   }
 
   getVsCodeThemeColor(): string {

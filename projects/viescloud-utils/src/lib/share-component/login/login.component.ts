@@ -15,7 +15,8 @@ import { environment } from 'projects/environments/environment.prod';
 @Component({
   selector: 'viescloud-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  styleUrls: ['./login.component.scss'],
+  standalone: false
 })
 export class LoginComponent implements OnInit {
 

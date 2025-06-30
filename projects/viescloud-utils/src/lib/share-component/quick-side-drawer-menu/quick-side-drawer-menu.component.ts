@@ -18,7 +18,8 @@ export class QuickSideDrawerMenu {
 @Component({
   selector: 'viescloud-quick-side-drawer-menu',
   templateUrl: './quick-side-drawer-menu.component.html',
-  styleUrls: ['./quick-side-drawer-menu.component.scss']
+  styleUrls: ['./quick-side-drawer-menu.component.scss'],
+  standalone: false
 })
 export class QuickSideDrawerMenuComponent implements OnInit {
   @Input()

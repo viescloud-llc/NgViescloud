@@ -14,6 +14,7 @@ import { OpenIdProviderService } from '../../service/open-id-provider.service';
   selector: 'app-open-id-provider',
   templateUrl: './open-id-provider.component.html',
   styleUrls: ['./open-id-provider.component.scss'],
+  standalone: false
 })
 export class OpenIdProviderComponent extends FixChangeDetection implements OnInit {
 

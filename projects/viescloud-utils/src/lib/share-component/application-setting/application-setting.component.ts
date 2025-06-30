@@ -9,7 +9,8 @@ import { DataUtils } from '../../util/Data.utils';
 @Component({
   selector: 'app-application-setting',
   templateUrl: './application-setting.component.html',
-  styleUrls: ['./application-setting.component.scss']
+  styleUrls: ['./application-setting.component.scss'],
+  standalone: false
 })
 export class ApplicationSettingComponent implements OnInit, OnDestroy {
 

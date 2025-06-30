@@ -3,7 +3,8 @@ import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 @Component({
   selector: 'viescloud-side-drawer-menu',
   templateUrl: './side-drawer-menu.component.html',
-  styleUrls: ['./side-drawer-menu.component.scss']
+  styleUrls: ['./side-drawer-menu.component.scss'],
+  standalone: false
 })
 export class SideDrawerMenuComponent implements OnInit {
 

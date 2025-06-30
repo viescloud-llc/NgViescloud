@@ -9,7 +9,8 @@ import { SelectionModel } from '@angular/cdk/collections';
 @Component({
   selector: 'app-mat-table',
   templateUrl: './mat-table.component.html',
-  styleUrls: ['./mat-table.component.scss']
+  styleUrls: ['./mat-table.component.scss'],
+  standalone: false
 })
 export class MatTableComponent<T extends object> implements OnInit, OnChanges, AfterViewInit, AfterContentInit {
 

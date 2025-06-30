@@ -6,7 +6,8 @@ import { AuthenticatorService } from 'projects/viescloud-utils/src/lib/service/a
 @Component({
   selector: 'app-user-setting',
   templateUrl: './user-setting.component.html',
-  styleUrls: ['./user-setting.component.scss']
+  styleUrls: ['./user-setting.component.scss'],
+  standalone: false
 })
 export class UserSettingComponent implements OnInit {
 

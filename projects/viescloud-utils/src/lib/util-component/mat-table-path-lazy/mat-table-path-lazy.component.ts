@@ -6,7 +6,8 @@ import { FixedSizeMap } from '../../model/data-structure.model';
 @Component({
   selector: 'app-mat-table-path-lazy',
   templateUrl: '../mat-table-path/mat-table-path.component.html',
-  styleUrls: ['../mat-table-path/mat-table-path.component.scss']
+  styleUrls: ['../mat-table-path/mat-table-path.component.scss'],
+  standalone: false
 })
 export class MatTablePathLazyComponent<T> extends MatTablePathComponent<T> implements OnDestroy {
 

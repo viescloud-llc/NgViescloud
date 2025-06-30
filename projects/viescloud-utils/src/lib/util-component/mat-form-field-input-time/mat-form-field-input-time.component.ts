@@ -12,6 +12,7 @@ export const TYPE = {DATE: 'DATE', TIME: 'TIME', DATE_TIME: 'DATE_TIME'};
   templateUrl: './mat-form-field-input-time.component.html',
   styleUrls: ['./mat-form-field-input-time.component.scss'],
   providers: [{provide: MatFormFieldComponent, useExisting: forwardRef(() => MatFormFieldInputTimeComponent)}],
+  standalone: false
 })
 export class MatFormFieldInputTimeComponent extends MatFormFieldComponent {
 

@@ -8,6 +8,7 @@ import { RgbColor, SampleRgbOptions } from '../../model/rgb.model';
   templateUrl: './mat-form-field-input-rgb-color-picker.component.html',
   styleUrls: ['./mat-form-field-input-rgb-color-picker.component.scss'],
   providers: [{provide: MatFormFieldComponent, useExisting: forwardRef(() => MatFormFieldInputRgbColorPickerComponent)}],
+  standalone: false
 })
 export class MatFormFieldInputRgbColorPickerComponent extends MatFormFieldComponent {
 

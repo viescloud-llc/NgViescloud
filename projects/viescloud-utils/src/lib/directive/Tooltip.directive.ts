@@ -2,7 +2,8 @@ import { Directive, Input, HostBinding } from '@angular/core';
 import { MatTooltip } from '@angular/material/tooltip';
 
 @Directive({
-  selector: '[viescloudTooltip]'
+  selector: '[viescloudTooltip]',
+  standalone: false
 })
 export class TooltipDirective {
   @Input('viescloudTooltip') tooltipText: string = '';

@@ -5,7 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 
 @Directive({
   selector: '[libViescloudApplicationMinimal]',
-  standalone: true,
+  standalone: false,
 })
 export abstract class ViescloudApplicationMinimal implements OnInit {
 

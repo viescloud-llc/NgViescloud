@@ -15,7 +15,8 @@ export interface LazyPageChange {
 @Component({
   selector: 'app-mat-table-lazy',
   templateUrl: '../mat-table/mat-table.component.html',
-  styleUrls: ['../mat-table/mat-table.component.scss']
+  styleUrls: ['../mat-table/mat-table.component.scss'],
+  standalone: false
 })
 export class MatTableLazyComponent<T extends object> extends MatTableComponent<T> implements OnDestroy{
 

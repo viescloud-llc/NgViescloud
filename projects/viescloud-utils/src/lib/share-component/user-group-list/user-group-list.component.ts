@@ -6,7 +6,8 @@ import { UserGroupService } from '../../service/user-group.service';
 @Component({
   selector: 'app-user-group-list',
   templateUrl: './user-group-list.component.html',
-  styleUrls: ['./user-group-list.component.scss']
+  styleUrls: ['./user-group-list.component.scss'],
+  standalone: false
 })
 export class UserGroupListComponent {
 

@@ -14,7 +14,8 @@ class customRow<T> {
 @Component({
   selector: 'app-mat-table-path',
   templateUrl: './mat-table-path.component.html',
-  styleUrls: ['./mat-table-path.component.scss']
+  styleUrls: ['./mat-table-path.component.scss'],
+  standalone: false
 })
 export class MatTablePathComponent<T> extends FixChangeDetection implements OnInit, OnChanges {
 

@@ -8,7 +8,8 @@ import { RgbColor } from "../model/rgb.model";
 type Value<T> = T | null | undefined;
 
 @Directive({
-    selector: '[valueTracking]'
+    selector: '[valueTracking]',
+    standalone: false
 })
 export class ValueTracking<T> extends FixChangeDetection implements TrackByIndex {
 

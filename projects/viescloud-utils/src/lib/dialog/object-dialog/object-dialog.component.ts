@@ -15,7 +15,8 @@ export interface ObjectDialogData<T = object, S = object> {
 @Component({
   selector: 'app-object-dialog',
   templateUrl: './object-dialog.component.html',
-  styleUrls: ['./object-dialog.component.scss']
+  styleUrls: ['./object-dialog.component.scss'],
+  standalone: false
 })
 export class ObjectDialog<T = object, S = object> implements OnInit, AfterViewChecked {
 

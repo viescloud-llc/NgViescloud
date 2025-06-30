@@ -2,7 +2,8 @@ import { Directive, Input, HostBinding, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 @Directive({
-  selector: '[viescloudRouteChangeSubcribe]'
+  selector: '[viescloudRouteChangeSubcribe]',
+  standalone: false
 })
 export abstract class RouteChangeSubcribe implements OnInit {
 

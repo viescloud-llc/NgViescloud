@@ -16,7 +16,8 @@ export enum UserAccessInputType {
   selector: 'app-mat-form-field-input-user-access',
   templateUrl: './mat-form-field-input-user-access.component.html',
   styleUrls: ['./mat-form-field-input-user-access.component.scss'],
-  providers: [{ provide: MatFormFieldComponent, useExisting: forwardRef(() => MatFormFieldInputUserAccessComponent) }]
+  providers: [{ provide: MatFormFieldComponent, useExisting: forwardRef(() => MatFormFieldInputUserAccessComponent) }],
+  standalone: false
 })
 export class MatFormFieldInputUserAccessComponent<T extends UserAccess | SharedUser[] | SharedGroup[] | AccessPermission[]> extends MatFormFieldComponent {
 

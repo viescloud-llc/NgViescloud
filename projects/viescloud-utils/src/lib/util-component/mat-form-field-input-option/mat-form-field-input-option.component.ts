@@ -10,6 +10,7 @@ import { DataUtils } from '../../util/Data.utils';
   templateUrl: './mat-form-field-input-option.component.html',
   styleUrls: ['./mat-form-field-input-option.component.scss'],
   providers: [{provide: MatFormFieldComponent, useExisting: forwardRef(() => MatFormFieldInputOptionComponent)}],
+  standalone: false
 })
 export class MatFormFieldInputOptionComponent<T> extends MatFormFieldComponent {
 

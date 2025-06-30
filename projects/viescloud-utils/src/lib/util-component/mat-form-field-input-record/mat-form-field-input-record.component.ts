@@ -17,6 +17,7 @@ class KeyPair<K, V> {
   templateUrl: './mat-form-field-input-record.component.html',
   styleUrls: ['./mat-form-field-input-record.component.scss'],
   providers: [{ provide: MatFormFieldComponent, useExisting: forwardRef(() => MatFormFieldInputRecordComponent) }],
+  standalone: false
 })
 export class MatFormFieldInputRecordComponent<K extends string | number, V> extends MatFormFieldComponent {
 

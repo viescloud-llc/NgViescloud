@@ -12,7 +12,8 @@ import { MatFromFieldInputDynamicItem } from '../../model/mat.model';
 @Component({
   selector: 'app-mat-form-field',
   templateUrl: './mat-form-field.component.html',
-  styleUrls: ['./mat-form-field.component.scss']
+  styleUrls: ['./mat-form-field.component.scss'],
+  standalone: false
 })
 export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChecked, DoCheck {
 

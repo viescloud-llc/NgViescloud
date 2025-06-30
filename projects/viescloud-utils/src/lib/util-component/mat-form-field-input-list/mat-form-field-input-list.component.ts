@@ -8,6 +8,7 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
   templateUrl: './mat-form-field-input-list.component.html',
   styleUrls: ['./mat-form-field-input-list.component.scss'],
   providers: [{provide: MatFormFieldComponent, useExisting: forwardRef(() => MatFormFieldInputListComponent)}],
+  standalone: false
 })
 export class MatFormFieldInputListComponent extends MatFormFieldComponent {
 

@@ -4,7 +4,8 @@ import { MatFormFieldComponent } from '../util-component/mat-form-field/mat-form
 import { MatButton } from '@angular/material/button';
 
 @Directive({
-  selector: '[appMatFormFieldGroup]'
+  selector: '[appMatFormFieldGroup]',
+  standalone: false
 })
 export class MatFormFieldGroupDirective implements AfterContentInit, AfterContentChecked, OnDestroy {
 

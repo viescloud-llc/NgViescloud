@@ -4,7 +4,8 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 @Component({
   selector: 'app-input-dialog',
   templateUrl: './input-dialog.component.html',
-  styleUrls: ['./input-dialog.component.scss']
+  styleUrls: ['./input-dialog.component.scss'],
+  standalone: false
 })
 export class InputDialog implements OnInit {
 

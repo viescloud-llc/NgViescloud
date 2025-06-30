@@ -24,6 +24,7 @@ export enum DynamicMatInputType {
   templateUrl: './mat-form-field-input-dynamic.component.html',
   styleUrls: ['./mat-form-field-input-dynamic.component.scss'],
   providers: [{ provide: MatFormFieldComponent, useExisting: forwardRef(() => MatFormFieldInputDynamicComponent) }],
+  standalone: false
 })
 export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
 

@@ -8,7 +8,8 @@ import { Component } from '@angular/core';
     </p>
   `,
   styles: [
-  ]
+  ],
+  standalone: false
 })
 export class ViescloudUtilsComponent {
 

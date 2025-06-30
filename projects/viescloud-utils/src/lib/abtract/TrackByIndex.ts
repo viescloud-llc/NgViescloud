@@ -1,7 +1,8 @@
 import { Directive } from '@angular/core';
 
 @Directive({
-  selector: '[appTrackByIndex]'
+  selector: '[appTrackByIndex]',
+  standalone: false
 })
 export class TrackByIndex {
 

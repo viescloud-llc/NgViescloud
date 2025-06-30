@@ -7,7 +7,8 @@ import { map, Observable } from 'rxjs';
 @Component({
   selector: 'app-mat-table-dynamic-vies-service',
   templateUrl: './mat-table-dynamic-vies-service.component.html',
-  styleUrls: ['./mat-table-dynamic-vies-service.component.scss']
+  styleUrls: ['./mat-table-dynamic-vies-service.component.scss'],
+  standalone: false
 })
 export class MatTableDynamicViesServiceComponent<T extends Object, S extends ViesRestService<T>> extends MatTableComponent<T> {
   @Input()

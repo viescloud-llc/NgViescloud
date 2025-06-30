@@ -12,7 +12,8 @@ import { RestUtils } from '../../util/Rest.utils';
 @Component({
   selector: 'app-mat-table-lazy-dynamic',
   templateUrl: './mat-table-lazy-dynamic.component.html',
-  styleUrls: ['./mat-table-lazy-dynamic.component.scss']
+  styleUrls: ['./mat-table-lazy-dynamic.component.scss'],
+  standalone: false
 })
 export class MatTableLazyDynamicComponent<T extends object, S> extends MatTableDynamicComponent<T, S> {
 

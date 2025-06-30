@@ -10,7 +10,8 @@ import { MatDialog } from '@angular/material/dialog';
 @Component({
   selector: 'app-mat-table-dynamic',
   templateUrl: './mat-table-dynamic.component.html',
-  styleUrls: ['./mat-table-dynamic.component.scss']
+  styleUrls: ['./mat-table-dynamic.component.scss'],
+  standalone: false
 })
 export class MatTableDynamicComponent<T extends object, S> extends MatTableComponent<T> {
 

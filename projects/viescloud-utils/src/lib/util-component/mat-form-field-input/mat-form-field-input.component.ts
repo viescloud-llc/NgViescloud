@@ -7,7 +7,8 @@ import { FormControl, ValidatorFn, Validators } from '@angular/forms';
   selector: 'app-mat-form-field-input',
   templateUrl: './mat-form-field-input.component.html',
   styleUrls: ['./mat-form-field-input.component.scss'],
-  providers: [{ provide: MatFormFieldComponent, useExisting: forwardRef(() => MatFormFieldInputComponent) }]
+  providers: [{ provide: MatFormFieldComponent, useExisting: forwardRef(() => MatFormFieldInputComponent) }],
+  standalone: false
 })
 export class MatFormFieldInputComponent extends MatFormFieldComponent {
   @Input()

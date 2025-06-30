@@ -15,7 +15,8 @@ import { StringUtils } from '../../util/String.utils';
       transition('void => enter', [animate('300ms ease-in')]),
       transition('enter => void', [animate('300ms ease-out')]),
     ])
-  ]
+  ],
+  standalone: false
 })
 export class MessagePopup implements OnInit {
 

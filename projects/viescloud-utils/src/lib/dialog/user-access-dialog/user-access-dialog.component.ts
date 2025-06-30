@@ -10,7 +10,8 @@ import { FixChangeDetection } from '../../abtract/FixChangeDetection';
 @Component({
   selector: 'app-user-access-dialog',
   templateUrl: './user-access-dialog.component.html',
-  styleUrls: ['./user-access-dialog.component.scss']
+  styleUrls: ['./user-access-dialog.component.scss'],
+  standalone: false
 })
 export class UserAccessDialog extends FixChangeDetection {
 

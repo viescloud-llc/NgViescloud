@@ -6,7 +6,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatNativeDateModule } from '@angular/material/core';
 import { provideHttpClient } from '@angular/common/http';
 
-const list = [
+const LIST = [
   CommonModule,
   BrowserModule,
   FormsModule,
@@ -19,8 +19,8 @@ const list = [
   declarations: [
 
   ],
-  imports: list,
-  exports: list,
+  imports: LIST,
+  exports: LIST,
   providers: [provideHttpClient()]
 })
 export class NgEssentialModule { }

@@ -5,7 +5,8 @@ import { SettingService } from '../../service/setting.service';
 @Component({
   selector: 'app-confirm-dialog',
   templateUrl: './confirm-dialog.component.html',
-  styleUrls: ['./confirm-dialog.component.scss']
+  styleUrls: ['./confirm-dialog.component.scss'],
+  standalone: false
 })
 export class ConfirmDialog implements OnInit {
 

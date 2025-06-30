@@ -3,7 +3,8 @@ import { Component, Input, OnInit } from '@angular/core';
 @Component({
   selector: 'app-input-type-switch',
   templateUrl: './input-type-switch.component.html',
-  styleUrls: ['./input-type-switch.component.scss']
+  styleUrls: ['./input-type-switch.component.scss'],
+  standalone: false
 })
 export class InputTypeSwitchComponent implements OnInit {
 

@@ -7,7 +7,8 @@ import { Router } from '@angular/router';
 import { environment } from 'projects/environments/environment.prod';
 
 @Directive({
-  selector: '[appViescloudApplication]'
+  selector: '[appViescloudApplication]',
+  standalone: false
 })
 export abstract class ViescloudApplication implements OnInit {
 

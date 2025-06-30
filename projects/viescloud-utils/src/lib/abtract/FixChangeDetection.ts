@@ -1,7 +1,8 @@
 import { AfterContentChecked, ChangeDetectorRef, Directive, inject } from '@angular/core';
 
 @Directive({
-  selector: '[appFixChangeDetection]'
+  selector: '[appFixChangeDetection]',
+  standalone: false
 })
 export class FixChangeDetection implements AfterContentChecked {
 

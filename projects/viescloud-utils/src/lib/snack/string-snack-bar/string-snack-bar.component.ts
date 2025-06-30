@@ -7,7 +7,8 @@ import { SettingService } from '../../service/setting.service';
 @Component({
   selector: 'app-string-snack-bar',
   templateUrl: './string-snack-bar.component.html',
-  styleUrls: ['./string-snack-bar.component.scss']
+  styleUrls: ['./string-snack-bar.component.scss'],
+  standalone: false
 })
 export class StringSnackBar {
 

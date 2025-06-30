@@ -9,7 +9,8 @@ import { UserService } from '../../service/user.service';
 @Component({
   selector: 'app-user-access',
   templateUrl: '../../util-component/mat-form-field-input-user-access/mat-form-field-input-user-access.component.html',
-  styleUrls: ['../../util-component/mat-form-field-input-user-access/mat-form-field-input-user-access.component.scss']
+  styleUrls: ['../../util-component/mat-form-field-input-user-access/mat-form-field-input-user-access.component.scss'],
+  standalone: false
 })
 export class UserAccessComponent<T extends UserAccess | SharedUser[] | SharedGroup[] | AccessPermission[]> extends MatFormFieldInputUserAccessComponent<T> {
 
