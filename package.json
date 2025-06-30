@@ -1,13 +1,14 @@
 {
-  "name": "ng-viescloud",
+  "name": "skeleton",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start_skeleton": "ng serve --project skeleton",
-    "build_skeleton": "ng build --project skeleton",
+    "start": "ng serve",
+    "build": "ng build",
+    "start_skeleton": "ng serve",
+    "build_skeleton": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:viescloud-utils": "node dist/viescloud-utils/server/server.mjs",
     "serve:ssr:skeleton": "node dist/skeleton/server/server.mjs"
   },
   "private": true,

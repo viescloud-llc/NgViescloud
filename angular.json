@@ -3,45 +3,6 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "viescloud-utils": {
-      "projectType": "library",
-      "root": "projects/viescloud-utils",
-      "sourceRoot": "projects/viescloud-utils/src",
-      "prefix": "lib",
-      "architect": {
-        "build": {
-          "builder": "@angular-devkit/build-angular:ng-packagr",
-          "options": {
-            "project": "projects/viescloud-utils/ng-package.json"
-          },
-          "configurations": {
-            "production": {
-              "tsConfig": "projects/viescloud-utils/tsconfig.lib.prod.json"
-            },
-            "development": {
-              "tsConfig": "projects/viescloud-utils/tsconfig.lib.json"
-            }
-          },
-          "defaultConfiguration": "production"
-        },
-        "test": {
-          "builder": "@angular/build:karma",
-          "options": {
-            "tsConfig": "projects/viescloud-utils/tsconfig.spec.json",
-            "inlineStyleLanguage": "scss",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "projects/viescloud-utils/public"
-              }
-            ],
-            "styles": [
-              "projects/viescloud-utils/src/styles.scss"
-            ]
-          }
-        }
-      }
-    },
     "skeleton": {
       "projectType": "application",
       "schematics": {
@@ -49,29 +10,29 @@
           "style": "scss"
         }
       },
-      "root": "projects/skeleton",
-      "sourceRoot": "projects/skeleton/src",
+      "root": "",
+      "sourceRoot": "src",
       "prefix": "app",
       "architect": {
         "build": {
           "builder": "@angular/build:application",
           "options": {
-            "browser": "projects/skeleton/src/main.ts",
-            "tsConfig": "projects/skeleton/tsconfig.app.json",
+            "browser": "src/main.ts",
+            "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
               {
                 "glob": "**/*",
-                "input": "projects/skeleton/public"
+                "input": "public"
               }
             ],
             "styles": [
-              "projects/skeleton/src/styles.scss"
+              "src/styles.scss"
             ],
-            "server": "projects/skeleton/src/main.server.ts",
+            "server": "src/main.server.ts",
             "outputMode": "server",
             "ssr": {
-              "entry": "projects/skeleton/src/server.ts"
+              "entry": "src/server.ts"
             }
           },
           "configurations": {
@@ -79,13 +40,13 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "999mb",
-                  "maximumError": "999mb"
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "999mb",
-                  "maximumError": "999mb"
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
                 }
               ],
               "outputHashing": "all"
@@ -116,16 +77,16 @@
         "test": {
           "builder": "@angular/build:karma",
           "options": {
-            "tsConfig": "projects/skeleton/tsconfig.spec.json",
+            "tsConfig": "tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
             "assets": [
               {
                 "glob": "**/*",
-                "input": "projects/skeleton/public"
+                "input": "public"
               }
             ],
             "styles": [
-              "projects/skeleton/src/styles.scss"
+              "src/styles.scss"
             ]
           }
         }
