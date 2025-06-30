@@ -1,7 +1,6 @@
 import { Observable, first, firstValueFrom, map } from "rxjs";
 import { HttpClient } from "@angular/common/http";
 import { UtilsService } from "./utils.service";
-import { environment } from "projects/environments/environment.prod";
 import { MatDialog } from "@angular/material/dialog";
 import { ObjectDialog, ObjectDialogData } from "../dialog/object-dialog/object-dialog.component";
 import { Injectable } from "@angular/core";

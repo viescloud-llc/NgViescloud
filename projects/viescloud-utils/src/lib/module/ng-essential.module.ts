@@ -3,19 +3,16 @@ import { CommonModule } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HttpClientModule } from '@angular/common/http';
 import { MatNativeDateModule } from '@angular/material/core';
-import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
+import { provideHttpClient } from '@angular/common/http';
 
 const list = [
   CommonModule,
   BrowserModule,
   FormsModule,
   BrowserAnimationsModule,
-  HttpClientModule,
   ReactiveFormsModule,
-  MatNativeDateModule,
-  MonacoEditorModule
+  MatNativeDateModule
 ]
 
 @NgModule({
@@ -23,6 +20,7 @@ const list = [
 
   ],
   imports: list,
-  exports: list
+  exports: list,
+  providers: [provideHttpClient()]
 })
 export class NgEssentialModule { }
