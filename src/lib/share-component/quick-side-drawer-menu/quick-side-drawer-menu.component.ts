@@ -106,7 +106,7 @@ export class QuickSideDrawerMenuComponent implements OnInit {
       if(item.routerLinkActive)
         return item.routerLinkActive;
       else
-        return 'custom-router-link-active';
+        return 'selectedPrimary';
     }
     else
       return '';

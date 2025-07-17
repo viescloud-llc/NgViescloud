@@ -2,7 +2,7 @@
   <ng-container *ngIf="isRoot && loadComponent;">
     <li>
       <br>
-      <button mat-raised-button color="primary" (click)="back()" style="width: 100%;">Back</button>
+      <button matButton="filled" (click)="back()" style="width: 100%;">Back</button>
     </li>
   </ng-container>
 
@@ -13,9 +13,10 @@
   <ng-container *ngIf="container.length <= 0">
     <ng-container #Else *ngFor="let item of menu">
       <ng-container *ngIf="item.routerLink && !isHide(item)">
-        <li [class]="routerLinkActive(item)">
+        <li >
           <button 
-          mat-flat-button 
+          [class]="routerLinkActive(item)"
+          matButton="tonal" 
           (click)="click(item)"
           (mousedown)="item.hideChildren = !item.hideChildren; click(item, $event)"
           [disabled]="isDisable(item)">
