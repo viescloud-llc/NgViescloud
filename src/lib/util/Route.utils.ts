@@ -1,5 +1,6 @@
 import { ActivatedRoute } from '@angular/router';
 import { first } from 'rxjs';
+import { ViesService } from '../service/rest.service';
 
 export const DEFAULT_PORTS: Record<string, string> = {
   http: '80',
@@ -147,7 +148,12 @@ export class RouteUtils {
    * @example window.location.href = 'https://example.com/users/123' => returns 'https://example.com/users/123'
    */
   static getCurrentUrl(): string {
-    return window.location.href;
+    if(ViesService.isBrowserCode()) {
+      return window.location.href;
+    }
+    else {
+      return '';
+    }
   }
 
   /**
@@ -191,6 +197,15 @@ export class RouteUtils {
     port: string | null;
     params: { [key: string]: string };
   } {
+    if (!url || !RouteUtils.isValidUrl(url)) {
+      return {
+        schema: '',
+        host: '',
+        port: '',
+        params: {}
+      };
+    }
+
     const parsedUrl = new URL(url);
   
     const port =

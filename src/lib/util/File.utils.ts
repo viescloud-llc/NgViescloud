@@ -1,4 +1,5 @@
 import { VFile } from '../model/vies.model';
+import { ViesService } from '../service/rest.service';
 
 export class FileUtils {
   private constructor() {}
@@ -257,10 +258,16 @@ export class FileUtils {
   }
 
   static localStorageSetItem(key: string, value: any): void {
-    localStorage.setItem(key, JSON.stringify(value));
+    if(ViesService.isBrowserCode()) {
+      localStorage.setItem(key, JSON.stringify(value));
+    }
   }
 
   static localStorageGetItem<T>(key: string): T | null {
+    if(ViesService.isNotBrowserCode()) {
+      return null;
+    }
+
     let value = localStorage.getItem(key);
     if (value) {
       let parseValue: T = JSON.parse(value) as T;
@@ -271,7 +278,9 @@ export class FileUtils {
   }
 
   static localStorageRemoveItem(key: string): void {
-    localStorage.removeItem(key);
+    if(ViesService.isBrowserCode()) {
+      localStorage.removeItem(key);
+    }
   }
 
   static localStorageGetAndRemoveItem<T>(key: string): T | null {

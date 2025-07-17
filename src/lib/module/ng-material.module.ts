@@ -22,7 +22,6 @@ import { MatTreeModule } from '@angular/material/tree';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSortModule } from '@angular/material/sort';
-import { BrowserModule } from '@angular/platform-browser';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -59,7 +58,6 @@ const list = [
   MatTabsModule,
   MatSnackBarModule,
   MatSortModule,
-  BrowserModule,
   MatStepperModule,
   MatDatepickerModule,
   MatAutocompleteModule,
@@ -71,12 +69,12 @@ const list = [
   DragDropModule,
   OverlayModule,
   MatGridListModule,
-  MatCheckboxModule
+  MatCheckboxModule,
 ]
 
 @NgModule({
   declarations: [
-
+    
   ],
   imports: list,
   exports: list

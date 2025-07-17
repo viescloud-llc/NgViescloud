@@ -189,6 +189,10 @@ export class SettingService<T extends GeneralSetting> {
   }
 
   changeTheme(matTheme: MatTheme) {
+    if(ViesService.isNotBrowserCode()) {
+      return;
+    }
+
     // Remove any previous theme class from the body
     document.body.classList.remove(... this.matThemes);
 

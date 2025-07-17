@@ -65,7 +65,7 @@ export abstract class ViesService {
     }
 
     private static loadEnvSync() {
-        if (this.env || this.env === null) {
+        if (this.env || this.env === null || ViesService.isNotBrowserCode()) {
             return this.env;
         }
     
@@ -88,6 +88,14 @@ export abstract class ViesService {
           this.env = null;
           return this.env;
         }
+    }
+
+    static isBrowserCode(): boolean {
+        return typeof window !== 'undefined';
+    }
+
+    static isNotBrowserCode(): boolean {
+        return !ViesService.isBrowserCode();
     }
 }
 

@@ -3,6 +3,7 @@ import { MatDrawer } from '@angular/material/sidenav';
 import { SettingService } from '../../service/setting.service';
 import { Router } from '@angular/router';
 import { DRAWER_STATE, HeaderComponent } from '../header/header.component';
+import { ViesService } from '../../service/rest.service';
 
 @Component({
   selector: 'vies-eco-header-minimal',
@@ -55,6 +56,10 @@ export class HeaderMinimalComponent {
   }
 
   getURL(): string {
+    if(ViesService.isNotBrowserCode()) {
+      return '';
+    }
+
     return document.URL;
   }
 
