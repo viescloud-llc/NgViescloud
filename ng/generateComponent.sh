@@ -106,7 +106,8 @@ import { Component } from '@angular/core';
 @Component({
   selector: 'app-$component_name',
   templateUrl: './$component_name.component.html',
-  styleUrls: ['./$component_name.component.$style_extension']
+  styleUrls: ['./$component_name.component.$style_extension'],
+  imports: []
 })
 export class ${name_no_dash^}Component {
   constructor() { }
