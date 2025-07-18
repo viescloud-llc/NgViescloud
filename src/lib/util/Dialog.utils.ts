@@ -90,7 +90,7 @@ export class DialogUtils {
     title: string,
     message: string,
     yes: string = 'OK',
-    width: string = '100%',
+    width: string = '99%',
     disableClose: boolean = false
   ) {
     return DialogUtils.openErrorMessage(
@@ -108,7 +108,7 @@ export class DialogUtils {
     title: string,
     message: string,
     yes: string = 'OK',
-    width: string = '100%',
+    width: string = '99%',
     disableClose: boolean = false
   ) {
     return this.openConfirmDialog(
@@ -127,7 +127,7 @@ export class DialogUtils {
     message: string,
     yes: string = 'Yes',
     no: string = 'No',
-    width: string = '100%',
+    width: string = '99%',
     disableClose: boolean = false
   ) {
     return DialogUtils.openConfirmDialog(
@@ -147,7 +147,7 @@ export class DialogUtils {
     message: string,
     yes: string = 'Yes',
     no: string = 'No',
-    width: string = '100%',
+    width: string = '99%',
     disableClose: boolean = false
   ) {
     return new Promise<string>((resolve, reject) => {
@@ -159,7 +159,7 @@ export class DialogUtils {
           yes: yes,
           no: no,
         },
-        width: width,
+        width: width
       });
 
       dialog.afterClosed().subscribe({
@@ -182,7 +182,7 @@ export class DialogUtils {
     multipleLine: boolean = false,
     input: string = '',
     placeholder: string = '',
-    width: string = '100%',
+    width: string = '99%',
     disableClose: boolean = false
   ) {
     return DialogUtils.openInputDialog(
@@ -208,7 +208,7 @@ export class DialogUtils {
     multipleLine: boolean = false,
     input: string = '',
     placeholder: string = '',
-    width: string = '100%',
+    width: string = '99%',
     disableClose: boolean = false
   ) {
     return new Promise<string>((resolve, reject) => {
@@ -243,7 +243,7 @@ export class DialogUtils {
   static openDynamicObjectDialog(
     matDialog: MatDialog,
     object: any,
-    width: string = '100%',
+    width: string = '99%',
     disableClose: boolean = false
   ) {
     //TODO
@@ -262,7 +262,7 @@ export class DialogUtils {
     title: string = 'User Access',
     yes: string = 'Save',
     no: string = 'Cancel',
-    width: string = '100%',
+    width: string = '99%',
     disableClose: boolean = false
   ) {
     return DialogUtils.openUserAccessDialog(
@@ -292,7 +292,7 @@ export class DialogUtils {
     title: string = 'User Access',
     yes: string = 'Save',
     no: string = 'Cancel',
-    width: string = '100%',
+    width: string = '99%',
     disableClose: boolean = false
   ) {
     return new Promise<T>((resolve, reject) => {

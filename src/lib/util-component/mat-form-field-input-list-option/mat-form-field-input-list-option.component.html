@@ -43,6 +43,6 @@
         ></app-mat-form-field-input-option>
       </ng-container>
     </ng-container>
-    <li *ngIf="!readonly && !reachMaxSize()"><button mat-raised-button color="primary" style="width: 100%;" (click)="addNewItem()">Add new {{label}}</button></li>
+    <li *ngIf="!readonly && !reachMaxSize()"><button matButton="filled" style="width: 100%;" (click)="addNewItem()">Add new {{label}}</button></li>
   </ul>
 </mat-expansion-panel>

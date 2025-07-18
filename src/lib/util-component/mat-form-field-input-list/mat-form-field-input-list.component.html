@@ -43,8 +43,8 @@
             styleWidth="100%"
             [readonly]="readonly"
             ></app-mat-form-field-input-dynamic>
-            <button *ngIf="showRemoveItemButton" (click)="removeWithWarning(i)" mat-raised-button color="warn">Remove this {{label}}</button>
-            <button *ngIf="showDragAndDropButton" mat-raised-button color="primary" cdkDragHandle>Rearrange this {{label}}</button>
+            <button *ngIf="showRemoveItemButton" (click)="removeWithWarning(i)" matButton="filled" class="warn">Remove this {{label}}</button>
+            <button *ngIf="showDragAndDropButton" matButton="filled" cdkDragHandle>Rearrange this {{label}}</button>
             <hr>
           </ng-container>
         </ng-container>
@@ -74,7 +74,7 @@
     </div>
 
     <li *ngIf="showAddItemButton">
-      <button mat-raised-button color="primary" style="width: 100%;" (click)="addNewItem()" [disabled]="reachMaxSize()">Add new {{label}}</button>
+      <button matButton="filled" style="width: 100%;" (click)="addNewItem()" [disabled]="reachMaxSize()">Add new {{label}}</button>
     </li>
   </ul>
 </mat-expansion-panel>

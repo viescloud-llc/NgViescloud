@@ -11,14 +11,14 @@
   </li>
   <li>
     <br>
-    <button [style.width]="'100%'" mat-raised-button color="primary" (click)="addUser()">Add user</button>
+    <button [style.width]="'100%'" matButton="filled" (click)="addUser()">Add user</button>
   </li>
 </ul>
 
 <ul class="margin-center" *ngIf="selectedUser" appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
   <li class="flex-row-container">
-    <button mat-raised-button color="primary" (click)="selectedUser = undefined">Back</button>
-    <button mat-raised-button color="primary" (click)="addUserGroup()" >Add user group</button>
+    <button matButton="filled" (click)="selectedUser = undefined">Back</button>
+    <button matButton="filled" (click)="addUserGroup()" >Add user group</button>
   </li>
   <hr>
   <li>
@@ -52,7 +52,7 @@
     ></app-mat-form-field-input>
   </li>
   <li class="flex-row-container-auto">
-    <button mat-raised-button color="primary" (click)="save()" [disabled]="!isValueChange() || !validForm">Save</button>
-    <button mat-raised-button color="warn" (click)="revert()" [disabled]="!isValueChange() || !validForm">revert</button>
+    <button matButton="filled" (click)="save()" [disabled]="!isValueChange() || !validForm">Save</button>
+    <button matButton="filled" class="warn" (click)="revert()" [disabled]="!isValueChange() || !validForm">revert</button>
   </li>
 </ul>

@@ -19,6 +19,6 @@
   ></app-mat-form-field-input-text-area>
 </div>
 <div mat-dialog-actions>
-  <button mat-raised-button color="primary" [mat-dialog-close]="input" cdkFocusInitial>{{yes}}</button>
-  <button *ngIf="no" mat-raised-button color="warn" mat-dialog-close>{{no}}</button>
+  <button matButton="filled" [mat-dialog-close]="input" cdkFocusInitial>{{yes}}</button>
+  <button *ngIf="no" matButton="filled" class="warn" mat-dialog-close>{{no}}</button>
 </div>

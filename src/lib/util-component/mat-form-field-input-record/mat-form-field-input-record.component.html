@@ -60,7 +60,7 @@
           </details>
         </li>
         <li class="flex-row-container-auto">
-          <button *ngIf="showRemoveItemButton" (click)="remove(i)" mat-raised-button color="warn">Remove this {{label}}</button>
+          <button *ngIf="showRemoveItemButton" (click)="remove(i)" matButton="filled" class="warn">Remove this {{label}}</button>
         </li>
         <hr>
       </ng-container>
@@ -99,7 +99,7 @@
     <div *ngIf="!validKeyPair" style="color: red;" class="text-center"><hr><b>!Duplicate key found!</b><hr></div>
 
     <li *ngIf="showAddItemButton" class="flex-row-container-auto">
-      <button mat-raised-button color="primary" (click)="addNewItem()" [disabled]="reachMaxSize()">Add new {{label}}</button>
+      <button matButton="filled" (click)="addNewItem()" [disabled]="reachMaxSize()">Add new {{label}}</button>
     </li>
   </ul>
 </mat-expansion-panel>

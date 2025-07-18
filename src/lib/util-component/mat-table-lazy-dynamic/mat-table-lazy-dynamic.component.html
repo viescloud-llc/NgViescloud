@@ -45,10 +45,10 @@
     ></app-mat-form-field-input-dynamic>
   </li>
   <li [class]="styleWidth === '100%' ? 'flex-row-container-auto' : ''">
-    <button *ngIf="addOrSaveFn" mat-raised-button color="primary" (click)="save()" [disabled]="!isValueChange() || !validForm">Save</button>
-    <button *ngIf="addOrSaveFn" mat-raised-button color="warn" (click)="revert()" [disabled]="!isValueChange()">Revert</button>
-    <button *ngIf="!newRow && cloneFn" mat-raised-button color="primary" (click)="cloneRow()">Clone</button>
-    <button mat-raised-button color="warn" (click)="selectRow(null)">{{ !addOrSaveFn ? 'Close' : !isValueChange() ? 'Cancel | Back' : 'Discard' }}</button>
-    <button *ngIf="deleteFn && !newRow" mat-raised-button color="warn" (click)="deleteRow(selectedRow)">Delete</button>
+    <button *ngIf="addOrSaveFn" matButton="filled" (click)="save()" [disabled]="!isValueChange() || !validForm">Save</button>
+    <button *ngIf="addOrSaveFn" matButton="filled" class="warn" (click)="revert()" [disabled]="!isValueChange()">Revert</button>
+    <button *ngIf="!newRow && cloneFn" matButton="filled" (click)="cloneRow()">Clone</button>
+    <button matButton="filled" class="warn" (click)="selectRow(null)">{{ !addOrSaveFn ? 'Close' : !isValueChange() ? 'Cancel | Back' : 'Discard' }}</button>
+    <button *ngIf="deleteFn && !newRow" matButton="filled" class="warn" (click)="deleteRow(selectedRow)">Delete</button>
   </li>
 </ul>

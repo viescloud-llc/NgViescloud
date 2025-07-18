@@ -39,7 +39,7 @@
       <span style="color: red;">{{error}}</span>
     </li>
     <li class="flex-row-container-auto">
-      <button mat-raised-button color="primary" [disabled]="!isValidForm()" (click)="changePassword()">Change Password</button>
+      <button matButton="filled" [disabled]="!isValidForm()" (click)="changePassword()">Change Password</button>
     </li>
   </ng-container>
 
@@ -57,7 +57,7 @@
       ></app-mat-form-field-input>
     </li>
     <li class="flex-row-container-auto">
-      <button mat-raised-button color="primary" [disabled]="!validForm2 || alias === aliasCopy" (click)="changeAlias()">Change Alias</button>
+      <button matButton="filled" [disabled]="!validForm2 || alias === aliasCopy" (click)="changeAlias()">Change Alias</button>
     </li>
   </ng-container>
 </ul>

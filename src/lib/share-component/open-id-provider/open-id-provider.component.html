@@ -24,8 +24,8 @@
       ></app-mat-form-field-input>
     </li>
     <li class="flex-row-container-auto">
-      <button mat-raised-button color="primary" (click)="autoFill(false)">Auto fill missing</button>
-      <button mat-raised-button color="primary" (click)="autoFill(true)">Auto fill all</button>
+      <button matButton="filled" (click)="autoFill(false)">Auto fill missing</button>
+      <button matButton="filled" (click)="autoFill(true)">Auto fill all</button>
     </li>
     <hr>
     <li>
@@ -78,11 +78,11 @@
     </li>
 
     <li class="flex-row-container-auto">
-      <button mat-raised-button color="primary" (click)="save()" [disabled]="!validForm || !isValueChange()">Save</button>
-      <button mat-raised-button color="primary" (click)="selectOpenIdProvider(undefined)">Cancel | Back</button>
-      <button mat-raised-button color="warn" (click)="revert()" [disabled]="!isValueChange()">Revert</button>
-      <button *ngIf="selectedOpenIdProvider && selectedOpenIdProvider.id" mat-raised-button color="warn" (click)="deleteProvider()">Delete</button>
-      <button mat-raised-button color="primary" (click)="addUserGroup()">Add new user group</button>
+      <button matButton="filled" (click)="save()" [disabled]="!validForm || !isValueChange()">Save</button>
+      <button matButton="filled" (click)="selectOpenIdProvider(undefined)">Cancel | Back</button>
+      <button matButton="filled" class="warn" (click)="revert()" [disabled]="!isValueChange()">Revert</button>
+      <button *ngIf="selectedOpenIdProvider && selectedOpenIdProvider.id" matButton="filled" class="warn" (click)="deleteProvider()">Delete</button>
+      <button matButton="filled" (click)="addUserGroup()">Add new user group</button>
     </li>
   </ul>
 </ng-container>

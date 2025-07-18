@@ -47,7 +47,7 @@
         <br>
       </li>
       <li class="flex-row-container-auto">
-        <button mat-raised-button color="primary" (click)="addNewSharedUser()" *ngIf="!readonly && (sharedUsers ?? []).length < userIdOptions.length">New share user</button>
+        <button matButton="filled" (click)="addNewSharedUser()" *ngIf="!readonly && (sharedUsers ?? []).length < userIdOptions.length">New share user</button>
       </li>
       <hr>
     </ng-container>
@@ -86,7 +86,7 @@
         <br>
       </li>
       <li class="flex-row-container-auto">
-        <button mat-raised-button color="primary" (click)="addNewSharedGroup()" *ngIf="!readonly && (sharedGroups ?? []).length < groupIdOptions.length">New share group</button>
+        <button matButton="filled" (click)="addNewSharedGroup()" *ngIf="!readonly && (sharedGroups ?? []).length < groupIdOptions.length">New share group</button>
       </li>
       <hr>
     </ng-container>
