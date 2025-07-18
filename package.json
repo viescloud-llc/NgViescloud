@@ -25,6 +25,7 @@
     "@angular/router": "^20.1.2",
     "@angular/ssr": "^20.1.1",
     "express": "^5.1.0",
+    "ngx-monaco-editor-v2": "^20.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },

@@ -2,6 +2,7 @@ import { Component, ElementRef, Input, AfterViewInit, Output, EventEmitter, View
 import { SettingService } from '../../service/setting.service';
 import { KeyCaptureEvent, KeyCaptureService } from '../../service/key-capture.service';
 import { MonacoLanguage } from '../../model/monaco-editor.model';
+import { ViesService } from '../../service/rest.service';
 
 @Component({
   selector: 'app-code-editor',
@@ -98,5 +99,9 @@ export class CodeEditorComponent implements AfterViewInit, OnDestroy {
 
   getTabSize() {
     return MonacoLanguage.getTabSizeForLanguage(this.language);
+  }
+
+  isBrowser() {
+    return ViesService.isBrowserCode();
   }
 }

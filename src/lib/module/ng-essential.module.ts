@@ -4,12 +4,14 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatNativeDateModule } from '@angular/material/core';
 import { HttpHandlerFn, HttpRequest, provideHttpClient, withInterceptors, withInterceptorsFromDi } from '@angular/common/http';
 import { AuthInterceptor } from '../guards/auth.interceptor';
+import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
 
 const LIST = [
   CommonModule,
   FormsModule,
   ReactiveFormsModule,
-  MatNativeDateModule
+  MatNativeDateModule,
+  MonacoEditorModule
 ]
 
 // export function authInterceptor(req: HttpRequest<unknown>, next: HttpHandlerFn) {
