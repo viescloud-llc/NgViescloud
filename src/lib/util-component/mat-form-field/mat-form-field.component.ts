@@ -9,6 +9,7 @@ import { StringUtils } from '../../util/String.utils';
 import { DataUtils } from '../../util/Data.utils';
 import { MatFromFieldInputDynamicItem } from '../../model/mat.model';
 import { BehaviorSubject } from 'rxjs';
+import { ViesService } from '../../service/rest.service';
 
 @Component({
   selector: 'app-mat-form-field',
@@ -101,6 +102,10 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
   }
 
   ngOnInit() {
+    if(ViesService.isNotBrowserCode()) {
+      return;
+    }
+
     if((this.value === undefined || this.value === null) && this.blankObject !== undefined && this.blankObject !== null) {
       this.value = structuredClone(this.blankObject);
       this.valueCopy = structuredClone(this.blankObject);
@@ -108,6 +113,10 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    if(ViesService.isNotBrowserCode()) {
+      return;
+    }
+
     if(changes['value']) {
       this.valueCopy = structuredClone(this.value);
       this.ngOnInit();

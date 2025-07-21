@@ -3,6 +3,7 @@ import { MatFormFieldComponent } from '../mat-form-field/mat-form-field.componen
 import { MatFromFieldInputDynamicItem, MatItemSetting, MatItemSettingType, MatOption } from '../../model/mat.model';
 import { UtilsService } from '../../service/utils.service';
 import { DataUtils } from '../../util/Data.utils';
+import { ViesService } from '../../service/rest.service';
 
 export enum DynamicMatInputType {
   UNKOWN = 'unkown',
@@ -100,6 +101,10 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
   MatItemSettingType = MatItemSettingType;
 
   override ngOnInit() {
+    if(ViesService.isNotBrowserCode()) {
+      return;
+    }
+
     super.ngOnInit();
 
     if(this.blankObject === undefined || this.blankObject === null) {
@@ -111,6 +116,10 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
   }
 
   override ngOnChanges(changes: SimpleChanges): void {
+    if(ViesService.isNotBrowserCode()) {
+      return;
+    }
+
     super.ngOnChanges(changes);
 
     if(changes['value'] && !this.initBlankObjectProvided) {
@@ -121,6 +130,10 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
   }
 
   init() {
+    if(ViesService.isNotBrowserCode()) {
+      return;
+    }
+
     if(this.isValueObject() && this.blankObject && !this.isValueArray())
       this.parseItems();
     this.setInputType();

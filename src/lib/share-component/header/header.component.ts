@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { AuthenticatorService } from '../../service/authenticator.service';
 import { SettingService } from '../../service/setting.service';
 import { environment } from '../../../environments/environment.prod';
+import { ViesService } from '../../service/rest.service';
 
 export enum DRAWER_STATE {
   OPEN = 'open',
@@ -41,6 +42,12 @@ export class HeaderComponent implements OnInit {
     let displayDrawer = this.settingService.applicationSetting.get<boolean>('primitive', ...this.settingService.DEFAULT_GENERAL_SETTING_PATHS.displayDrawer) ?? true;
     this.toggleDrawer(displayDrawer ? DRAWER_STATE.OPEN : DRAWER_STATE.CLOSE);
 
+    this.settingService.applicationSetting.getBehaviorSubject(...this.settingService.DEFAULT_GENERAL_SETTING_PATHS.displayDrawer).subscribe({
+      next: value => {
+        this.toggleDrawer(value as boolean ? DRAWER_STATE.OPEN : DRAWER_STATE.CLOSE);
+      }
+    })
+
     let intialDisplayHeader = this.settingService.applicationSetting.get<boolean>('primitive', ...this.settingService.DEFAULT_GENERAL_SETTING_PATHS.initalDisplayHeader) ?? true;
     this.settingService.applicationSetting.set(intialDisplayHeader, ...this.settingService.DEFAULT_GENERAL_SETTING_PATHS.displayHeader);
   }
@@ -54,6 +61,10 @@ export class HeaderComponent implements OnInit {
   }
 
   getURL(): string {
+    if(ViesService.isNotBrowserCode()) {
+      return '';
+    }
+
     return document.URL;
   }
 
@@ -63,19 +74,19 @@ export class HeaderComponent implements OnInit {
 
   toggleDrawer(state?: DRAWER_STATE): void {
     if(state) {
-      if(state === DRAWER_STATE.OPEN)
+      if(state === DRAWER_STATE.OPEN) {
         this.drawer?.open();
-      else if(state === DRAWER_STATE.CLOSE)
-        this.drawer?.close();
-    }
-    else
-      this.drawer?.toggle();
-
-    this.drawer?._animationEnd.subscribe({
-      next: () => {
-        this.settingService.applicationSetting.set(this.drawer?.opened ?? false, ...this.settingService.DEFAULT_GENERAL_SETTING_PATHS.displayDrawer);
       }
-    });
+      else if(state === DRAWER_STATE.CLOSE) {
+        this.drawer?.close();
+      }
+    }
+    else {
+      this.drawer?.toggle();
+    }
+
+    let drawerOpened = this.drawer?.opened ?? true;
+    this.settingService.applicationSetting.set(drawerOpened, ...this.settingService.DEFAULT_GENERAL_SETTING_PATHS.displayDrawer);
   }
 
   isDisplayHeader() {
