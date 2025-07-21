@@ -4,7 +4,21 @@ import { ViesService } from '../service/rest.service';
 export class FileUtils {
   private constructor() {}
 
+  static async isObjectUrlValid(url: string): Promise<boolean> {
+    if(ViesService.isNotBrowserCode()) {
+      return true;
+    }
+
+    return fetch(url)
+      .then(response => response.ok)
+      .catch(() => false);
+  }
+
   static async fetchAsVFile(uri: string): Promise<VFile> {
+    if(ViesService.isNotBrowserCode()) {
+      return {} as VFile;
+    }
+
     try {
       const response = await fetch(uri);
       if (!response.ok) {
@@ -43,6 +57,10 @@ export class FileUtils {
   }
 
   static async fetch<T>(uri: string) {
+    if(ViesService.isNotBrowserCode()) {
+      return {} as T;
+    }
+
     try {
       const response = await fetch(uri);
       if (!response.ok) {
@@ -293,6 +311,10 @@ export class FileUtils {
   }
 
   static async isObjectUrlActive(objectUrl: string): Promise<boolean> {
+    if(ViesService.isNotBrowserCode()) {
+      return true;
+    }
+
     try {
       const response = await fetch(objectUrl, { method: 'HEAD' });
       return response.ok;

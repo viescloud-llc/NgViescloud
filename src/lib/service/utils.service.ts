@@ -39,44 +39,6 @@ export class UtilsService {
     }
   }
 
-  static async fetchAsVFile(uri: string): Promise<VFile> {
-    try {
-      const response = await fetch(uri);
-      if (!response.ok) {
-        throw new Error('Failed to fetch file');
-      }
-
-      let contentType = response.headers.get('Content-Type');
-      let extension = '';
-      let fileName = uri.substring(uri.lastIndexOf('/') + 1);
-
-      if (!contentType) {
-        // If Content-Type is not provided, derive it from the file name
-        const fileName = uri.substring(uri.lastIndexOf('/') + 1);
-        extension = fileName.split('.').pop()?.toLowerCase() || '';
-        contentType = this.mapExtensionToContentType(extension);
-      } else {
-        // If Content-Type is provided, extract extension from it
-        extension = contentType.split('/')[1];
-      }
-
-      const blob = await response.blob();
-
-      const vFile: VFile = {
-        name: uri.substring(uri.lastIndexOf('/') + 1), // Use filename from URI
-        type: contentType,
-        extension: extension,
-        rawFile: blob,
-        originalLink: uri,
-        objectUrl: ''
-      };
-
-      return vFile;
-    } catch (error) {
-      throw error;
-    }
-  }
-
   // Helper method to map file extensions to MIME types
   static mapExtensionToContentType(extension: string): string {
     const extensionMap: { [key: string]: string } = {
@@ -694,12 +656,6 @@ export class UtilsService {
       })
 
     return matOptions;
-  }
-
-  static async isObjectUrlValid(url: string): Promise<boolean> {
-    return fetch(url)
-      .then(response => response.ok)
-      .catch(() => false);
   }
 
   static openSnackBar(snackBar: MatSnackBar, message: string, action?: string, duration: number = 2000, matSnackBarHorizontalPosition: MatSnackBarHorizontalPosition = MatSnackBarHorizontalPosition.CENTER, matSnackBarVerticalPosition: MatSnackBarVerticalPosition = MatSnackBarVerticalPosition.BOTTOM) {

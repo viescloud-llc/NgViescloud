@@ -288,7 +288,7 @@ export abstract class ObjectStorage {
 
   async fetchFile(uri: string, popupArgs?: PopupArgs): Promise<VFile> {
     if (!this.containViesLink(uri)) {
-      return UtilsService.fetchAsVFile(uri)
+      return FileUtils.fetchAsVFile(uri)
     }
     else {
       return firstValueFrom(this.httpClient.get(uri, { observe: 'response', responseType: 'blob' })

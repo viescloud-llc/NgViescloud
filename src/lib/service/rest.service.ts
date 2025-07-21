@@ -51,6 +51,10 @@ export abstract class ViesService {
     }
 
     static getUri(): string {
+        if(ViesRestService.isNotBrowserCode()) {
+            return 'http://localhost';
+        }
+
         const env_gateway_api = this.loadEnvSync()?.gateway_api;
         if (env_gateway_api) {
             return env_gateway_api;
