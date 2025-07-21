@@ -1,7 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDrawer } from '@angular/material/sidenav';
-import { first } from 'rxjs';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { AuthenticatorService } from '../../service/authenticator.service';
 import { SettingService } from '../../service/setting.service';
 import { environment } from '../../../environments/environment.prod';
@@ -30,14 +29,20 @@ export class HeaderComponent implements OnInit {
 
   constructor(
     public authenticatorService: AuthenticatorService, 
-    private settingService: SettingService<any>,
+    private settingService: SettingService,
     private router: Router
     ) { 
-      settingService.header = this;
+
     }
 
   ngOnInit() {
-    this.toggleDrawer(this.settingService.getDisplayDrawer() ? DRAWER_STATE.OPEN : DRAWER_STATE.CLOSE);
+    let intialDisplayDrawer = this.settingService.applicationSetting.get<boolean>('primitive', ...this.settingService.DEFAULT_GENERAL_SETTING_PATHS.initalDisplayDrawer) ?? true;
+    this.settingService.applicationSetting.set(intialDisplayDrawer, ...this.settingService.DEFAULT_GENERAL_SETTING_PATHS.displayDrawer);
+    let displayDrawer = this.settingService.applicationSetting.get<boolean>('primitive', ...this.settingService.DEFAULT_GENERAL_SETTING_PATHS.displayDrawer) ?? true;
+    this.toggleDrawer(displayDrawer ? DRAWER_STATE.OPEN : DRAWER_STATE.CLOSE);
+
+    let intialDisplayHeader = this.settingService.applicationSetting.get<boolean>('primitive', ...this.settingService.DEFAULT_GENERAL_SETTING_PATHS.initalDisplayHeader) ?? true;
+    this.settingService.applicationSetting.set(intialDisplayHeader, ...this.settingService.DEFAULT_GENERAL_SETTING_PATHS.displayHeader);
   }
 
   login(): void {
@@ -56,10 +61,6 @@ export class HeaderComponent implements OnInit {
     return this.authenticatorService.getCurrentUserAliasOrUsername();
   }
 
-  getDisplayHeader(): boolean {
-    return this.settingService.getDisplayHeader();
-  }
-
   toggleDrawer(state?: DRAWER_STATE): void {
     if(state) {
       if(state === DRAWER_STATE.OPEN)
@@ -72,8 +73,12 @@ export class HeaderComponent implements OnInit {
 
     this.drawer?._animationEnd.subscribe({
       next: () => {
-        this.settingService.onToggleDisplayDrawerSubject.next(this.drawer?.opened ? DRAWER_STATE.OPEN : DRAWER_STATE.CLOSE);
+        this.settingService.applicationSetting.set(this.drawer?.opened ?? false, ...this.settingService.DEFAULT_GENERAL_SETTING_PATHS.displayDrawer);
       }
     });
+  }
+
+  isDisplayHeader() {
+    return this.settingService.applicationSetting.get<boolean>('primitive', ...this.settingService.DEFAULT_GENERAL_SETTING_PATHS.displayHeader) ?? true;
   }
 }

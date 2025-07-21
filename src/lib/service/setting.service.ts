@@ -15,33 +15,41 @@ import { FileUtils } from '../util/File.utils';
 import { StringUtils } from '../util/String.utils';
 import { Subject } from 'rxjs';
 import { RouteUtils } from '../util/Route.utils';
-import { HeaderMinimalComponent } from '../share-component/header-minimal/header-minimal.component';
 import { Router } from '@angular/router';
 import { ViesService } from './rest.service';
 import { environment } from '../../environments/environment.prod';
+import DynamicJsonObject from '../model/dynamic-json-object.model';
 
 @Injectable({
   providedIn: 'root'
 })
-export class SettingService<T extends GeneralSetting> {
+export class SettingService {
   protected GENERAL_SETTING_KEY = 'generalSetting.json';
-  protected generalSetting: T = this.newSetting();
+  DEFAULT_GENERAL_SETTING_PATHS = {
+    initalDisplayDrawer: ['general', 'initalDisplayDrawer'],
+    displayDrawer: ['general', 'displayDrawer'],
+    initalDisplayHeader: ['general', 'initalDisplayHeader'],
+    displayHeader: ['general', 'displayHeader'],
+    initalAutoFetchGeneralSetting: ['general', 'initalAutoFetchGeneralSetting'],
+    promptLoginWhenTimeoutLogout: ['general', 'promptLoginWhenTimeoutLogout'],
+    backgroundImageUrl: ['general', 'backgroundImageUrl'],
+    theme: ['general', 'theme']
+  };
+  
+  applicationSetting: DynamicJsonObject = new DynamicJsonObject();
+
   protected matThemes = DataUtils.getEnumValues(MatTheme) as string[];
   protected authenticatorService: AuthenticatorService | undefined;
+
   protected onLoginSubscription: any = null;
   protected onTimeoutLogoutSubscription: any = null;
 
   protected onGeneralSettingChangeSubject = new Subject<void>();
   onGeneralSettingChange = this.onGeneralSettingChangeSubject.asObservable();
 
-  onToggleDisplayDrawerSubject = new Subject<DRAWER_STATE>();
-  onToggleDisplayDrawer$ = this.onToggleDisplayDrawerSubject.asObservable();
-
   prefix = '';
   currentMenu = "main";
   apiGatewayUrl: string = ViesService.getGatewayApi();
-  backgroundImageUrl: string = '';
-  header?: HeaderComponent | HeaderMinimalComponent;
   matThemeOptions = DataUtils.getEnumMatOptions(MatTheme);
 
   constructor(
@@ -58,21 +66,14 @@ export class SettingService<T extends GeneralSetting> {
 
     this.subscribeToSubject();
 
-    let setting = FileUtils.localStorageGetItem<T>(this.GENERAL_SETTING_KEY);
+    let setting = FileUtils.localStorageGetItem<string>(this.GENERAL_SETTING_KEY);
 
     if (setting) {
-      this.generalSetting = setting;
-    }
-    else {
-      this.generalSetting = this.newSetting();
+      this.applicationSetting.fromJson(setting);
     }
 
     this.applySetting();
     this.onGeneralSettingChangeSubject.next();
-  }
-
-  protected newSetting() {
-    return new GeneralSetting() as T;
   }
 
   private subscribeToSubject() {
@@ -89,7 +90,7 @@ export class SettingService<T extends GeneralSetting> {
       if(this.onTimeoutLogoutSubscription == null) {
         this.onTimeoutLogoutSubscription = this.authenticatorService.onTimeoutLogout(
           () => {
-            if(this.generalSetting.promptLoginWhenTimeoutLogout)
+            if(this.applicationSetting.get<boolean>('primitive', ...this.DEFAULT_GENERAL_SETTING_PATHS.promptLoginWhenTimeoutLogout))
               this.promptLoginWhenTimeoutLogout();
           }
         );
@@ -110,77 +111,50 @@ export class SettingService<T extends GeneralSetting> {
     this.objectStorageService.getFileByFileName(`${prefix}/${this.GENERAL_SETTING_KEY}`).pipe(RxJSUtils.waitLoadingDynamicStringSnackBar(this.snackBar, `Loading ${prefix}/${this.GENERAL_SETTING_KEY}`, 40, 'Dismiss', 10)).subscribe({
       next: (blob) => {
         StringUtils.readBlobAsText(blob).then((data) => {
-          this.generalSetting = JSON.parse(data);
+          this.applicationSetting.fromJson(data);
           this.onGeneralSettingChangeSubject.next();
-          this.saveSettingLocally(this.generalSetting);
+          this.saveSettingLocally(this.applicationSetting);
           this.applySetting();
         });
       },
       error: (error) => {
-        if(!FileUtils.localStorageGetItem<T>(this.GENERAL_SETTING_KEY)) {
-          this.generalSetting = this.newSetting();
+        if(!FileUtils.localStorageGetItem<string>(this.GENERAL_SETTING_KEY)) {
           this.applySetting();
         }
       }
     });
   }
 
+  getCurrentTheme() {
+    return this.applicationSetting.get<MatTheme>('anything', ...this.DEFAULT_GENERAL_SETTING_PATHS.theme) ?? MatTheme.IndigoPinkLight;
+  }
+
   applySetting() {
-    this.generalSetting.theme = this.generalSetting.theme ? this.generalSetting.theme : MatTheme.CyanDeepPurpleLight;
-    this.changeTheme(this.generalSetting.theme);
+    this.changeTheme(this.getCurrentTheme());
   }
 
-  getCopyOfGeneralSetting<T>(): T {
-    return JSON.parse(JSON.stringify(this.generalSetting));
-  }
-
-  getGatewayUrl(): string {
-    return this.apiGatewayUrl;
-  }
-
-  getDisplayHeader(): boolean {
-    return this.generalSetting.initDisplayHeader;
-  }
-
-  setDisplayHeader(value: boolean): void {
-    this.generalSetting.initDisplayHeader = value;
-  }
-
-  getDisplayDrawer(): boolean {
-    return this.generalSetting.initDisplayDrawer;
-  }
-
-  setDisplayDrawer(value: boolean): void {
-    this.generalSetting.initDisplayDrawer = value;
-    if(this.header) {
-      let state = this.generalSetting.initDisplayDrawer ? DRAWER_STATE.OPEN : DRAWER_STATE.CLOSE;
-      this.header.toggleDrawer(this.generalSetting.initDisplayDrawer ? DRAWER_STATE.OPEN : DRAWER_STATE.CLOSE);
+  saveSettingLocally(applicationSetting?: DynamicJsonObject): void {
+    if(!applicationSetting) {
+      applicationSetting = this.applicationSetting;
     }
+
+    FileUtils.localStorageSetItem(this.GENERAL_SETTING_KEY, applicationSetting.toJson());
+    this.applicationSetting.fromJson(applicationSetting.toJson());
   }
 
-  toggleDisplayHeader(): void {
-    this.generalSetting.initDisplayDrawer = !this.generalSetting.initDisplayDrawer;
-  }
+  saveSettingToServer(prefix: string, applicationSetting?: DynamicJsonObject): void {
+    if(!applicationSetting) {
+      applicationSetting = this.applicationSetting;
+    }
 
-  toggleDisplayDrawer(): void {
-    this.generalSetting.initDisplayDrawer = !this.generalSetting.initDisplayDrawer;
-    this.setDisplayDrawer(this.generalSetting.initDisplayDrawer);
-  }
-
-  saveSettingLocally(generalSetting: T): void {
-    FileUtils.localStorageSetItem(this.GENERAL_SETTING_KEY, generalSetting);
-    this.generalSetting = generalSetting;
-  }
-
-  saveSettingToServer(prefix: string, generalSetting: T): void {
-    this.saveSettingLocally(generalSetting);
+    this.saveSettingLocally(applicationSetting);
 
     let vFile: VFile = {
       name: prefix + '/' + this.GENERAL_SETTING_KEY,
       type: 'application/json',
       extension: 'json',
-      rawFile: new Blob([JSON.stringify(generalSetting)], {type: 'application/json'}),
-      objectUrl: JSON.stringify(generalSetting)
+      rawFile: new Blob([JSON.stringify(applicationSetting.toJson())], {type: 'application/json'}),
+      objectUrl: applicationSetting.toJson()
     }
 
     this.objectStorageService.postOrPutFile(vFile, {type: PopupType.LOADING_DIALOG}).then((data) => {}).catch((error) => {
@@ -201,7 +175,8 @@ export class SettingService<T extends GeneralSetting> {
   }
 
   changeToCurrentTheme() {
-    this.changeTheme(this.generalSetting.theme);
+    let theme = this.getCurrentTheme();
+    this.changeTheme(theme);
   }
 
   promptLoginWhenTimeoutLogout() {
@@ -225,22 +200,17 @@ export class SettingService<T extends GeneralSetting> {
   }
 
   getCurrentThemeTextColor(): string {
-    if(this.generalSetting.theme.toLowerCase().includes('light'))
+    let theme = this.getCurrentTheme();
+    if(theme.toLowerCase().includes('light'))
       return 'black';
     else
       return 'white';
   }
 
-  loadBackgroundImage(url: string, objectStorage?: ObjectStorage, popupArgs?: PopupArgs, rememberInitialUrl: boolean = true) {
+  loadBackgroundImage(url: string, popupArgs?: PopupArgs) {
     let currentRoute = RouteUtils.getCurrentUrl();
-    if(url.includes(ViesService.getGatewayApi()) && objectStorage) {
-      objectStorage.fetchFileAndGenerateObjectUrl(url, popupArgs).then(res => {
-        if(rememberInitialUrl && RouteUtils.getCurrentUrl() === currentRoute)
-          this.backgroundImageUrl = res;
-      })
-    }
-    else {
-      this.backgroundImageUrl = url;
-    }
+    this.objectStorageService.fetchFileAndGenerateObjectUrl(url, popupArgs).then(res => {
+      this.applicationSetting.set(res, ...this.DEFAULT_GENERAL_SETTING_PATHS.backgroundImageUrl);
+    })
   }
 }

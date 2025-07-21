@@ -173,7 +173,7 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
         item.blankObject = this.getKeyBlankObject(key);
         item.isBlankObjectArray = Array.isArray(this.blankObject[key]);
         item.key = key;
-        item.value = this.getValue(key);
+        item.value = this.getKeyValue(key);
         item.settings = this.getSettings(key);
         item.index = this.getIndexSettingValue(key, defaultIndex);
         item.label = this.getLabelSettingValue(key);
@@ -198,7 +198,7 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
       return blankObj;
   }
 
-  private getValue(key: string) {
+  private getKeyValue(key: string) {
     let value = this.value[key];
 
     if(typeof value === 'boolean')

@@ -19,7 +19,7 @@ export class StringSnackBar {
   isHovered: boolean = false;
 
   constructor(
-    private settingService: SettingService<any>,
+    private settingService: SettingService,
     private snackBarRef: MatSnackBarRef<StringSnackBar>,
     @Inject(MAT_SNACK_BAR_DATA) public data: { message: string , maxLength?: number, dismissLabel?: string, viewFullOnHover?: boolean},) {
     this.fullMessage = data.message;

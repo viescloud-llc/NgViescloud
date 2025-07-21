@@ -21,7 +21,7 @@ export class ConfirmDialog implements OnInit {
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: {title: string, message: string, yes?: string, no?: string},
-    private settingsService: SettingService<any>
+    private settingsService: SettingService
     ) { 
       this.message = data.message.replace(/\t/g, ' '.repeat(4));
       this.messageLines = this.message.split('\n');

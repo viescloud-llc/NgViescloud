@@ -37,12 +37,12 @@ export class CodeEditorComponent implements AfterViewInit, OnDestroy {
 
   constructor(
     private cd: ChangeDetectorRef,
-    private settingService: SettingService<any>,
+    private settingService: SettingService,
     private keycaptureService?: KeyCaptureService,
   ) {
 
     if(!this.onToggleDisplayDrawerSubscription) {
-      settingService.onToggleDisplayDrawer$.subscribe({
+      settingService.applicationSetting.getBehaviorSubject(...this.settingService.DEFAULT_GENERAL_SETTING_PATHS.displayDrawer).subscribe({
         next: state => {
           this.resizeEditor();
         }

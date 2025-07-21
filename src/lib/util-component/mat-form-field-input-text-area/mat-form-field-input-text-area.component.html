@@ -9,7 +9,8 @@
   #input
   matInput
   [ngStyle]="getInputColorNgStyle()"
-  [(ngModel)]="value"
+  [ngModel]="getValue()"
+  (ngModelChange)="setValue($event)"
   (ngModelChange)="emitValueWithCondition();"
   (keyup.enter)="emitEnter()"
   (paste)="emitValueWithCondition()"

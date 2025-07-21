@@ -1,4 +1,4 @@
-import { AfterContentChecked, ChangeDetectorRef, Component, DoCheck, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { AfterContentChecked, ChangeDetectorRef, Component, DoCheck, EventEmitter, Input, isSignal, OnChanges, OnInit, Output, Signal, SimpleChanges } from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
 import { MatFormFieldAppearance } from '@angular/material/form-field';
 import { FixChangeDetection } from '../../abtract/FixChangeDetection';
@@ -8,6 +8,7 @@ import { DialogUtils } from '../../util/Dialog.utils';
 import { StringUtils } from '../../util/String.utils';
 import { DataUtils } from '../../util/Data.utils';
 import { MatFromFieldInputDynamicItem } from '../../model/mat.model';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-mat-form-field',
@@ -110,6 +111,24 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
     if(changes['value']) {
       this.valueCopy = structuredClone(this.value);
       this.ngOnInit();
+    }
+  }
+
+  getValue() {
+    if(this.value instanceof BehaviorSubject) {
+      return this.value.value;
+    }
+    else {
+      return this.value;
+    }
+  }
+
+  setValue(value: any) {
+    if(this.value instanceof BehaviorSubject) {
+      this.value.next(value);
+    }
+    else {
+      this.value = value;
     }
   }
 

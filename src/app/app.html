@@ -5,14 +5,12 @@
     ></viescloud-quick-side-drawer-menu>
   </mat-drawer>
   <mat-drawer-content [ngStyle]="getBackgroundImageNgStyle()">
-    <vies-eco-header-minimal
+    <vies-eco-header
     [drawer]="drawer"
     imageSrc="../favicon.ico"
-    [alias]="authenticatorService.getCurrentUserAliasOrUsername()"
-    [isLogin]="authenticatorService.isAuthenticatedSync()"
     (onLogout)="authenticatorService.logOutManually()"
     (onLogin)="router.navigate([environment.endpoint_login])"
-    ></vies-eco-header-minimal>
+    ></vies-eco-header>
     <router-outlet></router-outlet>
   </mat-drawer-content>
 </mat-drawer-container>

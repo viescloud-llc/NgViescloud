@@ -25,7 +25,6 @@ import { TooltipDirective } from '../directive/Tooltip.directive';
 import { ApplicationSettingComponent } from '../share-component/application-setting/application-setting.component';
 import { MatFormFieldInputRgbColorPickerComponent } from '../util-component/mat-form-field-input-rgb-color-picker/mat-form-field-input-rgb-color-picker.component';
 import { DisableKeyCaptureOnInputDirective } from '../directive/DisableKeyCaptureOnInput.directive';
-import { HeaderMinimalComponent } from '../share-component/header-minimal/header-minimal.component';
 import { CodeEditorComponent } from '../util-component/code-editor/code-editor.component';
 import { MatTablePathComponent } from '../util-component/mat-table-path/mat-table-path.component';
 import { MatFormFieldInputRecordComponent } from '../util-component/mat-form-field-input-record/mat-form-field-input-record.component';
@@ -79,7 +78,6 @@ const COMPONENTS = [
   OpenIdProviderComponent,
   SideDrawerMenuComponent,
   QuickSideDrawerMenuComponent,
-  HeaderMinimalComponent,
   UserGroupListComponent,
   UserListComponent,
   UserSettingComponent,

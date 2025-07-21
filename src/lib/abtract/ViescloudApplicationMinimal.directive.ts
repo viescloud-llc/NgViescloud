@@ -10,7 +10,7 @@ import { MatDialog } from '@angular/material/dialog';
 export abstract class ViescloudApplicationMinimal implements OnInit {
 
   constructor(
-    protected settingService: SettingService<any>,
+    protected settingService: SettingService,
     protected keyCaptureService: KeyCaptureService,
     protected matDialog: MatDialog
   ) {
@@ -41,9 +41,10 @@ export abstract class ViescloudApplicationMinimal implements OnInit {
   }
 
   getBackgroundImageNgStyle(): any {
-    if(this.settingService.backgroundImageUrl) {
+    let backgroundImageUrl = this.settingService.applicationSetting.get<string>('primitive', ...this.settingService.DEFAULT_GENERAL_SETTING_PATHS.backgroundImageUrl);
+    if(backgroundImageUrl) {
       let style = {
-        'background-image': `url(${this.settingService.backgroundImageUrl})`,
+        'background-image': `url(${backgroundImageUrl})`,
         'background-size': 'cover',
         'background-position': 'center center'
       }

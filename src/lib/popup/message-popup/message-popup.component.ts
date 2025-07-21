@@ -30,7 +30,7 @@ export class MessagePopup implements OnInit {
   constructor(
     @Inject(POPUP_DATA) public data: { message: string , maxLength?: number, dismissLabel?: string, viewFullOnHover?: boolean},
     @Inject(POPUP_DISMISS) public dismiss: () => void,
-    settingService: SettingService<any>
+    settingService: SettingService
   ) {
     this.textColor = settingService.getCurrentThemeTextColor();
     this.fullMessage = data.message;

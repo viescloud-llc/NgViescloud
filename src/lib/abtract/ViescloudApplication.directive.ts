@@ -16,13 +16,12 @@ export abstract class ViescloudApplication implements OnInit {
 
   constructor(
     protected authenticatorService: AuthenticatorService,
-    protected settingService: SettingService<any>,
+    protected settingService: SettingService,
     protected keyCaptureService: KeyCaptureService,
     protected matDialog: MatDialog,
     protected router: Router,
   ) { 
     this.listenToDialogEvents();
-    // this.settingService.init(this.getTitle(), this.authenticatorService);
     this.settingService.init();
   }
 
@@ -47,9 +46,11 @@ export abstract class ViescloudApplication implements OnInit {
   }
 
   getBackgroundImageNgStyle(): any {
-    if(this.settingService.backgroundImageUrl) {
+    let backgroundImageUrl = this.settingService.applicationSetting.get<string>('primitive', ...this.settingService.DEFAULT_GENERAL_SETTING_PATHS.backgroundImageUrl) ?? '';
+
+    if(backgroundImageUrl) {
       let style = {
-        'background-image': `url(${this.settingService.backgroundImageUrl})`,
+        'background-image': `url(${backgroundImageUrl})`,
         'background-size': 'cover',
         'background-position': 'center center'
       }

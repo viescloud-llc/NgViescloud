@@ -19,7 +19,7 @@ export class ApplicationSettingComponent implements OnInit, OnDestroy {
   blankGeneralSetting: GeneralSetting = new GeneralSetting();
 
   constructor(
-    public settingService: SettingService<any>,
+    public settingService: SettingService,
     public authenticatorService: AuthenticatorService,
     private matDialog: MatDialog
   ) { 
@@ -31,22 +31,44 @@ export class ApplicationSettingComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.generalSetting = this.settingService.getCopyOfGeneralSetting();
-    this.generalSettingCopy = structuredClone(this.settingService.getCopyOfGeneralSetting());
+    this.syncGeneralSetting();
+    this.generalSettingCopy = structuredClone(this.generalSetting);
   }
 
   ngOnDestroy(): void {
     this.revert();
   }
 
+  syncGeneralSetting() {
+    if(!this.generalSetting) {
+      this.generalSetting = {
+        initAutoFetchGeneralSetting: this.settingService.applicationSetting.get<boolean>('primitive', ...this.settingService.DEFAULT_GENERAL_SETTING_PATHS.initalAutoFetchGeneralSetting) ?? true,
+        initDisplayDrawer: this.settingService.applicationSetting.get<boolean>('primitive', ...this.settingService.DEFAULT_GENERAL_SETTING_PATHS.initalDisplayDrawer) ?? true,
+        initDisplayHeader: this.settingService.applicationSetting.get<boolean>('primitive', ...this.settingService.DEFAULT_GENERAL_SETTING_PATHS.initalDisplayHeader) ?? true,
+        promptLoginWhenTimeoutLogout: this.settingService.applicationSetting.get<boolean>('primitive', ...this.settingService.DEFAULT_GENERAL_SETTING_PATHS.promptLoginWhenTimeoutLogout) ?? true,
+        backgroundImageUrl: this.settingService.applicationSetting.get<string>('primitive', ...this.settingService.DEFAULT_GENERAL_SETTING_PATHS.backgroundImageUrl) ?? '',
+        theme: this.settingService.getCurrentTheme()
+      }
+    }
+    
+    this.settingService.applicationSetting.set(this.generalSetting.initAutoFetchGeneralSetting, ...this.settingService.DEFAULT_GENERAL_SETTING_PATHS.initalAutoFetchGeneralSetting);
+    this.settingService.applicationSetting.set(this.generalSetting.initDisplayDrawer, ...this.settingService.DEFAULT_GENERAL_SETTING_PATHS.initalDisplayDrawer);
+    this.settingService.applicationSetting.set(this.generalSetting.initDisplayHeader, ...this.settingService.DEFAULT_GENERAL_SETTING_PATHS.initalDisplayHeader);
+    this.settingService.applicationSetting.set(this.generalSetting.promptLoginWhenTimeoutLogout, ...this.settingService.DEFAULT_GENERAL_SETTING_PATHS.promptLoginWhenTimeoutLogout);
+    this.settingService.applicationSetting.set(this.generalSetting.backgroundImageUrl, ...this.settingService.DEFAULT_GENERAL_SETTING_PATHS.backgroundImageUrl);
+    this.settingService.applicationSetting.set(this.generalSetting.theme, ...this.settingService.DEFAULT_GENERAL_SETTING_PATHS.theme);
+  }
+
   saveLocally() {
-    this.settingService.saveSettingLocally(this.generalSetting);
+    this.syncGeneralSetting();
+    this.settingService.saveSettingLocally();
     this.ngOnInit();
   }
 
   saveToServer() {
     if(this.settingService.prefix) {
-      this.settingService.saveSettingToServer(this.settingService.prefix, this.generalSetting);
+      this.syncGeneralSetting();
+      this.settingService.saveSettingToServer(this.settingService.prefix);
       this.ngOnInit();
     }
   }
