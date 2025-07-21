@@ -64,7 +64,7 @@ export class MatItemSetting {
     }
 
     equalType(type: MatItemSettingType) {
-        return this.type.toString() === type.toString();
+        return this.type === type;
     }
 }
 
@@ -184,6 +184,13 @@ export class MatFromFieldInputDynamicItem {
             this.settings.forEach(e => {
                 if(e.equalType(setting as MatItemSettingType))
                     include = true;
+            })
+        }
+        else {
+            this.settings.forEach(e => {
+                if(e.type === setting) {
+                    include = true;
+                }
             })
         }
 

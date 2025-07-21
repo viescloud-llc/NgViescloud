@@ -77,6 +77,9 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
   @Input()
   objectLabel?: string;
 
+  @Input()
+  selfRef?: MatFromFieldInputDynamicItem;
+
   // mat option
   options: MatOption<any>[] = [
     {
@@ -101,7 +104,7 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
   MatItemSettingType = MatItemSettingType;
 
   override ngOnInit() {
-    if(ViesService.isNotBrowserCode()) {
+    if(ViesService.isNotCSR()) {
       return;
     }
 
@@ -116,7 +119,7 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
   }
 
   override ngOnChanges(changes: SimpleChanges): void {
-    if(ViesService.isNotBrowserCode()) {
+    if(ViesService.isNotCSR()) {
       return;
     }
 
@@ -130,17 +133,22 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
   }
 
   init() {
-    if(ViesService.isNotBrowserCode()) {
-      return;
+    if(this.isValueObject() && this.blankObject && !this.isValueArray()) {
+      this.parseItems();
     }
 
-    if(this.isValueObject() && this.blankObject && !this.isValueArray())
-      this.parseItems();
+    this.loadSelfRefSetting();
     this.setInputType();
   }
 
   override isValidInput(): boolean {
     return this.validInput;
+  }
+
+  private loadSelfRefSetting() {
+    if(this.selfRef) {
+
+    }
   }
 
   private setInputType() {
@@ -251,17 +259,17 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
   private getSettings(key: string): MatItemSetting[] {
     let prototype = Object.getPrototypeOf(this.blankObject!);
     let settings: MatItemSetting[] = [];
-
     for(let type in MatItemSettingType) {
-      let name = key + type;
-      if (Object.hasOwn(prototype, name) && !!prototype[name])
-        settings.push(new MatItemSetting(type));
+      let typeName = MatItemSettingType[type];
+      let name = key + typeName;
+      if (Object.hasOwn(prototype, name) && !!prototype[name]) {
+        settings.push(new MatItemSetting(typeName));
+      }
     }
 
     return settings;
   }
 
-  //?
   public getTextAreaSettingValue(key: string): boolean {
     if(this.isTextArea)
       return true;

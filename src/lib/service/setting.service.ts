@@ -163,7 +163,7 @@ export class SettingService {
   }
 
   changeTheme(matTheme: MatTheme) {
-    if(ViesService.isNotBrowserCode()) {
+    if(ViesService.isNotCSR()) {
       return;
     }
 

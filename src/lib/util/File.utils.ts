@@ -5,7 +5,7 @@ export class FileUtils {
   private constructor() {}
 
   static async isObjectUrlValid(url: string): Promise<boolean> {
-    if(ViesService.isNotBrowserCode()) {
+    if(ViesService.isNotCSR()) {
       return true;
     }
 
@@ -15,7 +15,7 @@ export class FileUtils {
   }
 
   static async fetchAsVFile(uri: string): Promise<VFile> {
-    if(ViesService.isNotBrowserCode()) {
+    if(ViesService.isNotCSR()) {
       return {} as VFile;
     }
 
@@ -57,7 +57,7 @@ export class FileUtils {
   }
 
   static async fetch<T>(uri: string) {
-    if(ViesService.isNotBrowserCode()) {
+    if(ViesService.isNotCSR()) {
       return {} as T;
     }
 
@@ -276,13 +276,13 @@ export class FileUtils {
   }
 
   static localStorageSetItem(key: string, value: any): void {
-    if(ViesService.isBrowserCode()) {
+    if(ViesService.isCSR()) {
       localStorage.setItem(key, JSON.stringify(value));
     }
   }
 
   static localStorageGetItem<T>(key: string): T | null {
-    if(ViesService.isNotBrowserCode()) {
+    if(ViesService.isNotCSR()) {
       return null;
     }
 
@@ -296,7 +296,7 @@ export class FileUtils {
   }
 
   static localStorageRemoveItem(key: string): void {
-    if(ViesService.isBrowserCode()) {
+    if(ViesService.isCSR()) {
       localStorage.removeItem(key);
     }
   }
@@ -311,7 +311,7 @@ export class FileUtils {
   }
 
   static async isObjectUrlActive(objectUrl: string): Promise<boolean> {
-    if(ViesService.isNotBrowserCode()) {
+    if(ViesService.isNotCSR()) {
       return true;
     }
 

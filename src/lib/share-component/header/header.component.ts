@@ -61,7 +61,7 @@ export class HeaderComponent implements OnInit {
   }
 
   getURL(): string {
-    if(ViesService.isNotBrowserCode()) {
+    if(ViesService.isNotCSR()) {
       return '';
     }
 

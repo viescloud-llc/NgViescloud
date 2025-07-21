@@ -102,7 +102,7 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
   }
 
   ngOnInit() {
-    if(ViesService.isNotBrowserCode()) {
+    if(ViesService.isNotCSR()) {
       return;
     }
 
@@ -113,7 +113,7 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if(ViesService.isNotBrowserCode()) {
+    if(ViesService.isNotCSR()) {
       return;
     }
 
@@ -275,5 +275,13 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
 
   trackByIndex(index: number, obj: any): any {
     return index;
+  }
+
+  isCSR() {
+    return ViesService.isCSR();
+  }
+
+  isNotCSR() {
+    return ViesService.isNotCSR();
   }
 }

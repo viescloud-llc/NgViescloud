@@ -51,7 +51,7 @@ export abstract class ViesService {
     }
 
     static getUri(): string {
-        if(ViesRestService.isNotBrowserCode()) {
+        if(ViesRestService.isNotCSR()) {
             return 'http://localhost';
         }
 
@@ -69,7 +69,7 @@ export abstract class ViesService {
     }
 
     private static loadEnvSync() {
-        if (this.env || this.env === null || ViesService.isNotBrowserCode()) {
+        if (this.env || this.env === null || ViesService.isNotCSR()) {
             return this.env;
         }
     
@@ -94,12 +94,12 @@ export abstract class ViesService {
         }
     }
 
-    static isBrowserCode(): boolean {
+    static isCSR(): boolean {
         return typeof window !== 'undefined';
     }
 
-    static isNotBrowserCode(): boolean {
-        return !ViesService.isBrowserCode();
+    static isNotCSR(): boolean {
+        return !ViesService.isCSR();
     }
 }
 

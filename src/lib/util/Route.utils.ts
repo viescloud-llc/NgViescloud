@@ -148,7 +148,7 @@ export class RouteUtils {
    * @example window.location.href = 'https://example.com/users/123' => returns 'https://example.com/users/123'
    */
   static getCurrentUrl(): string {
-    if(ViesService.isBrowserCode()) {
+    if(ViesService.isCSR()) {
       return window.location.href;
     }
     else {

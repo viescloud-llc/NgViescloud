@@ -143,7 +143,7 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
           index: this.getDisplayColumIndex(key, index),
           label: this.getDisplayLabel(key),
           getDisplayValueFn: this.getDisplayValueFn(key)
-        })
+        });
       }
       index++;
     }

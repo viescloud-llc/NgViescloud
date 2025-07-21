@@ -102,6 +102,6 @@ export class CodeEditorComponent implements AfterViewInit, OnDestroy {
   }
 
   isBrowser() {
-    return ViesService.isBrowserCode();
+    return ViesService.isCSR();
   }
 }
