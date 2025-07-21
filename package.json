@@ -9,7 +9,9 @@
     "build_skeleton": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:skeleton": "node dist/skeleton/server/server.mjs"
+    "serve:ssr:skeleton": "node dist/skeleton/server/server.mjs",
+    "build_serve": "ng build && node dist/skeleton/server/server.mjs",
+    "watch:build_serve": "nodemon --watch src --ext ts,html,scss --exec \"npm run build_serve\""
   },
   "private": true,
   "dependencies": {
@@ -42,6 +44,7 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
+    "nodemon": "^3.1.10",
     "typescript": "~5.8.2"
   }
 }
