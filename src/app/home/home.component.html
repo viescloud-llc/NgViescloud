@@ -1,3 +1,67 @@
-<p>
-  home works!
-</p>
+<ul class="margin-center">
+  <li>
+    <app-mat-form-field-input
+    label="Docker Repository URL"
+    [(value)]="dockerRepositoryUrl"
+    [required]="true"
+    [styleWidth]="'100%'"
+    ></app-mat-form-field-input>
+  </li>
+  <li>
+    <app-mat-form-field-input
+    label="Docker Registry url"
+    [(value)]="dockerRegistryUrl"
+    [required]="true"
+    [styleWidth]="'100%'"
+    (onFocusout)="onDockerSettingInputFocusout()"
+    ></app-mat-form-field-input>
+  </li>
+  <li>
+    <app-mat-form-field-input
+    [label]="'Docker Image'"
+    [(value)]="dockerImage"
+    [required]="true"
+    [styleWidth]="'100%'"
+    (onFocusout)="onDockerSettingInputFocusout()"
+    ></app-mat-form-field-input>
+  </li>
+  <li>
+    <app-mat-form-field-input
+    [label]="'Docker Tag'"
+    [(value)]="dockerTag"
+    [required]="true"
+    [styleWidth]="'100%'"
+    ></app-mat-form-field-input>
+  </li>
+  <li *ngIf="dockerImage && dockerRegistryUrl">
+    <details open>
+      <summary>Tags table</summary>
+      <app-mat-table-lazy
+      [matRowsPage]="DockerTagsResultResponsePage"
+      [blankObject]="blankDockerTagsResultResponse"
+      (onLazyPageChange)="onDockerSettingInputFocusout($event)"
+      ></app-mat-table-lazy>
+    </details>
+  </li>
+  <li>
+    <app-mat-form-field-input
+    [label]="'Docker Username'"
+    [(value)]="dockerUsername"
+    [styleWidth]="'100%'"
+    ></app-mat-form-field-input>
+  </li>
+  <li>
+    <app-mat-form-field-input
+    *ngIf="dockerUsername"
+    [label]="'Docker Password'"
+    [(value)]="dockerPassword"
+    [styleWidth]="'100%'"
+    [required]="true"
+    [showVisibleSwitch]="true"
+    ></app-mat-form-field-input>
+  </li>
+
+  <li class="flex-row-container-auto">
+    <button matButton="filled">Pull Docker image</button>
+  </li>
+</ul>

@@ -1,16 +1,16 @@
 {
-  "name": "skeleton",
+  "name": "docker-util",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "start_skeleton": "ng serve",
-    "build_skeleton": "ng build",
+    "start_docker-util": "ng serve",
+    "build_docker-util": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:skeleton": "node dist/skeleton/server/server.mjs",
-    "build_serve": "ng build && node dist/skeleton/server/server.mjs",
+    "serve:ssr:docker-util": "node dist/docker-util/server/server.mjs",
+    "build_serve": "ng build && node dist/docker-util/server/server.mjs",
     "watch:build_serve": "nodemon --watch src --ext ts,html,scss --exec \"npm run build_serve\""
   },
   "private": true,

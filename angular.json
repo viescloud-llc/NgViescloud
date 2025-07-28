@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "skeleton": {
+    "docker-util": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -66,10 +66,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "skeleton:build:production"
+              "buildTarget": "docker-util:build:production"
             },
             "development": {
-              "buildTarget": "skeleton:build:development"
+              "buildTarget": "docker-util:build:development"
             }
           },
           "defaultConfiguration": "development"

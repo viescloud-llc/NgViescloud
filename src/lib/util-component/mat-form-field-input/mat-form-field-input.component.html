@@ -10,7 +10,7 @@
   (keydown)="addKey($event)"
   [ngModel]="getValue()"
   (ngModelChange)="setValue($event)"
-  (focus)="isFocus = true"
+  (focus)="focusEmit()"
   (focusout)="focusoutEmitValue()"
   (paste)="emitValueWithCondition()"
   (ngModelChange)="emitValueWithCondition();"
