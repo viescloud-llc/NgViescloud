@@ -1,3 +1,5 @@
+import { MatTableDisplayLabel } from "../../lib/model/mat.model";
+
 export class DockerTagsResponse {
     count: number = 0;
     next?: string = '';
@@ -7,5 +9,7 @@ export class DockerTagsResponse {
 
 export class DockerTagsResultResponse {
     id: number = 0;
+
+    @MatTableDisplayLabel('Tag')
     name: string = '';
 }

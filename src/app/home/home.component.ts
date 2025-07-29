@@ -29,18 +29,29 @@ export class HomeComponent {
   ) { }
 
   onDockerSettingInputFocusout(lazyPageChange?: LazyPageChange) {
-    this.dockerService.fetchDockerImageTags({
-      dockerRegistryUrl: this.dockerRegistryUrl,
-      dockerImage: this.dockerImage,
-      dockerUsername: this.dockerUsername,
-      dockerPassword: this.dockerPassword,
-      page: lazyPageChange?.pageIndex ?? 1,
-      pageSize: lazyPageChange?.pageSize ?? 10
-    }).pipe(this.rxjsUtils.waitLoadingSnackBar("fetching tags"))
-    .subscribe({
-      next: res => {
-        this.DockerTagsResultResponsePage = res;
+    if(this.dockerImage && this.dockerRegistryUrl) {
+      let imagePath = this.dockerImage;
+      if(!imagePath.includes('/')) {
+        imagePath = 'library/' + imagePath;
       }
-    })
+
+      this.dockerService.fetchDockerImageTags({
+        dockerRegistryUrl: this.dockerRegistryUrl,
+        dockerImage: imagePath,
+        dockerUsername: this.dockerUsername,
+        dockerPassword: this.dockerPassword,
+        page: lazyPageChange?.pageIndex ?? 0,
+        pageSize: lazyPageChange?.pageSize ?? 5
+      }).pipe(this.rxjsUtils.waitLoadingSnackBar("fetching tags"))
+      .subscribe({
+        next: res => {
+          this.DockerTagsResultResponsePage = res;
+        }
+      })
+    }
+  }
+
+  onEditRow(dockerTagsResultResponse: DockerTagsResultResponse) {
+    this.dockerTag = dockerTagsResultResponse.name;
   }
 }

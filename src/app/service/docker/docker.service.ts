@@ -4,6 +4,7 @@ import { DockerTagsResponse, DockerTagsResultResponse } from '../../model/docker
 import { HttpParamsBuilder } from '../../../lib/model/utils.model';
 import { map, reduce } from 'rxjs';
 import { Pageable } from '../../../lib/model/vies.model';
+import { ViesHttpClientService } from '../../../lib/service/vies.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,11 +12,12 @@ import { Pageable } from '../../../lib/model/vies.model';
 export class DockerService {
 
   constructor(
-    private httpClient: HttpClient
+    private httpClient: HttpClient,
+    private viesHttpClientService: ViesHttpClientService
   ) { }
 
   fetchDockerImageTags(request: {dockerRegistryUrl: string, dockerImage: string, page?: number, pageSize?: number, dockerUsername?: string, dockerPassword?: string}) {
-    let page = request.page && request.page >= 0 ? request.page : 1;
+    let page = request.page && request.page >= 0 ? request.page : 0;
     let size = request.pageSize && request.pageSize > 0 ? request.pageSize : 10;
     
     let dockerImage = request.dockerImage;
@@ -47,15 +49,16 @@ export class DockerService {
     //   );
     // }
 
-    return this.httpClient.get<DockerTagsResponse>(`${dockerRegistryUrl}/v2/repositories/${dockerImage}/tags`, {params: params.build()})
+    return this.viesHttpClientService.get<DockerTagsResponse>({url: `${dockerRegistryUrl}/v2/repositories/${dockerImage}/tags`, queryParams: params.toMap()})
     .pipe(
       map(res => {
+        let body = res.body;
         let pageable = new Pageable<DockerTagsResultResponse>()
         pageable._metadata.pageNumber = page;
         pageable._metadata.pageSize = size;
-        pageable._metadata.totalElement = res.count;
-        pageable._metadata.totalPage = res.count / size;
-        pageable.content = [...res.results];
+        pageable._metadata.totalElement = body!.count;
+        pageable._metadata.totalPage = (body!.count + size - 1);
+        pageable.content = [...body!.results];
         return pageable;
       })
     );

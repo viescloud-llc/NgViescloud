@@ -7,7 +7,7 @@ import { Observable, throwError } from "rxjs";
 @Injectable({
     providedIn: 'root'
 })
-export class ViesHttpClient extends ViesService {
+export class ViesHttpClientService extends ViesService {
 
     constructor(
         httpClient: HttpClient
@@ -166,11 +166,51 @@ export class ViesHttpClient extends ViesService {
         headers: HttpHeaders,
         responseType?: 'json' | 'text' | 'blob' | 'arraybuffer' | any
     ): Observable<HttpResponse<_>> {
-        return this.httpClient.post<_>('/api/request', body, {
+        return this.httpClient.post<_>(`${this.getPrefixUri()}/request`, body, {
             params: params,
             headers: headers,
             observe: 'response',
             responseType: responseType
         });
+    }
+
+    get<T>(request: {
+        url: string, 
+        headers?: Map<string, string>, 
+        queryParams?: Map<string, string>, 
+        body?: any,
+        responseType?: 'json' | 'text' | 'blob' | 'arraybuffer'
+    }): Observable<HttpResponse<T>> {
+        return this.request<T>({url: request.url, method: 'GET', headers: request.headers, queryParams: request.queryParams, body: request.body, responseType: request.responseType});
+    }
+
+    post<T>(request: {
+        url: string, 
+        headers?: Map<string, string>, 
+        queryParams?: Map<string, string>, 
+        body?: any,
+        responseType?: 'json' | 'text' | 'blob' | 'arraybuffer'
+    }): Observable<HttpResponse<T>> {
+        return this.request<T>({url: request.url, method: 'POST', headers: request.headers, queryParams: request.queryParams, body: request.body, responseType: request.responseType});
+    }
+
+    put<T>(request: {
+        url: string, 
+        headers?: Map<string, string>, 
+        queryParams?: Map<string, string>, 
+        body?: any,
+        responseType?: 'json' | 'text' | 'blob' | 'arraybuffer'
+    }): Observable<HttpResponse<T>> {
+        return this.request<T>({url: request.url, method: 'PUT', headers: request.headers, queryParams: request.queryParams, body: request.body, responseType: request.responseType});
+    }
+
+    delete<T>(request: {
+        url: string, 
+        headers?: Map<string, string>, 
+        queryParams?: Map<string, string>, 
+        body?: any,
+        responseType?: 'json' | 'text' | 'blob' | 'arraybuffer'
+    }): Observable<HttpResponse<T>> {
+        return this.request<T>({url: request.url, method: 'DELETE', headers: request.headers, queryParams: request.queryParams, body: request.body, responseType: request.responseType});
     }
 }
