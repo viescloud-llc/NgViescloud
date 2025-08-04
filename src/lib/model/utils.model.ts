@@ -39,4 +39,10 @@ export class HttpParamsBuilder {
   build(): HttpParams {
     return this.params;
   }
+
+  toMap(): Map<string, string> {
+    let map = new Map<string, string>();
+    this.params.keys().forEach(key => map.set(key, this.params.get(key)!));
+    return map;
+  }
 }

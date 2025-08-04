@@ -1,4 +1,4 @@
-import { AfterContentInit, AfterViewInit, ChangeDetectorRef, Component, ContentChild, ContentChildren, Directive, EventEmitter, Input, OnChanges, OnInit, Output, QueryList, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
+import { AfterContentInit, AfterViewInit, ChangeDetectorRef, Component, ContentChild, ContentChildren, Directive, EventEmitter, Input, OnChanges, OnInit, Output, QueryList, signal, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
 import { MatColumnDef, MatTable, MatTableDataSource } from '@angular/material/table';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -76,6 +76,11 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
 
   @ContentChildren(MatColumnDef) columnDefs?: QueryList<MatColumnDef>;
   @ViewChild(MatTable, { static: true }) table!: MatTable<any>;
+
+  @Input()
+  pageOffSet = 0;
+
+  disabledPaginator = signal(false);
 
   constructor(
     protected cd: ChangeDetectorRef
@@ -252,11 +257,11 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
     if (event) {
       if (event.button === 1) {
         this.onMiddleClickRow.emit(row);
+        return;
       }
     }
-    else {
-      this.onEditRow.emit(row);
-    }
+
+    this.onEditRow.emit(row);
   }
 
   getColumnSetting(label: string): MatColumn {
@@ -281,7 +286,7 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
 
   onPageIndexChangeEmit(event: PageEvent) {
     this.pageIndex = event.pageIndex;
-    this.onPageIndexChange.emit(event.pageIndex);
+    this.onPageIndexChange.emit(event.pageIndex + this.pageOffSet);
     this.multipleRowSelected.clear();
     this.onMultipleRowSelectedEmit();
   }

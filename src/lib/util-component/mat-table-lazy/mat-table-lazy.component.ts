@@ -124,8 +124,8 @@ export class MatTableLazyComponent<T extends object> extends MatTableComponent<T
     super.onPageIndexChangeEmit(event);
 
     let lazyPageChange: LazyPageChange = {
-      pageIndex: event.pageIndex,
-      pageSize: event.pageSize,
+      pageIndex: (event.pageIndex ?? 0) + this.pageOffSet,
+      pageSize: event.pageSize ?? this.pageSizeOptions[0],
       sort: {key: this.sort.active, order: this.sort.direction}
     }
 

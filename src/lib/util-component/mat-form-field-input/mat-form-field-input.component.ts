@@ -48,7 +48,7 @@ export class MatFormFieldInputComponent extends MatFormFieldComponent {
   manuallyEmitValue: boolean = false;
 
   @Input()
-  focusoutEmit: boolean = true;
+  onFocusoutEmitValueOnly: boolean = true;
 
   //input copy
   @Input()
@@ -211,7 +211,7 @@ export class MatFormFieldInputComponent extends MatFormFieldComponent {
   }
 
   focusoutEmitValue() {
-    this.isFocus = false;
+    this.focusoutEmit();
 
     if(this.autoFillHttps) {
       this.onAutoFillHttps();
@@ -224,8 +224,10 @@ export class MatFormFieldInputComponent extends MatFormFieldComponent {
       return;
     }
 
-    if (this.focusoutEmit)
+    if (this.onFocusoutEmitValueOnly) {
       this.emitValue();
+    }
+
   }
 
   emitCustomIcon() {

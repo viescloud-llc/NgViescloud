@@ -77,6 +77,12 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
   @Input()
   readonlyOnFocusHint: string = 'Read only';
 
+  @Output()
+  onFocusout: EventEmitter<void> = new EventEmitter();
+
+  @Output()
+  onFocus: EventEmitter<void> = new EventEmitter();
+
   //key capture
   keyDown: string[] = [];
 
@@ -283,5 +289,15 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
 
   isNotCSR() {
     return ViesService.isNotCSR();
+  }
+
+  focusoutEmit() {
+    this.isFocus = false;
+    this.onFocusout.emit();
+  }
+
+  focusEmit() {
+    this.isFocus = true;
+    this.onFocus.emit();
   }
 }
