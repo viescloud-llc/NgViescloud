@@ -5,6 +5,7 @@ import { DockerTagsResultResponse } from '../model/docker.model';
 import { Pageable } from '../../lib/model/vies.model';
 import { LazyPageChange } from '../../lib/util-component/mat-table-lazy/mat-table-lazy.component';
 import { RxJSUtils } from '../../lib/util/RxJS.utils';
+import { FileUtils } from '../../lib/util/File.utils';
 
 @Component({
   selector: 'app-home',
@@ -53,5 +54,21 @@ export class HomeComponent {
 
   onEditRow(dockerTagsResultResponse: DockerTagsResultResponse) {
     this.dockerTag = dockerTagsResultResponse.name;
+  }
+
+  pullDockerImage() {
+    this.dockerService.pullAndGetImage({
+      dockerHub: this.dockerRepositoryUrl,
+      image: this.dockerImage,
+      tag: this.dockerTag,
+      username: this.dockerUsername,
+      password: this.dockerPassword
+    })
+    .pipe(this.rxjsUtils.waitLoadingDialog())
+    .subscribe({
+      next: res => {
+        FileUtils.saveBlobAsFile('image1', res);
+      }
+    })
   }
 }

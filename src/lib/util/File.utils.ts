@@ -225,6 +225,14 @@ export class FileUtils {
     });
   }
 
+  static saveBlobAsFile(fileName: string, blob: Blob) {
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = fileName;
+    link.click();
+    link.remove();
+  }
+
   static saveFile(fileName: string, fileType: string, fileContent: string) {
     const file = new Blob([fileContent], { type: fileType });
     const link = document.createElement('a');

@@ -33,21 +33,23 @@
     [styleWidth]="'100%'"
     ></app-mat-form-field-input>
   </li>
-  <li *ngIf="dockerImage && dockerRegistryUrl">
-    <details open>
-      <summary>Tags table</summary>
-      <app-mat-table-lazy
-      [matRowsPage]="DockerTagsResultResponsePage"
-      [blankObject]="blankDockerTagsResultResponse"
-      (onLazyPageChange)="onDockerSettingInputFocusout($event)"
-      [showFilter]="true"
-      [showPagination]="true"
-      [pageOffSet]="1"
-      (onEditRow)="onEditRow($event)"
-      ></app-mat-table-lazy>
-    </details>
-    <br>
-  </li>
+  @if (dockerImage && dockerRegistryUrl) {
+    <li>
+      <details open>
+        <summary>Tags table</summary>
+        <app-mat-table-lazy
+        [matRowsPage]="DockerTagsResultResponsePage"
+        [blankObject]="blankDockerTagsResultResponse"
+        (onLazyPageChange)="onDockerSettingInputFocusout($event)"
+        [showFilter]="true"
+        [showPagination]="true"
+        [pageOffSet]="1"
+        (onEditRow)="onEditRow($event)"
+        ></app-mat-table-lazy>
+      </details>
+      <br>
+    </li>
+  }
   <li>
     <app-mat-form-field-input
     [label]="'Docker Username'"
@@ -67,6 +69,6 @@
   </li>
 
   <li class="flex-row-container-auto">
-    <button matButton="filled">Pull Docker image</button>
+    <button matButton="filled" (click)="pullDockerImage()">Pull Docker image</button>
   </li>
 </ul>

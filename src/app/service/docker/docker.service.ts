@@ -5,16 +5,23 @@ import { HttpParamsBuilder } from '../../../lib/model/utils.model';
 import { map, reduce } from 'rxjs';
 import { Pageable } from '../../../lib/model/vies.model';
 import { ViesHttpClientService } from '../../../lib/service/vies.service';
+import { ViesService } from '../../../lib/service/rest.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class DockerService {
+export class DockerService extends ViesService {
+
+  protected override getPrefixes(): string[] {
+    return ['api', 'v1', 'dockers'];
+  }
 
   constructor(
-    private httpClient: HttpClient,
+    httpClient: HttpClient,
     private viesHttpClientService: ViesHttpClientService
-  ) { }
+  ) { 
+    super(httpClient)
+  }
 
   fetchDockerImageTags(request: {dockerRegistryUrl: string, dockerImage: string, page?: number, pageSize?: number, dockerUsername?: string, dockerPassword?: string}) {
     let page = request.page && request.page >= 0 ? request.page : 0;
@@ -63,5 +70,13 @@ export class DockerService {
       })
     );
   }
-}
 
+  pullAndGetImage(dockerPullRequest: {dockerHub: string, image: string, tag: string, username?: string, password?: string}) {
+    return this.httpClient.put(
+      `${this.getPrefixUri()}/pull`,
+      dockerPullRequest,
+      { responseType: 'blob' }
+    )
+  }
+
+}
