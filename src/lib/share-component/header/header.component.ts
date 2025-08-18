@@ -28,6 +28,9 @@ export class HeaderComponent implements OnInit {
   @Input()
   useLogoutFlow = false;
 
+  @Input()
+  showLoginButton = true;
+
   constructor(
     public authenticatorService: AuthenticatorService, 
     private settingService: SettingService,

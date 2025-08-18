@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { DockerTagsResponse, DockerTagsResultResponse } from '../../model/docker.model';
 import { HttpParamsBuilder } from '../../../lib/model/utils.model';
-import { map, reduce } from 'rxjs';
+import { map, of, reduce } from 'rxjs';
 import { Pageable } from '../../../lib/model/vies.model';
 import { ViesHttpClientService } from '../../../lib/service/vies.service';
 import { ViesService } from '../../../lib/service/rest.service';
@@ -11,6 +11,8 @@ import { ViesService } from '../../../lib/service/rest.service';
   providedIn: 'root'
 })
 export class DockerService extends ViesService {
+
+  dockerReady = false;
 
   protected override getPrefixes(): string[] {
     return ['api', 'v1', 'dockers'];
@@ -42,20 +44,6 @@ export class DockerService extends ViesService {
     params.setIfValid("page_size", size);
     params.setIfValid("page", page);
 
-    // if(request.dockerUsername && request.dockerPassword) {
-    //   return this.httpClient.get<DockerTagsResponse>(`${dockerRegistryUrl}/v2/repositories/${dockerImage}/tags`, {params: params.build()});
-    // }
-    // else {
-    //   return this.httpClient.get<DockerTagsResponse>(`${dockerRegistryUrl}/v2/repositories/${dockerImage}/tags`, {params: params.build()})
-    //   .pipe(
-    //     map(res => {
-    //       let pageable = new Pageable<DockerTagsResponse>()
-
-    //       return pageable;
-    //     })
-    //   );
-    // }
-
     return this.viesHttpClientService.get<DockerTagsResponse>({url: `${dockerRegistryUrl}/v2/repositories/${dockerImage}/tags`, queryParams: params.toMap()})
     .pipe(
       map(res => {
@@ -71,12 +59,45 @@ export class DockerService extends ViesService {
     );
   }
 
-  pullAndGetImage(dockerPullRequest: {dockerHub: string, image: string, tag: string, username?: string, password?: string}) {
-    return this.httpClient.put(
-      `${this.getPrefixUri()}/pull`,
-      dockerPullRequest,
-      { responseType: 'blob' }
+  getImage(filePath: string) {
+    let params = new HttpParamsBuilder();
+    params.setIfValid("filePath", filePath);
+
+    return this.httpClient.get(
+      `${this.getPrefixUri()}/image`,
+      { 
+        responseType: 'blob', 
+        params: params.build()
+      }
     )
+  }
+
+  pullImage(dockerPullRequest: {dockerHub: string, image: string, tag: string, username?: string, password?: string}) {
+    return this.httpClient.put<{filePath: string}>(`${this.getPrefixUri()}/pull`, dockerPullRequest)
+                          .pipe(
+                            map(res => {
+                              return {
+                                filePath: res.filePath,
+                                url: `${this.getPrefixUri()}/image?filePath=${res.filePath}`
+                              }
+                            }
+                          ));
+  }
+
+  engineReady() {
+    if(this,this.dockerReady) {
+      return of(this.dockerReady);
+    }
+
+    return this.httpClient.get<{ready: boolean}>(`${this.getPrefixUri()}/engine/ready`).pipe(
+      map(res => {
+        if(res.ready) {
+          this.dockerReady = true;
+        }
+
+        return res.ready;
+      })
+    );
   }
 
 }

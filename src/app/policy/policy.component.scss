@@ -1,0 +1,46 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.policy-container {
+  max-width: 100%;
+  padding: 2rem;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid currentColor; // uses theme's current color
+  padding-bottom: 0.5rem;
+  font-weight: 600;
+  color: #0b5394;
+}
+
+h2 {
+  font-size: 1.5rem;
+  margin-top: 2rem;
+  font-weight: 500;
+  color: #0b5394;
+}
+
+p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-top: 0.5rem;
+}
+
+strong {
+  font-weight: 600;
+}
+
+footer {
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid currentColor;
+  text-align: center;
+  font-size: 0.9rem;
+}

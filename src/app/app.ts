@@ -18,20 +18,20 @@ export class App extends ViescloudApplication {
       title: 'Viescloud',
       children: [
         {
-          title: 'Home',
+          title: 'Docker',
           routerLink: environment.endpoint_home
         },
-        {
-          title: 'Login',
-          routerLink: environment.endpoint_login,
-          hideConditional: () => this.authenticatorService.isAuthenticatedSync(),
-        },
-        {
-          title: 'logout',
-          routerLink: '/logout',
-          hideConditional: () => !this.authenticatorService.isAuthenticatedSync(),
-          click: () => this.authenticatorService.logout()
-        }
+        // {
+        //   title: 'Login',
+        //   routerLink: environment.endpoint_login,
+        //   hideConditional: () => this.authenticatorService.isAuthenticatedSync(),
+        // },
+        // {
+        //   title: 'logout',
+        //   routerLink: '/logout',
+        //   hideConditional: () => !this.authenticatorService.isAuthenticatedSync(),
+        //   click: () => this.authenticatorService.logout()
+        // }
       ]
     },
     {

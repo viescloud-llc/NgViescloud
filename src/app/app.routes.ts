@@ -8,6 +8,7 @@ import { UserGroupListComponent } from '../lib/share-component/user-group-list/u
 import { UserListComponent } from '../lib/share-component/user-list/user-list.component';
 import { UserSettingComponent } from '../lib/share-component/user-setting/user-setting.component';
 import { HomeComponent } from './home/home.component';
+import { PolicyComponent } from './policy/policy.component';
 
 export const routes: Routes = [
   {
@@ -46,6 +47,10 @@ export const routes: Routes = [
         canActivate: [async () => inject(AuthGuard).isLogin()]
       }
     ]
+  },
+  {
+    path: 'policy',
+    component: PolicyComponent
   },
   {
     path: 'oauth2',

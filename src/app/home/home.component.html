@@ -1,74 +1,59 @@
-<ul class="margin-center">
-  <li>
-    <app-mat-form-field-input
-    label="Docker Repository URL"
-    [(value)]="dockerRepositoryUrl"
-    [required]="true"
-    [styleWidth]="'100%'"
-    ></app-mat-form-field-input>
-  </li>
-  <li>
-    <app-mat-form-field-input
-    label="Docker Registry url"
-    [(value)]="dockerRegistryUrl"
-    [required]="true"
-    [styleWidth]="'100%'"
-    (onFocusout)="onDockerSettingInputFocusout()"
-    ></app-mat-form-field-input>
-  </li>
-  <li>
-    <app-mat-form-field-input
-    [label]="'Docker Image'"
-    [(value)]="dockerImage"
-    [required]="true"
-    [styleWidth]="'100%'"
-    (onFocusout)="onDockerSettingInputFocusout()"
-    ></app-mat-form-field-input>
-  </li>
-  <li>
-    <app-mat-form-field-input
-    [label]="'Docker Tag'"
-    [(value)]="dockerTag"
-    [required]="true"
-    [styleWidth]="'100%'"
-    ></app-mat-form-field-input>
-  </li>
-  @if (dockerImage && dockerRegistryUrl) {
+@if (dockerReady && initLoading) {
+  <ul class="margin-center">
+    <li>
+      <app-mat-form-field-input label="Docker Repository URL" [(value)]="dockerRepositoryUrl" [required]="true"
+        [styleWidth]="'100%'"></app-mat-form-field-input>
+    </li>
+    <li>
+      <app-mat-form-field-input label="Docker Registry url" [(value)]="dockerRegistryUrl" [required]="true"
+        [styleWidth]="'100%'" (onFocusout)="onDockerSettingInputFocusout()"></app-mat-form-field-input>
+    </li>
+    <li>
+      <app-mat-form-field-input [label]="'Docker Image'" [(value)]="dockerImage" [required]="true" [styleWidth]="'100%'"
+        (onFocusout)="onDockerSettingInputFocusout()"></app-mat-form-field-input>
+    </li>
+    <li>
+      <app-mat-form-field-input [label]="'Docker Tag'" [(value)]="dockerTag" [required]="true"
+        [styleWidth]="'100%'"></app-mat-form-field-input>
+    </li>
+    @if (dockerImage && dockerRegistryUrl) {
     <li>
       <details open>
         <summary>Tags table</summary>
-        <app-mat-table-lazy
-        [matRowsPage]="DockerTagsResultResponsePage"
-        [blankObject]="blankDockerTagsResultResponse"
-        (onLazyPageChange)="onDockerSettingInputFocusout($event)"
-        [showFilter]="true"
-        [showPagination]="true"
-        [pageOffSet]="1"
-        (onEditRow)="onEditRow($event)"
-        ></app-mat-table-lazy>
+        <app-mat-table-lazy [matRowsPage]="DockerTagsResultResponsePage" [blankObject]="blankDockerTagsResultResponse"
+          (onLazyPageChange)="onDockerSettingInputFocusout($event)" [showFilter]="true" [showPagination]="true"
+          [pageOffSet]="1" (onEditRow)="onEditRow($event)"></app-mat-table-lazy>
       </details>
       <br>
     </li>
-  }
-  <li>
-    <app-mat-form-field-input
-    [label]="'Docker Username'"
-    [(value)]="dockerUsername"
-    [styleWidth]="'100%'"
-    ></app-mat-form-field-input>
-  </li>
-  <li>
-    <app-mat-form-field-input
-    *ngIf="dockerUsername"
-    [label]="'Docker Password'"
-    [(value)]="dockerPassword"
-    [styleWidth]="'100%'"
-    [required]="true"
-    [showVisibleSwitch]="true"
-    ></app-mat-form-field-input>
-  </li>
+    }
+    <li>
+      <app-mat-form-field-input [label]="'Docker Username'" [(value)]="dockerUsername"
+        [styleWidth]="'100%'"></app-mat-form-field-input>
+    </li>
+    <li>
+      <app-mat-form-field-input *ngIf="dockerUsername" [label]="'Docker Password'" [(value)]="dockerPassword"
+        [styleWidth]="'100%'" [required]="true" [showVisibleSwitch]="true"></app-mat-form-field-input>
+    </li>
 
-  <li class="flex-row-container-auto">
-    <button matButton="filled" (click)="pullDockerImage()">Pull Docker image</button>
-  </li>
-</ul>
+    <li class="flex-row-container-auto">
+      <button matButton="filled" (click)="pullDockerImage()">Pull Docker image</button>
+    </li>
+  </ul>
+}
+@else {
+  @if (!initLoading) {
+    <ul class="margin-center">
+      <li>
+        <h1 class="text-center">Initializing...</h1>
+      </li>
+    </ul>
+  }
+  @else {
+    <ul class="margin-center">
+      <li>
+        <p style="color: red">Docker is not ready, Please make sure Docker engine is running in backend services</p>
+      </li>
+    </ul>
+  }
+}
