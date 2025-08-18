@@ -1,5 +1,5 @@
 import { MatDialog } from "@angular/material/dialog";
-import { finalize, first, Observable, of, pipe, switchMap, tap } from "rxjs";
+import { finalize, first, Observable, of, pipe, switchMap, tap, timer } from "rxjs";
 import { LoadingDialog } from "../dialog/loading-dialog/loading-dialog.component";
 import { MatSnackBarHorizontalPosition, MatSnackBarVerticalPosition } from "../model/mat.model";
 import { MatSnackBar, MatSnackBarRef } from "@angular/material/snack-bar";
@@ -87,7 +87,8 @@ export class RxJSUtils {
     static waitLoadingDialog<T>(matDialog?: MatDialog, disableClose: boolean = true) {
         if (matDialog) {
             let dialog = matDialog.open(LoadingDialog, {
-                disableClose: disableClose
+                disableClose: disableClose,
+                minWidth: 'auto'
             });
 
             return pipe(
@@ -130,5 +131,24 @@ export class RxJSUtils {
             finalize<T>(() => this.popupUtils.dismiss(ref)),
             first<T>()
         );
+    }
+
+    wait(time: number, timeUnit: 'ms' | 's' | 'm' | 'h' | 'd' | 'y' = 'ms') {
+        return RxJSUtils.wait(time, timeUnit);
+    }
+
+    static wait(time: number, timeUnit: 'ms' | 's' | 'm' | 'h' | 'd' | 'y' = 'ms') {
+        let timeInMs = 0;
+
+        switch(timeUnit) {
+            case 'ms': timeInMs = time; break;
+            case 's':  timeInMs = time * 1000; break; 
+            case 'm':  timeInMs = time * 1000 * 60; break; 
+            case 'h':  timeInMs = time * 1000 * 60 * 60; break; 
+            case 'd':  timeInMs = time * 1000 * 60 * 60 * 24; break; 
+            case 'y':  timeInMs = time * 1000 * 60 * 60 * 24 * 365; break; 
+        }
+
+        return timer(timeInMs).pipe();
     }
 }
