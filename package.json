@@ -1,16 +1,16 @@
 {
-  "name": "skeleton",
+  "name": "venzora-manager",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "start_skeleton": "ng serve",
-    "build_skeleton": "ng build",
+    "start_venzora-manager": "ng serve",
+    "build_venzora-manager": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:skeleton": "node dist/skeleton/server/server.mjs",
-    "build_serve": "ng build && node dist/skeleton/server/server.mjs",
+    "serve:ssr:venzora-manager": "node dist/venzora-manager/server/server.mjs",
+    "build_serve": "ng build && node dist/venzora-manager/server/server.mjs",
     "watch:build_serve": "nodemon --watch src --ext ts,html,scss --exec \"npm run build_serve\""
   },
   "private": true,
