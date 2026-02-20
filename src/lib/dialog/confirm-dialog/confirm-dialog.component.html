@@ -2,14 +2,16 @@
 <div class="dialog-container" [ngStyle]="getNgStyleTextColor()" class="text-center">
   <pre class="ascii-border">
     {{ borderTop }}
-    <ng-container *ngFor="let line of borderSides">
-    {{ line }}
-    </ng-container>
+    @for (line of borderSides; track line) {
+      {{ line }}
+    }
     {{ borderBottom }}
   </pre>
 </div>
 
 <div mat-dialog-actions>
   <button matButton="filled" [mat-dialog-close]="yes.toLowerCase()">{{yes}}</button>
-  <button *ngIf="no" matButton="filled" class="warn" mat-dialog-close>{{no}}</button>
+  @if (no) {
+    <button matButton="filled" class="warn" mat-dialog-close>{{no}}</button>
+  }
 </div>

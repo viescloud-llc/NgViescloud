@@ -4,6 +4,8 @@
     <span>
       {{ isHovered && viewFullOnHover ? fullMessage : truncatedMessage }}
     </span>
-    <button *ngIf="dismissLabel" mat-button (click)="dismiss()">{{dismissLabel}}</button>
+    @if (dismissLabel) {
+      <button mat-button (click)="dismiss()">{{dismissLabel}}</button>
+    }
   </mat-card-content>
 </mat-card>

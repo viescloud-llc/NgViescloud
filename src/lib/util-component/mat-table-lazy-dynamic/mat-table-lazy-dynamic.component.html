@@ -1,54 +1,70 @@
-<ul *ngIf="!selectedRow">
-  <li>
-    <button mat-icon-button color="primary" (click)="init()" [matTooltip]="'Refresh'">
-      <mat-icon>refresh</mat-icon>
-    </button>
-    <button mat-icon-button color="primary" (click)="addNewRow()" [matTooltip]="'Add new row'">
-      <mat-icon>add_box</mat-icon>
-    </button>
-    <button *ngIf="showMultipleRowSelectionButton" mat-icon-button color="primary" (click)="showMultipleRowSelection = !showMultipleRowSelection" [matTooltip]="'Multiple Select'">
-      <mat-icon>edit</mat-icon>
-    </button>
-    <button *ngIf="showMultipleRowSelection" mat-icon-button color="primary" (click)="deleteRows(selectedRows)" [matTooltip]="'Delete All'">
-      <mat-icon>delete</mat-icon>
-    </button>
-  </li>
-  <hr>
-  <li>
-    <app-mat-table-lazy
-    [matRowsPage]="matRowsPage"
-    [sendPageIndexChangeSubject]="sendPageIndexChangeSubject"
-    [filterDisplay]="filterDisplay"
-    [initSort]="initSort"
-    [blankObject]="blankObject"
-    [pageSizeOptions]="pageSizeOptions"
-    [showFilter]="showFilter"
-    [showPagination]="showPagination"
-    [showMultipleRowSelection]="showMultipleRowSelection"
-    [showMatTooltip]="showMatTooltip"
-    [pageIndex]="pageIndex"
-    (onEditRow)="editRow($event)"
-    (onMiddleClickRow)="onMiddleClickRow.emit($event)"
-    (onMultipleRowSelected)="multipleRowSelectedFn($event)"
-    (onPageIndexChange)="pageIndexChange($event)"
-    (onLazyPageChange)="onLazyPageChange($event)"
-    ></app-mat-table-lazy>
-  </li>
-</ul>
+@if (!selectedRow) {
+  <ul>
+    <li>
+      <button mat-icon-button color="primary" (click)="init()" [matTooltip]="'Refresh'">
+        <mat-icon>refresh</mat-icon>
+      </button>
+      <button mat-icon-button color="primary" (click)="addNewRow()" [matTooltip]="'Add new row'">
+        <mat-icon>add_box</mat-icon>
+      </button>
+      @if (showMultipleRowSelectionButton) {
+        <button mat-icon-button color="primary" (click)="showMultipleRowSelection = !showMultipleRowSelection" [matTooltip]="'Multiple Select'">
+          <mat-icon>edit</mat-icon>
+        </button>
+      }
+      @if (showMultipleRowSelection) {
+        <button mat-icon-button color="primary" (click)="deleteRows(selectedRows)" [matTooltip]="'Delete All'">
+          <mat-icon>delete</mat-icon>
+        </button>
+      }
+    </li>
+    <hr>
+      <li>
+        <app-mat-table-lazy
+          [matRowsPage]="matRowsPage"
+          [sendPageIndexChangeSubject]="sendPageIndexChangeSubject"
+          [filterDisplay]="filterDisplay"
+          [initSort]="initSort"
+          [blankObject]="blankObject"
+          [pageSizeOptions]="pageSizeOptions"
+          [showFilter]="showFilter"
+          [showPagination]="showPagination"
+          [showMultipleRowSelection]="showMultipleRowSelection"
+          [showMatTooltip]="showMatTooltip"
+          [pageIndex]="pageIndex"
+          (onEditRow)="editRow($event)"
+          (onMiddleClickRow)="onMiddleClickRow.emit($event)"
+          (onMultipleRowSelected)="multipleRowSelectedFn($event)"
+          (onPageIndexChange)="pageIndexChange($event)"
+          (onLazyPageChange)="onLazyPageChange($event)"
+        ></app-mat-table-lazy>
+      </li>
+    </ul>
+  }
 
-<ul *ngIf="selectedRow" appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
-  <li>
-    <app-mat-form-field-input-dynamic
-    [(value)]="selectedRow"
-    [styleWidth]="styleWidth"
-    [blankObject]="blankObject"
-    ></app-mat-form-field-input-dynamic>
-  </li>
-  <li [class]="styleWidth === '100%' ? 'flex-row-container-auto' : ''">
-    <button *ngIf="addOrSaveFn" matButton="filled" (click)="save()" [disabled]="!isValueChange() || !validForm">Save</button>
-    <button *ngIf="addOrSaveFn" matButton="filled" class="warn" (click)="revert()" [disabled]="!isValueChange()">Revert</button>
-    <button *ngIf="!newRow && cloneFn" matButton="filled" (click)="cloneRow()">Clone</button>
-    <button matButton="filled" class="warn" (click)="selectRow(null)">{{ !addOrSaveFn ? 'Close' : !isValueChange() ? 'Cancel | Back' : 'Discard' }}</button>
-    <button *ngIf="deleteFn && !newRow" matButton="filled" class="warn" (click)="deleteRow(selectedRow)">Delete</button>
-  </li>
-</ul>
+  @if (selectedRow) {
+    <ul appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
+      <li>
+        <app-mat-form-field-input-dynamic
+          [(value)]="selectedRow"
+          [styleWidth]="styleWidth"
+          [blankObject]="blankObject"
+        ></app-mat-form-field-input-dynamic>
+      </li>
+      <li [class]="styleWidth === '100%' ? 'flex-row-container-auto' : ''">
+        @if (addOrSaveFn) {
+          <button matButton="filled" (click)="save()" [disabled]="!isValueChange() || !validForm">Save</button>
+        }
+        @if (addOrSaveFn) {
+          <button matButton="filled" class="warn" (click)="revert()" [disabled]="!isValueChange()">Revert</button>
+        }
+        @if (!newRow && cloneFn) {
+          <button matButton="filled" (click)="cloneRow()">Clone</button>
+        }
+        <button matButton="filled" class="warn" (click)="selectRow(null)">{{ !addOrSaveFn ? 'Close' : !isValueChange() ? 'Cancel | Back' : 'Discard' }}</button>
+        @if (deleteFn && !newRow) {
+          <button matButton="filled" class="warn" (click)="deleteRow(selectedRow)">Delete</button>
+        }
+      </li>
+    </ul>
+  }

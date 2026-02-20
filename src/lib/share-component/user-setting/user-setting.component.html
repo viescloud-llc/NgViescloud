@@ -7,37 +7,39 @@
     <li><h4>Change Password</h4></li>
     <li>
       <app-mat-form-field-input
-      [label]="'Current password'"
-      [(value)]="currentPassword"
-      [blankObject]="''"
-      [required]="true"
-      styleWidth="100%"
-      [showVisibleSwitch]="true"
+        [label]="'Current password'"
+        [(value)]="currentPassword"
+        [blankObject]="''"
+        [required]="true"
+        styleWidth="100%"
+        [showVisibleSwitch]="true"
       ></app-mat-form-field-input>
     </li>
     <li>
       <app-mat-form-field-input
-      [label]="'New password'"
-      [(value)]="newPassword"
-      [blankObject]="''"
-      [required]="true"
-      styleWidth="100%"
-      [showVisibleSwitch]="true"
+        [label]="'New password'"
+        [(value)]="newPassword"
+        [blankObject]="''"
+        [required]="true"
+        styleWidth="100%"
+        [showVisibleSwitch]="true"
       ></app-mat-form-field-input>
     </li>
     <li>
       <app-mat-form-field-input
-      [label]="'Confirm new password'"
-      [(value)]="reNewPassword"
-      [blankObject]="''"
-      [required]="true"
-      styleWidth="100%"
-      [showVisibleSwitch]="true"
+        [label]="'Confirm new password'"
+        [(value)]="reNewPassword"
+        [blankObject]="''"
+        [required]="true"
+        styleWidth="100%"
+        [showVisibleSwitch]="true"
       ></app-mat-form-field-input>
     </li>
-    <li *ngIf="error">
-      <span style="color: red;">{{error}}</span>
-    </li>
+    @if (error) {
+      <li>
+        <span style="color: red;">{{error}}</span>
+      </li>
+    }
     <li class="flex-row-container-auto">
       <button matButton="filled" [disabled]="!isValidForm()" (click)="changePassword()">Change Password</button>
     </li>
@@ -45,19 +47,19 @@
 
   <ng-container appMatFormFieldGroup (onAllInputCheck)="validForm2 = $event" (onFormSummit)="changeAlias()">
     <hr>
-    <li><h4>Change Alias</h4></li>
-    <li>
-      <app-mat-form-field-input
-      label="Alias"
-      [(value)]="alias"
-      [blankObject]="''"
-      [required]="true"
-      styleWidth="100%"
-      [disable]="false"
-      ></app-mat-form-field-input>
-    </li>
-    <li class="flex-row-container-auto">
-      <button matButton="filled" [disabled]="!validForm2 || alias === aliasCopy" (click)="changeAlias()">Change Alias</button>
-    </li>
-  </ng-container>
-</ul>
+      <li><h4>Change Alias</h4></li>
+      <li>
+        <app-mat-form-field-input
+          label="Alias"
+          [(value)]="alias"
+          [blankObject]="''"
+          [required]="true"
+          styleWidth="100%"
+          [disable]="false"
+        ></app-mat-form-field-input>
+      </li>
+      <li class="flex-row-container-auto">
+        <button matButton="filled" [disabled]="!validForm2 || alias === aliasCopy" (click)="changeAlias()">Change Alias</button>
+      </li>
+    </ng-container>
+  </ul>

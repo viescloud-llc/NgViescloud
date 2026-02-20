@@ -1,34 +1,39 @@
-<ul *ngIf="!openIdLogin" class="margin-center-li-center" appMatFormFieldGroup (onAllInputCheck)="validForm = $event" [formSummitClick]="loginButton">
+@if (!openIdLogin) {
+  <ul class="margin-center-li-center" appMatFormFieldGroup (onAllInputCheck)="validForm = $event" [formSummitClick]="loginButton">
     <li>
       <app-mat-form-field-input
-      label="Username or email"
-      [(value)]="username"
-      [required]="true"
-      styleWidth="50%">
-    </app-mat-form-field-input>
+        label="Username or email"
+        [(value)]="username"
+        [required]="true"
+        styleWidth="50%">
+      </app-mat-form-field-input>
     </li>
     <li>
       <app-mat-form-field-input
-      label="Password"
-      [(value)]="password"
-      [required]="true"
-      styleWidth="50%"
-      [showVisibleSwitch]="true">
-    </app-mat-form-field-input>
+        label="Password"
+        [(value)]="password"
+        [required]="true"
+        styleWidth="50%"
+        [showVisibleSwitch]="true">
+      </app-mat-form-field-input>
     </li>
     <li>
       <button #loginButton [style.width]="'50%'" matButton="filled" (click)="login()" [disabled]="!validForm">Login</button>
     </li>
-    <li *ngFor="let provider of ensibleOpenIDProviders">
-      <br>
-      <button [style.width]="'50%'" matButton="filled" (click)="loginWithProvider(provider)" >Login with {{provider.name}}</button>
-    </li>
-</ul>
-  
+    @for (provider of ensibleOpenIDProviders; track provider) {
+      <li>
+        <br>
+          <button [style.width]="'50%'" matButton="filled" (click)="loginWithProvider(provider)" >Login with {{provider.name}}</button>
+        </li>
+      }
+    </ul>
+  }
 
-<ul *ngIf="openIdLogin" class="margin-center">
-    <li>
-      <h1>{{loading}}</h1>
-    </li>
-</ul>
-  
+
+  @if (openIdLogin) {
+    <ul class="margin-center">
+      <li>
+        <h1>{{loading}}</h1>
+      </li>
+    </ul>
+  }

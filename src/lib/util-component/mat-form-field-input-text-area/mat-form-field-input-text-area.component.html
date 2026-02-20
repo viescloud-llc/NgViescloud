@@ -1,51 +1,67 @@
 <mat-form-field
-[appearance]="getAppearance()"
-[color]="matColor"
-[style.width.ch]="getSize(value ? value.toString() : '')"
-[style.width]="styleWidth">
+  [appearance]="getAppearance()"
+  [color]="matColor"
+  [style.width.ch]="getSize(value ? value.toString() : '')"
+  [style.width]="styleWidth">
 
   <mat-label>{{label}}</mat-label>
   <textarea
-  #input
-  matInput
-  [ngStyle]="getInputColorNgStyle()"
-  [ngModel]="getValue()"
-  (ngModelChange)="setValue($event)"
-  (ngModelChange)="emitValueWithCondition();"
-  (keyup.enter)="emitEnter()"
-  (paste)="emitValueWithCondition()"
-  (focus)="focusEmit()"
-  (focusout)="focusoutEmit()"
-  [placeholder]="placeholder"
-  [required]="required"
-  [disabled]="disable"
-  [maxlength]="maxlength"
-  [rows]="rows"
-  [cols]="cols"
-  [cdkTextareaAutosize]="autoResizeHeight && !showResizeVerticalButton"
-  [style.overflow]="'auto'"
-  [style.resize]="showResizeVerticalButton ? 'vertical' : 'none'"
-  [readonly]="readonly">
+    #input
+    matInput
+    [ngStyle]="getInputColorNgStyle()"
+    [ngModel]="getValue()"
+    (ngModelChange)="setValue($event)"
+    (ngModelChange)="emitValueWithCondition();"
+    (keyup.enter)="emitEnter()"
+    (paste)="emitValueWithCondition()"
+    (focus)="focusEmit()"
+    (focusout)="focusoutEmit()"
+    [placeholder]="placeholder"
+    [required]="required"
+    [disabled]="disable"
+    [maxlength]="maxlength"
+    [rows]="rows"
+    [cols]="cols"
+    [cdkTextareaAutosize]="autoResizeHeight && !showResizeVerticalButton"
+    [style.overflow]="'auto'"
+    [style.resize]="showResizeVerticalButton ? 'vertical' : 'none'"
+    [readonly]="readonly">
   </textarea>
   <mat-error>{{label}} can't be empty</mat-error>
-  <mat-hint *ngIf="error" style="color: red;" align="start">{{error}}</mat-hint>
-  <mat-hint *ngIf="manuallyEmitValue && isValueChange()" style="color: goldenrod;" align="start">Press apply icon to apply input</mat-hint>
-  <mat-hint *ngIf="isValueString() && maxlength" align="end">{{value.toString().length}} / {{maxlength}}</mat-hint>
+  @if (error) {
+    <mat-hint style="color: red;" align="start">{{error}}</mat-hint>
+  }
+  @if (manuallyEmitValue && isValueChange()) {
+    <mat-hint style="color: goldenrod;" align="start">Press apply icon to apply input</mat-hint>
+  }
+  @if (isValueString() && maxlength) {
+    <mat-hint align="end">{{value.toString().length}} / {{maxlength}}</mat-hint>
+  }
 
-  <button *ngIf="manuallyEmitValue && isValueChange()" matSuffix mat-icon-button (click)="emitValue()">
-    <mat-icon>check_circle_outline</mat-icon>
-  </button>
+  @if (manuallyEmitValue && isValueChange()) {
+    <button matSuffix mat-icon-button (click)="emitValue()">
+      <mat-icon>check_circle_outline</mat-icon>
+    </button>
+  }
 
-  <button *ngIf="showClearIcon && value && !disable && !readonly" matSuffix mat-icon-button (click)="clear()">
-    <mat-icon>close</mat-icon>
-  </button>
+  @if (showClearIcon && value && !disable && !readonly) {
+    <button matSuffix mat-icon-button (click)="clear()">
+      <mat-icon>close</mat-icon>
+    </button>
+  }
 
-  <button *ngIf="showEnterIcon && value && !disable" matSuffix mat-icon-button (click)="emitEnter();">
-    <mat-icon>chat_bubble</mat-icon>
-  </button>
+  @if (showEnterIcon && value && !disable) {
+    <button matSuffix mat-icon-button (click)="emitEnter();">
+      <mat-icon>chat_bubble</mat-icon>
+    </button>
+  }
 
-  <button *ngIf="value && !disable && showGoto" matSuffix mat-icon-button (click)="openLink(value.toString())">
-    <mat-icon>public</mat-icon>
-  </button>
-  <app-copy-to-clipboard-util *ngIf="showCopyToClipboard && !disable" matSuffix [copyValue]="value.toString()" [displayMessage]="copyDisplayMessage"></app-copy-to-clipboard-util>
+  @if (value && !disable && showGoto) {
+    <button matSuffix mat-icon-button (click)="openLink(value.toString())">
+      <mat-icon>public</mat-icon>
+    </button>
+  }
+  @if (showCopyToClipboard && !disable) {
+    <app-copy-to-clipboard-util matSuffix [copyValue]="value.toString()" [displayMessage]="copyDisplayMessage"></app-copy-to-clipboard-util>
+  }
 </mat-form-field>

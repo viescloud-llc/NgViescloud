@@ -1,18 +1,24 @@
-<ul class="margin-center" *ngIf="generalSetting">
-  <li><h1 class="text-center">Application Setting</h1></li>
-  <li><h4>Display Setting</h4></li>
-  <li>
-    <app-mat-form-field-input-dynamic
-    [(value)]="generalSetting"
-    [blankObject]="blankGeneralSetting"
-    (onValueChange)="changeTheme()"
-    [indent]="false"
-    ></app-mat-form-field-input-dynamic>
-  </li>
-  <li>
-    <button matButton="filled" class="warn" (click)="revert()" [disabled]="!isValueChange()">Revert</button>
-    <button matButton="filled" (click)="saveLocally()" [disabled]="!isValueChange()">Save Locally</button>
-    <button *ngIf="authenticatorService.isAuthenticatedSync()" matButton="filled" class="warn" (click)="reSync()" [disabled]="!authenticatorService.isAuthenticatedSync()">Re Sync</button>
-    <button *ngIf="authenticatorService.isAuthenticatedSync()" matButton="filled" (click)="saveToServer()" [disabled]="!authenticatorService.isAuthenticatedSync()">Save to Server</button>
-  </li>
-</ul>
+@if (generalSetting) {
+  <ul class="margin-center">
+    <li><h1 class="text-center">Application Setting</h1></li>
+    <li><h4>Display Setting</h4></li>
+    <li>
+      <app-mat-form-field-input-dynamic
+        [(value)]="generalSetting"
+        [blankObject]="blankGeneralSetting"
+        (onValueChange)="changeTheme()"
+        [indent]="false"
+      ></app-mat-form-field-input-dynamic>
+    </li>
+    <li>
+      <button matButton="filled" class="warn" (click)="revert()" [disabled]="!isValueChange()">Revert</button>
+      <button matButton="filled" (click)="saveLocally()" [disabled]="!isValueChange()">Save Locally</button>
+      @if (authenticatorService.isAuthenticatedSync()) {
+        <button matButton="filled" class="warn" (click)="reSync()" [disabled]="!authenticatorService.isAuthenticatedSync()">Re Sync</button>
+      }
+      @if (authenticatorService.isAuthenticatedSync()) {
+        <button matButton="filled" (click)="saveToServer()" [disabled]="!authenticatorService.isAuthenticatedSync()">Save to Server</button>
+      }
+    </li>
+  </ul>
+}

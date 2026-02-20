@@ -1,6 +1,10 @@
-<button *ngIf="switch && htmlInputElement.value" matSuffix mat-icon-button (click)="switchVisibility()">
-  <mat-icon>{{onIcon}}</mat-icon>
-</button>
-<button *ngIf="!switch && htmlInputElement.value" matSuffix mat-icon-button (click)="switchVisibility()">
-  <mat-icon>{{offIcon}}</mat-icon>
-</button>
+@if (switch && htmlInputElement.value) {
+  <button matSuffix mat-icon-button (click)="switchVisibility()">
+    <mat-icon>{{onIcon}}</mat-icon>
+  </button>
+}
+@if (!switch && htmlInputElement.value) {
+  <button matSuffix mat-icon-button (click)="switchVisibility()">
+    <mat-icon>{{offIcon}}</mat-icon>
+  </button>
+}

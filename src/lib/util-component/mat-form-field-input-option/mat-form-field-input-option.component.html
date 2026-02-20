@@ -8,9 +8,15 @@
     (opened)="emitOpened()"
     (closed)="emitClosed()"
     (selectionChange)="emitSelectionChange($event)">
-    <mat-option *ngIf="noneLabel" [value]="noneLabelValue">{{noneLabel}}</mat-option>
-    <mat-option *ngFor="let option of options" [value]="option.value" [disabled]="option.disable">{{option.valueLabel}}</mat-option>
-    <mat-option *ngIf="customOptionLabel" [value]="customOptionLabel" (click)="onCustomOptionSelected.emit()"><p [style.color]="customOptionLabelColor">{{customOptionLabel}}</p></mat-option>
+    @if (noneLabel) {
+      <mat-option [value]="noneLabelValue">{{noneLabel}}</mat-option>
+    }
+    @for (option of options; track option) {
+      <mat-option [value]="option.value" [disabled]="option.disable">{{option.valueLabel}}</mat-option>
+    }
+    @if (customOptionLabel) {
+      <mat-option [value]="customOptionLabel" (click)="onCustomOptionSelected.emit()"><p [style.color]="customOptionLabelColor">{{customOptionLabel}}</p></mat-option>
+    }
   </mat-select>
   <mat-error>{{label}} can't be empty</mat-error>
 </mat-form-field>
