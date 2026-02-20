@@ -8,41 +8,45 @@
     </mat-panel-description>
   </mat-expansion-panel-header>
   <br>
-  <ul>
-    <li *ngIf="showSizeInput">
-      <app-mat-form-field-input
-      [label]="'Number of ' + label"
-      [value]="value.length"
-      (valueChange)="listLength = $event"
-      (onValueChange)="updateListLength()"
-      defaultType="number"
-      [showMinMaxHint]="true"
-      min="0"
-      [max]="maxSize.toString()"
-      [required]="true"
-      [styleWidth]="styleWidth"
-      [manuallyEmitValue]="true"
-      [showClearIcon]="false"
-      [onFocusoutEmitValueOnly]="false"
-      [readonly]="readonly"
-      ></app-mat-form-field-input>
-    </li>
-    <ng-container>
-      <ng-container *ngFor="let item of value; let i = index; trackBy: trackByIndex;">
-        <app-mat-form-field-input-option
-        [label]="label"
-        [value]="value[i]" (valueChange)="value[i] = $event"
-        [options]="getOptons()"
-        styleWidth="100%"
-        noneLabel=""
-        [required]="required"
-        [customOptionLabel]="'Remove'"
-        [customOptionLabelColor]="'red'"
-        (onCustomOptionSelected)="remove(i)"
-        [readonly]="readonly"
-        ></app-mat-form-field-input-option>
+    <ul>
+      @if (showSizeInput) {
+        <li>
+          <app-mat-form-field-input
+            [label]="'Number of ' + label"
+            [value]="value.length"
+            (valueChange)="listLength = $event"
+            (onValueChange)="updateListLength()"
+            defaultType="number"
+            [showMinMaxHint]="true"
+            min="0"
+            [max]="maxSize.toString()"
+            [required]="true"
+            [styleWidth]="styleWidth"
+            [manuallyEmitValue]="true"
+            [showClearIcon]="false"
+            [onFocusoutEmitValueOnly]="false"
+            [readonly]="readonly"
+          ></app-mat-form-field-input>
+        </li>
+      }
+      <ng-container>
+        @for (item of value; track trackByIndex(i, item); let i = $index) {
+          <app-mat-form-field-input-option
+            [label]="label"
+            [value]="value[i]" (valueChange)="value[i] = $event"
+            [options]="getOptons()"
+            styleWidth="100%"
+            noneLabel=""
+            [required]="required"
+            [customOptionLabel]="'Remove'"
+            [customOptionLabelColor]="'red'"
+            (onCustomOptionSelected)="remove(i)"
+            [readonly]="readonly"
+          ></app-mat-form-field-input-option>
+        }
       </ng-container>
-    </ng-container>
-    <li *ngIf="!readonly && !reachMaxSize()"><button matButton="filled" style="width: 100%;" (click)="addNewItem()">Add new {{label}}</button></li>
-  </ul>
-</mat-expansion-panel>
+      @if (!readonly && !reachMaxSize()) {
+        <li><button matButton="filled" style="width: 100%;" (click)="addNewItem()">Add new {{label}}</button></li>
+      }
+    </ul>
+  </mat-expansion-panel>

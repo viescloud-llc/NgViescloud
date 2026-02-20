@@ -1,7 +1,7 @@
 <mat-expansion-panel [ngStyle]="{width: styleWidth}" appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
   <mat-expansion-panel-header>
     <mat-panel-title>
-      color picker for {{label}} 
+      color picker for {{label}}
     </mat-panel-title>
     <mat-panel-description>
       <span [ngStyle]="getNgStyle()">{{value.name}}</span>
@@ -10,54 +10,56 @@
   <ul>
     <li>
       <app-mat-form-field-input-option
-      [label]="label"
-      [placeholder]="placeholder"
-      [(value)]="value"
-      (onValueChange)="emitValue()"
-      [options]="sampleOptions"
-      [required]="required"
-      [disable]="disable"
-      noneLabel="None"
-      styleWidth="100%"
+        [label]="label"
+        [placeholder]="placeholder"
+        [(value)]="value"
+        (onValueChange)="emitValue()"
+        [options]="sampleOptions"
+        [required]="required"
+        [disable]="disable"
+        noneLabel="None"
+        styleWidth="100%"
       ></app-mat-form-field-input-option>
     </li>
-    <li *ngIf="value.name === 'Custom'">
-      <app-mat-form-field-input
-      label="R"
-      placeholder="e.g 255"
-      [required]="true"
-      [(value)]="value.r"
-      defaultType="number"
-      min="0"
-      max="255"
-      styleWidth="fit-content"
-      [showClearIcon]="false"
-      [showMinMaxHint]="true"
-      ></app-mat-form-field-input>
-      <app-mat-form-field-input
-      label="G"
-      placeholder="e.g 255"
-      [required]="true"
-      [(value)]="value.g"
-      defaultType="number"
-      min="0"
-      max="255"
-      styleWidth="fit-content"
-      [showClearIcon]="false"
-      [showMinMaxHint]="true"
-      ></app-mat-form-field-input>
-      <app-mat-form-field-input
-      label="B"
-      placeholder="e.g 255"
-      [required]="true"
-      [(value)]="value.b"
-      defaultType="number"
-      min="0"
-      max="255"
-      styleWidth="fit-content"
-      [showClearIcon]="false"
-      [showMinMaxHint]="true"
-      ></app-mat-form-field-input>
-    </li>
+    @if (value.name === 'Custom') {
+      <li>
+        <app-mat-form-field-input
+          label="R"
+          placeholder="e.g 255"
+          [required]="true"
+          [(value)]="value.r"
+          defaultType="number"
+          min="0"
+          max="255"
+          styleWidth="fit-content"
+          [showClearIcon]="false"
+          [showMinMaxHint]="true"
+        ></app-mat-form-field-input>
+        <app-mat-form-field-input
+          label="G"
+          placeholder="e.g 255"
+          [required]="true"
+          [(value)]="value.g"
+          defaultType="number"
+          min="0"
+          max="255"
+          styleWidth="fit-content"
+          [showClearIcon]="false"
+          [showMinMaxHint]="true"
+        ></app-mat-form-field-input>
+        <app-mat-form-field-input
+          label="B"
+          placeholder="e.g 255"
+          [required]="true"
+          [(value)]="value.b"
+          defaultType="number"
+          min="0"
+          max="255"
+          styleWidth="fit-content"
+          [showClearIcon]="false"
+          [showMinMaxHint]="true"
+        ></app-mat-form-field-input>
+      </li>
+    }
   </ul>
 </mat-expansion-panel>

@@ -1,125 +1,136 @@
 <ng-template #template>
   <ul appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
-    <li *ngIf="containInputType(UserAccessInputType.OWNER_USER_ID)">
-      <app-mat-form-field-input
-      [label]="'Owner User ID'"
-      [placeholder]="'e.g 1, 2, 3, book, book2, book3'"
-      [(value)]="ownerUserId"
-      blankObject="''"
-      styleWidth="100%"
-      [required]="true"
-      [readonly]="readonly"
-      ></app-mat-form-field-input>
-      <hr>
-    </li>
-
-    <ng-container *ngIf="containInputType(UserAccessInputType.SHARED_USERS)">
-      <li><p>Shared Users</p></li>
-      <li *ngFor="let sharedUser of sharedUsers; let i = index; trackBy: trackByIndex">
-        <ul>
-          <li>
-            <app-mat-form-field-input-option
-            label="User"
-            [(value)]="sharedUser.userId"
-            [options]="userIdOptions"
-            [required]="true"
-            styleWidth="100%"
-            [noneLabel]="''"
-            [customOptionLabel]="'Remove'"
-            [customOptionLabelColor]="'red'"
-            (onCustomOptionSelected)="removeSharedUser(i)"
-            [readonly]="readonly"
-            ></app-mat-form-field-input-option>
-          </li>
-          <li>
-            <app-mat-form-field-input-list-option
-            label="Permissions"
-            [(value)]="sharedUser.permissions"
-            [options]="permissionOptions"
-            styleWidth="100%"
-            [showSizeInput]="false"
-            [minSize]="1"
-            [uniqueValue]="true"
-            [readonly]="readonly"
-            ></app-mat-form-field-input-list-option>
-          </li>
-        </ul>
-        <br>
-      </li>
-      <li class="flex-row-container-auto">
-        <button matButton="filled" (click)="addNewSharedUser()" *ngIf="!readonly && (sharedUsers ?? []).length < userIdOptions.length">New share user</button>
-      </li>
-      <hr>
-    </ng-container>
-
-    <ng-container *ngIf="containInputType(UserAccessInputType.SHARED_GROUPS)">
-      <li><p>Shared groups</p></li>
-      <li *ngFor="let sharedGroup of sharedGroups; let i = index; trackBy: trackByIndex">
-        <ul>
-          <li>
-            <app-mat-form-field-input-option
-            label="Group"
-            [(value)]="sharedGroup.groupId"
-            [options]="groupIdOptions"
-            [required]="true"
-            styleWidth="100%"
-            [noneLabel]="''"
-            [customOptionLabel]="'Remove'"
-            [customOptionLabelColor]="'red'"
-            (onCustomOptionSelected)="removeSharedGroup(i)"
-            [readonly]="readonly"
-            ></app-mat-form-field-input-option>
-          </li>
-          <li>
-            <app-mat-form-field-input-list-option
-            label="Permissions"
-            [(value)]="sharedGroup.permissions"
-            [options]="permissionOptions"
-            styleWidth="100%"
-            [showSizeInput]="false"
-            [uniqueValue]="true"
-            [minSize]="1"
-            [readonly]="readonly"
-            ></app-mat-form-field-input-list-option>
-          </li>
-        </ul>
-        <br>
-      </li>
-      <li class="flex-row-container-auto">
-        <button matButton="filled" (click)="addNewSharedGroup()" *ngIf="!readonly && (sharedGroups ?? []).length < groupIdOptions.length">New share group</button>
-      </li>
-      <hr>
-    </ng-container>
-
-    <ng-container *ngIf="containInputType(UserAccessInputType.SHARED_OTHERS)">
+    @if (containInputType(UserAccessInputType.OWNER_USER_ID)) {
       <li>
-        <app-mat-form-field-input-list-option
-        label="Shared to others"
-        [(value)]="sharedOthers"
-        [options]="permissionOptions"
-        styleWidth="100%"
-        [expanded]="true"
-        [showSizeInput]="false"
-        [uniqueValue]="true"
-        [readonly]="readonly"
-        ></app-mat-form-field-input-list-option>
-      </li>
-    </ng-container>
-  </ul>
-</ng-template>
+        <app-mat-form-field-input
+          [label]="'Owner User ID'"
+          [placeholder]="'e.g 1, 2, 3, book, book2, book3'"
+          [(value)]="ownerUserId"
+          blankObject="''"
+          styleWidth="100%"
+          [required]="true"
+          [readonly]="readonly"
+        ></app-mat-form-field-input>
+        <hr>
+        </li>
+      }
 
-<mat-expansion-panel [expanded]="expanded" (expandedChange)="expandedChange.emit($event)" [ngStyle]="{width: styleWidth || 'max-content'}" *ngIf="showExpansionPanel">
-  <mat-expansion-panel-header>
-    <mat-panel-title>
-      {{label}}
-    </mat-panel-title>
-    <mat-panel-description>
+      @if (containInputType(UserAccessInputType.SHARED_USERS)) {
+        <li><p>Shared Users</p></li>
+        @for (sharedUser of sharedUsers; track trackByIndex(i, sharedUser); let i = $index) {
+          <li>
+            <ul>
+              <li>
+                <app-mat-form-field-input-option
+                  label="User"
+                  [(value)]="sharedUser.userId"
+                  [options]="userIdOptions"
+                  [required]="true"
+                  styleWidth="100%"
+                  [noneLabel]="''"
+                  [customOptionLabel]="'Remove'"
+                  [customOptionLabelColor]="'red'"
+                  (onCustomOptionSelected)="removeSharedUser(i)"
+                  [readonly]="readonly"
+                ></app-mat-form-field-input-option>
+              </li>
+              <li>
+                <app-mat-form-field-input-list-option
+                  label="Permissions"
+                  [(value)]="sharedUser.permissions"
+                  [options]="permissionOptions"
+                  styleWidth="100%"
+                  [showSizeInput]="false"
+                  [minSize]="1"
+                  [uniqueValue]="true"
+                  [readonly]="readonly"
+                ></app-mat-form-field-input-list-option>
+              </li>
+            </ul>
+            <br>
+            </li>
+          }
+          <li class="flex-row-container-auto">
+            @if (!readonly && (sharedUsers).length < userIdOptions.length) {
+              <button matButton="filled" (click)="addNewSharedUser()">New share user</button>
+            }
+          </li>
+          <hr>
+          }
 
-    </mat-panel-description>
-  </mat-expansion-panel-header>
-  <ng-container *ngTemplateOutlet="template" ></ng-container>
-</mat-expansion-panel>
+          @if (containInputType(UserAccessInputType.SHARED_GROUPS)) {
+            <li><p>Shared groups</p></li>
+            @for (sharedGroup of sharedGroups; track trackByIndex(i, sharedGroup); let i = $index) {
+              <li>
+                <ul>
+                  <li>
+                    <app-mat-form-field-input-option
+                      label="Group"
+                      [(value)]="sharedGroup.groupId"
+                      [options]="groupIdOptions"
+                      [required]="true"
+                      styleWidth="100%"
+                      [noneLabel]="''"
+                      [customOptionLabel]="'Remove'"
+                      [customOptionLabelColor]="'red'"
+                      (onCustomOptionSelected)="removeSharedGroup(i)"
+                      [readonly]="readonly"
+                    ></app-mat-form-field-input-option>
+                  </li>
+                  <li>
+                    <app-mat-form-field-input-list-option
+                      label="Permissions"
+                      [(value)]="sharedGroup.permissions"
+                      [options]="permissionOptions"
+                      styleWidth="100%"
+                      [showSizeInput]="false"
+                      [uniqueValue]="true"
+                      [minSize]="1"
+                      [readonly]="readonly"
+                    ></app-mat-form-field-input-list-option>
+                  </li>
+                </ul>
+                <br>
+                </li>
+              }
+              <li class="flex-row-container-auto">
+                @if (!readonly && (sharedGroups).length < groupIdOptions.length) {
+                  <button matButton="filled" (click)="addNewSharedGroup()">New share group</button>
+                }
+              </li>
+              <hr>
+              }
 
-<ng-container *ngIf="!showExpansionPanel">
-  <ng-container *ngTemplateOutlet="template" ></ng-container>
-</ng-container>
+              @if (containInputType(UserAccessInputType.SHARED_OTHERS)) {
+                <li>
+                  <app-mat-form-field-input-list-option
+                    label="Shared to others"
+                    [(value)]="sharedOthers"
+                    [options]="permissionOptions"
+                    styleWidth="100%"
+                    [expanded]="true"
+                    [showSizeInput]="false"
+                    [uniqueValue]="true"
+                    [readonly]="readonly"
+                  ></app-mat-form-field-input-list-option>
+                </li>
+              }
+            </ul>
+          </ng-template>
+
+          @if (showExpansionPanel) {
+            <mat-expansion-panel [expanded]="expanded" (expandedChange)="expandedChange.emit($event)" [ngStyle]="{width: styleWidth || 'max-content'}">
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  {{label}}
+                </mat-panel-title>
+                <mat-panel-description>
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+              <ng-container *ngTemplateOutlet="template" ></ng-container>
+            </mat-expansion-panel>
+          }
+
+          @if (!showExpansionPanel) {
+            <ng-container *ngTemplateOutlet="template" ></ng-container>
+          }

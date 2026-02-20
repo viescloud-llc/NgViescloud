@@ -1,22 +1,26 @@
-<mat-toolbar color="primary" *ngIf="isDisplayHeader()">
-  <button mat-icon-button (click)="toggleDrawer()">
-    <mat-icon>menu</mat-icon>
-  </button>
-
-  <span *ngIf="getAlias()">Hello: {{getAlias()}}</span>
-
-  <span class="spacer"></span>
-  <img *ngIf="imageSrc" class="cursor-hover" mat-card-avatar [src]="imageSrc" alt="!?"/>
-  <app-copy-to-clipboard-util
-  [copyValue]="getURL()"
-  matIcon="share"
-  ></app-copy-to-clipboard-util>
-  @if (showLoginButton) {
-    @if (authenticatorService.isAuthenticatedSync()) {
-      <span style="cursor: pointer;" (click)="logout()">Logout</span>
+@if (isDisplayHeader()) {
+  <mat-toolbar color="primary">
+    <button mat-icon-button (click)="toggleDrawer()">
+      <mat-icon>menu</mat-icon>
+    </button>
+    @if (getAlias()) {
+      <span>Hello: {{getAlias()}}</span>
     }
-    @else {
+    <span class="spacer"></span>
+    @if (imageSrc) {
+      <img class="cursor-hover" mat-card-avatar [src]="imageSrc" alt="!?"/>
+    }
+    <app-copy-to-clipboard-util
+      [copyValue]="getURL()"
+      matIcon="share"
+    ></app-copy-to-clipboard-util>
+    @if (showLoginButton) {
+      @if (authenticatorService.isAuthenticatedSync()) {
+        <span style="cursor: pointer;" (click)="logout()">Logout</span>
+      }
+      @else {
       <span style="cursor: pointer;" (click)="login()">Login</span>
     }
   }
 </mat-toolbar>
+}

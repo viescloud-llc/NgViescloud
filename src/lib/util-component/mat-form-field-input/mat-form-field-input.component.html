@@ -2,48 +2,72 @@
   <mat-label>{{label}}</mat-label>
 
   <input
-  #input
-  matInput
-  [ngStyle]="getInputColorNgStyle()"
-  [type]="defaultType"
-  (keyup.enter)="emitEnter()"
-  (keydown)="addKey($event)"
-  [ngModel]="getValue()"
-  (ngModelChange)="setValue($event)"
-  (focus)="focusEmit()"
-  (focusout)="focusoutEmitValue()"
-  (paste)="emitValueWithCondition()"
-  (ngModelChange)="emitValueWithCondition();"
-  [placeholder]="placeholder"
-  [maxlength]="maxlength"
-  [formControl]="formControl"
-  [matAutocomplete]="auto"
-  [readonly]="readonly">
+    #input
+    matInput
+    [ngStyle]="getInputColorNgStyle()"
+    [type]="defaultType"
+    (keyup.enter)="emitEnter()"
+    (keydown)="addKey($event)"
+    [ngModel]="getValue()"
+    (ngModelChange)="setValue($event)"
+    (focus)="focusEmit()"
+    (focusout)="focusoutEmitValue()"
+    (paste)="emitValueWithCondition()"
+    (ngModelChange)="emitValueWithCondition();"
+    [placeholder]="placeholder"
+    [maxlength]="maxlength"
+    [formControl]="formControl"
+    [matAutocomplete]="auto"
+    [readonly]="readonly">
 
   <mat-error>{{getFormControlError()}}</mat-error>
-  <mat-hint *ngIf="error" style="color: red;" align="start">{{error}}</mat-hint>
-  <mat-hint *ngIf="manuallyEmitValue && isValueChange()" style="color: goldenrod;" align="start">{{manuallyEmitValueHint}}</mat-hint>
-  <mat-hint *ngIf="isValueString() && maxlength" align="end">{{value.toString().length}} / {{maxlength}}</mat-hint>
-  <mat-hint *ngIf="showMinMaxHint && isValueNumber() && value" align="end">
-    <ng-container *ngIf="min">{{min + '\<'}}</ng-container>
-    <span [ngStyle]="getInputHintColorNgStyle()">{{value}}</span>
-    <ng-container *ngIf="max">{{'\<' + max}}</ng-container>
-  </mat-hint>
-  <mat-hint *ngIf="customIconLabel && customIconHint && value" style="color: goldenrod;" align="start">{{customIconHint}}</mat-hint>
-  <mat-hint *ngIf="isFocus && readonly && readonlyOnFocusHint" style="color: goldenrod;" align="start">{{readonlyOnFocusHint}}</mat-hint>
+  @if (error) {
+    <mat-hint style="color: red;" align="start">{{error}}</mat-hint>
+  }
+  @if (manuallyEmitValue && isValueChange()) {
+    <mat-hint style="color: goldenrod;" align="start">{{manuallyEmitValueHint}}</mat-hint>
+  }
+  @if (isValueString() && maxlength) {
+    <mat-hint align="end">{{value.toString().length}} / {{maxlength}}</mat-hint>
+  }
+  @if (showMinMaxHint && isValueNumber() && value) {
+    <mat-hint align="end">
+      @if (min) {
+        {{min + '\<'}}
+      }
+      <span [ngStyle]="getInputHintColorNgStyle()">{{value}}</span>
+      @if (max) {
+        {{'\<' + max}}
+      }
+    </mat-hint>
+  }
+  @if (customIconLabel && customIconHint && value) {
+    <mat-hint style="color: goldenrod;" align="start">{{customIconHint}}</mat-hint>
+  }
+  @if (isFocus && readonly && readonlyOnFocusHint) {
+    <mat-hint style="color: goldenrod;" align="start">{{readonlyOnFocusHint}}</mat-hint>
+  }
 
-  <button *ngIf="customIconLabel" matSuffix mat-icon-button (click)="emitCustomIcon()">
-    <mat-icon [style.color]="getCustomIconLabelColor()">{{customIconLabel}}</mat-icon>
-  </button>
-  <button *ngIf="manuallyEmitValue && isValueChange()" matSuffix mat-icon-button (click)="emitValue()" [matTooltip]="'Apply ' + label">
-    <mat-icon>check_circle_outline</mat-icon>
-  </button>
-  <button *ngIf="showClearIcon && value && !disable && !readonly" matSuffix mat-icon-button (click)="clear()" [matTooltip]="'Clear ' + label">
-    <mat-icon>close</mat-icon>
-  </button>
-  <button *ngIf="value && !disable && showGoto" matSuffix mat-icon-button (click)="openLink(value.toString())" [matTooltip]="'Go to ' + label">
-    <mat-icon>public</mat-icon>
-  </button>
+  @if (customIconLabel) {
+    <button matSuffix mat-icon-button (click)="emitCustomIcon()">
+      <mat-icon [style.color]="getCustomIconLabelColor()">{{customIconLabel}}</mat-icon>
+    </button>
+  }
+  @if (manuallyEmitValue && isValueChange()) {
+    <button matSuffix mat-icon-button (click)="emitValue()" [matTooltip]="'Apply ' + label">
+      <mat-icon>check_circle_outline</mat-icon>
+    </button>
+  }
+  @if (showClearIcon && value && !disable && !readonly) {
+    <button matSuffix mat-icon-button (click)="clear()" [matTooltip]="'Clear ' + label">
+      <mat-icon>close</mat-icon>
+    </button>
+  }
+  @if (value && !disable && showGoto) {
+    <button matSuffix mat-icon-button (click)="openLink(value.toString())" [matTooltip]="'Go to ' + label">
+      <mat-icon>public</mat-icon>
+    </button>
+  }
 
   <span matSuffix viescloudClickStopPropagation>
     <ng-content select="button"></ng-content>
@@ -55,13 +79,19 @@
     <ng-content select="[matHintEnd]"></ng-content>
   </mat-hint>
 
-  <app-input-type-switch *ngIf="showVisibleSwitch && !disable" matSuffix [switch]="switchVisibility" [htmlInputElement]="input" [trueValue]="defaultType" [falseValue]="switchType" [onIcon]="onIcon" [offIcon]="offIcon"></app-input-type-switch>
-  <app-copy-to-clipboard-util *ngIf="showCopyToClipboard && !disable" matSuffix [copyValue]="value.toString()" [displayMessage]="copyDisplayMessage"></app-copy-to-clipboard-util>
+  @if (showVisibleSwitch && !disable) {
+    <app-input-type-switch matSuffix [switch]="switchVisibility" [htmlInputElement]="input" [trueValue]="defaultType" [falseValue]="switchType" [onIcon]="onIcon" [offIcon]="offIcon"></app-input-type-switch>
+  }
+  @if (showCopyToClipboard && !disable) {
+    <app-copy-to-clipboard-util matSuffix [copyValue]="value.toString()" [displayMessage]="copyDisplayMessage"></app-copy-to-clipboard-util>
+  }
 
   <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
-    <mat-option *ngFor="let option of filteredOptions  | async" [value]="option">
-      {{option}}
-    </mat-option>
+    @for (option of filteredOptions  | async; track option) {
+      <mat-option [value]="option">
+        {{option}}
+      </mat-option>
+    }
   </mat-autocomplete>
 
 </mat-form-field>

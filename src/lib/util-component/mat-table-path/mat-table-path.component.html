@@ -1,22 +1,24 @@
-<button *ngIf="!unixStyleBack" mat-icon-button [matTooltip]="'go back'" (click)="goBack()">
-  <mat-icon>arrow_back</mat-icon>
-</button>
+@if (!unixStyleBack) {
+  <button mat-icon-button [matTooltip]="'go back'" (click)="goBack()">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+}
 
 <app-mat-form-field-input
-label="Current Path"
-[(value)]="currentPath"
-(onValueChange)="checkValidPath()"
-[styleWidth]="'100%'"
-[focusOutAutoFillFn]="formatDash"
-[readonly]="readonlyPathInput"
-[readonlyOnFocusHint]="'Path is readonly'"
+  label="Current Path"
+  [(value)]="currentPath"
+  (onValueChange)="checkValidPath()"
+  [styleWidth]="'100%'"
+  [focusOutAutoFillFn]="formatDash"
+  [readonly]="readonlyPathInput"
+  [readonlyOnFocusHint]="'Path is readonly'"
 ></app-mat-form-field-input>
 <br>
-<app-mat-table
-[matRows]="customRows"
-[blankObject]="blankRow"
-[showMultipleRowSelection]="showMultipleRowSelection"
-(onEditRow)="selectedRow($event)"
-(onMiddleClickRow)="middleClickItem($event)"
-(onMultipleRowSelected)="onMultipleRowSelectedEmit($event)"
-></app-mat-table>
+  <app-mat-table
+    [matRows]="customRows"
+    [blankObject]="blankRow"
+    [showMultipleRowSelection]="showMultipleRowSelection"
+    (onEditRow)="selectedRow($event)"
+    (onMiddleClickRow)="middleClickItem($event)"
+    (onMultipleRowSelected)="onMultipleRowSelectedEmit($event)"
+  ></app-mat-table>

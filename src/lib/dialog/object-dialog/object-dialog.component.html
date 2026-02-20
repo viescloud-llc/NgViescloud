@@ -1,17 +1,21 @@
 <h1 mat-dialog-title>{{getTitle()}}</h1>
 <div mat-dialog-content appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
-  <ul *ngIf="value">
-    <li *ngIf="error">
-      <h1 class="text-center" style="color: red">{{error}}</h1>
-    </li>
-    <li>
-      <app-mat-form-field-input-dynamic
-      [value]="value" (valueChange)="value = $event"
-      [blankObject]="data.blankObject"
-      styleWidth="100%"
-      ></app-mat-form-field-input-dynamic>
-    </li>
-  </ul>
+  @if (value) {
+    <ul>
+      @if (error) {
+        <li>
+          <h1 class="text-center" style="color: red">{{error}}</h1>
+        </li>
+      }
+      <li>
+        <app-mat-form-field-input-dynamic
+          [value]="value" (valueChange)="value = $event"
+          [blankObject]="data.blankObject"
+          styleWidth="100%"
+        ></app-mat-form-field-input-dynamic>
+      </li>
+    </ul>
+  }
 </div>
 <div mat-dialog-actions>
   <button matButton="filled" [disabled]="!validForm" (click)="triggerItemEvent()">{{getModifyLabel()}}</button>

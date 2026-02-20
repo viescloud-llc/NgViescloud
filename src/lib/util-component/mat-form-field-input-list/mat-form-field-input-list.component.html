@@ -8,73 +8,84 @@
     </mat-panel-description>
   </mat-expansion-panel-header>
   <br>
-  <ul>
-    <li *ngIf="showSizeInput">
-      <app-mat-form-field-input
-      [label]="'Number of ' + label"
-      [value]="value.length"
-      (valueChange)="listLength = $event"
-      (onValueChange)="updateListLength()"
-      defaultType="number"
-      [showMinMaxHint]="true"
-      min="0"
-      [max]="maxSize.toString()"
-      [required]="true"
-      [styleWidth]="styleWidth"
-      [manuallyEmitValue]="true"
-      [showClearIcon]="false"
-      [onFocusoutEmitValueOnly]="false"
-      [readonly]="readonly"
-      ></app-mat-form-field-input>
-    </li>
-
-    <div cdkDropListGroup>
-      <div 
-      cdkDropList 
-      [cdkDropListData]="value" 
-      (cdkDropListDropped)="drop($event)">
-
-        <ng-container *ngIf="blankObjectType =='object'; else Else" >
-          <ng-container *ngFor="let item of value; let i = index; trackBy: trackByIndex;">
-            <app-mat-form-field-input-dynamic
-            [label]="label"
-            [value]="item" (valueChange)="value[i] = $event"
-            [blankObject]="blankObject"
-            styleWidth="100%"
+    <ul>
+      @if (showSizeInput) {
+        <li>
+          <app-mat-form-field-input
+            [label]="'Number of ' + label"
+            [value]="value.length"
+            (valueChange)="listLength = $event"
+            (onValueChange)="updateListLength()"
+            defaultType="number"
+            [showMinMaxHint]="true"
+            min="0"
+            [max]="maxSize.toString()"
+            [required]="true"
+            [styleWidth]="styleWidth"
+            [manuallyEmitValue]="true"
+            [showClearIcon]="false"
+            [onFocusoutEmitValueOnly]="false"
             [readonly]="readonly"
-            ></app-mat-form-field-input-dynamic>
-            <button *ngIf="showRemoveItemButton" (click)="removeWithWarning(i)" matButton="filled" class="warn">Remove this {{label}}</button>
-            <button *ngIf="showDragAndDropButton" matButton="filled" cdkDragHandle>Rearrange this {{label}}</button>
-            <hr>
-          </ng-container>
-        </ng-container>
-    
-        <ng-template #Else>
-          <li *ngFor="let item of value; let i = index; trackBy: trackByIndex;" cdkDrag>
-            <app-mat-form-field-input
-            [label]="label + ' ' + (i + 1)"
-            [placeholder]="placeholder"
-            [value]="item" (valueChange)="value[i] = $event"
-            styleWidth="100%"
-            [focusOutAutoFillFn]="getFocusOutAutoFillFn(i)"
-            [required]="required"
-            [readonly]="readonly">
-            
-              <button *ngIf="!readonly" matSuffix mat-icon-button [matTooltip]="'remove this ' + label + ' item'" (click)="remove(i)" style="color: red;">
-                <mat-icon>remove_circle</mat-icon>
-              </button>
+          ></app-mat-form-field-input>
+        </li>
+      }
 
-              <button *ngIf="showDragAndDropButton" matSuffix mat-icon-button cdkDragHandle [matTooltip]="'rearrange this ' + label + ' item'">
-                <mat-icon>drag_indicator</mat-icon>
-              </button>
-            </app-mat-form-field-input>
+      <div cdkDropListGroup>
+        <div
+          cdkDropList
+          [cdkDropListData]="value"
+          (cdkDropListDropped)="drop($event)">
+
+          @if (blankObjectType =='object') {
+            @for (item of value; track trackByIndex(i, item); let i = $index) {
+              <app-mat-form-field-input-dynamic
+                [label]="label"
+                [value]="item" (valueChange)="value[i] = $event"
+                [blankObject]="blankObject"
+                styleWidth="100%"
+                [readonly]="readonly"
+              ></app-mat-form-field-input-dynamic>
+              @if (showRemoveItemButton) {
+                <button (click)="removeWithWarning(i)" matButton="filled" class="warn">Remove this {{label}}</button>
+              }
+              @if (showDragAndDropButton) {
+                <button matButton="filled" cdkDragHandle>Rearrange this {{label}}</button>
+              }
+              <hr>
+              }
+            } @else {
+              @for (item of value; track trackByIndex(i, item); let i = $index) {
+                <li cdkDrag>
+                  <app-mat-form-field-input
+                    [label]="label + ' ' + (i + 1)"
+                    [placeholder]="placeholder"
+                    [value]="item" (valueChange)="value[i] = $event"
+                    styleWidth="100%"
+                    [focusOutAutoFillFn]="getFocusOutAutoFillFn(i)"
+                    [required]="required"
+                    [readonly]="readonly">
+                    @if (!readonly) {
+                      <button matSuffix mat-icon-button [matTooltip]="'remove this ' + label + ' item'" (click)="remove(i)" style="color: red;">
+                        <mat-icon>remove_circle</mat-icon>
+                      </button>
+                    }
+                    @if (showDragAndDropButton) {
+                      <button matSuffix mat-icon-button cdkDragHandle [matTooltip]="'rearrange this ' + label + ' item'">
+                        <mat-icon>drag_indicator</mat-icon>
+                      </button>
+                    }
+                  </app-mat-form-field-input>
+                </li>
+              }
+            }
+
+          </div>
+        </div>
+
+        @if (showAddItemButton) {
+          <li>
+            <button matButton="filled" style="width: 100%;" (click)="addNewItem()" [disabled]="reachMaxSize()">Add new {{label}}</button>
           </li>
-        </ng-template>
-      </div>
-    </div>
-
-    <li *ngIf="showAddItemButton">
-      <button matButton="filled" style="width: 100%;" (click)="addNewItem()" [disabled]="reachMaxSize()">Add new {{label}}</button>
-    </li>
-  </ul>
-</mat-expansion-panel>
+        }
+      </ul>
+    </mat-expansion-panel>

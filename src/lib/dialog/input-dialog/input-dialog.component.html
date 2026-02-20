@@ -1,24 +1,28 @@
 <h1 mat-dialog-title>{{data.title}}</h1>
 <div mat-dialog-content>
-  <app-mat-form-field-input
-  *ngIf="!data.multipleLine"
-  [label]="label"
-  [value]="input" (valueChange)="input = $event.toString()"
-  [placeholder]="data.placeholder ?? ''"
-  [autoResize]="true"
-  styleWidth="100%"
-  ></app-mat-form-field-input>
-  <app-mat-form-field-input-text-area
-  *ngIf="data.multipleLine"
-  [label]="label"
-  [value]="input" (valueChange)="input = $event.toString()"
-  [placeholder]="data.placeholder ?? ''"
-  cols="50"
-  rows="10"
-  styleWidth="100%"
-  ></app-mat-form-field-input-text-area>
+  @if (!data.multipleLine) {
+    <app-mat-form-field-input
+      [label]="label"
+      [value]="input" (valueChange)="input = $event.toString()"
+      [placeholder]="data.placeholder ?? ''"
+      [autoResize]="true"
+      styleWidth="100%"
+    ></app-mat-form-field-input>
+  }
+  @if (data.multipleLine) {
+    <app-mat-form-field-input-text-area
+      [label]="label"
+      [value]="input" (valueChange)="input = $event.toString()"
+      [placeholder]="data.placeholder ?? ''"
+      cols="50"
+      rows="10"
+      styleWidth="100%"
+    ></app-mat-form-field-input-text-area>
+  }
 </div>
 <div mat-dialog-actions>
   <button matButton="filled" [mat-dialog-close]="input" cdkFocusInitial>{{yes}}</button>
-  <button *ngIf="no" matButton="filled" class="warn" mat-dialog-close>{{no}}</button>
+  @if (no) {
+    <button matButton="filled" class="warn" mat-dialog-close>{{no}}</button>
+  }
 </div>

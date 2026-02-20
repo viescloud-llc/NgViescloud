@@ -1,15 +1,19 @@
 <h1 mat-dialog-title>{{title}}</h1>
 <div mat-dialog-content appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
   <app-mat-form-field-input-user-access
-  [(value)]="value"
-  [inputType]="inputType"
-  [showExpansionPanel]="false"
-  [userIdOptions]="userIdOptions"
-  [groupIdOptions]="groupIdOptions"
-  [readonly]="readonly"
+    [(value)]="value"
+    [inputType]="inputType"
+    [showExpansionPanel]="false"
+    [userIdOptions]="userIdOptions"
+    [groupIdOptions]="groupIdOptions"
+    [readonly]="readonly"
   ></app-mat-form-field-input-user-access>
 </div>
 <div mat-dialog-actions>
-  <button *ngIf="!readonly" matButton="filled" [mat-dialog-close]="value" cdkFocusInitial [disabled]="!validForm">{{yes}}</button>
-  <button *ngIf="no" matButton="filled" class="warn" [mat-dialog-close]="{}">{{readonly ? 'Close' : no}}</button>
+  @if (!readonly) {
+    <button matButton="filled" [mat-dialog-close]="value" cdkFocusInitial [disabled]="!validForm">{{yes}}</button>
+  }
+  @if (no) {
+    <button matButton="filled" class="warn" [mat-dialog-close]="{}">{{readonly ? 'Close' : no}}</button>
+  }
 </div>

@@ -8,98 +8,102 @@
     </mat-panel-description>
   </mat-expansion-panel-header>
   <br>
-  <ul>
-    <li *ngIf="showSizeInput">
-      <app-mat-form-field-input
-      [label]="'Number of ' + label"
-      [value]="getKeyPairsSize()"
-      (valueChange)="listLength = $event"
-      (onValueChange)="updateListLength()"
-      defaultType="number"
-      [showMinMaxHint]="true"
-      min="0"
-      [max]="maxSize.toString()"
-      [required]="true"
-      [styleWidth]="styleWidth"
-      [manuallyEmitValue]="true"
-      [showClearIcon]="false"
-      [onFocusoutEmitValueOnly]="false"
-      [readonly]="readonly"
-      ></app-mat-form-field-input>
-    </li>
-
-    <ng-container *ngFor="let keypair of keypairs; let i = index; trackBy: trackByIndex">
-
-      <ng-container *ngIf="isMapKeyOrValueObject(); else Else">
+    <ul>
+      @if (showSizeInput) {
         <li>
-          <details open>
-            <summary>{{i + '. key'}}</summary>
-            <app-mat-form-field-input-dynamic
-            [(value)]="keypair.key"
-            [blankObject]="getBlankKey()"
-            (onValueChange)="applyValue()"
-            [styleWidth]="'100%'"
+          <app-mat-form-field-input
+            [label]="'Number of ' + label"
+            [value]="getKeyPairsSize()"
+            (valueChange)="listLength = $event"
+            (onValueChange)="updateListLength()"
+            defaultType="number"
+            [showMinMaxHint]="true"
+            min="0"
+            [max]="maxSize.toString()"
             [required]="true"
+            [styleWidth]="styleWidth"
+            [manuallyEmitValue]="true"
+            [showClearIcon]="false"
+            [onFocusoutEmitValueOnly]="false"
             [readonly]="readonly"
-            [indent]="false"
-            ></app-mat-form-field-input-dynamic>
-          </details>
+          ></app-mat-form-field-input>
         </li>
-        <li>
-          <details open>
-            <summary>value</summary>
-            <app-mat-form-field-input-dynamic
-            [(value)]="keypair.value"
-            [blankObject]="getBlankValue()"
-            (onValueChange)="applyValue()"
-            [styleWidth]="'100%'"
-            [required]="required"
-            [readonly]="readonly"
-            [indent]="false"
-            ></app-mat-form-field-input-dynamic>
-          </details>
-        </li>
-        <li class="flex-row-container-auto">
-          <button *ngIf="showRemoveItemButton" (click)="remove(i)" matButton="filled" class="warn">Remove this {{label}}</button>
-        </li>
-        <hr>
-      </ng-container>
+      }
 
-      <ng-template #Else>
-        <li class="flex-row-container-auto">
-          <app-mat-form-field-input-dynamic
-          label="key"
-          [(value)]="keypair.key"
-          [blankObject]="getBlankKey()"
-          (onValueChange)="applyValue()"
-          [styleWidth]="'100%'"
-          [required]="true"
-          [readonly]="readonly"
-          [style.width]="showRemoveItemButton && !readonly ? '44%' : ''"
-          ></app-mat-form-field-input-dynamic>
+      @for (keypair of keypairs; track trackByIndex(i, keypair); let i = $index) {
+        @if (isMapKeyOrValueObject()) {
+          <li>
+            <details open>
+              <summary>{{i + '. key'}}</summary>
+              <app-mat-form-field-input-dynamic
+                [(value)]="keypair.key"
+                [blankObject]="getBlankKey()"
+                (onValueChange)="applyValue()"
+                [styleWidth]="'100%'"
+                [required]="true"
+                [readonly]="readonly"
+                [indent]="false"
+              ></app-mat-form-field-input-dynamic>
+            </details>
+          </li>
+          <li>
+            <details open>
+              <summary>value</summary>
+              <app-mat-form-field-input-dynamic
+                [(value)]="keypair.value"
+                [blankObject]="getBlankValue()"
+                (onValueChange)="applyValue()"
+                [styleWidth]="'100%'"
+                [required]="required"
+                [readonly]="readonly"
+                [indent]="false"
+              ></app-mat-form-field-input-dynamic>
+            </details>
+          </li>
+          <li class="flex-row-container-auto">
+            @if (showRemoveItemButton) {
+              <button (click)="remove(i)" matButton="filled" class="warn">Remove this {{label}}</button>
+            }
+          </li>
+          <hr>
+          } @else {
+            <li class="flex-row-container-auto">
+              <app-mat-form-field-input-dynamic
+                label="key"
+                [(value)]="keypair.key"
+                [blankObject]="getBlankKey()"
+                (onValueChange)="applyValue()"
+                [styleWidth]="'100%'"
+                [required]="true"
+                [readonly]="readonly"
+                [style.width]="showRemoveItemButton && !readonly ? '44%' : ''"
+              ></app-mat-form-field-input-dynamic>
+              <app-mat-form-field-input-dynamic
+                label="value"
+                [placeholder]="placeholder"
+                [(value)]="keypair.value"
+                [blankObject]="getBlankValue()"
+                (onValueChange)="applyValue()"
+                [styleWidth]="'100%'"
+                [required]="required"
+                [readonly]="readonly"
+                [style.width]="showRemoveItemButton && !readonly ? '44%' : ''"
+              ></app-mat-form-field-input-dynamic>
+              @if (showRemoveItemButton) {
+                <span style="width: 5%;"><button mat-icon-button color="warn" (click)="remove(i)" [disabled]="readonly"><mat-icon>remove_circle</mat-icon></button></span>
+              }
+            </li>
+          }
+        }
 
-          <app-mat-form-field-input-dynamic
-          label="value"
-          [placeholder]="placeholder"
-          [(value)]="keypair.value"
-          [blankObject]="getBlankValue()"
-          (onValueChange)="applyValue()"
-          [styleWidth]="'100%'"
-          [required]="required"
-          [readonly]="readonly"
-          [style.width]="showRemoveItemButton && !readonly ? '44%' : ''"
-          ></app-mat-form-field-input-dynamic>
+        @if (!validKeyPair) {
+          <div style="color: red;" class="text-center"><hr><b>!Duplicate key found!</b><hr></div>
+        }
 
-          <span *ngIf="showRemoveItemButton" style="width: 5%;"><button mat-icon-button color="warn" (click)="remove(i)" [disabled]="readonly"><mat-icon>remove_circle</mat-icon></button></span>
-        </li>
-      </ng-template>
-
-    </ng-container>
-
-    <div *ngIf="!validKeyPair" style="color: red;" class="text-center"><hr><b>!Duplicate key found!</b><hr></div>
-
-    <li *ngIf="showAddItemButton" class="flex-row-container-auto">
-      <button matButton="filled" (click)="addNewItem()" [disabled]="reachMaxSize()">Add new {{label}}</button>
-    </li>
-  </ul>
-</mat-expansion-panel>
+        @if (showAddItemButton) {
+          <li class="flex-row-container-auto">
+            <button matButton="filled" (click)="addNewItem()" [disabled]="reachMaxSize()">Add new {{label}}</button>
+          </li>
+        }
+      </ul>
+    </mat-expansion-panel>

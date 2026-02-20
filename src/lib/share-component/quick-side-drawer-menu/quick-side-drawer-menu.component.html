@@ -1,49 +1,47 @@
 <ul>
-  <ng-container *ngIf="isRoot && loadComponent;">
+  @if (isRoot && loadComponent;) {
     <li>
       <br>
-      <button matButton="filled" (click)="back()" style="width: 100%;">Back</button>
+        <button matButton="filled" (click)="back()" style="width: 100%;">Back</button>
+      </li>
+    }
+
+    <li>
+      <ng-template #dynamicComponentContainer></ng-template>
     </li>
-  </ng-container>
 
-  <li>
-    <ng-template #dynamicComponentContainer></ng-template>
-  </li>
-
-  <ng-container *ngIf="container.length <= 0">
-    <ng-container #Else *ngFor="let item of menu">
-      <ng-container *ngIf="item.routerLink && !isHide(item)">
-        <li >
-          <button 
-          [class]="routerLinkActive(item)"
-          matButton="tonal" 
-          (click)="click(item)"
-          (mousedown)="item.hideChildren = !item.hideChildren; click(item, $event)"
-          [disabled]="isDisable(item)">
-            {{item.title}}
-          </button>
-        </li>
-      </ng-container>
-  
-      <ng-container *ngIf="!item.routerLink && !isHide(item)">
-        <li>
-          <button 
-          mat-icon-button  
-          (click)="item.hideChildren = !item.hideChildren; click(item)"
-          
-          [disabled]="isDisable(item)">
-            <mat-icon class="my-button">
-              {{item.hideChildren ? 'expand_more' : 'chevron_right'}}
-            </mat-icon>
-          </button>
-          <b class="title" (click)="item.hideChildren = !item.hideChildren; click(item)" [ariaDisabled]="isDisable(item)">{{item.title}}</b>
-        </li>
-  
-        <ng-container *ngIf="item.children && !item.hideChildren">
-          <viescloud-quick-side-drawer-menu [menu]="item.children" [isRoot]="false" (onClickLoadComponent)="onLoadComponent($event)"></viescloud-quick-side-drawer-menu>
+    @if (container.length <= 0) {
+      @for (item of menu; track item) {
+        <ng-container #Else>
+          @if (item.routerLink && !isHide(item)) {
+            <li >
+              <button
+                [class]="routerLinkActive(item)"
+                matButton="tonal"
+                (click)="click(item)"
+                (mousedown)="item.hideChildren = !item.hideChildren; click(item, $event)"
+                [disabled]="isDisable(item)">
+                {{item.title}}
+              </button>
+            </li>
+          }
+          @if (!item.routerLink && !isHide(item)) {
+            <li>
+              <button
+                mat-icon-button
+                (click)="item.hideChildren = !item.hideChildren; click(item)"
+                [disabled]="isDisable(item)">
+                <mat-icon class="my-button">
+                  {{item.hideChildren ? 'expand_more' : 'chevron_right'}}
+                </mat-icon>
+              </button>
+              <b class="title" (click)="item.hideChildren = !item.hideChildren; click(item)" [ariaDisabled]="isDisable(item)">{{item.title}}</b>
+            </li>
+            @if (item.children && !item.hideChildren) {
+              <viescloud-quick-side-drawer-menu [menu]="item.children" [isRoot]="false" (onClickLoadComponent)="onLoadComponent($event)"></viescloud-quick-side-drawer-menu>
+            }
+          }
         </ng-container>
-  
-      </ng-container>
-    </ng-container>
-  </ng-container>
-</ul>
+      }
+    }
+  </ul>

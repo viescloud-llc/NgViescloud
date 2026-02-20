@@ -1,45 +1,48 @@
-<ng-container *ngIf="type === 'DATE' || type === 'DATE_TIME'">
-    <mat-form-field *ngIf="!range" [color]="matColor"  >
-        <mat-label>Choose {{label}} date</mat-label>
-        <input matInput [matDatepicker]="datepicker" #date1 [(ngModel)]="startDate" (dateChange)="changeStartDate()">
-        <mat-hint>MM/DD/YYYY</mat-hint>
-        <mat-datepicker-toggle matIconSuffix [for]="datepicker"></mat-datepicker-toggle>
-        <mat-datepicker #datepicker>
-            <mat-datepicker-actions>
-                <button mat-button matDatepickerCancel>Cancel</button>
-                <button matButton="filled" matDatepickerApply>Apply</button>
-            </mat-datepicker-actions>
-        </mat-datepicker>
+@if (type === 'DATE' || type === 'DATE_TIME') {
+  @if (!range) {
+    <mat-form-field [color]="matColor"  >
+      <mat-label>Choose {{label}} date</mat-label>
+      <input matInput [matDatepicker]="datepicker" #date1 [(ngModel)]="startDate" (dateChange)="changeStartDate()">
+      <mat-hint>MM/DD/YYYY</mat-hint>
+      <mat-datepicker-toggle matIconSuffix [for]="datepicker"></mat-datepicker-toggle>
+      <mat-datepicker #datepicker>
+        <mat-datepicker-actions>
+          <button mat-button matDatepickerCancel>Cancel</button>
+          <button matButton="filled" matDatepickerApply>Apply</button>
+        </mat-datepicker-actions>
+      </mat-datepicker>
     </mat-form-field>
-    
-    <mat-form-field *ngIf="range" [color]="matColor">
-        <mat-label>Choose {{label}} date range</mat-label>
-        <mat-date-range-input [rangePicker]="rangePicker">
-            <input matStartDate placeholder="Start date" [(ngModel)]="startDate" (dateChange)="changeStartDate()">
-            <input matEndDate placeholder="End date" [(ngModel)]="endDate" (dateChange)="changeEndDate()">
-        </mat-date-range-input>
-        <mat-hint>MM/DD/YYYY</mat-hint>
-        <mat-datepicker-toggle matIconSuffix [for]="rangePicker"></mat-datepicker-toggle>
-        <mat-date-range-picker #rangePicker>
-            <mat-date-range-picker-actions>
-                <button mat-button matDateRangePickerCancel>Cancel</button>
-                <button matButton="filled" matDateRangePickerApply>Apply</button>
-            </mat-date-range-picker-actions>
-        </mat-date-range-picker>
+  }
+  @if (range) {
+    <mat-form-field [color]="matColor">
+      <mat-label>Choose {{label}} date range</mat-label>
+      <mat-date-range-input [rangePicker]="rangePicker">
+        <input matStartDate placeholder="Start date" [(ngModel)]="startDate" (dateChange)="changeStartDate()">
+        <input matEndDate placeholder="End date" [(ngModel)]="endDate" (dateChange)="changeEndDate()">
+      </mat-date-range-input>
+      <mat-hint>MM/DD/YYYY</mat-hint>
+      <mat-datepicker-toggle matIconSuffix [for]="rangePicker"></mat-datepicker-toggle>
+      <mat-date-range-picker #rangePicker>
+        <mat-date-range-picker-actions>
+          <button mat-button matDateRangePickerCancel>Cancel</button>
+          <button matButton="filled" matDateRangePickerApply>Apply</button>
+        </mat-date-range-picker-actions>
+      </mat-date-range-picker>
     </mat-form-field>
-    
+  }
+  @if (value) {
     <app-mat-form-field-input-text-area
-    *ngIf="value"
-    [disable]="true"
-    label="Date picked"
-    [value]="display"
+      [disable]="true"
+      label="Date picked"
+      [value]="display"
     ></app-mat-form-field-input-text-area>
-</ng-container>
+  }
+}
 <br>
-<ng-container *ngIf="type === 'TIME' || type === 'DATE_TIME'">
-    <ng-container *ngIf="value">
-        <h3>Start time</h3>
-        <app-mat-form-field-input
+  @if (type === 'TIME' || type === 'DATE_TIME') {
+    @if (value) {
+      <h3>Start time</h3>
+      <app-mat-form-field-input
         label="Hours"
         [value]="value.hour" (valueChange)="value.hour = $event"
         (onValueChange)="displayDatePicked()"
@@ -50,8 +53,8 @@
         [autoResize]="autoResize"
         [showClearIcon]="false"
         [showMinMaxHint]="true"
-        ></app-mat-form-field-input>
-        <app-mat-form-field-input
+      ></app-mat-form-field-input>
+      <app-mat-form-field-input
         label="Minutes"
         [value]="value.minute" (valueChange)="value.minute = $event"
         (onValueChange)="displayDatePicked()"
@@ -62,8 +65,8 @@
         [autoResize]="autoResize"
         [showClearIcon]="false"
         [showMinMaxHint]="true"
-        ></app-mat-form-field-input>
-        <app-mat-form-field-input
+      ></app-mat-form-field-input>
+      <app-mat-form-field-input
         label="Seconds"
         [value]="value.second" (valueChange)="value.second = $event"
         (onValueChange)="displayDatePicked()"
@@ -74,47 +77,47 @@
         [autoResize]="autoResize"
         [showClearIcon]="false"
         [showMinMaxHint]="true"
-        ></app-mat-form-field-input>
-    </ng-container>
+      ></app-mat-form-field-input>
+    }
     <br>
-    <ng-container *ngIf="range && toValue">
+      @if (range && toValue) {
         <h3>End time</h3>
         <app-mat-form-field-input
-        label="Hours"
-        [value]="toValue.hour" (valueChange)="toValue.hour = $event"
-        (onValueChange)="displayDatePicked()"
-        defaultType="number"
-        max="24"
-        min="1"
-        [width]="timeWidth"
-        [autoResize]="autoResize"
-        [showClearIcon]="false"
-        [showMinMaxHint]="true"
+          label="Hours"
+          [value]="toValue.hour" (valueChange)="toValue.hour = $event"
+          (onValueChange)="displayDatePicked()"
+          defaultType="number"
+          max="24"
+          min="1"
+          [width]="timeWidth"
+          [autoResize]="autoResize"
+          [showClearIcon]="false"
+          [showMinMaxHint]="true"
         ></app-mat-form-field-input>
         <app-mat-form-field-input
-        label="Minutes"
-        [value]="toValue.minute" (valueChange)="toValue.minute = $event"
-        (onValueChange)="displayDatePicked()"
-        defaultType="number"
-        max="59"
-        min="0"
-        [width]="timeWidth"
-        [autoResize]="autoResize"
-        [showClearIcon]="false"
-        [showMinMaxHint]="true"
+          label="Minutes"
+          [value]="toValue.minute" (valueChange)="toValue.minute = $event"
+          (onValueChange)="displayDatePicked()"
+          defaultType="number"
+          max="59"
+          min="0"
+          [width]="timeWidth"
+          [autoResize]="autoResize"
+          [showClearIcon]="false"
+          [showMinMaxHint]="true"
         ></app-mat-form-field-input>
         <app-mat-form-field-input
-        label="Seconds"
-        [value]="toValue.second" (valueChange)="toValue.second = $event"
-        (onValueChange)="displayDatePicked()"
-        defaultType="number"
-        max="59"
-        min="0"
-        [width]="timeWidth"
-        [autoResize]="autoResize"
-        [showClearIcon]="false"
-        [showMinMaxHint]="true"
+          label="Seconds"
+          [value]="toValue.second" (valueChange)="toValue.second = $event"
+          (onValueChange)="displayDatePicked()"
+          defaultType="number"
+          max="59"
+          min="0"
+          [width]="timeWidth"
+          [autoResize]="autoResize"
+          [showClearIcon]="false"
+          [showMinMaxHint]="true"
         ></app-mat-form-field-input>
-    </ng-container>
-</ng-container>
+      }
+    }
 

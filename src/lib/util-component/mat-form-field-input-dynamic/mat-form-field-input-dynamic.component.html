@@ -1,146 +1,108 @@
-<ng-container [ngSwitch]="inputType" appMatFormFieldGroup (onAllInputCheck)="validInput = $event">
+<div appMatFormFieldGroup (onAllInputCheck)="validInput = $event">
+  @switch (inputType) {
+    <!-- Number Input -->
+    @case (DynamicMatInputType.NUMBER) {
+      <app-mat-form-field-input
+        [label]="label"
+        [placeholder]="placeholder"
+        [(value)]="value"
+        (onValueChange)="emitValue()"
+        [styleWidth]="styleWidth"
+        [disable]="disable"
+        [required]="required"
+        defaultType="number"
+        [blankObject]="0"
+        [readonly]="readonly"
+      ></app-mat-form-field-input>
+    }
 
-  <!-- Number Input -->
-  <ng-container *ngSwitchCase="DynamicMatInputType.NUMBER">
-    <app-mat-form-field-input
-      [label]="label"
-      [placeholder]="placeholder"
-      [(value)]="value"
-      (onValueChange)="emitValue()"
-      [styleWidth]="styleWidth"
-      [disable]="disable"
-      [required]="required"
-      defaultType="number"
-      [blankObject]="0"
-      [readonly]="readonly"
-    ></app-mat-form-field-input>
-  </ng-container>
+    <!-- Boolean Input (not slide toggle) -->
+    @case (DynamicMatInputType.BOOLEAN) {
+      <app-mat-form-field-input-option
+        [label]="label"
+        [placeholder]="placeholder"
+        [(value)]="value"
+        (onValueChange)="emitValue()"
+        [options]="options"
+        noneLabel=""
+        [styleWidth]="styleWidth"
+        [disable]="disable"
+        [required]="required"
+        [blankObject]="blankObject"
+        [readonly]="readonly"
+      ></app-mat-form-field-input-option>
+    }
 
-  <!-- Boolean Input (not slide toggle) -->
-  <ng-container *ngSwitchCase="DynamicMatInputType.BOOLEAN">
-    <app-mat-form-field-input-option
-      [label]="label"
-      [placeholder]="placeholder"
-      [(value)]="value"
-      (onValueChange)="emitValue()"
-      [options]="options"
-      noneLabel=""
-      [styleWidth]="styleWidth"
-      [disable]="disable"
-      [required]="required"
-      [blankObject]="blankObject"
-      [readonly]="readonly"
-    ></app-mat-form-field-input-option>
-  </ng-container>
+    <!-- Boolean Input (slide toggle) -->
+    @case (DynamicMatInputType.BOOLEAN_SLIDE_TOGGLE) {
+      <mat-slide-toggle
+        style="margin: 0.05rem;"
+        [color]="matColor"
+        [(ngModel)]="value"
+        (ngModelChange)="emitValue()"
+        (toggleChange)="emitValue()"
+        [disabled]="disable"
+        [required]="required">
+        {{label}}
+      </mat-slide-toggle>
+    }
 
-  <!-- Boolean Input (slide toggle) -->
-  <ng-container *ngSwitchCase="DynamicMatInputType.BOOLEAN_SLIDE_TOGGLE">
-    <mat-slide-toggle
-      style="margin: 0.05rem;"
-      [color]="matColor"
-      [(ngModel)]="value"
-      (ngModelChange)="emitValue()"
-      (toggleChange)="emitValue()"
-      [disabled]="disable"
-      [required]="required">
-      {{label}}
-    </mat-slide-toggle>
-  </ng-container>
+    <!-- Options Input -->
+    @case (DynamicMatInputType.OPTIONS) {
+      <app-mat-form-field-input-option
+        [label]="label"
+        [placeholder]="placeholder"
+        [(value)]="value"
+        (onValueChange)="emitValue()"
+        [options]="matOptions!"
+        noneLabel=""
+        [styleWidth]="styleWidth"
+        [disable]="disable"
+        [required]="required"
+        [blankObject]="blankObject"
+        [readonly]="readonly"
+      ></app-mat-form-field-input-option>
+    }
 
-  <!-- Options Input -->
-  <ng-container *ngSwitchCase="DynamicMatInputType.OPTIONS">
-    <app-mat-form-field-input-option
-      [label]="label"
-      [placeholder]="placeholder"
-      [(value)]="value"
-      (onValueChange)="emitValue()"
-      [options]="matOptions!"
-      noneLabel=""
-      [styleWidth]="styleWidth"
-      [disable]="disable"
-      [required]="required"
-      [blankObject]="blankObject"
-      [readonly]="readonly"
-    ></app-mat-form-field-input-option>
-  </ng-container>
+    <!-- String Input (Single Line) -->
+    @case (DynamicMatInputType.STRING) {
+      <app-mat-form-field-input
+        [label]="label"
+        [placeholder]="placeholder"
+        [value]="value" (valueChange)="value = $event"
+        (onValueChange)="emitValue()"
+        [required]="required"
+        [showVisibleSwitch]="isPassword"
+        [validateEmail]="isEmail"
+        [autoFillHttps]="isHttps"
+        [showGoto]="showGotoButton"
+        [styleWidth]="styleWidth"
+        [disable]="disable"
+        [required]="required"
+        [blankObject]="''"
+        [readonly]="readonly"
+      ></app-mat-form-field-input>
+    }
 
-  <!-- String Input (Single Line) -->
-  <ng-container *ngSwitchCase="DynamicMatInputType.STRING">
-    <app-mat-form-field-input
-      [label]="label"
-      [placeholder]="placeholder"
-      [value]="value" (valueChange)="value = $event"
-      (onValueChange)="emitValue()"
-      [required]="required"
-      [showVisibleSwitch]="isPassword"
-      [validateEmail]="isEmail"
-      [autoFillHttps]="isHttps"
-      [showGoto]="showGotoButton"
-      [styleWidth]="styleWidth"
-      [disable]="disable"
-      [required]="required"
-      [blankObject]="''"
-      [readonly]="readonly"
-    ></app-mat-form-field-input>
-  </ng-container>
+    <!-- String Input (Multiple Lines) -->
+    @case (DynamicMatInputType.STRING_MULTIPLE_LINE) {
+      <app-mat-form-field-input-text-area
+        [label]="label"
+        [placeholder]="placeholder"
+        [value]="value" (valueChange)="value = $event"
+        (onValueChange)="emitValue()"
+        [required]="required"
+        [styleWidth]="styleWidth"
+        [disable]="disable"
+        [required]="required"
+        [blankObject]="''"
+        [readonly]="readonly"
+      ></app-mat-form-field-input-text-area>
+    }
 
-  <!-- String Input (Multiple Lines) -->
-  <ng-container *ngSwitchCase="DynamicMatInputType.STRING_MULTIPLE_LINE">
-    <app-mat-form-field-input-text-area
-      [label]="label"
-      [placeholder]="placeholder"
-      [value]="value" (valueChange)="value = $event"
-      (onValueChange)="emitValue()"
-      [required]="required"
-      [styleWidth]="styleWidth"
-      [disable]="disable"
-      [required]="required"
-      [blankObject]="''"
-      [readonly]="readonly"
-    ></app-mat-form-field-input-text-area>
-  </ng-container>
-
-  <!-- Record input -->
-  <ng-container *ngSwitchCase="DynamicMatInputType.RECORD">
-    <app-mat-form-field-input-record
-    [label]="label"
-    [placeholder]="placeholder"
-    [(value)]="value"
-    (onValueChange)="emitValue()"
-    [required]="required"
-    [styleWidth]="styleWidth"
-    [disable]="disable"
-    [required]="required"
-    [blankObject]="blankObject"
-    [showSizeInput]="showListSizeInput"
-    [showAddItemButton]="showListAddItemButton"
-    [showRemoveItemButton]="showListRemoveItemButton"
-    [blankObject]="blankObject"
-    [readonly]="readonly"
-    [minSize]="listRequired ? 1 : 0"
-    ></app-mat-form-field-input-record>
-    <br>
-  </ng-container>
-
-  <!-- rgb color Input -->
-  <ng-container *ngSwitchCase="DynamicMatInputType.RGB_COLOR">
-    <app-mat-form-field-input-rgb-color-picker
-    [label]="label"
-    [placeholder]="placeholder"
-    [(value)]="value"
-    (onValueChange)="emitValue()"
-    [styleWidth]="styleWidth"
-    [disable]="disable"
-    [required]="required"
-    [blankObject]="blankObject"
-    [readonly]="readonly"
-    ></app-mat-form-field-input-rgb-color-picker>
-    <br>
-  </ng-container>
-
-  <!-- Array Input -->
-  <ng-container *ngSwitchCase="DynamicMatInputType.ARRAY">
-    <app-mat-form-field-input-list
+    <!-- Record input -->
+    @case (DynamicMatInputType.RECORD) {
+      <app-mat-form-field-input-record
       [label]="label"
       [placeholder]="placeholder"
       [(value)]="value"
@@ -156,53 +118,95 @@
       [blankObject]="blankObject"
       [readonly]="readonly"
       [minSize]="listRequired ? 1 : 0"
-    ></app-mat-form-field-input-list>
-    <br>
-  </ng-container>
+      ></app-mat-form-field-input-record>
+      <br>
+    }
 
-  <!-- Object Input -->
-  <ng-container *ngSwitchCase="DynamicMatInputType.OBJECT">
-    <ul [class]="indent ? '' : 'no-indented-ul'">
-      <li [class]="indent ? '' : 'no-indented-li'">
-        <h2 class="text-center" *ngIf="objectLabel">{{objectLabel}}</h2>
-      </li>
-      <li *ngFor="let item of items; let i = index; trackBy: trackByIndex" [class]="indent ? '' : 'no-indented-li'">
-        <app-mat-form-field-input-dynamic
-          [label]="item.label"
-          [placeholder]="item.placeholder"
-          [value]="item.value" (valueChange)="item.setValueFn($event)"
-          [styleWidth]="styleWidth"
-          [isSlideToggle]="containSetting(item, MatItemSettingType.SLIDE_TOGGLE)"
-          [disable]="containSetting(item, MatItemSettingType.DISABLE)"
-          [required]="containSetting(item, MatItemSettingType.REQUIRE)"
-          [isTextArea]="containSetting(item, MatItemSettingType.TEXT_AREA)"
-          [isOptions]="containSetting(item, MatItemSettingType.OPTIONS)"
-          [isEmail]="containSetting(item, MatItemSettingType.VALIDATE_EMAIL)"
-          [isHttps]="containSetting(item, MatItemSettingType.AUTO_FILL_HTTPS)"
-          [showListSizeInput]="containSetting(item, MatItemSettingType.LIST_SHOW_LIST_SIZE_INPUT)"
-          [showListAddItemButton]="containSetting(item, MatItemSettingType.LIST_SHOW_ADD_ITEM_BUTTON)"
-          [showListRemoveItemButton]="containSetting(item, MatItemSettingType.LIST_SHOW_REMOVE_ITEM_BUTTON)"
-          [isRecord]="containSetting(item, MatItemSettingType.RECORD)"
-          [showGotoButton]="containSetting(item, MatItemSettingType.SHOW_GOTO_BUTTON)"
-          [readonly]="containSetting(item, MatItemSettingType.READ_ONLY)"
-          [listRequired]="containSetting(item, MatItemSettingType.LIST_REQUIRE)"
-          [matOptions]="item.matOptions"
-          [isBlankObjectArray]="item.isBlankObjectArray"
-          (onValueChange)="onValueChangeFn()"
-          [indent]="indent"
-          [blankObject]="item.blankObject"
-          [objectLabel]="item.key"
-          [selfRef]="item"
-        ></app-mat-form-field-input-dynamic>
-      </li>
-    </ul>
-  </ng-container>
+    <!-- rgb color Input -->
+    @case (DynamicMatInputType.RGB_COLOR) {
+      <app-mat-form-field-input-rgb-color-picker
+      [label]="label"
+      [placeholder]="placeholder"
+      [(value)]="value"
+      (onValueChange)="emitValue()"
+      [styleWidth]="styleWidth"
+      [disable]="disable"
+      [required]="required"
+      [blankObject]="blankObject"
+      [readonly]="readonly"
+      ></app-mat-form-field-input-rgb-color-picker>
+      <br>
+    }
 
-  <!-- Unknown Input Type -->
-  <ng-container *ngSwitchDefault>
-    <p>Unknown input type</p>
-  </ng-container>
+    <!-- Array Input -->
+    @case (DynamicMatInputType.ARRAY) {
+      <app-mat-form-field-input-list
+        [label]="label"
+        [placeholder]="placeholder"
+        [(value)]="value"
+        (onValueChange)="emitValue()"
+        [required]="required"
+        [styleWidth]="styleWidth"
+        [disable]="disable"
+        [required]="required"
+        [blankObject]="blankObject"
+        [showSizeInput]="showListSizeInput"
+        [showAddItemButton]="showListAddItemButton"
+        [showRemoveItemButton]="showListRemoveItemButton"
+        [blankObject]="blankObject"
+        [readonly]="readonly"
+        [minSize]="listRequired ? 1 : 0"
+      ></app-mat-form-field-input-list>
+      <br>
+    }
+
+    <!-- Object Input -->
+    @case (DynamicMatInputType.OBJECT) {
+      <ul [class]="indent ? '' : 'no-indented-ul'">
+        <li [class]="indent ? '' : 'no-indented-li'">
+          @if (objectLabel) {
+            <h2 class="text-center">{{objectLabel}}</h2>
+          }
+        </li>
+        @for (item of items; track trackByIndex($index, item); let i = $index) {
+          <li [class]="indent ? '' : 'no-indented-li'">
+            <app-mat-form-field-input-dynamic
+              [label]="item.label"
+              [placeholder]="item.placeholder"
+              [value]="item.value" (valueChange)="item.setValueFn($event)"
+              [styleWidth]="styleWidth"
+              [isSlideToggle]="containSetting(item, MatItemSettingType.SLIDE_TOGGLE)"
+              [disable]="containSetting(item, MatItemSettingType.DISABLE)"
+              [required]="containSetting(item, MatItemSettingType.REQUIRE)"
+              [isTextArea]="containSetting(item, MatItemSettingType.TEXT_AREA)"
+              [isOptions]="containSetting(item, MatItemSettingType.OPTIONS)"
+              [isEmail]="containSetting(item, MatItemSettingType.VALIDATE_EMAIL)"
+              [isHttps]="containSetting(item, MatItemSettingType.AUTO_FILL_HTTPS)"
+              [showListSizeInput]="containSetting(item, MatItemSettingType.LIST_SHOW_LIST_SIZE_INPUT)"
+              [showListAddItemButton]="containSetting(item, MatItemSettingType.LIST_SHOW_ADD_ITEM_BUTTON)"
+              [showListRemoveItemButton]="containSetting(item, MatItemSettingType.LIST_SHOW_REMOVE_ITEM_BUTTON)"
+              [isRecord]="containSetting(item, MatItemSettingType.RECORD)"
+              [showGotoButton]="containSetting(item, MatItemSettingType.SHOW_GOTO_BUTTON)"
+              [readonly]="containSetting(item, MatItemSettingType.READ_ONLY)"
+              [listRequired]="containSetting(item, MatItemSettingType.LIST_REQUIRE)"
+              [matOptions]="item.matOptions"
+              [isBlankObjectArray]="item.isBlankObjectArray"
+              (onValueChange)="onValueChangeFn()"
+              [indent]="indent"
+              [blankObject]="item.blankObject"
+              [objectLabel]="item.key"
+              [selfRef]="item"
+            ></app-mat-form-field-input-dynamic>
+          </li>
+        }
+      </ul>
+    }
+
+    <!-- Unknown Input Type -->
+    @default {
+      <p>Unknown input type</p>
+    }
+  }
 
   <ng-content></ng-content>
-
-</ng-container>
+</div>
