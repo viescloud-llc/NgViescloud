@@ -42,9 +42,8 @@ export class AuthInterceptor implements HttpInterceptor {
     authenticatorService: AuthenticatorService
   ): Observable<HttpEvent<any>> {
     let body = req.body;
-
-    if (authenticatorService.isAuthenticatedSync()) {
-      let token = authenticatorService.currentJwtToken;
+    let token = authenticatorService.currentJwtToken;
+    if (token) {
       if (body && typeof body === 'string' && StringUtils.isValidJson(body)) {
         return next.handle(req.clone({
           headers: req.headers.set('Content-Type', 'application/json')
