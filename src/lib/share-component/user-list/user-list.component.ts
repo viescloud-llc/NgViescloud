@@ -1,5 +1,5 @@
 import { DialogUtils } from '../../util/Dialog.utils';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { RxJSUtils } from '../../util/RxJS.utils';
 import { MatOption } from '../../model/mat.model';
 import { DataUtils } from '../../util/Data.utils';
@@ -14,11 +14,11 @@ import { UserService } from '../../service/user.service';
   standalone: false
 })
 export class UserListComponent implements OnInit {
-  users: User[] = [];
+  users = signal<User[]>([]);
   blankUser = new User();
-  userGroups: UserGroup[] = [];
+  userGroups = signal<UserGroup[]>([]);
   blankUserGroup = new UserGroup();
-  userGroupsOptions: MatOption<UserGroup>[] = [];
+  userGroupsOptions = signal<MatOption<UserGroup>[]>([]);
 
   selectedUser?: User;
   selectedUserCopy?: User;
@@ -38,7 +38,7 @@ export class UserListComponent implements OnInit {
 
     this.userUserService.getAll().pipe(this.rxjs.waitLoadingDialog()).subscribe({
       next: res => {
-        this.users = res;
+        this.users.set(res);
       }
     })
 
@@ -48,10 +48,10 @@ export class UserListComponent implements OnInit {
   private fetchUserGroups() {
     this.userGroupService.getAll().pipe(this.rxjs.waitLoadingDialog()).subscribe({
       next: res => {
-        this.userGroups = res;
-        this.userGroupsOptions = [];
-        this.userGroups.forEach(userGroup => {
-          this.userGroupsOptions.push({
+        this.userGroups.set(res);
+        this.userGroupsOptions.set([]);
+        this.userGroups().forEach(userGroup => {
+          this.userGroupsOptions().push({
             value: userGroup,
             valueLabel: userGroup.name
           });

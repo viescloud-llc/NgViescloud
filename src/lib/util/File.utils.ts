@@ -283,12 +283,22 @@ export class FileUtils {
     });
   }
 
+  /**
+   * Store a value in localStorage. Automatically stringifies objects.
+   * @param key The storage key
+   * @param value The value to store (will be JSON.stringify'd)
+   */
   static localStorageSetItem(key: string, value: any): void {
     if(ViesService.isCSR()) {
       localStorage.setItem(key, JSON.stringify(value));
     }
   }
 
+  /**
+   * Retrieve and parse a value from localStorage.
+   * @param key The storage key
+   * @returns The parsed value or null
+   */
   static localStorageGetItem<T>(key: string): T | null {
     if(ViesService.isNotCSR()) {
       return null;
@@ -301,6 +311,32 @@ export class FileUtils {
     }
 
     return null;
+  }
+
+  /**
+   * Store a raw string in localStorage without stringifying.
+   * Use this when the value is already a JSON string.
+   * @param key The storage key
+   * @param value The raw string value to store
+   */
+  static localStorageSetRawString(key: string, value: string): void {
+    if(ViesService.isCSR()) {
+      localStorage.setItem(key, value);
+    }
+  }
+
+  /**
+   * Retrieve a raw string from localStorage without parsing.
+   * Use this when you need the raw JSON string.
+   * @param key The storage key
+   * @returns The raw string or null
+   */
+  static localStorageGetRawString(key: string): string | null {
+    if(ViesService.isNotCSR()) {
+      return null;
+    }
+
+    return localStorage.getItem(key);
   }
 
   static localStorageRemoveItem(key: string): void {

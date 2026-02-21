@@ -1,7 +1,8 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Injectable, OnDestroy, OnInit } from '@angular/core';
+import { Injectable, OnDestroy, signal, computed } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { User, UserGroup } from '../model/authenticator.model';
-import { BehaviorSubject, Observable, Subject, Subscription, catchError, filter, first, interval, map, switchMap, tap, throwError } from 'rxjs';
+import { Observable, Subscription, catchError, filter, finalize, first, interval, map, switchMap, tap, throwError } from 'rxjs';
 import { ViesService } from './rest.service';
 import { AliasChangeRequest, AuthEvent, AuthResponse, LoginRequest, Oauth2LoginRequest, PasswordChangeRequest, RefreshTokenRequest, RegisterRequest } from '../model/vies.model';
 import { StringUtils } from '../util/String.utils';
@@ -10,215 +11,444 @@ import { Router } from '@angular/router';
 import { DialogUtils } from '../util/Dialog.utils';
 import { environment } from '../../environments/environment.prod';
 
+/**
+ * Configuration options for AuthenticatorService
+ */
+export interface AuthenticatorServiceConfig {
+  /** JWT refresh interval in milliseconds (default: 5 minutes) */
+  jwtRefreshInterval?: number;
+  /** User data refresh interval in milliseconds (default: 3 minutes) */
+  userRefreshInterval?: number;
+  /** Enable debug logging (default: false) */
+  debugMode?: boolean;
+  /** Session storage key for refresh token (default: 'auth_refresh_token') */
+  sessionStorageKey?: string;
+}
+
+/**
+ * Modern AuthenticatorService using Angular Signals
+ * Provides authentication state management with reactive signals
+ */
 @Injectable({
   providedIn: 'root'
 })
 export class AuthenticatorService implements OnDestroy {
-  private readonly sessionStorageKey = 'auth_refresh_token';
-  private readonly reloadJwtInterval = 5 * 60 * 1000; // 5 minutes
-  private readonly reloadUserInterval = 3 * 60 * 1000; // 3 minutes
+  // Configuration
+  private config: Required<AuthenticatorServiceConfig> = {
+    jwtRefreshInterval: 5 * 60 * 1000, // 5 minutes
+    userRefreshInterval: 3 * 60 * 1000, // 3 minutes
+    debugMode: false,
+    sessionStorageKey: 'auth_refresh_token'
+  };
 
-  // State management
-  private currentUser$ = new BehaviorSubject<User | null>(null);
-  private isAuthenticated$ = new BehaviorSubject<boolean>(false);
-  private authEvents$ = new BehaviorSubject<AuthEvent | null>(null);
-  private initializationComplete$ = new BehaviorSubject<boolean>(false);
-  private currentJwt: string | null = null;
-  private currentRefreshToken: string | null = null;
+  // Core state signals
+  private readonly _currentUser = signal<User | null>(null);
+  private readonly _isAuthenticated = signal<boolean>(false);
+  private readonly _authEvents = signal<AuthEvent | null>(null);
+  private readonly _initialized = signal<boolean>(false);
+  private readonly _jwt = signal<string | null>(null);
+  private readonly _refreshToken = signal<string | null>(null);
 
-  // Intervals and subscriptions
+  // OAuth2 state
+  private readonly _isOAuth2Login = signal<boolean>(false);
+  private readonly _openIdProvider = signal<OpenIDProvider | undefined>(undefined);
+
+  // Readonly signals for public access
+  readonly isAuthenticated = this._isAuthenticated.asReadonly();
+  readonly initialized = this._initialized.asReadonly();
+  readonly isOAuth2Login = this._isOAuth2Login.asReadonly();
+  readonly openIdProvider = this._openIdProvider.asReadonly();
+
+  // Computed signals for user information
+  readonly currentUserAlias = computed(() => {
+    const user = this._currentUser();
+    return user?.alias ?? user?.username ?? '';
+  });
+
+  readonly userGroups = computed(() => {
+    return this._currentUser()?.userGroups ?? [];
+  });
+
+  // Observable conversions for backward compatibility
+  readonly user$ = toObservable(this._currentUser);
+  readonly isAuthenticated$ = toObservable(this._isAuthenticated);
+  readonly authEvents$ = toObservable(this._authEvents).pipe(
+    filter(event => event !== null)
+  );
+  readonly initialized$ = toObservable(this._initialized).pipe(
+    filter(initialized => initialized === true),
+    first()
+  );
+
+  // Interval subscriptions
   private userFetchInterval: Subscription | null = null;
   private jwtRefreshInterval: Subscription | null = null;
-
-  isloginWithOauth2 = false;
-  openIdProvider?: OpenIDProvider;
 
   constructor(
     private httpClient: HttpClient,
     private router: Router,
     private dialogUtils: DialogUtils
   ) {
-    setTimeout(() => {
-      this.initializeService();
-    })
-    // this.initializeService();
-  }
-  
-  protected getURI(): string {
-    return ViesService.getUri();  
+    // Initialize service asynchronously to avoid construction blocking
+    setTimeout(() => this.initializeService(), 0);
   }
 
-  protected getPrefixPath(): string {
-    let prefixes = this.getPrefixes();
-    let path = "";
-    prefixes.forEach(e => {
-        path += `/${e}`;
-    });
-    return path;
+  // ========================================
+  // Configuration
+  // ========================================
+
+  /**
+   * Configure the service with custom options
+   * Should be called before the service initializes
+   */
+  configure(config: AuthenticatorServiceConfig): void {
+    this.config = { ...this.config, ...config };
+    this.log('Configured with options:', this.config);
+  }
+
+  // ========================================
+  // API Endpoint Helpers
+  // ========================================
+
+  protected getURI(): string {
+    return ViesService.getUri();
   }
 
   protected getPrefixes(): string[] {
-    return ['api', 'v1', 'authenticators']
+    return ['api', 'v1', 'authenticators'];
+  }
+
+  protected getPrefixPath(): string {
+    return this.getPrefixes().map(p => `/${p}`).join('');
   }
 
   public getPrefixUri(): string {
     return `${this.getURI()}${this.getPrefixPath()}`;
   }
 
-  // Public observables for components to subscribe to
-  get user$(): Observable<User | null> {
-    return this.currentUser$.asObservable();
+  // ========================================
+  // Initialization
+  // ========================================
+
+  /**
+   * Initialize the authentication service
+   * Loads refresh token from session and attempts to restore session
+   */
+  private initializeService(): void {
+    this.log('Initializing service...');
+    this.loadRefreshTokenFromSession();
+
+    const refreshToken = this._refreshToken();
+    if (refreshToken) {
+      this.log('Found refresh token, attempting to restore session');
+      this.refreshJwtToken().pipe(finalize(() => this._initialized.set(true))).subscribe({
+        next: () => {
+          this.log('Session restored successfully');
+          this.startIntervals();
+        },
+        error: (error) => {
+          this.logError('Failed to restore session:', error);
+          this.logout();
+        }
+      });
+    } else {
+      this.log('No refresh token found, skipping session restore');
+      this._initialized.set(true);
+    }
   }
 
-  get isAuthenticated(): Observable<boolean> {
-    return this.isAuthenticated$.asObservable();
-  }
-
-  get authEvents(): Observable<AuthEvent | null> {
-    return this.authEvents$.asObservable().pipe(
-      filter(event => event !== null)
-    );
-  }
-
-  get currentJwtToken(): string | null {
-    return this.currentJwt;
-  }
-
-  get currentUser(): User | null {
-    return this.currentUser$.value;
-  }
-
-  get initialized$(): Observable<boolean> {
-    return this.initializationComplete$.pipe(
-      filter(initialized => initialized === true),
-      first()
-    );
-  }
-
+  /**
+   * Check if the service has been initialized
+   */
   isInitialized(): boolean {
-    return this.initializationComplete$.value === true;
+    return this._initialized();
   }
 
+  /**
+   * Check if a refresh token exists in session storage
+   */
   hasSessionRefreshToken(): boolean {
-    return (this.currentRefreshToken !== null) || (typeof sessionStorage !== 'undefined' && sessionStorage.getItem(this.sessionStorageKey) !== null);
-  }
-
-  getCurrentUserAliasOrUsername() {
-    if (this.isAuthenticatedSync()) {
-      return this.currentUser?.alias ?? this.currentUser?.username ?? '';
-    }
-    else {
-      return '';
-    }
-  }
-
-  // Subscription methods for login/logout events
-  onLogin(callback: (user: User) => void): Subscription {
-    return this.authEvents$.pipe(
-      filter(event => event?.type === 'login' && event.user !== undefined)
-    ).subscribe(event => callback(event!.user!));
-  }
-
-  onLogout(callback: () => void): Subscription {
-    return this.authEvents$.pipe(
-      filter(event => event?.type === 'logout')
-    ).subscribe(() => callback());
-  }
-
-  onTimeoutLogout(callback: () => void): Subscription {
-    return this.authEvents$.pipe(
-      filter(event => event?.type === 'timeout logout')
-    ).subscribe(() => callback());
-  }
-
-  // Synchronous authentication check methods
-  private matchUserGroup(userGroups: UserGroup[], userGroupNameOrId: string): boolean {
-    if(!userGroups) {
-      return false;
-    }
-
-    if(StringUtils.isNumber(userGroupNameOrId)) {
-      return userGroups.some(group => group.id === Number(userGroupNameOrId));
-    }
-    else {
-      return userGroups.some(group => group.name === userGroupNameOrId);
-    }
-  }
-
-  isAuthenticatedSync(): boolean {
-    return this.isAuthenticated$.value && this.currentJwt !== null;
-  }
-
-  isAuthenticatedWithUserGroup(userGroupNameOrId: string): boolean {
-    const user = this.currentUser$.value;
-    const isAuth = this.isAuthenticatedSync();
-
-    if (!isAuth || !user || !user.userGroups) {
-      return false;
-    }
-
-    return this.matchUserGroup(user.userGroups, userGroupNameOrId);
-  }
-
-  hasUserGroup(userGroupNameOrId: string): boolean {
-    return this.isAuthenticatedWithUserGroup(userGroupNameOrId);
-  }
-
-  hasAnyUserGroup(userGroupNamesOrIds: string[]): boolean {
-    const user = this.currentUser$.value;
-
-    if (!this.isAuthenticatedSync() || !user || !user.userGroups) {
-      return false;
-    }
-
-    return userGroupNamesOrIds.some(groupNameOrId =>
-      this.matchUserGroup(user.userGroups, groupNameOrId)
+    return (
+      this._refreshToken() !== null ||
+      (typeof sessionStorage !== 'undefined' &&
+       sessionStorage.getItem(this.config.sessionStorageKey) !== null)
     );
   }
 
-  hasAllUserGroups(userGroupNamesOrIds: string[]): boolean {
-    const user = this.currentUser$.value;
+  // ========================================
+  // Authentication Methods
+  // ========================================
 
-    if (!this.isAuthenticatedSync() || !user || !user.userGroups) {
-      return false;
-    }
-
-    return userGroupNamesOrIds.every(groupNameOrId =>
-      this.matchUserGroup(user.userGroups, groupNameOrId)
+  /**
+   * Login with username/email and password
+   */
+  login(credentials: LoginRequest): Observable<User> {
+    this.log('Logging in...');
+    return this.httpClient.post<AuthResponse>(`${this.getPrefixUri()}/login`, credentials).pipe(
+      switchMap(response => this.handleAuthSuccess(response)),
+      tap(() => {
+        this._isOAuth2Login.set(false);
+        this.log('Login successful');
+      }),
+      catchError(error => this.handleError(error))
     );
   }
 
+  /**
+   * Register a new user
+   */
+  register(userData: RegisterRequest): Observable<User> {
+    this.log('Registering new user...');
+    return this.httpClient.post<AuthResponse>(`${this.getPrefixUri()}/register`, userData).pipe(
+      switchMap(response => this.handleAuthSuccess(response)),
+      tap(() => this.log('Registration successful')),
+      catchError(error => this.handleError(error))
+    );
+  }
+
+  /**
+   * Login with OAuth2
+   */
+  loginOAuth2(oauth2Data: Oauth2LoginRequest, openIdProvider?: OpenIDProvider): Observable<User> {
+    this.log('Logging in with OAuth2...');
+    this._openIdProvider.set(openIdProvider);
+
+    return this.httpClient.post<AuthResponse>(`${this.getPrefixUri()}/login/oauth2`, oauth2Data).pipe(
+      tap(response => {
+        this._jwt.set(response.jwt);
+        this._refreshToken.set(response.refreshToken);
+        this.saveRefreshTokenToSession();
+      }),
+      switchMap(() => this.fetchCurrentUser()),
+      tap(() => {
+        this.startIntervals();
+        this._isOAuth2Login.set(true);
+        this.log('OAuth2 login successful');
+      }),
+      catchError(error => this.handleError(error))
+    );
+  }
+
+  /**
+   * Logout the current user
+   */
+  logout(type: 'logout' | 'timeout logout' = 'logout'): void {
+    this.log('Logging out, type:', type);
+
+    const refreshRequest: RefreshTokenRequest = {
+      refreshToken: this._refreshToken() ?? ''
+    };
+
+    this.stopIntervals();
+    this._jwt.set(null);
+    this._refreshToken.set(null);
+    this.removeRefreshTokenFromSession();
+    this._currentUser.set(null);
+    this._isAuthenticated.set(false);
+    this._authEvents.set({ type: type });
+
+    // Call logout endpoint (fire and forget)
+    this.httpClient
+      .delete<void>(`${this.getPrefixUri()}/logout`, { body: refreshRequest })
+      .subscribe({
+        error: (error) => this.logError('Error during logout API call:', error)
+      });
+  }
+
+  /**
+   * Manually logout with navigation and OAuth2 provider logout prompt
+   */
+  logOutManually(): void {
+    this.logout();
+    this.router.navigate([environment.endpoint_login]);
+
+    if (this._isOAuth2Login()) {
+      this._isOAuth2Login.set(false);
+      const provider = this._openIdProvider();
+
+      if (provider?.endSessionEndpoint) {
+        this.dialogUtils
+          .openConfirmDialog(
+            'logout',
+            'Do you want to logout from OAuth2 provider too?',
+            'yes',
+            'no'
+          )
+          .then(() => {
+            this.router.navigate(['/']).then(() => {
+              window.location.href = provider.endSessionEndpoint;
+            });
+          })
+          .catch(() => {
+            // User declined OAuth2 provider logout
+          });
+      }
+    }
+  }
+
+  // ========================================
+  // User Management
+  // ========================================
+
+  /**
+   * Fetch the current authenticated user
+   */
+  getCurrentUser(): Observable<User> {
+    const jwt = this._jwt();
+    if (!jwt) {
+      return throwError(() => new Error('Not authenticated'));
+    }
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${jwt}`
+    });
+
+    return this.httpClient.get<User>(`${this.getPrefixUri()}/user`, { headers }).pipe(
+      tap(user => {
+        this._currentUser.set(user);
+        this.log('User data fetched:', user.username);
+      }),
+      catchError(error => this.handleError(error))
+    );
+  }
+
+  /**
+   * Update user password
+   */
+  updatePassword(passwordData: PasswordChangeRequest): Observable<User> {
+    const jwt = this._jwt();
+    if (!jwt) {
+      return throwError(() => new Error('Not authenticated'));
+    }
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${jwt}`
+    });
+
+    return this.httpClient
+      .put<User>(`${this.getPrefixUri()}/user/password`, passwordData, { headers })
+      .pipe(
+        tap(user => {
+          this._currentUser.set(user);
+          this.log('Password updated successfully');
+        }),
+        catchError(error => this.handleError(error))
+      );
+  }
+
+  /**
+   * Update user alias
+   */
+  updateAlias(aliasData: AliasChangeRequest): Observable<User> {
+    const jwt = this._jwt();
+    if (!jwt) {
+      return throwError(() => new Error('Not authenticated'));
+    }
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${jwt}`
+    });
+
+    return this.httpClient
+      .put<User>(`${this.getPrefixUri()}/user/alias`, aliasData, { headers })
+      .pipe(
+        tap(user => {
+          this._currentUser.set(user);
+          this.log('Alias updated successfully');
+        }),
+        catchError(error => this.handleError(error))
+      );
+  }
+
+  // ========================================
+  // User Group Checks (Signal-Based)
+  // ========================================
+
+  /**
+   * Check if user belongs to a specific group (signal-based)
+   * Use as: auth.hasUserGroupSignal()('ADMIN')
+   */
+  private hasUserGroupSignal = computed(() => {
+    return (userGroupNameOrId: string): boolean => {
+      const user = this._currentUser();
+      const isAuth = this._isAuthenticated();
+
+      if (!isAuth || !user?.userGroups) {
+        return false;
+      }
+
+      return this.matchUserGroup(user.userGroups, userGroupNameOrId);
+    };
+  });
+
+  /**
+   * Check if user belongs to any of the specified groups (signal-based)
+   * Use as: auth.hasAnyUserGroupSignal()(['ADMIN', 'USER'])
+   */
+  private hasAnyUserGroupSignal = computed(() => {
+    return (userGroupNamesOrIds: string[]): boolean => {
+      const user = this._currentUser();
+      const isAuth = this._isAuthenticated();
+
+      if (!isAuth || !user?.userGroups) {
+        return false;
+      }
+
+      return userGroupNamesOrIds.some(groupNameOrId =>
+        this.matchUserGroup(user.userGroups, groupNameOrId)
+      );
+    };
+  });
+
+  /**
+   * Check if user belongs to all of the specified groups (signal-based)
+   * Use as: auth.hasAllUserGroupsSignal()(['ADMIN', 'USER'])
+   */
+  private hasAllUserGroupsSignal = computed(() => {
+    return (userGroupNamesOrIds: string[]): boolean => {
+      const user = this._currentUser();
+      const isAuth = this._isAuthenticated();
+
+      if (!isAuth || !user?.userGroups) {
+        return false;
+      }
+
+      return userGroupNamesOrIds.every(groupNameOrId =>
+        this.matchUserGroup(user.userGroups, groupNameOrId)
+      );
+    };
+  });
+
+  /**
+   * Get user groups (returns signal)
+   */
   getUserGroups(): UserGroup[] {
-    const user = this.currentUser$.value;
-    return user?.userGroups || [];
+    return this._currentUser()?.userGroups ?? [];
   }
 
-  // Observable versions for reactive programming
-  isAuthenticatedWithUserGroup$(userGroupNameOrId: string): Observable<boolean> {
-    return this.currentUser$.pipe(
+  /**
+   * Observable version: Check if user has a specific group
+   */
+  hasUserGroup$(userGroupNameOrId: string): Observable<boolean> {
+    return this.user$.pipe(
       map(user => {
-        const isAuth = this.isAuthenticatedSync();
-
-        if (!isAuth || !user || !user.userGroups) {
+        if (!this._isAuthenticated() || !user?.userGroups) {
           return false;
         }
-
         return this.matchUserGroup(user.userGroups, userGroupNameOrId);
       })
     );
   }
 
-  hasUserGroup$(userGroupNameOrId: string): Observable<boolean> {
-    return this.isAuthenticatedWithUserGroup$(userGroupNameOrId);
-  }
-
+  /**
+   * Observable version: Check if user has any of the specified groups
+   */
   hasAnyUserGroup$(userGroupNamesOrIds: string[]): Observable<boolean> {
-    return this.currentUser$.pipe(
+    return this.user$.pipe(
       map(user => {
-        if (!this.isAuthenticatedSync() || !user || !user.userGroups) {
+        if (!this._isAuthenticated() || !user?.userGroups) {
           return false;
         }
-
         return userGroupNamesOrIds.some(groupNameOrId =>
           this.matchUserGroup(user.userGroups, groupNameOrId)
         );
@@ -226,13 +456,15 @@ export class AuthenticatorService implements OnDestroy {
     );
   }
 
+  /**
+   * Observable version: Check if user has all of the specified groups
+   */
   hasAllUserGroups$(userGroupNamesOrIds: string[]): Observable<boolean> {
-    return this.currentUser$.pipe(
+    return this.user$.pipe(
       map(user => {
-        if (!this.isAuthenticatedSync() || !user || !user.userGroups) {
+        if (!this._isAuthenticated() || !user?.userGroups) {
           return false;
         }
-
         return userGroupNamesOrIds.every(groupNameOrId =>
           this.matchUserGroup(user.userGroups, groupNameOrId)
         );
@@ -240,134 +472,132 @@ export class AuthenticatorService implements OnDestroy {
     );
   }
 
-  // Initialize service - load refresh token and start intervals
-  private initializeService(): void {
-    this.loadRefreshTokenFromSession();
-
-    if (this.currentRefreshToken) {
-      this.refreshJwtToken().subscribe({
-        next: () => {
-          this.startIntervals();
-          this.initializationComplete$.next(true);
-        },
-        error: () => {
-          this.logout();
-          this.initializationComplete$.next(true);
-        }
-      });
+  /**
+   * Helper method to match user groups by name or ID
+   */
+  private matchUserGroup(userGroups: UserGroup[], userGroupNameOrId: string): boolean {
+    if (!userGroups) {
+      return false;
     }
-    else {
-      this.initializationComplete$.next(true);
+
+    if (StringUtils.isNumber(userGroupNameOrId)) {
+      return userGroups.some(group => group.id === Number(userGroupNameOrId));
+    } else {
+      return userGroups.some(group => group.name === userGroupNameOrId);
     }
   }
 
-  // Authentication methods
-  login(credentials: LoginRequest): Observable<User> {
-    return this.httpClient.post<AuthResponse>(`${this.getPrefixUri()}/login`, credentials).pipe(
-      switchMap(response => this.handleAuthSuccess(response)),
-      tap(() => this.isloginWithOauth2 = false),
-      catchError(error => this.handleError(error))
-    );
+  // ========================================
+  // Backward Compatibility Methods
+  // ========================================
+
+  /**
+   * Get auth events observable (backward compatibility)
+   * @deprecated Use authEvents$ instead
+   */
+  get authEvents(): Observable<AuthEvent | null> {
+    return this.authEvents$;
   }
 
-  register(userData: RegisterRequest): Observable<User> {
-    return this.httpClient.post<AuthResponse>(`${this.getPrefixUri()}/register`, userData).pipe(
-      switchMap(response => this.handleAuthSuccess(response)),
-      catchError(error => this.handleError(error))
-    );
+  /**
+   * Get current user (backward compatibility)
+   */
+  get currentUser(): User | null {
+    return this._currentUser();
   }
 
-  loginOAuth2(oauth2Data: Oauth2LoginRequest, openIdProvider?: OpenIDProvider): Observable<User> {
-    this.openIdProvider = openIdProvider;
-    return this.httpClient.post<AuthResponse>(`${this.getPrefixUri()}/login/oauth2`, oauth2Data).pipe(
-      tap(response => {
-        this.currentJwt = response.jwt;
-        this.currentRefreshToken = response.refreshToken;
-        this.saveRefreshTokenToSession();
-      }),
-      switchMap(() => this.fetchCurrentUser()),
-      tap({next: () => this.startIntervals()}),
-      tap({next: () => this.isloginWithOauth2 = true}),
-      catchError(error => this.handleError(error))
-    );
+
+  get currentJwtToken(): string | null {
+    return this._jwt();
   }
 
-  logout(type: 'logout' | 'timeout logout' = 'logout'): void {
-    const refreshRequest: RefreshTokenRequest = {
-      refreshToken: structuredClone(this.currentRefreshToken) ?? ''
-    };
-
-    this.stopIntervals();
-    this.currentJwt = null;
-    this.currentRefreshToken = null;
-    this.removeRefreshTokenFromSession();
-    this.currentUser$.next(null);
-    this.isAuthenticated$.next(false);
-    this.authEvents$.next({ type: type });
-
-    this.httpClient.delete<void>(`${this.getPrefixUri()}/logout`, {body: refreshRequest}).subscribe();
+  /**
+   * Check if user is authenticated (synchronous check)
+   */
+  isAuthenticatedSync(): boolean {
+    return this._isAuthenticated() && this._jwt() !== null;
   }
 
-  logOutManually() {
-    this.logout();
-    this.router.navigate([environment.endpoint_login]);
-    if(this.isloginWithOauth2) {
-      this.isloginWithOauth2 = false;
-      if(this.openIdProvider && this.openIdProvider.endSessionEndpoint) {
-        this.dialogUtils.openConfirmDialog("logout", "Do you want to logout from OAuth2 provider too?", 'yes', 'no').then(res => {
-          this.router.navigate(["/"]).then(result => { window.location.href = this.openIdProvider!.endSessionEndpoint; });
-        });
-      }
-    }
+  /**
+   * Get current user alias or username
+   */
+  getCurrentUserAliasOrUsername(): string {
+    return this.currentUserAlias();
   }
 
-  // User management methods
-  getCurrentUser(): Observable<User> {
-    if (!this.currentJwt) {
-      return throwError(() => new Error('Not authenticated'));
-    }
-
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${this.currentJwt}`
-    });
-
-    return this.httpClient.get<User>(`${this.getPrefixUri()}/user`, { headers }).pipe(
-      tap(user => this.currentUser$.next(user)),
-      catchError(error => this.handleError(error))
-    );
+  /**
+   * Check if user has a specific group (method version for backward compatibility)
+   */
+  hasUserGroup(userGroupNameOrId: string): boolean {
+    return this.hasUserGroupSignal()(userGroupNameOrId);
   }
 
-  updatePassword(passwordData: PasswordChangeRequest): Observable<User> {
-    if (!this.currentJwt) {
-      return throwError(() => new Error('Not authenticated'));
-    }
-
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${this.currentJwt}`
-    });
-
-    return this.httpClient.put<User>(`${this.getPrefixUri()}/user/password`, passwordData, { headers }).pipe(
-      tap(user => this.currentUser$.next(user)),
-      catchError(error => this.handleError(error))
-    );
+  /**
+   * Check if user has any of the specified groups (method version)
+   */
+  hasAnyUserGroup(userGroupNamesOrIds: string[]): boolean {
+    return this.hasAnyUserGroupSignal()(userGroupNamesOrIds);
   }
 
-  updateAlias(aliasData: AliasChangeRequest): Observable<User> {
-    if (!this.currentJwt) {
-      return throwError(() => new Error('Not authenticated'));
-    }
-
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${this.currentJwt}`
-    });
-
-    return this.httpClient.put<User>(`${this.getPrefixUri()}/user/alias`, aliasData, { headers }).pipe(
-      tap(user => this.currentUser$.next(user)),
-      catchError(error => this.handleError(error))
-    );
+  /**
+   * Check if user has all of the specified groups (method version)
+   */
+  hasAllUserGroups(userGroupNamesOrIds: string[]): boolean {
+    return this.hasAllUserGroupsSignal()(userGroupNamesOrIds);
   }
 
-  // Validation methods
+  /**
+   * Check if user is authenticated with a specific group (backward compatibility)
+   */
+  isAuthenticatedWithUserGroup(userGroupNameOrId: string): boolean {
+    return this.hasUserGroup(userGroupNameOrId);
+  }
+
+  /**
+   * Observable version: Check if user is authenticated with a specific group
+   */
+  isAuthenticatedWithUserGroup$(userGroupNameOrId: string): Observable<boolean> {
+    return this.hasUserGroup$(userGroupNameOrId);
+  }
+
+  // ========================================
+  // Event Subscriptions (Backward Compatibility)
+  // ========================================
+
+  /**
+   * Subscribe to login events
+   */
+  onLogin(callback: (user: User) => void): Subscription {
+    return this.authEvents$
+      .pipe(filter(event => event?.type === 'login' && event.user !== undefined))
+      .subscribe(event => callback(event!.user!));
+  }
+
+  /**
+   * Subscribe to logout events
+   */
+  onLogout(callback: () => void): Subscription {
+    return this.authEvents$
+      .pipe(filter(event => event?.type === 'logout'))
+      .subscribe(() => callback());
+  }
+
+  /**
+   * Subscribe to timeout logout events
+   */
+  onTimeoutLogout(callback: () => void): Subscription {
+    return this.authEvents$
+      .pipe(filter(event => event?.type === 'timeout logout'))
+      .subscribe(() => callback());
+  }
+
+  // ========================================
+  // Validation Methods
+  // ========================================
+
+  /**
+   * Check if an email already exists
+   */
   checkEmailExists(email: string): Observable<boolean> {
     const params = new HttpParams().set('email', email);
 
@@ -377,6 +607,9 @@ export class AuthenticatorService implements OnDestroy {
     );
   }
 
+  /**
+   * Check if a username already exists
+   */
   checkUsernameExists(username: string): Observable<boolean> {
     const params = new HttpParams().set('username', username);
 
@@ -386,51 +619,70 @@ export class AuthenticatorService implements OnDestroy {
     );
   }
 
-  // JWT refresh method
+  // ========================================
+  // JWT Token Management
+  // ========================================
+
+  /**
+   * Refresh the JWT token using the refresh token
+   */
   refreshJwtToken(): Observable<void> {
-    if (!this.currentRefreshToken) {
+    const refreshToken = this._refreshToken();
+    if (!refreshToken) {
       return throwError(() => new Error('No refresh token available'));
     }
 
     const refreshRequest: RefreshTokenRequest = {
-      refreshToken: this.currentRefreshToken
+      refreshToken: refreshToken
     };
 
-    return this.httpClient.post<AuthResponse>(`${this.getPrefixUri()}/jwt/refresh`, refreshRequest).pipe(
-      tap(response => {
-        this.currentJwt = response.jwt;
-        this.currentRefreshToken = response.refreshToken;
-        this.saveRefreshTokenToSession();
-      }),
-      tap(() => {
-        if(!this.currentUser) {
-          this.fetchCurrentUser().subscribe();
-        }
-      }),
-      map(() => void 0),
-      catchError(error => {
-        this.logout('timeout logout');
-        return this.handleError(error);
-      })
-    );
+    return this.httpClient
+      .post<AuthResponse>(`${this.getPrefixUri()}/jwt/refresh`, refreshRequest)
+      .pipe(
+        tap(response => {
+          this._jwt.set(response.jwt);
+          this._refreshToken.set(response.refreshToken);
+          this.saveRefreshTokenToSession();
+          this.log('JWT token refreshed');
+        }),
+        tap(() => {
+          // Fetch user if not already loaded
+          if (!this._currentUser()) {
+            this.fetchCurrentUser().subscribe();
+          }
+        }),
+        map(() => void 0),
+        catchError(error => {
+          this.logError('JWT refresh failed:', error);
+          this.logout('timeout logout');
+          return this.handleError(error);
+        })
+      );
   }
 
-  // Private methods
+  // ========================================
+  // Private Methods
+  // ========================================
+
+  /**
+   * Handle successful authentication response
+   */
   private handleAuthSuccess(response: AuthResponse): Observable<User> {
-    this.currentJwt = response.jwt;
-    this.currentRefreshToken = response.refreshToken;
+    this._jwt.set(response.jwt);
+    this._refreshToken.set(response.refreshToken);
     this.saveRefreshTokenToSession();
 
-    return this.fetchCurrentUser().pipe(
-      tap(() => this.startIntervals())
-    );
+    return this.fetchCurrentUser().pipe(tap(() => this.startIntervals()));
   }
 
+  /**
+   * Fetch current user and emit login event
+   */
   private fetchCurrentUser(): Observable<User> {
     return this.getCurrentUser().pipe(
       tap(user => {
-        this.isAuthenticated$.next(true);
-        this.authEvents$.next({ type: 'login', user });
+        this._isAuthenticated.set(true);
+        this._authEvents.set({ type: 'login', user });
       }),
       catchError(error => {
         this.logout();
@@ -439,27 +691,40 @@ export class AuthenticatorService implements OnDestroy {
     );
   }
 
+  /**
+   * Start periodic JWT refresh and user data sync
+   */
   private startIntervals(): void {
     this.stopIntervals();
+    this.log('Starting auto-refresh intervals');
 
-    this.userFetchInterval = interval(this.reloadUserInterval).pipe(
-      switchMap(() => this.getCurrentUser()),
-      catchError(error => {
-        console.error('Error fetching user:', error);
-        return [];
-      })
-    ).subscribe();
+    // User data refresh interval
+    this.userFetchInterval = interval(this.config.userRefreshInterval)
+      .pipe(
+        switchMap(() => this.getCurrentUser()),
+        catchError(error => {
+          this.logError('Error fetching user:', error);
+          return [];
+        })
+      )
+      .subscribe();
 
-    this.jwtRefreshInterval = interval(this.reloadJwtInterval).pipe(
-      switchMap(() => this.refreshJwtToken()),
-      catchError(error => {
-        console.error('Error refreshing JWT:', error);
-        this.logout();
-        return [];
-      })
-    ).subscribe();
+    // JWT refresh interval
+    this.jwtRefreshInterval = interval(this.config.jwtRefreshInterval)
+      .pipe(
+        switchMap(() => this.refreshJwtToken()),
+        catchError(error => {
+          this.logError('Error refreshing JWT:', error);
+          this.logout();
+          return [];
+        })
+      )
+      .subscribe();
   }
 
+  /**
+   * Stop all periodic intervals
+   */
   private stopIntervals(): void {
     if (this.userFetchInterval) {
       this.userFetchInterval.unsubscribe();
@@ -472,27 +737,40 @@ export class AuthenticatorService implements OnDestroy {
     }
   }
 
+  /**
+   * Save refresh token to session storage
+   */
   private saveRefreshTokenToSession(): void {
-    if (this.currentRefreshToken && typeof sessionStorage !== 'undefined') {
-      sessionStorage.setItem(this.sessionStorageKey, this.currentRefreshToken);
+    const refreshToken = this._refreshToken();
+    if (refreshToken && typeof sessionStorage !== 'undefined') {
+      sessionStorage.setItem(this.config.sessionStorageKey, refreshToken);
     }
   }
 
+  /**
+   * Load refresh token from session storage
+   */
   private loadRefreshTokenFromSession(): void {
     if (typeof sessionStorage !== 'undefined') {
-      const token = sessionStorage.getItem(this.sessionStorageKey);
+      const token = sessionStorage.getItem(this.config.sessionStorageKey);
       if (token) {
-        this.currentRefreshToken = token;
+        this._refreshToken.set(token);
       }
     }
   }
 
+  /**
+   * Remove refresh token from session storage
+   */
   private removeRefreshTokenFromSession(): void {
     if (typeof sessionStorage !== 'undefined') {
-      sessionStorage.removeItem(this.sessionStorageKey);
+      sessionStorage.removeItem(this.config.sessionStorageKey);
     }
   }
 
+  /**
+   * Handle HTTP errors
+   */
   private handleError(error: any): Observable<never> {
     let errorMessage = 'An unknown error occurred';
 
@@ -504,15 +782,35 @@ export class AuthenticatorService implements OnDestroy {
       errorMessage = error;
     }
 
-    console.error('AuthenticationService Error:', error);
+    this.logError('Authentication error:', errorMessage);
     return throwError(() => new Error(errorMessage));
   }
 
-  // Angular OnDestroy lifecycle
+  /**
+   * Log debug messages
+   */
+  private log(...args: any[]): void {
+    if (this.config.debugMode) {
+      console.log('[AuthenticatorService]', ...args);
+    }
+  }
+
+  /**
+   * Log error messages
+   */
+  private logError(...args: any[]): void {
+    console.error('[AuthenticatorService]', ...args);
+  }
+
+  // ========================================
+  // Lifecycle Hooks
+  // ========================================
+
+  /**
+   * Cleanup when service is destroyed
+   */
   ngOnDestroy(): void {
+    this.log('Destroying service...');
     this.stopIntervals();
-    this.currentUser$.complete();
-    this.isAuthenticated$.complete();
-    this.authEvents$.complete();
   }
 }
