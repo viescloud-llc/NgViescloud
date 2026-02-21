@@ -4,6 +4,7 @@ import { ViescloudUtilsModule } from '../lib/viescloud-utils.module';
 import { QuickSideDrawerMenu } from '../lib/share-component/quick-side-drawer-menu/quick-side-drawer-menu.component';
 import { environment } from '../environments/environment.prod';
 import { ViescloudApplication } from '../lib/abtract/ViescloudApplication.directive';
+import { APP_ROUTES } from './app.routes';
 
 @Component({
   selector: 'app-root',
@@ -42,7 +43,11 @@ export class App extends ViescloudApplication {
       children: [
         {
           title: 'list',
-          routerLink: '/product/list'
+          routerLink: APP_ROUTES.productList
+        },
+        {
+          title: 'add',
+          routerLink: APP_ROUTES.product(0)
         }
       ]
     },
@@ -52,26 +57,26 @@ export class App extends ViescloudApplication {
       children: [
         {
           title: 'Application Setting',
-          routerLink: '/setting/application-setting'
+          routerLink: APP_ROUTES.applicationSetting
         },
         {
           title: 'Account',
-          routerLink: '/setting/account',
+          routerLink: APP_ROUTES.accountSetting,
           hideConditional: () => !this.authenticatorService.isAuthenticatedSync()
         },
         {
           title: 'Users',
-          routerLink: '/setting/users',
+          routerLink: APP_ROUTES.usersSetting,
           hideConditional: () => !this.authenticatorService.hasUserGroup(this.ADMIN_GROUP)
         },
         {
           title: 'User groups',
-          routerLink: '/setting/user/groups',
+          routerLink: APP_ROUTES.userGroupsSetting,
           hideConditional: () => !this.authenticatorService.hasUserGroup(this.ADMIN_GROUP)
         },
         {
           title: 'OpenId Provider',
-          routerLink: '/setting/openid-provider',
+          routerLink: APP_ROUTES.openidProviderSetting,
           hideConditional: () => !this.authenticatorService.hasUserGroup(this.ADMIN_GROUP)
         }
       ]

@@ -9,6 +9,24 @@ import { UserListComponent } from '../lib/share-component/user-list/user-list.co
 import { UserSettingComponent } from '../lib/share-component/user-setting/user-setting.component';
 import { HomeComponent } from './home/home.component';
 import { ProductListComponent } from './product/product-list/product-list.component';
+import { ProductComponent } from './product/product.component';
+
+export const APP_ROUTES = {
+  home: "home",
+  login: "login",
+  productList: "product/list",
+  setting: "setting",
+  applicationSetting: "setting/application-setting",
+  accountSetting: "setting/account",
+  usersSetting: "setting/users",
+  userGroupsSetting: "setting/user/groups",
+  openidProviderSetting: "setting/openid-provider",
+  oauth2: "oauth2",
+
+  product(id: number) {
+    return `product/${id}`;
+  }
+}
 
 export const routes: Routes = [
   {
@@ -25,6 +43,10 @@ export const routes: Routes = [
       {
         path: "list",
         component: ProductListComponent
+      },
+      {
+        path: ":productId",
+        component: ProductComponent
       }
     ]
   },
