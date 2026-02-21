@@ -9,6 +9,18 @@ import { UserListComponent } from '../lib/share-component/user-list/user-list.co
 import { UserSettingComponent } from '../lib/share-component/user-setting/user-setting.component';
 import { HomeComponent } from './home/home.component';
 
+export const APP_ROUTES = {
+  home: "home",
+  login: "login",
+  setting: "setting",
+  applicationSetting: "setting/application-setting",
+  accountSetting: "setting/account",
+  usersSetting: "setting/users",
+  userGroupsSetting: "setting/user/groups",
+  openidProviderSetting: "setting/openid-provider",
+  oauth2: "oauth2",
+}
+
 export const routes: Routes = [
   {
     path: "home",
