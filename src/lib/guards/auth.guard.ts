@@ -38,7 +38,7 @@ export class AuthGuard /*, CanActivateChild, CanDeactivate<unknown>, CanLoad */
   }
 
   private getAuthInitializationSignal(): Observable<any> {
-    return this.authenticatorService.authEvents;
+    return this.authenticatorService.authEvents$;
   }
 
   private checkAuthentication(): Observable<boolean> {

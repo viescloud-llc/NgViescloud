@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable, OnDestroy, signal, computed } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { User, UserGroup } from '../model/authenticator.model';
-import { Observable, Subscription, catchError, filter, first, interval, map, switchMap, tap, throwError } from 'rxjs';
+import { Observable, Subscription, catchError, filter, finalize, first, interval, map, switchMap, tap, throwError } from 'rxjs';
 import { ViesService } from './rest.service';
 import { AliasChangeRequest, AuthEvent, AuthResponse, LoginRequest, Oauth2LoginRequest, PasswordChangeRequest, RefreshTokenRequest, RegisterRequest } from '../model/vies.model';
 import { StringUtils } from '../util/String.utils';
@@ -141,16 +141,14 @@ export class AuthenticatorService implements OnDestroy {
     const refreshToken = this._refreshToken();
     if (refreshToken) {
       this.log('Found refresh token, attempting to restore session');
-      this.refreshJwtToken().subscribe({
+      this.refreshJwtToken().pipe(finalize(() => this._initialized.set(true))).subscribe({
         next: () => {
           this.log('Session restored successfully');
           this.startIntervals();
-          this._initialized.set(true);
         },
         error: (error) => {
           this.logError('Failed to restore session:', error);
           this.logout();
-          this._initialized.set(true);
         }
       });
     } else {
@@ -508,10 +506,7 @@ export class AuthenticatorService implements OnDestroy {
     return this._currentUser();
   }
 
-  /**
-   * Get current JWT token (backward compatibility)
-   * @deprecated Use currentJwtToken() signal instead
-   */
+
   get currentJwtToken(): string | null {
     return this._jwt();
   }

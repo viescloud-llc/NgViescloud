@@ -12,6 +12,7 @@ import { ViescloudApplication } from '../lib/abtract/ViescloudApplication.direct
   styleUrl: './app.scss'
 })
 export class App extends ViescloudApplication {
+  readonly ADMIN_GROUP = 'ADMIN';
 
   menu: QuickSideDrawerMenu[] = [
     {
@@ -35,6 +36,17 @@ export class App extends ViescloudApplication {
       ]
     },
     {
+      title: 'Products',
+      hideChildren: true,
+      hideConditional: () => !this.authenticatorService.isAuthenticatedSync() || !this.authenticatorService.hasUserGroup(this.ADMIN_GROUP),
+      children: [
+        {
+          title: 'list',
+          routerLink: '/product/list'
+        }
+      ]
+    },
+    {
       title: 'Settings',
       hideChildren: true,
       children: [
@@ -50,17 +62,17 @@ export class App extends ViescloudApplication {
         {
           title: 'Users',
           routerLink: '/setting/users',
-          hideConditional: () => !this.authenticatorService.hasUserGroup('ADMIN')
+          hideConditional: () => !this.authenticatorService.hasUserGroup(this.ADMIN_GROUP)
         },
         {
           title: 'User groups',
           routerLink: '/setting/user/groups',
-          hideConditional: () => !this.authenticatorService.hasUserGroup('ADMIN')
+          hideConditional: () => !this.authenticatorService.hasUserGroup(this.ADMIN_GROUP)
         },
         {
           title: 'OpenId Provider',
           routerLink: '/setting/openid-provider',
-          hideConditional: () => !this.authenticatorService.hasUserGroup('ADMIN')
+          hideConditional: () => !this.authenticatorService.hasUserGroup(this.ADMIN_GROUP)
         }
       ]
     },
