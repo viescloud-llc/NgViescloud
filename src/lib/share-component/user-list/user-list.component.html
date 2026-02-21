@@ -2,7 +2,7 @@
   <ul class="margin-center">
     <li>
       <app-mat-table
-        [matRows]="users"
+        [matRows]="users()"
         [blankObject]="blankUser"
         [showMatTooltip]="true"
         [showPagination]="true"
@@ -28,7 +28,7 @@
           <app-mat-form-field-input-list-option
             label="User Groups"
             [(value)]="selectedUser.userGroups"
-            [options]="userGroupsOptions"
+            [options]="userGroupsOptions()"
             [styleWidth]="'100%'"
             [showSizeInput]="false"
             [required]="true"

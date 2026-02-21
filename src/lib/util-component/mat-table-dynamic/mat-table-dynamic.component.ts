@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectorRef, Component, computed, EventEmitter, Input, Output, signal, SimpleChanges, WritableSignal } from '@angular/core';
 import { MatTableComponent } from '../mat-table/mat-table.component';
 import { firstValueFrom, Observable } from 'rxjs';
 import { FunctionUtils } from '../../util/FunctionUtils';
@@ -14,6 +14,8 @@ import { MatDialog } from '@angular/material/dialog';
   standalone: false
 })
 export class MatTableDynamicComponent<T extends object, S> extends MatTableComponent<T> {
+
+  matRowsSignal = signal<T[]>([]);
 
   @Input()
   getAllFn?: Observable<T[]> | Promise<T[]> | T[];
@@ -72,7 +74,7 @@ export class MatTableDynamicComponent<T extends object, S> extends MatTableCompo
     if(this.getAllFn && !this.fetchSubscription) {
       this.fetchSubscription = FunctionUtils.applyObservable<T[]>(this.getAllFn).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
         next: res => {
-          this.matRows = res;
+          this.matRowsSignal.set(res);
           this.fetchSubscription = null;
         }
       })
@@ -80,14 +82,14 @@ export class MatTableDynamicComponent<T extends object, S> extends MatTableCompo
   }
 
   protected updateRow(row: T) {
-    this.matRows = this.matRows.map(r => {
+    this.matRowsSignal.set(this.matRowsSignal().map(r => {
       if(DataUtils.isEqual(r, this.selectedRowCopy)) {
         return row;
       }
       else {
         return r;
       }
-    });
+    }));
 
     this.selectRow(row);
   }
@@ -122,7 +124,7 @@ export class MatTableDynamicComponent<T extends object, S> extends MatTableCompo
   }
 
   protected pushNewRow(row: T) {
-    this.matRows.push(row);
+    this.matRowsSignal().push(row);
     this.selectRow(row);
   }
 
@@ -169,7 +171,7 @@ export class MatTableDynamicComponent<T extends object, S> extends MatTableCompo
   }
 
   protected removeRowFromTable(row: T) {
-    this.matRows = this.matRows.filter(r => DataUtils.isNotEqual(r, row));
+    this.matRowsSignal.set(this.matRowsSignal().filter(r => DataUtils.isNotEqual(r, row)));
   }
 
   async deleteRow(selectedRow: T, confirmation = true) {
