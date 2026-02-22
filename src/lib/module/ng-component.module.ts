@@ -95,7 +95,9 @@ const COMPONENTS = [
   ],
   exports: [
     ...UTILS,
-    ...COMPONENTS
+    ...COMPONENTS,
+    NgMaterialModule,
+    NgEssentialModule
   ]
 })
 export class NgComponentModule { }

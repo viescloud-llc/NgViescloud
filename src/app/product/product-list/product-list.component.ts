@@ -3,7 +3,6 @@ import { RxJSUtils } from '../../../lib/util/RxJS.utils';
 import { ProductService } from '../../shared/service/product/product.service';
 import { Product } from '../../shared/model/product.model';
 import { NgComponentModule } from "../../../lib/module/ng-component.module";
-import { MatAnchor } from "@angular/material/button";
 import { Router } from '@angular/router';
 import { APP_ROUTES } from '../../app.routes';
 
@@ -11,7 +10,7 @@ import { APP_ROUTES } from '../../app.routes';
   selector: 'app-product-list',
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.scss'],
-  imports: [NgComponentModule, MatAnchor]
+  imports: [NgComponentModule]
 })
 export class ProductListComponent implements OnInit {
 

@@ -12,7 +12,7 @@ import { MatAnchor } from '@angular/material/button';
   selector: 'app-product',
   templateUrl: './product.component.html',
   styleUrls: ['./product.component.scss'],
-  imports: [NgComponentModule, MatAnchor]
+  imports: [NgComponentModule]
 })
 export class ProductComponent implements OnInit {
 
