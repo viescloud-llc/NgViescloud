@@ -7,12 +7,13 @@ import { Product } from '../shared/model/product.model';
 import { DialogUtils } from '../../lib/util/Dialog.utils';
 import { NgComponentModule } from "../../lib/module/ng-component.module";
 import { MatAnchor } from '@angular/material/button';
+import { ProductMediaListComponent } from "./product-media-list/product-media-list.component";
 
 @Component({
   selector: 'app-product',
   templateUrl: './product.component.html',
   styleUrls: ['./product.component.scss'],
-  imports: [NgComponentModule]
+  imports: [NgComponentModule, ProductMediaListComponent]
 })
 export class ProductComponent implements OnInit {
 

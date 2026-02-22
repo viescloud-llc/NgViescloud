@@ -5,6 +5,7 @@ import { Product } from '../../shared/model/product.model';
 import { NgComponentModule } from "../../../lib/module/ng-component.module";
 import { Router } from '@angular/router';
 import { APP_ROUTES } from '../../app.routes';
+import { ProductMediaListComponent } from "../product-media-list/product-media-list.component";
 
 @Component({
   selector: 'app-product-list',

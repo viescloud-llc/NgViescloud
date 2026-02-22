@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, input, signal } from '@angular/core';
 import { NgComponentModule } from '../../../lib/module/ng-component.module';
+import { ProductMedia } from '../../shared/model/product.model';
 
 @Component({
   selector: 'app-product-media-list',
@@ -8,5 +9,8 @@ import { NgComponentModule } from '../../../lib/module/ng-component.module';
   imports: [NgComponentModule]
 })
 export class ProductMediaListComponent {
-  constructor() { }
+
+  productMedias = input<ProductMedia[]>([]);
+  dialog = input<boolean>(false);
+  
 }
