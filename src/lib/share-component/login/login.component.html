@@ -1,5 +1,5 @@
 @if (!openIdLogin) {
-  <ul class="margin-center-li-center" appMatFormFieldGroup (onAllInputCheck)="validForm = $event" [formSummitClick]="loginButton">
+  <ul class="margin-center-li-center" appMatFormFieldGroup (onAllInputCheck)="validForm = $event" [formSummitButton]="loginButton">
     <li>
       <app-mat-form-field-input
         label="Username or email"

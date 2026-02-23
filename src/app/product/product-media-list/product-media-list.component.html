@@ -1,5 +1,15 @@
 <ul class="margin-center">
+  @for (item of productMedias(); track $index) {
+    <li>
+      <app-mat-form-field-input-dynamic-form
+      [value]="item"
+      (valueChange)="productMedias()[$index] = $event"
+      [blankObject]="blankProductMedia"
+      styleWidth="100%"
+      ></app-mat-form-field-input-dynamic-form>
+    </li>
+  }
   <li>
-    
+    <button matButton="filled" (click)="addMedia()">Add media</button>
   </li>
 </ul>

@@ -39,6 +39,8 @@ import { UserSettingComponent } from '../share-component/user-setting/user-setti
 import { UserAccessComponent } from '../share-component/user-access/user-access.component';
 import { MatTableDynamicViesServiceComponent } from '../util-component/mat-table-dynamic-vies-service/mat-table-dynamic-vies-service.component';
 import { MatTableLazyDynamicComponent } from '../util-component/mat-table-lazy-dynamic/mat-table-lazy-dynamic.component';
+import { MatFormFieldInputDynamicFormComponent } from '../util-component/mat-form-field-input-dynamic-form/mat-form-field-input-dynamic-form.component';
+import { MatFormFieldFormComponent } from '../util-component/mat-form-field-form/mat-form-field-form.component';
 
 const UTILS = [
   CopyToClipboardUtilComponent,
@@ -52,11 +54,13 @@ const UTILS = [
   MatTableDynamicComponent,
   MatFormFieldGroupDirective,
   MatFormFieldComponent,
+  MatFormFieldFormComponent,
   MatFormFieldInputTextAreaComponent,
   MatFormFieldInputTimeComponent,
   MatFormFieldInputOptionComponent,
   MatFormFieldInputListComponent,
   MatFormFieldInputDynamicComponent,
+  MatFormFieldInputDynamicFormComponent,
   MatFormFieldInputListOptionComponent,
   MatFormFieldInputRgbColorPickerComponent,
   MatFormFieldInputRecordComponent,

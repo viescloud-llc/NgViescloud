@@ -165,3 +165,13 @@ export interface VFile {
   value?: any;
 }
 
+export interface ViesForm<T> {
+    save(input?: T): void;
+    revert(input?: T): void;
+    remove(): void;
+}
+
+export interface ViesListForm<T> extends ViesForm<T> {
+    add(input?: T): void;
+    addAll(input?: T[]): void;
+}

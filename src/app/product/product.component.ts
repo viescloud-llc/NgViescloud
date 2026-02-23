@@ -8,6 +8,7 @@ import { DialogUtils } from '../../lib/util/Dialog.utils';
 import { NgComponentModule } from "../../lib/module/ng-component.module";
 import { MatAnchor } from '@angular/material/button';
 import { ProductMediaListComponent } from "./product-media-list/product-media-list.component";
+import { DataUtils } from '../../lib/util/Data.utils';
 
 @Component({
   selector: 'app-product',
@@ -21,7 +22,7 @@ export class ProductComponent implements OnInit {
   protected readonly productService = inject(ProductService)
   protected readonly dialogUtils = inject(DialogUtils)
 
-  product = signal<Product>(new Product());
+  product = signal<Product>(DataUtils.purgeValue(new Product()));
   readonly blankProduct = new Product();
 
   id = 0;

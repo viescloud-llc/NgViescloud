@@ -1,0 +1,15 @@
+<ul class="margin-center" appMatFormFieldGroup (onAllInputCheck)="validInput.set($event)" [formSummitButton]="saveButton">
+  <li>
+    <app-mat-form-field-input-dynamic
+    [(value)]="value"
+    [blankObject]="blankObject"
+    [styleWidth]="styleWidth"
+    [indent]="false"
+    ></app-mat-form-field-input-dynamic>
+  </li>
+  <li class="flex-row-container-auto">
+    <button #saveButton matButton="filled" (click)="save()" [disabled]="!validInput() || !isValueChange()">{{ saveLabel() }}</button>
+    <button matButton="filled" class="accent" (click)="revert()" [disabled]="!validInput() || !isValueChange()">{{ revertLabel() }}</button>
+    <button matButton="filled" class="warn" (click)="remove()">{{ removeLabel() }}</button>
+  </li>
+</ul>
