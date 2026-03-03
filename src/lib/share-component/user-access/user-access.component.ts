@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { RxJSUtils } from '../../util/RxJS.utils';
 import { MatFormFieldInputUserAccessComponent } from '../../util-component/mat-form-field-input-user-access/mat-form-field-input-user-access.component';
 import { UserAccess, SharedUser, SharedGroup, AccessPermission } from '../../model/authenticator.model';
@@ -14,15 +14,9 @@ import { UserService } from '../../service/user.service';
 })
 export class UserAccessComponent<T extends UserAccess | SharedUser[] | SharedGroup[] | AccessPermission[]> extends MatFormFieldInputUserAccessComponent<T> {
 
-  constructor(
-    private userGroupService: UserGroupService,
-    private userService: UserService,
-    private rxjsUtils: RxJSUtils,
-    cd: ChangeDetectorRef,
-    dialogUtils: DialogUtils
-  ) {
-    super(cd, dialogUtils);
-  }
+  userGroupService = inject(UserGroupService);
+  userService = inject(UserService);
+  rxjsUtils = inject(RxJSUtils);
 
   override ngOnInit(): void {
     super.ngOnInit();

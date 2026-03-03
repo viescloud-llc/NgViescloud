@@ -99,4 +99,24 @@ export class ReflectionUtils {
 
         return obj1;
     }
+
+    static syncDialogData(classObject: any, dialogData: any): void {
+        if (!dialogData ) {
+            return;
+        }
+
+        const instance = classObject as Record<string, any>;
+        Object.keys(instance).forEach(key => {
+            // find all linkedSignals (keys starting with _)
+            if (!key.startsWith('_')) return;
+
+            const inputKey = key.slice(1); // strip the _
+            const hasMatchingInput = typeof instance[inputKey]?.() !== 'undefined'; // check input exists
+            const dialogValue = dialogData[inputKey];
+
+            if (hasMatchingInput && dialogValue !== undefined) {
+            instance[key].set(dialogValue);
+            }
+        });
+    }
 }

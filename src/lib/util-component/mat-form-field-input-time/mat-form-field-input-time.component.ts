@@ -47,13 +47,6 @@ export class MatFormFieldInputTimeComponent extends MatFormFieldComponent {
   @Input()
   range: boolean = false;
 
-  constructor(
-    protected override cd: ChangeDetectorRef,
-    protected override dialogUtils: DialogUtils
-  ) {
-    super(cd, dialogUtils);
-  }
-
   override ngOnInit() {
     super.ngOnInit();
     if(this.value) {

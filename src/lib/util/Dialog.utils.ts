@@ -3,7 +3,7 @@ import { LoadingDialog } from '../dialog/loading-dialog/loading-dialog.component
 import { ConfirmDialog } from '../dialog/confirm-dialog/confirm-dialog.component';
 import { Injectable } from '@angular/core';
 import { MatOption } from '../model/mat.model';
-import { NotAuthenticatedError, ViesErrorResponse } from '../model/error.model';
+import { ViesErrorResponse } from '../model/error.model';
 import { InputDialog } from '../dialog/input-dialog/input-dialog.component';
 import { DataUtils } from './Data.utils';
 import { Observable } from 'rxjs';
@@ -15,6 +15,16 @@ import {
 } from '../model/authenticator.model';
 import { UserAccessInputType } from '../util-component/mat-form-field-input-user-access/mat-form-field-input-user-access.component';
 import { UserAccessDialog } from '../dialog/user-access-dialog/user-access-dialog.component';
+import { MatFormFieldInputDynamicFormComponent } from '../util-component/mat-form-field-input-dynamic-form/mat-form-field-input-dynamic-form.component';
+
+export interface DialogSetting {
+  matDialog?: MatDialog;
+  title?: string;
+  width?: string;
+  disableClose?: boolean;
+  yes?: string;
+  no?: string;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -240,13 +250,66 @@ export class DialogUtils {
 
   // -------------------------Dyanmic Object Dialog-------------------------
 
-  static openDynamicObjectDialog(
-    matDialog: MatDialog,
-    object: any,
-    width: string = '99%',
-    disableClose: boolean = false
+  static openDynamicFormDialog(
+    value: any,
+    blankValue: any,
+    {
+      matDialog,
+      title,
+      width = '99%',
+      disableClose = false,
+      yes = 'yes',
+      no = 'no'
+    }: DialogSetting
   ) {
-    //TODO
+    if(!matDialog) {
+      throw new Error('matDialog is required');
+    }
+
+    throw new Error('Not implemented');
+    // TODO: fix type error if using MatFormFieldInputDynamicFormComponent as dialog
+    // return new Promise<any>((resolve, reject) => {
+    //   let dialog = matDialog.open(MatFormFieldInputDynamicFormComponent, {
+    //     data: {
+    //       value: value,
+    //       blankValue: blankValue,
+    //       title: title,
+    //       yes: yes,
+    //       no: no,
+    //     },
+    //     width: width,
+    //     disableClose: disableClose
+    //   });
+
+    //   dialog.afterClosed().subscribe({
+    //     next: (result) => {
+    //       if (result) resolve(result);
+    //       else reject(result);
+    //     },
+    //     error: (error) => {
+    //       reject(error);
+    //     }
+    //   });
+    // });
+  }
+
+  openDynamicFormDialog(
+    value: any,
+    blankValue: any,
+    {
+      matDialog = this.matDialog,
+      title,
+      width = '99%',
+      disableClose = false,
+      yes = 'yes',
+      no = 'no'
+    }: DialogSetting
+  ) {
+    return DialogUtils.openDynamicFormDialog(
+      value,
+      blankValue,
+      { matDialog, title, width, disableClose, yes, no },
+    );
   }
 
   // -------------------------User Access Dialog-------------------------

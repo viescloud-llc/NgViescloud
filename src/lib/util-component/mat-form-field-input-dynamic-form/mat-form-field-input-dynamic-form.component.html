@@ -1,3 +1,6 @@
+@if(isDialog())  {
+  <h1 mat-dialog-title>{{dialogTitle()}}</h1>
+}
 <ul class="margin-center" appMatFormFieldGroup (onAllInputCheck)="validInput.set($event)" [formSummitButton]="saveButton">
   <li>
     <app-mat-form-field-input-dynamic
@@ -8,12 +11,15 @@
     ></app-mat-form-field-input-dynamic>
   </li>
   <li class="flex-row-container-auto">
-    <button #saveButton matButton="filled" (click)="save()" [disabled]="!validInput() || !isValueChange()">{{ saveLabel() }}</button>
+    <button #saveButton matButton="filled" (click)="save()" [disabled]="!validInput() || !isValueChange()">{{ _saveLabel() }}</button>
     @if (!hideRevertButton()) {
-      <button matButton="filled" class="accent" (click)="revert()" [disabled]="!validInput() || !isValueChange()">{{ revertLabel() }}</button>
+      <button matButton="filled" class="accent" (click)="revert()" [disabled]="!validInput() || !isValueChange()">{{ _revertLabel() }}</button>
     }
     @if (!hideRemoveButton()) {
-      <button matButton="filled" class="warn" (click)="remove()">{{ removeLabel() }}</button>
+      <button matButton="filled" class="warn" (click)="remove()">{{ _removeLabel() }}</button>
+    }
+    @if(isDialog()) {
+      <button matButton="filled" class="warn" (click)="cancel()">{{ dialogNo() }}</button>
     }
   </li>
 </ul>

@@ -1,13 +1,10 @@
-import { AfterContentChecked, ChangeDetectorRef, Component, DoCheck, EventEmitter, Input, isSignal, OnChanges, OnInit, Output, Signal, SimpleChanges } from '@angular/core';
+import { AfterContentChecked, ChangeDetectorRef, Component, DoCheck, EventEmitter, inject, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
 import { MatFormFieldAppearance } from '@angular/material/form-field';
-import { FixChangeDetection } from '../../abtract/FixChangeDetection';
 import { UtilsService } from '../../service/utils.service';
 import { RgbColor } from '../../model/rgb.model';
 import { DialogUtils } from '../../util/Dialog.utils';
-import { StringUtils } from '../../util/String.utils';
 import { DataUtils } from '../../util/Data.utils';
-import { MatFromFieldInputDynamicItem } from '../../model/mat.model';
 import { BehaviorSubject } from 'rxjs';
 import { ViesService } from '../../service/rest.service';
 
@@ -92,10 +89,8 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
 
   isFocus = false;
 
-  constructor(
-    protected cd: ChangeDetectorRef,
-    protected dialogUtils: DialogUtils
-  ) { }
+  cd = inject(ChangeDetectorRef);
+  dialogUtils = inject(DialogUtils);
 
   ngDoCheck(): void {
     if(DataUtils.isNotEqual(this.value, this.valueCopy)) {
