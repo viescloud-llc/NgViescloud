@@ -1,1 +1,25 @@
 /* Add your component styles here */
+
+// :host {
+//   display: flex;
+//   flex-direction: column;
+//   max-height: 80vh;
+//   overflow: hidden;
+// }
+
+// .margin-center {
+//   display: flex;
+//   flex-direction: column;
+//   gap: 1rem;
+//   overflow-y: auto;
+//   overflow-x: hidden;
+//   padding-right: 0.5rem;
+
+//   // Scrollable content area
+//   li:first-child {
+//     flex: 1;
+//     overflow-y: auto;
+//     overflow-x: hidden;
+//     min-height: 0;
+//   }
+// }

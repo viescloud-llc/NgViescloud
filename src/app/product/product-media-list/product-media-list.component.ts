@@ -23,7 +23,7 @@ export class ProductMediaListComponent {
     let newMedia = DataUtils.purgeValue(new ProductMedia());
     // this.productMedias().push(newMedia);
 
-    this.dialogUtils.openDynamicFormDialog(newMedia, this.blankProductMedia, {title: 'Add new media'}).then(res => {
+    this.dialogUtils.openDynamicFormDialog(newMedia, this.blankProductMedia, {title: 'Add new media', yes: 'save', no: 'cancel', settings: {hideRevertButton: true, hideRemoveButton: true}}).then(res => {
       if(res) {
         console.log(res);
       }

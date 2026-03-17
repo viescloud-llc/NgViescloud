@@ -1,4 +1,4 @@
-import { Component, forwardRef, input, signal } from '@angular/core';
+import { Component, forwardRef, input, linkedSignal, signal } from '@angular/core';
 import { MatFormFieldFormComponent } from '../mat-form-field-form/mat-form-field-form.component';
 
 @Component({
@@ -13,6 +13,11 @@ export class MatFormFieldInputDynamicFormComponent extends MatFormFieldFormCompo
   validInput = signal<boolean>(false);
 
   hideRevertButton = input<boolean>(false);
+  _hideRevertButton = linkedSignal(() => this.hideRevertButton());
+
   hideRemoveButton = input<boolean>(false);
+  _hideRemoveButton = linkedSignal(() => this.hideRemoveButton());
+
   indent = input<boolean>(false);
+  _indent = linkedSignal(() => this.indent());
 }

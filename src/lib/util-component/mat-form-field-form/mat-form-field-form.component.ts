@@ -2,6 +2,7 @@ import { Component, computed, forwardRef, inject, Inject, input, linkedSignal, O
 import { MatFormFieldComponent } from '../mat-form-field/mat-form-field.component';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ReflectionUtils } from '../../util/Reflection.utils';
+import { DialogResponse } from '../../model/dialog.model';
 
 @Component({
   selector: 'app-mat-form-field-form',
@@ -65,7 +66,7 @@ export class MatFormFieldFormComponent extends MatFormFieldComponent {
       this.dialogData.width ? this.dialogWidth.set(this.dialogData.width) : undefined;
       this.dialogData.yes ? this._saveLabel.set(this.dialogData.yes) : undefined;
       this.dialogData.no ? this.dialogNo.set(this.dialogData.no) : undefined;
-      ReflectionUtils.syncDialogData(this, this.dialogData);    
+      this.dialogData.settings ? ReflectionUtils.syncDialogData(this, this.dialogData.settings) : undefined;
     }
 
     this.value = structuredClone(this.value);
@@ -78,6 +79,10 @@ export class MatFormFieldFormComponent extends MatFormFieldComponent {
           this.valueChange.emit(this.value);
           this.valueCopy = structuredClone(this.value);
           this.onSave.emit();
+
+          if(this.isDialog() && this.dialogRef) {
+            this.dialogRef.close(DialogResponse.builder().result(this.value).save().build());
+          }
         }
       });
     }
@@ -85,6 +90,10 @@ export class MatFormFieldFormComponent extends MatFormFieldComponent {
       this.valueChange.emit(this.value);
       this.valueCopy = structuredClone(this.value);
       this.onSave.emit();
+
+      if(this.isDialog() && this.dialogRef) {
+        this.dialogRef.close(DialogResponse.builder().result(this.value).save().build());
+      }
     }
   }
   revert(): void {
@@ -107,17 +116,25 @@ export class MatFormFieldFormComponent extends MatFormFieldComponent {
       this.dialogUtils.openConfirmDialog("Delete", "Are you sure you want to delete?", "Yes", "No").then(res => {
         if(res) {
           this.onDelete.emit();
+
+          if(this.isDialog() && this.dialogRef) {
+            this.dialogRef.close(DialogResponse.builder().remove().build());
+          }
         }
       });
     }
     else {
       this.onDelete.emit();
+
+      if(this.isDialog() && this.dialogRef) {
+        this.dialogRef.close(DialogResponse.builder().remove().build());
+      }
     }
   }
 
   cancel() {
     if(this.isDialog() && this.dialogRef) {
-      this.dialogRef.close();
+      this.dialogRef.close(DialogResponse.builder().cancel().build());
     }
   }
 }

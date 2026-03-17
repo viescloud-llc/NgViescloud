@@ -7,16 +7,16 @@
     [(value)]="value"
     [blankObject]="blankObject"
     [styleWidth]="styleWidth"
-    [indent]="indent()"
+    [indent]="_indent()"
     [readonly]="_readonly()"
     ></app-mat-form-field-input-dynamic>
   </li>
   <li class="flex-row-container-auto">
     <button #saveButton matButton="filled" (click)="save()" [disabled]="!validInput() || !isValueChange()">{{ _saveLabel() }}</button>
-    @if (!hideRevertButton()) {
+    @if (!_hideRevertButton()) {
       <button matButton="filled" class="accent" (click)="revert()" [disabled]="!validInput() || !isValueChange()">{{ _revertLabel() }}</button>
     }
-    @if (!hideRemoveButton()) {
+    @if (!_hideRemoveButton()) {
       <button matButton="filled" class="warn" (click)="remove()">{{ _removeLabel() }}</button>
     }
     @if(isDialog()) {
