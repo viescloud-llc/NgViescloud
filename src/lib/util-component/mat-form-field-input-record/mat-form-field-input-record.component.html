@@ -25,7 +25,7 @@
             [manuallyEmitValue]="true"
             [showClearIcon]="false"
             [onFocusoutEmitValueOnly]="false"
-            [readonly]="readonly"
+            [readonly]="_readonly()"
           ></app-mat-form-field-input>
         </li>
       }
@@ -41,7 +41,7 @@
                 (onValueChange)="applyValue()"
                 [styleWidth]="'100%'"
                 [required]="true"
-                [readonly]="readonly"
+                [readonly]="_readonly()"
                 [indent]="false"
               ></app-mat-form-field-input-dynamic>
             </details>
@@ -55,7 +55,7 @@
                 (onValueChange)="applyValue()"
                 [styleWidth]="'100%'"
                 [required]="required"
-                [readonly]="readonly"
+                [readonly]="_readonly()"
                 [indent]="false"
               ></app-mat-form-field-input-dynamic>
             </details>
@@ -75,7 +75,7 @@
                 (onValueChange)="applyValue()"
                 [styleWidth]="'100%'"
                 [required]="true"
-                [readonly]="readonly"
+                [readonly]="_readonly()"
                 [style.width]="showRemoveItemButton && !readonly ? '44%' : ''"
               ></app-mat-form-field-input-dynamic>
               <app-mat-form-field-input-dynamic
@@ -86,8 +86,8 @@
                 (onValueChange)="applyValue()"
                 [styleWidth]="'100%'"
                 [required]="required"
-                [readonly]="readonly"
-                [style.width]="showRemoveItemButton && !readonly ? '44%' : ''"
+                [readonly]="_readonly()"
+                [style.width]="showRemoveItemButton && !_readonly() ? '44%' : ''"
               ></app-mat-form-field-input-dynamic>
               @if (showRemoveItemButton) {
                 <span style="width: 5%;"><button mat-icon-button color="warn" (click)="remove(i)" [disabled]="readonly"><mat-icon>remove_circle</mat-icon></button></span>

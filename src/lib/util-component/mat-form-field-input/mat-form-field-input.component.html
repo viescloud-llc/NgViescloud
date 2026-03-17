@@ -18,7 +18,7 @@
     [maxlength]="maxlength"
     [formControl]="formControl"
     [matAutocomplete]="auto"
-    [readonly]="readonly">
+    [readonly]="_readonly()">
 
   <mat-error>{{getFormControlError()}}</mat-error>
   @if (error) {
@@ -44,7 +44,7 @@
   @if (customIconLabel && customIconHint && value) {
     <mat-hint style="color: goldenrod;" align="start">{{customIconHint}}</mat-hint>
   }
-  @if (isFocus && readonly && readonlyOnFocusHint) {
+  @if (isFocus && _readonly() && readonlyOnFocusHint) {
     <mat-hint style="color: goldenrod;" align="start">{{readonlyOnFocusHint}}</mat-hint>
   }
 

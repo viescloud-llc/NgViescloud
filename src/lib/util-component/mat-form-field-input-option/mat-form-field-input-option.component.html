@@ -3,7 +3,7 @@
   <mat-select
     [(ngModel)]="value"
     (ngModelChange)="emitValue()"
-    [disabled]="disable || readonly"
+    [disabled]="disable || _readonly()"
     [required]="required"
     (opened)="emitOpened()"
     (closed)="emitClosed()"

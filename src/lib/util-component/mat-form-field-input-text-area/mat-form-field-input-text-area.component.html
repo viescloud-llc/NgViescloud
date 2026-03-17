@@ -25,7 +25,7 @@
     [cdkTextareaAutosize]="autoResizeHeight && !showResizeVerticalButton"
     [style.overflow]="'auto'"
     [style.resize]="showResizeVerticalButton ? 'vertical' : 'none'"
-    [readonly]="readonly">
+    [readonly]="_readonly()">
   </textarea>
   <mat-error>{{label}} can't be empty</mat-error>
   @if (error) {

@@ -25,7 +25,7 @@
             [manuallyEmitValue]="true"
             [showClearIcon]="false"
             [onFocusoutEmitValueOnly]="false"
-            [readonly]="readonly"
+            [readonly]="_readonly()"
           ></app-mat-form-field-input>
         </li>
       }
@@ -43,7 +43,7 @@
                 [value]="item" (valueChange)="value[i] = $event"
                 [blankObject]="blankObject"
                 styleWidth="100%"
-                [readonly]="readonly"
+                [readonly]="_readonly()"
               ></app-mat-form-field-input-dynamic>
               @if (showRemoveItemButton) {
                 <button (click)="removeWithWarning(i)" matButton="filled" class="warn">Remove this {{label}}</button>
@@ -63,8 +63,8 @@
                     styleWidth="100%"
                     [focusOutAutoFillFn]="getFocusOutAutoFillFn(i)"
                     [required]="required"
-                    [readonly]="readonly">
-                    @if (!readonly) {
+                    [readonly]="_readonly()">
+                    @if (!_readonly()) {
                       <button matSuffix mat-icon-button [matTooltip]="'remove this ' + label + ' item'" (click)="remove(i)" style="color: red;">
                         <mat-icon>remove_circle</mat-icon>
                       </button>

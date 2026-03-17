@@ -1,4 +1,4 @@
-import { AfterContentChecked, ChangeDetectorRef, Component, DoCheck, EventEmitter, inject, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { AfterContentChecked, ChangeDetectorRef, Component, DoCheck, EventEmitter, inject, input, Input, linkedSignal, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
 import { MatFormFieldAppearance } from '@angular/material/form-field';
 import { UtilsService } from '../../service/utils.service';
@@ -67,9 +67,9 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
 
   @Input()
   defaultErrorTextColor = 'red';
-
-  @Input()
-  readonly: boolean = false;
+  
+  readonly = input<boolean>(false);
+  _readonly = linkedSignal(() => this.readonly());
 
   @Input()
   readonlyOnFocusHint: string = 'Read only';

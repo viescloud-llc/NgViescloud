@@ -41,11 +41,19 @@ export class MatFormFieldFormComponent extends MatFormFieldComponent {
   dialogYes = computed(() => this._saveLabel());
   dialogNo = signal<string>('no');
 
-  @Optional()
-  @Inject(MAT_DIALOG_DATA) 
   dialogData?: any;
   dialogRef?: MatDialogRef<MatFormFieldFormComponent> = inject(MatDialogRef<MatFormFieldFormComponent>, { optional: true }) ?? undefined;
   
+  constructor(
+    @Optional()
+    @Inject(MAT_DIALOG_DATA) 
+    // public data?: {title: string, message: string, yes?: string, no?: string},
+    public data?: any
+    ) { 
+      super();
+      this.dialogData = data;
+    }
+
   override ngOnInit(): void {
     super.ngOnInit();
 

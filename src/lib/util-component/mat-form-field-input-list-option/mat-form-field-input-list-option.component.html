@@ -25,7 +25,7 @@
             [manuallyEmitValue]="true"
             [showClearIcon]="false"
             [onFocusoutEmitValueOnly]="false"
-            [readonly]="readonly"
+            [readonly]="_readonly()"
           ></app-mat-form-field-input>
         </li>
       }
@@ -41,7 +41,7 @@
             [customOptionLabel]="'Remove'"
             [customOptionLabelColor]="'red'"
             (onCustomOptionSelected)="remove(i)"
-            [readonly]="readonly"
+            [readonly]="_readonly()"
           ></app-mat-form-field-input-option>
         }
       </ng-container>

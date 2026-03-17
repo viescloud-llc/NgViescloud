@@ -15,7 +15,6 @@ import {
 } from '../model/authenticator.model';
 import { UserAccessInputType } from '../util-component/mat-form-field-input-user-access/mat-form-field-input-user-access.component';
 import { UserAccessDialog } from '../dialog/user-access-dialog/user-access-dialog.component';
-import { MatFormFieldInputDynamicFormComponent } from '../util-component/mat-form-field-input-dynamic-form/mat-form-field-input-dynamic-form.component';
 
 export interface DialogSetting {
   matDialog?: MatDialog;
@@ -250,7 +249,7 @@ export class DialogUtils {
 
   // -------------------------Dyanmic Object Dialog-------------------------
 
-  static openDynamicFormDialog(
+  static async openDynamicFormDialog(
     value: any,
     blankValue: any,
     {
@@ -266,31 +265,33 @@ export class DialogUtils {
       throw new Error('matDialog is required');
     }
 
-    throw new Error('Not implemented');
-    // TODO: fix type error if using MatFormFieldInputDynamicFormComponent as dialog
-    // return new Promise<any>((resolve, reject) => {
-    //   let dialog = matDialog.open(MatFormFieldInputDynamicFormComponent, {
-    //     data: {
-    //       value: value,
-    //       blankValue: blankValue,
-    //       title: title,
-    //       yes: yes,
-    //       no: no,
-    //     },
-    //     width: width,
-    //     disableClose: disableClose
-    //   });
+    const { MatFormFieldInputDynamicFormComponent } = await import('../util-component/mat-form-field-input-dynamic-form/mat-form-field-input-dynamic-form.component');
 
-    //   dialog.afterClosed().subscribe({
-    //     next: (result) => {
-    //       if (result) resolve(result);
-    //       else reject(result);
-    //     },
-    //     error: (error) => {
-    //       reject(error);
-    //     }
-    //   });
-    // });
+    return new Promise<any>((resolve, reject) => {
+      let dialog = matDialog.open(MatFormFieldInputDynamicFormComponent, {
+        data: {
+          value: value,
+          blankValue: blankValue,
+          title: title,
+          yes: yes,
+          no: no,
+          styleWidth: "100%",
+          readonly: true
+        },
+        width: width,
+        disableClose: disableClose
+      });
+
+      dialog.afterClosed().subscribe({
+        next: (result) => {
+          if (result) resolve(result);
+          else reject(result);
+        },
+        error: (error) => {
+          reject(error);
+        }
+      });
+    });
   }
 
   openDynamicFormDialog(

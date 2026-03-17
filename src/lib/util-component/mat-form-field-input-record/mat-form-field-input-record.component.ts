@@ -62,7 +62,7 @@ export class MatFormFieldInputRecordComponent<K extends string | number, V> exte
   override ngOnInit(): void {
     super.ngOnInit();
 
-    if(this.readonly) {
+    if(this._readonly()) {
       this.showSizeInput = false;
       this.showRemoveItemButton = false;
       this.showAddItemButton = false;

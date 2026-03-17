@@ -9,7 +9,7 @@
           blankObject="''"
           styleWidth="100%"
           [required]="true"
-          [readonly]="readonly"
+          [readonly]="_readonly()"
         ></app-mat-form-field-input>
         <hr>
         </li>
@@ -31,7 +31,7 @@
                   [customOptionLabel]="'Remove'"
                   [customOptionLabelColor]="'red'"
                   (onCustomOptionSelected)="removeSharedUser(i)"
-                  [readonly]="readonly"
+                  [readonly]="_readonly()"
                 ></app-mat-form-field-input-option>
               </li>
               <li>
@@ -43,7 +43,7 @@
                   [showSizeInput]="false"
                   [minSize]="1"
                   [uniqueValue]="true"
-                  [readonly]="readonly"
+                  [readonly]="_readonly()"
                 ></app-mat-form-field-input-list-option>
               </li>
             </ul>
@@ -74,7 +74,7 @@
                       [customOptionLabel]="'Remove'"
                       [customOptionLabelColor]="'red'"
                       (onCustomOptionSelected)="removeSharedGroup(i)"
-                      [readonly]="readonly"
+                      [readonly]="_readonly()"
                     ></app-mat-form-field-input-option>
                   </li>
                   <li>
@@ -86,7 +86,7 @@
                       [showSizeInput]="false"
                       [uniqueValue]="true"
                       [minSize]="1"
-                      [readonly]="readonly"
+                      [readonly]="_readonly()"
                     ></app-mat-form-field-input-list-option>
                   </li>
                 </ul>
@@ -111,7 +111,7 @@
                     [expanded]="true"
                     [showSizeInput]="false"
                     [uniqueValue]="true"
-                    [readonly]="readonly"
+                    [readonly]="_readonly()"
                   ></app-mat-form-field-input-list-option>
                 </li>
               }

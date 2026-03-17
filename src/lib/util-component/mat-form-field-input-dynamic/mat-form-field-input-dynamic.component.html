@@ -12,7 +12,7 @@
         [required]="required"
         defaultType="number"
         [blankObject]="0"
-        [readonly]="readonly"
+        [readonly]="_readonly()"
       ></app-mat-form-field-input>
     }
 
@@ -29,7 +29,7 @@
         [disable]="disable"
         [required]="required"
         [blankObject]="blankObject"
-        [readonly]="readonly"
+        [readonly]="_readonly()"
       ></app-mat-form-field-input-option>
     }
 
@@ -60,7 +60,7 @@
         [disable]="disable"
         [required]="required"
         [blankObject]="blankObject"
-        [readonly]="readonly"
+        [readonly]="_readonly()"
       ></app-mat-form-field-input-option>
     }
 
@@ -80,7 +80,7 @@
         [disable]="disable"
         [required]="required"
         [blankObject]="''"
-        [readonly]="readonly"
+        [readonly]="_readonly()"
       ></app-mat-form-field-input>
     }
 
@@ -96,7 +96,7 @@
         [disable]="disable"
         [required]="required"
         [blankObject]="''"
-        [readonly]="readonly"
+        [readonly]="_readonly()"
       ></app-mat-form-field-input-text-area>
     }
 
@@ -116,7 +116,7 @@
       [showAddItemButton]="showListAddItemButton"
       [showRemoveItemButton]="showListRemoveItemButton"
       [blankObject]="blankObject"
-      [readonly]="readonly"
+      [readonly]="_readonly()"
       [minSize]="listRequired ? 1 : 0"
       ></app-mat-form-field-input-record>
       <br>
@@ -133,7 +133,7 @@
       [disable]="disable"
       [required]="required"
       [blankObject]="blankObject"
-      [readonly]="readonly"
+      [readonly]="_readonly()"
       ></app-mat-form-field-input-rgb-color-picker>
       <br>
     }
@@ -154,7 +154,7 @@
         [showAddItemButton]="showListAddItemButton"
         [showRemoveItemButton]="showListRemoveItemButton"
         [blankObject]="blankObject"
-        [readonly]="readonly"
+        [readonly]="_readonly()"
         [minSize]="listRequired ? 1 : 0"
       ></app-mat-form-field-input-list>
       <br>
