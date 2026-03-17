@@ -1,8 +1,77 @@
-<ul class="margin-center">
-  @for (item of productMedias(); track $index) {
+<div class="media-gallery-container">
+  @if (productMedias().length > 0) {
+    <div class="gallery-layout">
+      <!-- Thumbnail List -->
+      <div class="thumbnail-list">
+        @for (media of productMedias(); track media.id || $index) {
+          <div class="thumbnail-wrapper"
+               [class.selected]="$index === selectedIndex()"
+               (click)="selectMedia($index)">
+            <app-product-media [productMedia]="media"></app-product-media>
+          </div>
+        }
+      </div>
 
+      <!-- Main Viewer -->
+      <div class="main-viewer">
+        @if (selectedMedia()) {
+          @if (selectedMedia()!.mediaType === ProductMediaType.IMAGE) {
+            <img [src]="selectedMedia()!.url"
+                 [alt]="selectedMedia()!.altText || 'Product image'" />
+          } @else if (selectedMedia()!.mediaType === ProductMediaType.VIDEO) {
+            <video [src]="selectedMedia()!.url" controls></video>
+          }
+
+          @if (selectedMedia()!.caption) {
+            <div class="caption">{{ selectedMedia()!.caption }}</div>
+          }
+        }
+
+        <!-- Navigation Arrows -->
+        @if (productMedias().length > 1) {
+          <button mat-icon-button class="nav-button prev"
+                  (click)="previousMedia()"
+                  [disabled]="selectedIndex() === 0">
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <button mat-icon-button class="nav-button next"
+                  (click)="nextMedia()"
+                  [disabled]="selectedIndex() === productMedias().length - 1">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Selected Media Actions -->
+    <div class="selected-actions">
+      <button matButton="filled" (click)="editMedia(selectedIndex())">
+        <mat-icon>edit</mat-icon>
+        Edit
+      </button>
+      @if (!selectedMedia()!.isPrimary) {
+        <button matButton="filled" class="accent" (click)="setPrimary(selectedIndex())">
+          <mat-icon>star</mat-icon>
+          Set as primary
+        </button>
+      }
+      <button matButton="filled" class="warn" (click)="deleteMedia(selectedIndex())">
+        <mat-icon>delete</mat-icon>
+        Delete
+      </button>
+    </div>
+  } @else {
+    <div class="empty-state">
+      <mat-icon>image</mat-icon>
+      <p>No media added yet</p>
+    </div>
   }
-  <li>
-    <button matButton="filled" (click)="addMedia()">Add media</button>
-  </li>
-</ul>
+
+  <!-- Add Media Button -->
+  <div class="actions">
+    <button matButton="filled" (click)="addMedia()">
+      <mat-icon>add_photo_alternate</mat-icon>
+      Add media
+    </button>
+  </div>
+</div>

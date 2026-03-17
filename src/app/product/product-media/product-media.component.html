@@ -1,3 +1,16 @@
-<p>
-  product-media works!
-</p>
+<div class="media-thumbnail" [class.primary]="productMedia().isPrimary">
+  @if (productMedia().mediaType === ProductMediaType.IMAGE) {
+    <img [src]="productMedia().url" [alt]="productMedia().altText || 'Product image'" />
+  } @else if (productMedia().mediaType === ProductMediaType.VIDEO) {
+    <video [src]="productMedia().url" preload="metadata"></video>
+    <div class="video-overlay">
+      <mat-icon>play_circle</mat-icon>
+    </div>
+  }
+
+  @if (productMedia().isPrimary) {
+    <div class="primary-badge">
+      <mat-icon>star</mat-icon>
+    </div>
+  }
+</div>
