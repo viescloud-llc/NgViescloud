@@ -13,7 +13,7 @@ export interface DialogSetting {
 
 export class DialogResponse<T> {
   result!: T;
-  save: boolean = false;
+  sucess: boolean = false;
   revert: boolean = false;
   remove: boolean = false;
   cancel: boolean = false;
@@ -32,7 +32,7 @@ export class DialogResponseBuilder<T> {
   }
 
   save(): DialogResponseBuilder<T> {
-    this.response.save = true;
+    this.response.sucess = true;
     return this;
   }
 
