@@ -120,14 +120,22 @@ export class ReflectionUtils {
         Object.keys(instance).forEach(key => allKeys.add(key));
 
         allKeys.forEach(key => {
-            if (!key.startsWith('_')) return;
+            if (key.startsWith('_')) {
+                const inputKey = key.slice(1);
+                const hasMatchingInput = typeof instance[inputKey]?.() !== 'undefined';
+                const dialogValue = dialogData[inputKey];
+    
+                if (hasMatchingInput && dialogValue !== undefined) {
+                    instance[key].set(dialogValue);
+                }
+            }
+            else if(instance[key]) {
+                const isSignal = typeof instance[key] === 'function' && typeof instance[key].set === 'function';
+                const dialogValue = dialogData[key];
 
-            const inputKey = key.slice(1);
-            const hasMatchingInput = typeof instance[inputKey]?.() !== 'undefined';
-            const dialogValue = dialogData[inputKey];
-
-            if (hasMatchingInput && dialogValue !== undefined) {
-                instance[key].set(dialogValue);
+                if (isSignal && dialogValue !== undefined && typeof instance[key]?.() !== 'undefined') {
+                    instance[key].set(dialogValue);
+                }
             }
         });
     }
