@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { first, firstValueFrom, from, map, Observable, pipe, throwError } from 'rxjs';
 import { UtilsService } from './utils.service';
 import { VFile } from '../model/vies.model';
@@ -9,12 +9,14 @@ import { PopupArgs, PopupType } from '../model/popup.model';
 import { HttpParamsBuilder } from '../model/utils.model';
 import { ViesService } from './rest.service';
 import { FileUtils } from '../util/File.utils';
+import { ViesHttpClientService } from './vies.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export abstract class ObjectStorage {
   objectUrlCache = new Map<string, string>();
+  protected viesHttpClientService = inject(ViesHttpClientService);
 
   constructor(
     protected httpClient: HttpClient,
@@ -310,10 +312,15 @@ export abstract class ObjectStorage {
     return objectUrl;
   }
 
-  async fetchFile(uri: string, options?: { popupArgs?: PopupArgs, generateObjectUrl?: boolean } ): Promise<VFile> {
+  async fetchFile(uri: string, options?: { popupArgs?: PopupArgs, generateObjectUrl?: boolean, fetchFromBackend?: boolean }): Promise<VFile> {
     let vFile: VFile | null = null;
     if (!this.containViesLink(uri)) {
-      vFile = await firstValueFrom(from(FileUtils.fetchAsVFile(uri)).pipe(this.getLoadingPipe(options?.popupArgs)));
+      if(options?.fetchFromBackend) {
+        vFile = await firstValueFrom(this.viesHttpClientService.getBlobAsVFile({url: uri}).pipe(this.getLoadingPipe(options?.popupArgs)).pipe(map(response => response.body)));
+      }
+      else {
+        vFile = await firstValueFrom(from(FileUtils.fetchAsVFile(uri)).pipe(this.getLoadingPipe(options?.popupArgs)));
+      }
     }
     else {
       vFile = await firstValueFrom(this.httpClient.get(uri, { observe: 'response', responseType: 'blob' })
@@ -347,7 +354,8 @@ export abstract class ObjectStorage {
             return vFile;
           }),
           first()
-        ))
+        )
+      );
     }
 
     if(vFile) {

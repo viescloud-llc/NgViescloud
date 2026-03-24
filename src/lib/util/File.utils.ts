@@ -14,6 +14,20 @@ export class FileUtils {
       .catch(() => false);
   }
 
+  // static extractInfoFromFileName(fileName: string): {contentType: string, extension: string} {
+  //   let contentType = '';
+  //   let extension = '';
+
+  //   if (!contentType) {
+  //     // If Content-Type is not provided, derive it from the file name
+  //     extension = fileName.split('.').pop()?.toLowerCase() || '';
+  //     contentType = FileUtils.mapExtensionToContentType(extension);
+  //   } else {
+  //     // If Content-Type is provided, extract extension from it
+  //     extension = contentType.split('/')[1];
+  //   }
+  // }
+
   static async fetchAsVFile(uri: string, options?: { generateObjectUrl?: boolean }): Promise<VFile> {
     if(ViesService.isNotCSR()) {
       return {} as VFile;
@@ -31,7 +45,6 @@ export class FileUtils {
 
       if (!contentType) {
         // If Content-Type is not provided, derive it from the file name
-        const fileName = uri.substring(uri.lastIndexOf('/') + 1);
         extension = fileName.split('.').pop()?.toLowerCase() || '';
         contentType = FileUtils.mapExtensionToContentType(extension);
       } else {
@@ -42,7 +55,7 @@ export class FileUtils {
       const blob = await response.blob();
 
       const vFile: VFile = {
-        name: uri.substring(uri.lastIndexOf('/') + 1), // Use filename from URI
+        name: fileName, // Use filename from URI
         type: contentType,
         extension: extension,
         rawFile: blob,

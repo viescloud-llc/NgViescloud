@@ -77,8 +77,7 @@ export class ProductMediaListComponent {
         }
       }
     ).then(res => {
-      if(res.sucess) {
-        this.updateMediaUrlToLocalFile(res.result);
+      if(res.sucess && this.updateMediaUrlToLocalFile(res.result)) {
         // Create new array reference to trigger change detection
         this.productMedias.set([...this.productMedias(), res.result]);
         // Select the newly added media
@@ -114,9 +113,8 @@ export class ProductMediaListComponent {
         no: 'cancel'
       }
     ).then(res => {
-      if(res.sucess) {
+      if(res.sucess && this.updateMediaUrlToLocalFile(res.result)) {
         this.localFileCache = this.localFileCache.filter(f => f.objectUrl !== media.url);
-        this.updateMediaUrlToLocalFile(res.result);
         // Create new array with updated media
         const updated = [...this.productMedias()];
         updated[index] = res.result;
@@ -155,12 +153,16 @@ export class ProductMediaListComponent {
 
   private updateMediaUrlToLocalFile(media: ProductMedia) {
     if(media && media.url && !media.url.startsWith('blob:')) {
-      this.objectStorageService.fetchFile(media.url, { generateObjectUrl: true }).then(vfile => {
+      this.objectStorageService.fetchFile(media.url, { generateObjectUrl: true, fetchFromBackend: true }).then(vfile => {
         this.localFileCache.push(vfile);
         media.url = vfile.objectUrl;
+        return true;
       }).catch(err => {
         this.dialogUtils.openErrorMessage('Error fetching media', 'Unable to fetch media from url: ' + media.url);
+        return false;
       });
     }
+
+    return true;
   }
 }

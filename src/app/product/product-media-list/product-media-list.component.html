@@ -3,7 +3,7 @@
     <div class="gallery-layout">
       <!-- Thumbnail List -->
       <div class="thumbnail-list">
-        @for (media of productMedias(); track media?.id ?? $index) {
+        @for (media of productMedias(); track $index) {
           <div class="thumbnail-wrapper"
                [class.selected]="$index === selectedIndex()"
                (click)="selectMedia($index)">
