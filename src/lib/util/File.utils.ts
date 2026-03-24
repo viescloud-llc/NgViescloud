@@ -1,4 +1,4 @@
-import { VFile } from '../model/vies.model';
+import { FileType, VFile } from '../model/vies.model';
 import { ViesService } from '../service/rest.service';
 
 export class FileUtils {
@@ -14,7 +14,7 @@ export class FileUtils {
       .catch(() => false);
   }
 
-  static async fetchAsVFile(uri: string): Promise<VFile> {
+  static async fetchAsVFile(uri: string, options?: { generateObjectUrl?: boolean }): Promise<VFile> {
     if(ViesService.isNotCSR()) {
       return {} as VFile;
     }
@@ -47,7 +47,7 @@ export class FileUtils {
         extension: extension,
         rawFile: blob,
         originalLink: uri,
-        objectUrl: '',
+        objectUrl: options?.generateObjectUrl ? URL.createObjectURL(blob) : '',
       };
 
       return vFile;
@@ -242,7 +242,48 @@ export class FileUtils {
     link.remove();
   }
 
-  static async uploadFileAsVFile(accept: string): Promise<VFile> {
+  static getFileTypeFromExtension(extension: string): FileType {
+    const ext = extension.replace(/^\./, '').toLowerCase();
+
+    const map: Record<string, FileType> = {
+      // Images
+      jpg: FileType.IMAGE, jpeg: FileType.IMAGE, png: FileType.IMAGE,
+      gif: FileType.IMAGE, webp: FileType.IMAGE, svg: FileType.IMAGE,
+      bmp: FileType.IMAGE, ico: FileType.IMAGE, tiff: FileType.IMAGE,
+      tif: FileType.IMAGE, avif: FileType.IMAGE, heic: FileType.IMAGE,
+
+      // Videos
+      mp4: FileType.VIDEO, mov: FileType.VIDEO, avi: FileType.VIDEO,
+      mkv: FileType.VIDEO, webm: FileType.VIDEO, flv: FileType.VIDEO,
+      wmv: FileType.VIDEO, m4v: FileType.VIDEO, ogv: FileType.VIDEO,
+
+      // Audio
+      mp3: FileType.AUDIO, wav: FileType.AUDIO, ogg: FileType.AUDIO,
+      flac: FileType.AUDIO, aac: FileType.AUDIO, m4a: FileType.AUDIO,
+      wma: FileType.AUDIO, opus: FileType.AUDIO, aiff: FileType.AUDIO,
+
+      // Files/Documents
+      pdf: FileType.FILE, doc: FileType.FILE, docx: FileType.FILE,
+      xls: FileType.FILE, xlsx: FileType.FILE, ppt: FileType.FILE,
+      pptx: FileType.FILE, txt: FileType.FILE, csv: FileType.FILE,
+      zip: FileType.FILE, rar: FileType.FILE, tar: FileType.FILE,
+      gz: FileType.FILE,  json: FileType.FILE, xml: FileType.FILE,
+      html: FileType.FILE, css: FileType.FILE, js: FileType.FILE,
+      ts: FileType.FILE,
+    };
+
+    return map[ext] ?? FileType.UNKNOWN;
+  }
+
+  /**
+   * Prompts the user to select a file based on the given accept type
+   * and returns a Promise of VFile containing the selected file
+   * information.
+   * @param accept The accept type of the file input, for example 'image/*'
+   * @returns A Promise of VFile containing the selected file information.
+   * @VFile value is the String representation of the file content
+   */
+  static async uploadLocalFileAsVFile(accept: string, option?: { createObjectUrl?: boolean }): Promise<VFile> {
     return new Promise<VFile>((resolve, reject) => {
       let fileInput = document.createElement('input');
       fileInput.accept = accept;
@@ -270,7 +311,7 @@ export class FileUtils {
             name: fileName,
             type: fileType,
             rawFile: rawFile,
-            objectUrl: '',
+            objectUrl: option?.createObjectUrl ? URL.createObjectURL(rawFile) : '',
             extension: extension,
             value: value
           };

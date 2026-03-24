@@ -1,16 +1,13 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { first, firstValueFrom, from, map, mergeMap, Observable, of, pipe, switchMap, throwError, UnaryFunction } from 'rxjs';
+import { first, firstValueFrom, from, map, Observable, pipe, throwError } from 'rxjs';
 import { UtilsService } from './utils.service';
 import { VFile } from '../model/vies.model';
 import { Metadata } from '../model/object-storage-manager.model';
-import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { RxJSUtils } from '../util/RxJS.utils';
 import { PopupArgs, PopupType } from '../model/popup.model';
 import { HttpParamsBuilder } from '../model/utils.model';
 import { ViesService } from './rest.service';
-import { RouteUtils } from '../util/Route.utils';
 import { FileUtils } from '../util/File.utils';
 
 @Injectable({
@@ -269,6 +266,33 @@ export abstract class ObjectStorage {
     })
   }
 
+  async fetchFileAndGenerateObjectUrl(uri: string, popupArgs?: PopupArgs) {
+    if(this.objectUrlCache.has(uri)) {
+      let objectUrl = this.objectUrlCache.get(uri);
+      let isActiveUrl = await FileUtils.isObjectUrlActive(objectUrl!).catch(err => false);
+      if(isActiveUrl) {
+        return objectUrl!;
+      }
+      else {
+        URL.revokeObjectURL(objectUrl!);
+      }
+    }
+
+    let error: any;
+    let vFile = await this.fetchFile(uri, { popupArgs: popupArgs }).catch(error => {
+      error = error;
+      return null;
+    });
+
+    if (vFile && vFile.rawFile) {
+      vFile.objectUrl = URL.createObjectURL(vFile.rawFile);
+      this.objectUrlCache.set(uri, vFile.objectUrl);
+      return vFile.objectUrl;
+    }
+
+    return Promise.reject(error);
+  }
+
   async createObjectUrl(uri: string, rawFile: Blob) {
     if(this.objectUrlCache.has(uri)) {
       let objectUrl = this.objectUrlCache.get(uri);
@@ -286,13 +310,14 @@ export abstract class ObjectStorage {
     return objectUrl;
   }
 
-  async fetchFile(uri: string, popupArgs?: PopupArgs): Promise<VFile> {
+  async fetchFile(uri: string, options?: { popupArgs?: PopupArgs, generateObjectUrl?: boolean } ): Promise<VFile> {
+    let vFile: VFile | null = null;
     if (!this.containViesLink(uri)) {
-      return FileUtils.fetchAsVFile(uri)
+      vFile = await firstValueFrom(from(FileUtils.fetchAsVFile(uri)).pipe(this.getLoadingPipe(options?.popupArgs)));
     }
     else {
-      return firstValueFrom(this.httpClient.get(uri, { observe: 'response', responseType: 'blob' })
-        .pipe(this.getLoadingPipe(popupArgs))
+      vFile = await firstValueFrom(this.httpClient.get(uri, { observe: 'response', responseType: 'blob' })
+        .pipe(this.getLoadingPipe(options?.popupArgs))
         .pipe(
           map((response) => {
             let contentType = response.headers.get('Content-Type') || '';
@@ -324,33 +349,16 @@ export abstract class ObjectStorage {
           first()
         ))
     }
-  }
 
-  async fetchFileAndGenerateObjectUrl(uri: string, popupArgs?: PopupArgs) {
-    if(this.objectUrlCache.has(uri)) {
-      let objectUrl = this.objectUrlCache.get(uri);
-      let isActiveUrl = await FileUtils.isObjectUrlActive(objectUrl!).catch(err => false);
-      if(isActiveUrl) {
-        return objectUrl!;
+    if(vFile) {
+      if(options?.generateObjectUrl && vFile.rawFile && vFile.rawFile instanceof Blob) {
+        vFile.objectUrl = await this.createObjectUrl(uri, vFile.rawFile).catch(err => '');
       }
-      else {
-        URL.revokeObjectURL(objectUrl!);
-      }
+      return vFile;
     }
-
-    let error: any;
-    let vFile = await this.fetchFile(uri, popupArgs).catch(error => {
-      error = error;
-      return null;
-    });
-
-    if (vFile && vFile.rawFile) {
-      vFile.objectUrl = URL.createObjectURL(vFile.rawFile);
-      this.objectUrlCache.set(uri, vFile.objectUrl);
-      return vFile.objectUrl;
+    else {
+      return Promise.reject(new Error('Failed to fetch file'));
     }
-
-    return Promise.reject(error);
   }
 }
 

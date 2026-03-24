@@ -36,6 +36,36 @@ export class StringUtils {
       });
     }
 
+    static generateIdFromObject(obj: any): string {
+      const normalize = (value: any): any => {
+        if (Array.isArray(value)) {
+          return value.map(normalize);
+        }
+
+        if (value !== null && typeof value === 'object') {
+          return Object.keys(value)
+            .sort()
+            .reduce((acc, key) => {
+              acc[key] = normalize(value[key]);
+              return acc;
+            }, {} as any);
+        }
+
+        return value;
+      };
+
+      const normalized = JSON.stringify(normalize(obj));
+
+      let hash = 0;
+      for (let i = 0; i < normalized.length; i++) {
+        const char = normalized.charCodeAt(i);
+        hash = (hash << 5) - hash + char;
+        hash |= 0;
+      }
+
+      return Math.abs(hash).toString(36);
+    }
+
     static getMaxString(str: string, length: number, replaceWith: string = '...'): string {
         if (str.length > length) {
             return str.substring(0, length) + replaceWith;

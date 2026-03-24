@@ -4,6 +4,9 @@ import { ProductMedia, ProductMediaType } from '../../shared/model/product.model
 import { DataUtils } from '../../../lib/util/Data.utils';
 import { DialogUtils } from '../../../lib/util/Dialog.utils';
 import { ProductMediaComponent } from '../product-media/product-media.component';
+import { FileUtils } from '../../../lib/util/File.utils';
+import { FileType, VFile } from '../../../lib/model/vies.model';
+import { ObjectStorageService } from '../../../lib/service/object-storage-manager.service';
 
 @Component({
   selector: 'app-product-media-list',
@@ -19,8 +22,11 @@ export class ProductMediaListComponent {
   blankProductMedia = new ProductMedia();
   selectedIndex = signal<number>(0);
   selectedMedia = computed(() => this.productMedias()[this.selectedIndex()]);
-
+  
+  localFileCache: VFile[] = [];
+  
   dialogUtils = inject(DialogUtils);
+  objectStorageService = inject(ObjectStorageService);
 
   // Expose enum to template
   readonly ProductMediaType = ProductMediaType;
@@ -72,14 +78,28 @@ export class ProductMediaListComponent {
       }
     ).then(res => {
       if(res.sucess) {
+        this.updateMediaUrlToLocalFile(res.result);
         // Create new array reference to trigger change detection
         this.productMedias.set([...this.productMedias(), res.result]);
         // Select the newly added media
         this.selectedIndex.set(this.productMedias().length - 1);
       }
-    }).catch(() => {
-      // User cancelled
-    });
+    })
+  }
+
+  addMediaFromLocal() {
+    FileUtils.uploadLocalFileAsVFile("image/*,video/*", { createObjectUrl: true }).then(vfile => {
+      let fileType = FileUtils.getFileTypeFromExtension(vfile.extension);
+
+      if(fileType === FileType.IMAGE || fileType === FileType.VIDEO) {
+        let newMedia = DataUtils.purgeValue(new ProductMedia());
+        newMedia.url = vfile.objectUrl;
+        newMedia.mediaType = fileType === FileType.IMAGE ? ProductMediaType.IMAGE : ProductMediaType.VIDEO;
+        this.productMedias.set([...this.productMedias(), newMedia]);
+        this.selectedIndex.set(this.productMedias().length - 1);
+        this.localFileCache.push(vfile);
+      }
+    })
   }
 
   editMedia(index: number) {
@@ -95,6 +115,8 @@ export class ProductMediaListComponent {
       }
     ).then(res => {
       if(res.sucess) {
+        this.localFileCache = this.localFileCache.filter(f => f.objectUrl !== media.url);
+        this.updateMediaUrlToLocalFile(res.result);
         // Create new array with updated media
         const updated = [...this.productMedias()];
         updated[index] = res.result;
@@ -114,10 +136,10 @@ export class ProductMediaListComponent {
       'Cancel'
     ).then(res => {
       if(res) {
-        // Create new array without the deleted item
+        let media = this.productMedias()[index];
+        this.localFileCache = this.localFileCache.filter(f => f.objectUrl !== media.url);
         const updated = this.productMedias().filter((_, i) => i !== index);
         this.productMedias.set(updated);
-        // Effect will automatically adjust selectedIndex if needed
       }
     });
   }
@@ -129,5 +151,16 @@ export class ProductMediaListComponent {
       isPrimary: i === index
     }));
     this.productMedias.set(updated);
+  }
+
+  private updateMediaUrlToLocalFile(media: ProductMedia) {
+    if(media && media.url && !media.url.startsWith('blob:')) {
+      this.objectStorageService.fetchFile(media.url, { generateObjectUrl: true }).then(vfile => {
+        this.localFileCache.push(vfile);
+        media.url = vfile.objectUrl;
+      }).catch(err => {
+        this.dialogUtils.openErrorMessage('Error fetching media', 'Unable to fetch media from url: ' + media.url);
+      });
+    }
   }
 }

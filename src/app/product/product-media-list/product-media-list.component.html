@@ -69,9 +69,14 @@
 
   <!-- Add Media Button -->
   <div class="actions">
+    <button matButton="filled" (click)="addMediaFromLocal()">
+      <mat-icon>add_photo_alternate</mat-icon>
+      Add media from local
+    </button>
+
     <button matButton="filled" (click)="addMedia()">
       <mat-icon>add_photo_alternate</mat-icon>
-      Add media
+      Add media from URL
     </button>
   </div>
 </div>

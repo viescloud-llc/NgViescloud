@@ -34,6 +34,14 @@ export enum MatchCaseEnum {
     NONE = "NONE"
 }
 
+export enum FileType {
+    IMAGE = "IMAGE",
+    VIDEO = "VIDEO",
+    AUDIO = "AUDIO",
+    FILE = "FILE",
+    FOLDER = "FOLDER",
+    UNKNOWN = "UNKNOWN"
+}
 
 export class PathNode<T> {
     value?: T;
