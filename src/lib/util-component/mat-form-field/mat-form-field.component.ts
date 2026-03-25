@@ -1,4 +1,4 @@
-import { AfterContentChecked, ChangeDetectorRef, Component, DoCheck, EventEmitter, inject, input, Input, linkedSignal, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { AfterContentChecked, ChangeDetectorRef, Component, DoCheck, EventEmitter, inject, input, Input, isSignal, linkedSignal, OnChanges, OnInit, Output, signal, SimpleChanges, WritableSignal } from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
 import { MatFormFieldAppearance } from '@angular/material/form-field';
 import { UtilsService } from '../../service/utils.service';
@@ -93,7 +93,7 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
   dialogUtils = inject(DialogUtils);
 
   ngDoCheck(): void {
-    if(DataUtils.isNotEqual(this.value, this.valueCopy)) {
+    if(DataUtils.isNotEqual(this.getValue(), this.getValueCopy())) {
       this.ngOnChanges({});
     }
   }
@@ -107,9 +107,9 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
       return;
     }
 
-    if((this.value === undefined || this.value === null) && this.blankObject !== undefined && this.blankObject !== null) {
-      this.value = structuredClone(this.blankObject);
-      this.valueCopy = structuredClone(this.blankObject);
+    if((this.getValue() === undefined || this.getValue() === null) && this.blankObject !== undefined && this.blankObject !== null) {
+      this.setValue(structuredClone(this.blankObject));
+      this.setValueCopy(structuredClone(this.blankObject));
     }
   }
 
@@ -119,31 +119,29 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
     }
 
     if(changes['value']) {
-      this.valueCopy = structuredClone(this.value);
+      this.setValueCopy(structuredClone(this.getValue()));
       this.ngOnInit();
     }
   }
 
   getValue() {
-    if(this.value instanceof BehaviorSubject) {
-      return this.value.value;
-    }
-    else {
-      return this.value;
-    }
+    return DataUtils.getAnyValue(this.value);
   }
 
   setValue(value: any) {
-    if(this.value instanceof BehaviorSubject) {
-      this.value.next(value);
-    }
-    else {
-      this.value = value;
-    }
+    DataUtils.setAnyValue(this.value, value, () => this.value = value);
+  }
+
+  getValueCopy() {
+    return DataUtils.getAnyValue(this.valueCopy);
+  }
+
+  setValueCopy(value: any) {
+    DataUtils.setAnyValue(this.valueCopy, value, () => this.value = value);
   }
 
   emitValue(): void {
-    this.valueChange.emit(this.value);
+    this.valueChange.emit(this.getValue());
     this.onValueChange.emit();
   }
 
@@ -156,16 +154,18 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
   }
 
   clear(): void {
-    if (this.isValueNumber())
-      this.value = 0;
-    else
-      this.value = '';
+    if (this.isValueNumber()) {
+      this.setValue(0);
+    }
+    else {
+      this.setValue('');
+    }
 
-    this.valueChange.emit(this.value);
+    this.valueChange.emit(this.getValue());
   }
 
   isValidInput(): boolean {
-    if (this.required && !this.value)
+    if (this.required && !this.getValue())
       return false;
 
     if(this.internalError)
@@ -210,47 +210,47 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
   }
 
   isValueChange(): boolean {
-    return DataUtils.isNotEqual(this.value, this.valueCopy);
+    return DataUtils.isNotEqual(this.getValue(), this.getValueCopy());
   }
 
   isValueNotChange(): boolean {
-    return DataUtils.isEqual(this.value, this.valueCopy);
+    return DataUtils.isEqual(this.getValue(), this.getValueCopy());
   }
 
   isValueEnum(): boolean {
-    return UtilsService.isEnum(this.value);
+    return UtilsService.isEnum(this.getValue());
   }
 
   isValueString(): boolean {
-    return typeof this.value === 'string';
+    return typeof this.getValue() === 'string';
   }
 
   isValueMultipleStringLine(): boolean {
-    return typeof this.value === 'string' && this.value.includes("\n");
+    return typeof this.getValue() === 'string' && this.getValue().includes("\n");
   }
 
   isValueNonMultipleStringLine(): boolean {
-    return typeof this.value === 'string' && !this.value.includes("\n");
+    return typeof this.getValue() === 'string' && !this.getValue().includes("\n");
   }
 
   isValueNumber(): boolean {
-    return typeof this.value === 'number';
+    return typeof this.getValue() === 'number';
   }
 
   isValueBoolean(): boolean {
-    return typeof this.value === 'boolean';
+    return typeof this.getValue() === 'boolean';
   }
 
   resetValue(): void {
-    this.value = structuredClone(this.valueCopy);
+    this.setValue(structuredClone(this.getValueCopy()));
   }
 
   isValueArray(): boolean {
-    return Array.isArray(this.value) || Array.isArray(this.blankObject);
+    return Array.isArray(this.getValue()) || Array.isArray(this.blankObject);
   }
 
   isValueObject(): boolean {
-    return typeof this.value === 'object';
+    return typeof this.getValue() === 'object';
   }
 
   isValuePrimitive(): boolean {
@@ -261,7 +261,7 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
   }
 
   isValueRgbColor(): boolean {
-    return this.value instanceof RgbColor || (this.blankObject && this.blankObject instanceof RgbColor);
+    return this.getValue() instanceof RgbColor || (this.blankObject && this.blankObject instanceof RgbColor);
   }
 
   getInputColorNgStyle() {

@@ -37,16 +37,16 @@
           (cdkDropListDropped)="drop($event)">
 
           @if (blankObjectType =='object') {
-            @for (item of value; track trackByIndex(i, item); let i = $index) {
+            @for (item of value; track $index) {
               <app-mat-form-field-input-dynamic
                 [label]="label"
-                [value]="item" (valueChange)="value[i] = $event"
+                [value]="item" (valueChange)="value[$index] = $event"
                 [blankObject]="blankObject"
                 styleWidth="100%"
                 [readonly]="_readonly()"
               ></app-mat-form-field-input-dynamic>
               @if (showRemoveItemButton) {
-                <button (click)="removeWithWarning(i)" matButton="filled" class="warn">Remove this {{label}}</button>
+                <button (click)="removeWithWarning($index)" matButton="filled" class="warn">Remove this {{label}}</button>
               }
               @if (showDragAndDropButton) {
                 <button matButton="filled" cdkDragHandle>Rearrange this {{label}}</button>
@@ -54,18 +54,18 @@
               <hr>
               }
             } @else {
-              @for (item of value; track trackByIndex(i, item); let i = $index) {
+              @for (item of value; track $index) {
                 <li cdkDrag>
                   <app-mat-form-field-input
-                    [label]="label + ' ' + (i + 1)"
+                    [label]="label + ' ' + ($index + 1)"
                     [placeholder]="placeholder"
-                    [value]="item" (valueChange)="value[i] = $event"
+                    [value]="item" (valueChange)="value[$index] = $event"
                     styleWidth="100%"
-                    [focusOutAutoFillFn]="getFocusOutAutoFillFn(i)"
+                    [focusOutAutoFillFn]="getFocusOutAutoFillFn($index)"
                     [required]="required"
                     [readonly]="_readonly()">
                     @if (!_readonly()) {
-                      <button matSuffix mat-icon-button [matTooltip]="'remove this ' + label + ' item'" (click)="remove(i)" style="color: red;">
+                      <button matSuffix mat-icon-button [matTooltip]="'remove this ' + label + ' item'" (click)="remove($index)" style="color: red;">
                         <mat-icon>remove_circle</mat-icon>
                       </button>
                     }

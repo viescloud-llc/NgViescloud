@@ -1,5 +1,7 @@
+import { BehaviorSubject } from "rxjs";
 import { MatItemSettingType, MatOption } from "../model/mat.model";
 import { ReflectionUtils } from "./Reflection.utils";
+import { isSignal, WritableSignal } from "@angular/core";
 
 export class DataUtils {
   private constructor() { }
@@ -402,5 +404,29 @@ export class DataUtils {
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     return hashHex;
+  }
+
+  static getAnyValue(object: any) {
+    if(object instanceof BehaviorSubject) {
+      return object.value;
+    }
+    else if(isSignal(object)) {
+      return object();
+    }
+    else {
+      return object;
+    }
+  }
+
+  static setAnyValue(object: any, value: any, defaultSet: () => void) {
+    if(object instanceof BehaviorSubject) {
+      object.next(value);
+    }
+    else if(isSignal(object) && typeof (object as any).set === 'function') {
+      (object as WritableSignal<any>).set(value);
+    }
+    else {
+      defaultSet();
+    }
   }
 }

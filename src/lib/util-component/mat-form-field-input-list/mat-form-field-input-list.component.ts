@@ -97,6 +97,7 @@ export class MatFormFieldInputListComponent extends MatFormFieldComponent {
     if(!this.reachMaxSize())
       this.value.push(this.cloneBlankObject());
     this.listLength = this.value.length;
+    this.valueChange.emit(this.value);
   }
 
   clone(obj: any): any {
@@ -112,6 +113,8 @@ export class MatFormFieldInputListComponent extends MatFormFieldComponent {
 
   remove(index: number): void {
     this.value.splice(index, 1);
+    this.value=[...this.value];
+    this.valueChange.emit(this.value);
   }
 
   removeWithWarning(index: number): void {
