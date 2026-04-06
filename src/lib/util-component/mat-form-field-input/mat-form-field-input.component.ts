@@ -1,6 +1,6 @@
-import { Component, EventEmitter, Input, Output, SimpleChanges, forwardRef } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, Output, SimpleChanges, forwardRef, signal } from '@angular/core';
 import { MatFormFieldComponent } from '../mat-form-field/mat-form-field.component';
-import { Observable, map, startWith } from 'rxjs';
+import { Observable, Subscription, map, startWith } from 'rxjs';
 import { FormControl, ValidatorFn, Validators } from '@angular/forms';
 
 @Component({
@@ -10,7 +10,7 @@ import { FormControl, ValidatorFn, Validators } from '@angular/forms';
   providers: [{ provide: MatFormFieldComponent, useExisting: forwardRef(() => MatFormFieldInputComponent) }],
   standalone: false
 })
-export class MatFormFieldInputComponent extends MatFormFieldComponent {
+export class MatFormFieldInputComponent extends MatFormFieldComponent implements OnDestroy {
   @Input()
   options: string[] = [];
 
@@ -88,6 +88,9 @@ export class MatFormFieldInputComponent extends MatFormFieldComponent {
   formControl!: FormControl;
   filteredOptions!: Observable<string[]>;
 
+  private valueChangesSubscription?: Subscription;
+  private isUpdatingFromParent = signal(false);
+
   //custom icon
   @Output()
   onCustomIconClick: EventEmitter<any> = new EventEmitter();
@@ -109,17 +112,47 @@ export class MatFormFieldInputComponent extends MatFormFieldComponent {
   override ngOnInit(): void {
     super.ngOnInit();
 
-    this.formControl = new FormControl(this.value);
+    this.formControl = new FormControl(this.getValue());
 
     this.addValidator();
 
     this.initFilteredOptions();
+
+    // Subscribe to formControl value changes
+    this.valueChangesSubscription = this.formControl.valueChanges.subscribe(value => {
+      if (this.isUpdatingFromParent()) {
+        return; // Prevent circular updates
+      }
+
+      // Update the internal value
+      this.setValue(value);
+
+      // Emit value if not in manual mode or after paste
+      this.emitValueWithCondition();
+    });
   }
 
   override ngOnChanges(changes: SimpleChanges): void {
     super.ngOnChanges(changes);
+
+    // Sync formControl value when input value changes from parent
+    if (changes['value'] && this.formControl) {
+      this.isUpdatingFromParent.set(true);
+      const currentValue = this.getValue();
+      if (this.formControl.value !== currentValue) {
+        this.formControl.setValue(currentValue, { emitEvent: false });
+      }
+      this.isUpdatingFromParent.set(false);
+    }
+
     if (changes['options'] && this.filteredOptions) {
       this.initFilteredOptions();
+    }
+
+    // Update validators if relevant inputs change
+    if (changes['disable'] || changes['required'] || changes['validateEmail'] ||
+        changes['min'] || changes['max'] || changes['minlength'] || changes['maxlength']) {
+      this.updateValidators();
     }
   }
 
@@ -131,26 +164,46 @@ export class MatFormFieldInputComponent extends MatFormFieldComponent {
   }
 
   private addValidator() {
-    if (this.disable)
-      this.formControl.disable({ onlySelf: true });
+    this.updateValidators();
+  }
+
+  private updateValidators() {
+    // Clear all validators first
+    this.formControl.clearValidators();
+
+    const validators: ValidatorFn[] = [];
 
     if (this.validateEmail)
-      this.formControl.addValidators(Validators.email);
+      validators.push(Validators.email);
 
     if (this.max)
-      this.formControl.addValidators(Validators.max(+this.max));
+      validators.push(Validators.max(+this.max));
 
     if (this.min)
-      this.formControl.addValidators(Validators.min(+this.min));
+      validators.push(Validators.min(+this.min));
 
     if (this.maxlength)
-      this.formControl.addValidators(Validators.maxLength(+this.maxlength));
+      validators.push(Validators.maxLength(+this.maxlength));
 
     if (this.minlength)
-      this.formControl.addValidators(Validators.minLength(+this.minlength));
+      validators.push(Validators.minLength(+this.minlength));
 
-    if(this.required)
-      this.formControl.addValidators(Validators.required);
+    if (this.required)
+      validators.push(Validators.required);
+
+    // Set all validators at once
+    if (validators.length > 0) {
+      this.formControl.setValidators(validators);
+    }
+
+    // Update enabled/disabled state
+    if (this.disable)
+      this.formControl.disable({ onlySelf: true });
+    else
+      this.formControl.enable({ onlySelf: true });
+
+    // Update validity
+    this.formControl.updateValueAndValidity({ emitEvent: false });
   }
 
   getFormControlError(): string {
@@ -219,7 +272,11 @@ export class MatFormFieldInputComponent extends MatFormFieldComponent {
     }
 
     if(this.focusOutAutoFillFn) {
-      this.value = this.focusOutAutoFillFn(this.value);
+      const newValue = this.focusOutAutoFillFn(this.getValue());
+      this.setValue(newValue);
+      this.isUpdatingFromParent.set(true);
+      this.formControl.setValue(newValue, { emitEvent: false });
+      this.isUpdatingFromParent.set(false);
       this.emitValue();
       return;
     }
@@ -273,15 +330,17 @@ export class MatFormFieldInputComponent extends MatFormFieldComponent {
   }
 
   override clear(): void {
-    if (this.defaultType === 'number')
-      this.value = 0;
-    else
-      this.value = '';
+    const clearValue = this.defaultType === 'number' ? 0 : '';
+
+    this.setValue(clearValue);
+    this.isUpdatingFromParent.set(true);
+    this.formControl.setValue(clearValue, { emitEvent: false });
+    this.isUpdatingFromParent.set(false);
 
     if (this.manuallyEmitValue)
       return;
 
-    this.valueChange.emit(this.value);
+    this.valueChange.emit(clearValue);
     this.onValueChange.emit();
   }
 
@@ -324,10 +383,20 @@ export class MatFormFieldInputComponent extends MatFormFieldComponent {
   }
 
   onAutoFillHttps() {
-    if(this.value && !this.value.startsWith('https://') && !this.value.startsWith('http://'))
-      this.value = 'https://' + this.value;
+    const currentValue = this.getValue();
+    if(currentValue && !currentValue.startsWith('https://') && !currentValue.startsWith('http://')) {
+      const newValue = 'https://' + currentValue;
+      this.setValue(newValue);
+      this.isUpdatingFromParent.set(true);
+      this.formControl.setValue(newValue, { emitEvent: false });
+      this.isUpdatingFromParent.set(false);
+    }
 
     this.emitValue();
+  }
+
+  ngOnDestroy(): void {
+    this.valueChangesSubscription?.unsubscribe();
   }
 
   getCustomIconLabelColor() {

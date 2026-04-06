@@ -172,7 +172,7 @@ export class MatFromFieldInputDynamicItem {
     constructor() {}
 
     setValueFn(value: any) {
-        this.ref[this.key] = value;
+        DataUtils.setAnyValue(this.ref[this.key], value, () => this.ref[this.key] = value);
     };
 
     containSetting(setting: string | MatItemSettingType): boolean {

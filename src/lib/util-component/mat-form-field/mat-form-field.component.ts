@@ -140,8 +140,18 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
     DataUtils.setAnyValue(this.valueCopy, value, () => this.value = value);
   }
 
-  emitValue(): void {
-    this.valueChange.emit(this.getValue());
+  emitValue(value?: any): void {
+    if(value) {
+      this.setValue(value);
+    }
+
+    // For signals, emit the signal itself (not the unwrapped value) to preserve the reference
+    // This allows two-way binding [(value)]="signal" to work correctly
+    if(isSignal(this.value)) {
+      this.valueChange.emit(this.value);
+    } else {
+      this.valueChange.emit(this.getValue());
+    }
     this.onValueChange.emit();
   }
 
@@ -294,5 +304,9 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
   focusEmit() {
     this.isFocus = true;
     this.onFocus.emit();
+  }
+
+  printValue() {
+    console.log(this.getValue());
   }
 }

@@ -82,8 +82,9 @@ export class MatFormFieldInputListComponent extends MatFormFieldComponent {
     if(this.reachMaxSize())
       this.listLength = this.maxSize;
 
-    while(this.value.length < this.listLength)
+    while(this.value.length < this.listLength) {
       this.value.push(this.cloneBlankObject());
+    }
 
     if(this.value.length > this.listLength) {
       let deleteSize = this.value.length - this.listLength
@@ -94,10 +95,12 @@ export class MatFormFieldInputListComponent extends MatFormFieldComponent {
   }
 
   addNewItem() {
-    if(!this.reachMaxSize())
+    if(!this.reachMaxSize()) {
       this.value.push(this.cloneBlankObject());
+    }
     this.listLength = this.value.length;
-    this.valueChange.emit(this.value);
+    // this.valueChange.emit(this.getValue());
+    this.emitValue();
   }
 
   clone(obj: any): any {

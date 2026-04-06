@@ -5,8 +5,9 @@
       <app-mat-form-field-input
         [label]="label"
         [placeholder]="placeholder"
-        [(value)]="value"
-        (onValueChange)="emitValue()"
+        [value]="value"
+        (valueChange)="emitValue($event)"
+        (onValueChange)="onValueChange.emit()"
         [styleWidth]="styleWidth"
         [disable]="disable"
         [required]="required"
@@ -21,8 +22,9 @@
       <app-mat-form-field-input-option
         [label]="label"
         [placeholder]="placeholder"
-        [(value)]="value"
-        (onValueChange)="emitValue()"
+        [value]="value"
+        (valueChange)="emitValue($event)"
+        (onValueChange)="onValueChange.emit()"
         [options]="options"
         noneLabel=""
         [styleWidth]="styleWidth"
@@ -38,8 +40,8 @@
       <mat-slide-toggle
         style="margin: 0.05rem;"
         [color]="matColor"
-        [(ngModel)]="value"
-        (ngModelChange)="emitValue()"
+        [ngModel]="value"
+        (ngModelChange)="emitValue($event)"
         (toggleChange)="emitValue()"
         [disabled]="disable"
         [required]="required">
@@ -52,8 +54,9 @@
       <app-mat-form-field-input-option
         [label]="label"
         [placeholder]="placeholder"
-        [(value)]="value"
-        (onValueChange)="emitValue()"
+        [value]="value"
+        (valueChange)="emitValue($event)"
+        (onValueChange)="onValueChange.emit()"
         [options]="matOptions!"
         noneLabel=""
         [styleWidth]="styleWidth"
@@ -69,8 +72,9 @@
       <app-mat-form-field-input
         [label]="label"
         [placeholder]="placeholder"
-        [value]="value" (valueChange)="value = $event"
-        (onValueChange)="emitValue()"
+        [value]="value" 
+        (valueChange)="emitValue($event)"
+        (onValueChange)="onValueChange.emit()"
         [required]="required"
         [showVisibleSwitch]="isPassword"
         [validateEmail]="isEmail"
@@ -89,8 +93,9 @@
       <app-mat-form-field-input-text-area
         [label]="label"
         [placeholder]="placeholder"
-        [value]="value" (valueChange)="value = $event"
-        (onValueChange)="emitValue()"
+        [value]="value" 
+        (valueChange)="emitValue($event)"
+        (onValueChange)="onValueChange.emit()"
         [required]="required"
         [styleWidth]="styleWidth"
         [disable]="disable"
@@ -105,8 +110,9 @@
       <app-mat-form-field-input-record
       [label]="label"
       [placeholder]="placeholder"
-      [(value)]="value"
-      (onValueChange)="emitValue()"
+      [value]="value"
+      (valueChange)="emitValue($event)"
+      (onValueChange)="onValueChange.emit()"
       [required]="required"
       [styleWidth]="styleWidth"
       [disable]="disable"
@@ -127,8 +133,9 @@
       <app-mat-form-field-input-rgb-color-picker
       [label]="label"
       [placeholder]="placeholder"
-      [(value)]="value"
-      (onValueChange)="emitValue()"
+      [value]="value"
+      (valueChange)="emitValue($event)"
+      (onValueChange)="onValueChange.emit()"
       [styleWidth]="styleWidth"
       [disable]="disable"
       [required]="required"
@@ -143,8 +150,9 @@
       <app-mat-form-field-input-list
         [label]="label"
         [placeholder]="placeholder"
-        [(value)]="value"
-        (onValueChange)="emitValue()"
+        [value]="value"
+        (valueChange)="emitValue($event)"
+        (onValueChange)="onValueChange.emit()"
         [required]="required"
         [styleWidth]="styleWidth"
         [disable]="disable"
@@ -173,7 +181,8 @@
             <app-mat-form-field-input-dynamic
               [label]="item.label"
               [placeholder]="item.placeholder"
-              [value]="item.value" (valueChange)="item.setValueFn($event)"
+              [value]="item.value" 
+              (valueChange)="item.setValueFn($event); emitValue()"
               [styleWidth]="styleWidth"
               [isSlideToggle]="containSetting(item, MatItemSettingType.SLIDE_TOGGLE)"
               [disable]="containSetting(item, MatItemSettingType.DISABLE)"
@@ -191,7 +200,7 @@
               [listRequired]="containSetting(item, MatItemSettingType.LIST_REQUIRE)"
               [matOptions]="item.matOptions"
               [isBlankObjectArray]="item.isBlankObjectArray"
-              (onValueChange)="onValueChangeFn()"
+              (onValueChange)="onValueChange.emit()"
               [indent]="indent"
               [blankObject]="item.blankObject"
               [objectLabel]="item.key"
@@ -207,6 +216,8 @@
       <p>Unknown input type</p>
     }
   }
+
+  <!-- <button (click)="printValue()">print</button> -->
 
   <ng-content></ng-content>
 </div>

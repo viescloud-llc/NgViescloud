@@ -418,12 +418,23 @@ export class DataUtils {
     }
   }
 
-  static setAnyValue(object: any, value: any, defaultSet: () => void) {
+  static isWriteableSignal(object: any): object is WritableSignal<any> {
+    return isSignal(object) && typeof (object as any).set === 'function';
+  }
+
+  static setAnyValue(object: any, value: any, defaultSet: () => void, avoidImpureWrite = false) {
     if(object instanceof BehaviorSubject) {
       object.next(value);
     }
-    else if(isSignal(object) && typeof (object as any).set === 'function') {
-      (object as WritableSignal<any>).set(value);
+    else if(this.isWriteableSignal(object) && Array.isArray(this.getAnyValue(object)) && !avoidImpureWrite) {
+      object.set([...value]);
+    }
+    else if(this.isWriteableSignal(object)) {
+      object.set(value);
+    }
+    else if(Array.isArray(object) && Array.isArray(value) && !avoidImpureWrite) {
+      object.length = 0;
+      object.push(...value);
     }
     else {
       defaultSet();

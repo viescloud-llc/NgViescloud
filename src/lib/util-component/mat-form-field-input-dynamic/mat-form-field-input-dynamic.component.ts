@@ -1,8 +1,6 @@
 import { Component, Input, SimpleChanges, forwardRef } from '@angular/core';
 import { MatFormFieldComponent } from '../mat-form-field/mat-form-field.component';
 import { MatFromFieldInputDynamicItem, MatItemSetting, MatItemSettingType, MatOption } from '../../model/mat.model';
-import { UtilsService } from '../../service/utils.service';
-import { DataUtils } from '../../util/Data.utils';
 import { ViesService } from '../../service/rest.service';
 
 export enum DynamicMatInputType {
@@ -111,7 +109,7 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
     super.ngOnInit();
 
     if(this.blankObject === undefined || this.blankObject === null) {
-      this.blankObject = structuredClone(this.value);
+      this.blankObject = structuredClone(this.getValue());
       this.initBlankObjectProvided = false;
     }
 
@@ -126,7 +124,7 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
     super.ngOnChanges(changes);
 
     if(changes['value'] && !this.initBlankObjectProvided) {
-      this.blankObject = structuredClone(this.value);
+      this.blankObject = structuredClone(this.getValue());
     }
 
     this.init();
@@ -182,9 +180,9 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
     let defaultIndex = 100;
 
     //check if value is null or undefine
-    if(!this.value) {
-      this.value = structuredClone(this.blankObject);
-      Object.setPrototypeOf(this.value , this.blankObject);
+    if(!this.getValue()) {
+      this.setValue(structuredClone(this.blankObject));
+      Object.setPrototypeOf(this.getValue() , this.blankObject);
     }
 
     for (const [key] of Object.entries(this.blankObject)) {
@@ -220,7 +218,7 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
   }
 
   private getKeyValue(key: string) {
-    let value = this.value[key];
+    let value = this.getValue()[key];
 
     if(typeof value === 'boolean')
       return value;
@@ -310,9 +308,5 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
 
   isValueRecord(): boolean {
     return this.isRecord;
-  }
-
-  onValueChangeFn() {
-    this.onValueChange.emit();
   }
 }

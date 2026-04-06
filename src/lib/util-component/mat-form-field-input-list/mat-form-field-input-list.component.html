@@ -40,7 +40,9 @@
             @for (item of value; track $index) {
               <app-mat-form-field-input-dynamic
                 [label]="label"
-                [value]="item" (valueChange)="value[$index] = $event"
+                [value]="item" 
+                (valueChange)="value[$index] = $event; emitValue()"
+                (onValueChange)="onValueChange.emit()"
                 [blankObject]="blankObject"
                 styleWidth="100%"
                 [readonly]="_readonly()"
@@ -59,7 +61,9 @@
                   <app-mat-form-field-input
                     [label]="label + ' ' + ($index + 1)"
                     [placeholder]="placeholder"
-                    [value]="item" (valueChange)="value[$index] = $event"
+                    [value]="item" 
+                    (valueChange)="value[$index] = $event; emitValue()"
+                    (onValueChange)="onValueChange.emit()"
                     styleWidth="100%"
                     [focusOutAutoFillFn]="getFocusOutAutoFillFn($index)"
                     [required]="required"
