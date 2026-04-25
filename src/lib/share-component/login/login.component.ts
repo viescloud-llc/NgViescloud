@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { first, firstValueFrom } from 'rxjs';
@@ -11,6 +11,7 @@ import { StringUtils } from '../../util/String.utils';
 import { FileUtils } from '../../util/File.utils';
 import { RouteUtils } from '../../util/Route.utils';
 import { environment } from '../../../environments/environment.prod';
+import { ViesMatFormFieldMap } from '../../abtract/ViesMatFormFieldMap';
 
 @Component({
   selector: 'viescloud-login',
@@ -18,7 +19,7 @@ import { environment } from '../../../environments/environment.prod';
   styleUrls: ['./login.component.scss'],
   standalone: false
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent extends ViesMatFormFieldMap implements OnInit {
 
   public static defaultStateKey = "ensible_auth_state";
 
@@ -26,8 +27,8 @@ export class LoginComponent implements OnInit {
 
   username = '';
   password = '';
-  validForm = false;
-  openIdLogin = false;
+  validForm = signal(false);
+  openIdLogin = signal(false);
 
   loading = 'Logging in, please wait';
   count = 0;
@@ -38,14 +39,16 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private ensibleOpenidService: OpenIdProviderService,
     private rxjsUtils: RxJSUtils
-  ) { }
+  ) { 
+    super();
+  }
 
   async ngOnInit() {
     let code = RouteUtils.getQueryParam('code');
     let state = RouteUtils.getQueryParam('state');
 
     if(code && state) {
-      this.openIdLogin = true;
+      this.openIdLogin.set(true);
       setInterval(() => {
         this.count++;
         if (this.count > 5) {
@@ -74,7 +77,7 @@ export class LoginComponent implements OnInit {
       }
 
       RouteUtils.deleteQueryParam('code', 'state');
-      this.openIdLogin = false;
+      this.openIdLogin.set(false);
       this.ngOnInit();
     }
     else {
@@ -89,7 +92,7 @@ export class LoginComponent implements OnInit {
   async login() {
     let success = false;
 
-    if (this.validForm)
+    if (this.validForm())
       await firstValueFrom(this.authenticatorService.login({ username: this.username, password: this.password }).pipe(this.rxjsUtils.waitLoadingDialog()))
       .then(res => {
         success = true;

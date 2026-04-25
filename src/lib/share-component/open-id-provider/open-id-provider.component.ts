@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterContentChecked, ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { RxJSUtils } from '../../util/RxJS.utils';
 import { DataUtils } from '../../util/Data.utils';
 import { OpenIDProvider } from '../../model/open-id.model';
@@ -9,6 +9,7 @@ import { FixChangeDetection } from '../../abtract/FixChangeDetection';
 import { UserGroup } from '../../model/authenticator.model';
 import { UserGroupService } from '../../service/user-group.service';
 import { OpenIdProviderService } from '../../service/open-id-provider.service';
+import { ViesMatFormFieldMap } from '../../abtract/ViesMatFormFieldMap';
 
 @Component({
   selector: 'app-open-id-provider',
@@ -16,7 +17,7 @@ import { OpenIdProviderService } from '../../service/open-id-provider.service';
   styleUrls: ['./open-id-provider.component.scss'],
   standalone: false
 })
-export class OpenIdProviderComponent extends FixChangeDetection implements OnInit {
+export class OpenIdProviderComponent extends ViesMatFormFieldMap implements OnInit, AfterContentChecked {
 
   openIdProviders: OpenIDProvider[] = [];
   blankOpenIdProvider: OpenIDProvider = new OpenIDProvider();
@@ -34,6 +35,9 @@ export class OpenIdProviderComponent extends FixChangeDetection implements OnIni
 
   claimSupporteds: string[] = [];
 
+  protected cd: ChangeDetectorRef = inject(ChangeDetectorRef);
+
+
   constructor(
     private openIdService: OpenIdProviderService,
     private rxjsUtils: RxJSUtils,
@@ -50,6 +54,10 @@ export class OpenIdProviderComponent extends FixChangeDetection implements OnIni
         this.openIdProviders = res;
       }
     })
+  }
+
+  ngAfterContentChecked(): void {
+    this.cd.detectChanges();
   }
 
   selectOpenIdProvider(openIdProvider: OpenIDProvider | undefined) {

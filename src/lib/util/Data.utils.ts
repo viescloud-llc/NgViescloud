@@ -1,5 +1,7 @@
+import { BehaviorSubject } from "rxjs";
 import { MatItemSettingType, MatOption } from "../model/mat.model";
 import { ReflectionUtils } from "./Reflection.utils";
+import { isSignal, WritableSignal } from "@angular/core";
 
 export class DataUtils {
   private constructor() { }
@@ -402,5 +404,40 @@ export class DataUtils {
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     return hashHex;
+  }
+
+  static getAnyValue(object: any) {
+    if(object instanceof BehaviorSubject) {
+      return object.value;
+    }
+    else if(isSignal(object)) {
+      return object();
+    }
+    else {
+      return object;
+    }
+  }
+
+  static isWriteableSignal(object: any): object is WritableSignal<any> {
+    return isSignal(object) && typeof (object as any).set === 'function';
+  }
+
+  static setAnyValue(object: any, value: any, defaultSet: () => void, avoidImpureWrite = false) {
+    if(object instanceof BehaviorSubject) {
+      object.next(value);
+    }
+    else if(this.isWriteableSignal(object) && Array.isArray(this.getAnyValue(object)) && !avoidImpureWrite) {
+      object.set([...value]);
+    }
+    else if(this.isWriteableSignal(object)) {
+      object.set(value);
+    }
+    else if(Array.isArray(object) && Array.isArray(value) && !avoidImpureWrite) {
+      object.length = 0;
+      object.push(...value);
+    }
+    else {
+      defaultSet();
+    }
   }
 }

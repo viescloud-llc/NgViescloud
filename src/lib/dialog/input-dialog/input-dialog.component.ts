@@ -1,5 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { ViesMatFormFieldMap } from '../../abtract/ViesMatFormFieldMap';
 
 @Component({
   selector: 'app-input-dialog',
@@ -7,7 +8,7 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
   styleUrls: ['./input-dialog.component.scss'],
   standalone: false
 })
-export class InputDialog implements OnInit {
+export class InputDialog extends ViesMatFormFieldMap implements OnInit {
 
   yes: string = 'Save';
   no: string = 'Cancel';
@@ -16,7 +17,9 @@ export class InputDialog implements OnInit {
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: { title: string, label?: string, yes?: string, no?: string, multipleLine: boolean, input?: string , placeholder?: string}
-  ) { }
+  ) { 
+    super();
+  }
 
   ngOnInit() {
     if (this.data.yes)

@@ -99,4 +99,44 @@ export class ReflectionUtils {
 
         return obj1;
     }
+
+    static syncDialogData(classObject: any, dialogData: any): void {
+        if (!dialogData) {
+            return;
+        }
+
+        const instance = classObject as Record<string, any>;
+        
+        // collect all keys from the entire prototype chain
+        const allKeys = new Set<string>();
+        let proto = Object.getPrototypeOf(instance);
+        
+        while (proto && proto !== Object.prototype) {
+            Object.getOwnPropertyNames(proto).forEach(key => allKeys.add(key));
+            proto = Object.getPrototypeOf(proto);
+        }
+        
+        // also include own properties
+        Object.keys(instance).forEach(key => allKeys.add(key));
+
+        allKeys.forEach(key => {
+            if (key.startsWith('_')) {
+                const inputKey = key.slice(1);
+                const hasMatchingInput = typeof instance[inputKey]?.() !== 'undefined';
+                const dialogValue = dialogData[inputKey];
+    
+                if (hasMatchingInput && dialogValue !== undefined) {
+                    instance[key].set(dialogValue);
+                }
+            }
+            else if(instance[key]) {
+                const isSignal = typeof instance[key] === 'function' && typeof instance[key].set === 'function';
+                const dialogValue = dialogData[key];
+
+                if (isSignal && dialogValue !== undefined && typeof instance[key]?.() !== 'undefined') {
+                    instance[key].set(dialogValue);
+                }
+            }
+        });
+    }
 }

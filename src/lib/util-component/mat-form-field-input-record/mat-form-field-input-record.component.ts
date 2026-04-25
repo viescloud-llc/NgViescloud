@@ -30,24 +30,6 @@ export class MatFormFieldInputRecordComponent<K extends string | number, V> exte
   @Output()
   override valueChange: EventEmitter<Record<K, V>> = new EventEmitter();
 
-  @Input()
-  showSizeInput: boolean = true;
-
-  @Input()
-  showRemoveItemButton: boolean = true;
-
-  @Input()
-  showAddItemButton: boolean = true;
-
-  @Input()
-  maxSize: number = 100;
-
-  @Input()
-  minSize: number = 0;
-
-  @Input()
-  expanded: boolean = false;
-
   @Output()
   expandedChange: EventEmitter<boolean> = new EventEmitter<boolean>();
 
@@ -62,10 +44,10 @@ export class MatFormFieldInputRecordComponent<K extends string | number, V> exte
   override ngOnInit(): void {
     super.ngOnInit();
 
-    if(this.readonly) {
-      this.showSizeInput = false;
-      this.showRemoveItemButton = false;
-      this.showAddItemButton = false;
+    if(this.getInputValue(this.inputKeys.readonly)) {
+      this.setInputValue(this.inputKeys.showSizeInput, false);
+      this.setInputValue(this.inputKeys.showRemoveItemButton, false);
+      this.setInputValue(this.inputKeys.showAddItemButton, false);
       this.validForm = true;
     }
 
@@ -91,7 +73,7 @@ export class MatFormFieldInputRecordComponent<K extends string | number, V> exte
     this.checkValidKeyPair();
     if(!superCheck)
       return superCheck;
-    else if(this.getRecordSize() < this.minSize)
+    else if(this.getRecordSize() < this.getInputValue(this.inputKeys.minSize))
       return false;
     else
       return this.validForm && this.validKeyPair;
@@ -161,7 +143,7 @@ export class MatFormFieldInputRecordComponent<K extends string | number, V> exte
 
   updateListLength() {
     if(this.reachMaxSize())
-      this.listLength = this.maxSize;
+      this.listLength = this.getInputValue(this.inputKeys.maxSize);
 
     while(this.getKeyPairsSize() < this.listLength)
       this.keypairs.push(new KeyPair<K, V>(this.getBlankKey(), this.getBlankValue()));
@@ -189,7 +171,7 @@ export class MatFormFieldInputRecordComponent<K extends string | number, V> exte
   }
 
   reachMaxSize() {
-    return this.getKeyPairsSize() >= this.maxSize;
+    return this.getKeyPairsSize() >= this.getInputValue(this.inputKeys.maxSize);
   }
 
   isMapKeyOrValueObject(): boolean {

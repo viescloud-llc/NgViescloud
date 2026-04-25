@@ -1,8 +1,6 @@
-import { Component, Input, SimpleChanges, forwardRef } from '@angular/core';
+import { Component, Input, SimpleChanges, forwardRef, input } from '@angular/core';
 import { MatFormFieldComponent } from '../mat-form-field/mat-form-field.component';
 import { MatFromFieldInputDynamicItem, MatItemSetting, MatItemSettingType, MatOption } from '../../model/mat.model';
-import { UtilsService } from '../../service/utils.service';
-import { DataUtils } from '../../util/Data.utils';
 import { ViesService } from '../../service/rest.service';
 
 export enum DynamicMatInputType {
@@ -28,54 +26,6 @@ export enum DynamicMatInputType {
   standalone: false
 })
 export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
-
-  @Input()
-  isPassword: boolean = false;
-
-  @Input()
-  isEmail: boolean = false;
-
-  @Input()
-  isTextArea: boolean = false;
-
-  @Input()
-  isSlideToggle: boolean = false;
-
-  @Input()
-  isOptions: boolean = false;
-
-  @Input()
-  isHttps: boolean = false;
-
-  @Input()
-  isRecord: boolean = false;
-
-  @Input()
-  isBlankObjectArray: boolean = false;
-
-  @Input()
-  showGotoButton: boolean = false;
-
-  @Input()
-  showListSizeInput: boolean = false;
-
-  @Input()
-  showListRemoveItemButton: boolean = true;
-
-  @Input()
-  showListAddItemButton: boolean = true;
-
-  @Input()
-  listRequired: boolean = false;
-
-  @Input()
-  indent: boolean = true;
-
-  @Input()
-  matOptions?: MatOption<any>[];
-
-  @Input()
-  objectLabel?: string;
 
   @Input()
   selfRef?: MatFromFieldInputDynamicItem;
@@ -111,7 +61,7 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
     super.ngOnInit();
 
     if(this.blankObject === undefined || this.blankObject === null) {
-      this.blankObject = structuredClone(this.value);
+      this.blankObject = structuredClone(this.getValue());
       this.initBlankObjectProvided = false;
     }
 
@@ -126,7 +76,7 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
     super.ngOnChanges(changes);
 
     if(changes['value'] && !this.initBlankObjectProvided) {
-      this.blankObject = structuredClone(this.value);
+      this.blankObject = structuredClone(this.getValue());
     }
 
     this.init();
@@ -158,11 +108,11 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
       this.inputType = DynamicMatInputType.RECORD;
     else if(this.isValueNumber())
       this.inputType = DynamicMatInputType.NUMBER;
-    else if(this.isValueBoolean() && !this.isSlideToggle)
+    else if(this.isValueBoolean() && !this.getInputValue(this.inputKeys.isSlideToggle))
       this.inputType = DynamicMatInputType.BOOLEAN;
-    else if(this.isValueBoolean() && this.isSlideToggle)
+    else if(this.isValueBoolean() && this.getInputValue(this.inputKeys.isSlideToggle))
       this.inputType = DynamicMatInputType.BOOLEAN_SLIDE_TOGGLE;
-    else if(this.isOptions)
+    else if(this.getInputValue(this.inputKeys.isOptions))
       this.inputType = DynamicMatInputType.OPTIONS;
     else if(this.isValueNonMultipleStringLine())
       this.inputType = DynamicMatInputType.STRING;
@@ -182,9 +132,9 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
     let defaultIndex = 100;
 
     //check if value is null or undefine
-    if(!this.value) {
-      this.value = structuredClone(this.blankObject);
-      Object.setPrototypeOf(this.value , this.blankObject);
+    if(!this.getValue()) {
+      this.setValue(structuredClone(this.blankObject));
+      Object.setPrototypeOf(this.getValue() , this.blankObject);
     }
 
     for (const [key] of Object.entries(this.blankObject)) {
@@ -197,9 +147,31 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
         item.value = this.getKeyValue(key);
         item.settings = this.getSettings(key);
         item.index = this.getIndexSettingValue(key, defaultIndex);
-        item.label = this.getLabelSettingValue(key);
-        item.placeholder = this.getPlaceholderSettingValue(key);
         item.matOptions = this.getMatOptions(key);
+
+        item.inputMap = this.inputMap.clone();
+
+        item.inputMap.set(this.inputKeys.label, this.getLabelSettingValue(key));
+        item.inputMap.set(this.inputKeys.placeholder, this.getPlaceholderSettingValue(key));
+        item.inputMap.set(this.inputKeys.matOptions, item.matOptions);
+        item.inputMap.set(this.inputKeys.isBlankObjectArray, item.isBlankObjectArray);
+        item.inputMap.set(this.inputKeys.objectLabel, item.key);
+
+        item.inputMap.set(this.inputKeys.isSlideToggle, this.containSetting(item, MatItemSettingType.SLIDE_TOGGLE));
+        item.inputMap.set(this.inputKeys.disable, this.containSetting(item, MatItemSettingType.DISABLE));
+        item.inputMap.set(this.inputKeys.required, this.containSetting(item, MatItemSettingType.REQUIRE));
+        item.inputMap.set(this.inputKeys.isTextArea, this.containSetting(item, MatItemSettingType.TEXT_AREA));
+        item.inputMap.set(this.inputKeys.isOptions, this.containSetting(item, MatItemSettingType.OPTIONS));
+        item.inputMap.set(this.inputKeys.isEmail, this.containSetting(item, MatItemSettingType.VALIDATE_EMAIL));
+        item.inputMap.set(this.inputKeys.isHttps, this.containSetting(item, MatItemSettingType.AUTO_FILL_HTTPS));
+        item.inputMap.set(this.inputKeys.showListSizeInput, this.containSetting(item, MatItemSettingType.LIST_SHOW_LIST_SIZE_INPUT));
+        item.inputMap.set(this.inputKeys.showListAddItemButton, this.containSetting(item, MatItemSettingType.LIST_SHOW_ADD_ITEM_BUTTON));
+        item.inputMap.set(this.inputKeys.showListRemoveItemButton, this.containSetting(item, MatItemSettingType.LIST_SHOW_REMOVE_ITEM_BUTTON));
+        item.inputMap.set(this.inputKeys.isRecord, this.containSetting(item, MatItemSettingType.RECORD));
+        item.inputMap.set(this.inputKeys.showGotoButton, this.containSetting(item, MatItemSettingType.SHOW_GOTO_BUTTON));
+        item.inputMap.set(this.inputKeys.readonly, this.containSetting(item, MatItemSettingType.READ_ONLY));
+        item.inputMap.set(this.inputKeys.listRequired, this.containSetting(item, MatItemSettingType.LIST_REQUIRE));
+
         this.items.push(item);
       }
       defaultIndex++;
@@ -220,7 +192,7 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
   }
 
   private getKeyValue(key: string) {
-    let value = this.value[key];
+    let value = this.getValue()[key];
 
     if(typeof value === 'boolean')
       return value;
@@ -271,7 +243,7 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
   }
 
   public getTextAreaSettingValue(key: string): boolean {
-    if(this.isTextArea)
+    if(this.getInputValue(this.inputKeys.isTextArea))
       return true;
 
     let prototype = Object.getPrototypeOf(this.blankObject!);
@@ -290,29 +262,25 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
   }
 
   override isValueMultipleStringLine(): boolean {
-      return (super.isValueMultipleStringLine() || this.isTextArea) && !this.isOptions;
+      return (super.isValueMultipleStringLine() || this.getInputValue(this.inputKeys.isTextArea)) && !this.getInputValue(this.inputKeys.isOptions);
   }
 
   override isValueNonMultipleStringLine(): boolean {
-    return (super.isValueNonMultipleStringLine() && !this.isTextArea) && !this.isOptions;
+    return (super.isValueNonMultipleStringLine() && !this.getInputValue(this.inputKeys.isTextArea)) && !this.getInputValue(this.inputKeys.isOptions);
   }
 
   override isValueNumber(): boolean {
     if(this.blankObject)
-      return typeof this.blankObject === 'number' && !this.isOptions;
+      return typeof this.blankObject === 'number' && !this.getInputValue(this.inputKeys.isOptions);
     else
-      return super.isValueNumber() && !this.isOptions;
+      return super.isValueNumber() && !this.getInputValue(this.inputKeys.isOptions);
   }
 
   override isValueArray(): boolean {
-    return this.isBlankObjectArray || super.isValueArray();
+    return this.getInputValue(this.inputKeys.isBlankObjectArray) || super.isValueArray();
   }
 
   isValueRecord(): boolean {
-    return this.isRecord;
-  }
-
-  onValueChangeFn() {
-    this.onValueChange.emit();
+    return this.getInputValue(this.inputKeys.isRecord);
   }
 }

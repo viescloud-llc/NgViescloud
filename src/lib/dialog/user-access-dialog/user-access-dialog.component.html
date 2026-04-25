@@ -6,14 +6,14 @@
     [showExpansionPanel]="false"
     [userIdOptions]="userIdOptions"
     [groupIdOptions]="groupIdOptions"
-    [readonly]="readonly"
+    [inputMap]="inputField('1').set(inputKeys.readonly, readonly)"
   ></app-mat-form-field-input-user-access>
 </div>
 <div mat-dialog-actions>
-  @if (!readonly) {
+  @if (!readonly()) {
     <button matButton="filled" [mat-dialog-close]="value" cdkFocusInitial [disabled]="!validForm">{{yes}}</button>
   }
   @if (no) {
-    <button matButton="filled" class="warn" [mat-dialog-close]="{}">{{readonly ? 'Close' : no}}</button>
+    <button matButton="filled" class="warn" [mat-dialog-close]="{}">{{readonly() ? 'Close' : no}}</button>
   }
 </div>

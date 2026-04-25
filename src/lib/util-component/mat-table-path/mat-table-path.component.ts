@@ -1,8 +1,10 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { AfterContentChecked, ChangeDetectorRef, Component, EventEmitter, inject, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { MatTableDisplayLabel, MatTableHide } from '../../model/mat.model';
 import { FixChangeDetection } from '../../abtract/FixChangeDetection';
 import { RouteUtils } from '../../util/Route.utils';
 import { FileUtils } from '../../util/File.utils';
+import { MatFormFields } from '../../model/utils.model';
+import { ViesMatFormFieldMap } from '../../abtract/ViesMatFormFieldMap';
 
 class customRow<T> {
   @MatTableHide()
@@ -17,7 +19,13 @@ class customRow<T> {
   styleUrls: ['./mat-table-path.component.scss'],
   standalone: false
 })
-export class MatTablePathComponent<T> extends FixChangeDetection implements OnInit, OnChanges {
+export class MatTablePathComponent<T> extends ViesMatFormFieldMap implements OnInit, OnChanges, AfterContentChecked {
+
+  @Input()
+  inputMap = new MatFormFields().addInputDefault();
+  
+  @Input()
+  outputMap = new MatFormFields().addOutputDefault();
 
   @Input()
   value: T[] = [];
@@ -70,6 +78,8 @@ export class MatTablePathComponent<T> extends FixChangeDetection implements OnIn
   pathHistory: string[] = [];
   pathType = 'path';
 
+  cd: ChangeDetectorRef = inject(ChangeDetectorRef);
+
   ngOnChanges(changes: SimpleChanges): void {
     if(changes['value']) {
       this.parseTableMap();
@@ -89,6 +99,10 @@ export class MatTablePathComponent<T> extends FixChangeDetection implements OnIn
     this.parseTableMap();
     this.parseTableRow();
     this.onPathChangeEmit(this.currentPath);
+  }
+
+  ngAfterContentChecked(): void {
+    this.cd.detectChanges();
   }
 
   checkValidPath() {

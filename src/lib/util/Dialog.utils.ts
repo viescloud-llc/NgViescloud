@@ -3,7 +3,7 @@ import { LoadingDialog } from '../dialog/loading-dialog/loading-dialog.component
 import { ConfirmDialog } from '../dialog/confirm-dialog/confirm-dialog.component';
 import { Injectable } from '@angular/core';
 import { MatOption } from '../model/mat.model';
-import { NotAuthenticatedError, ViesErrorResponse } from '../model/error.model';
+import { ViesErrorResponse } from '../model/error.model';
 import { InputDialog } from '../dialog/input-dialog/input-dialog.component';
 import { DataUtils } from './Data.utils';
 import { Observable } from 'rxjs';
@@ -15,6 +15,9 @@ import {
 } from '../model/authenticator.model';
 import { UserAccessInputType } from '../util-component/mat-form-field-input-user-access/mat-form-field-input-user-access.component';
 import { UserAccessDialog } from '../dialog/user-access-dialog/user-access-dialog.component';
+import { DialogResponse, DialogSetting } from '../model/dialog.model';
+import { MatFormField } from '@angular/material/form-field';
+import { MatFormFieldInputKeys, MatFormFields } from '../model/utils.model';
 
 @Injectable({
   providedIn: 'root',
@@ -90,7 +93,7 @@ export class DialogUtils {
     title: string,
     message: string,
     yes: string = 'OK',
-    width: string = '99%',
+    width: string = '99vh',
     disableClose: boolean = false
   ) {
     return DialogUtils.openErrorMessage(
@@ -108,7 +111,7 @@ export class DialogUtils {
     title: string,
     message: string,
     yes: string = 'OK',
-    width: string = '99%',
+    width: string = '99vh',
     disableClose: boolean = false
   ) {
     return this.openConfirmDialog(
@@ -127,7 +130,7 @@ export class DialogUtils {
     message: string,
     yes: string = 'Yes',
     no: string = 'No',
-    width: string = '99%',
+    width: string = '99vh',
     disableClose: boolean = false
   ) {
     return DialogUtils.openConfirmDialog(
@@ -147,7 +150,7 @@ export class DialogUtils {
     message: string,
     yes: string = 'Yes',
     no: string = 'No',
-    width: string = '99%',
+    width: string = '99vh',
     disableClose: boolean = false
   ) {
     return new Promise<string>((resolve, reject) => {
@@ -182,7 +185,7 @@ export class DialogUtils {
     multipleLine: boolean = false,
     input: string = '',
     placeholder: string = '',
-    width: string = '99%',
+    width: string = '99vh',
     disableClose: boolean = false
   ) {
     return DialogUtils.openInputDialog(
@@ -208,7 +211,7 @@ export class DialogUtils {
     multipleLine: boolean = false,
     input: string = '',
     placeholder: string = '',
-    width: string = '99%',
+    width: string = '99vh',
     disableClose: boolean = false
   ) {
     return new Promise<string>((resolve, reject) => {
@@ -240,13 +243,81 @@ export class DialogUtils {
 
   // -------------------------Dyanmic Object Dialog-------------------------
 
-  static openDynamicObjectDialog(
-    matDialog: MatDialog,
-    object: any,
-    width: string = '99%',
-    disableClose: boolean = false
+  static async openDynamicFormDialog<T>(
+    value: T,
+    blankValue: T,
+    {
+      matDialog,
+      title,
+      width = '99vh',
+      height = '80vh',
+      disableClose = false,
+      yes = 'save',
+      no = 'cancel',
+      settings
+    }: DialogSetting,
   ) {
-    //TODO
+    if(!matDialog) {
+      throw new Error('matDialog is required');
+    }
+
+    const { MatFormFieldInputDynamicFormComponent } = await import('../util-component/mat-form-field-input-dynamic-form/mat-form-field-input-dynamic-form.component');
+
+    return new Promise<DialogResponse<T>>((resolve, reject) => {
+      let inputMap = new MatFormFields().addInputDefault();
+      
+      if(settings) {
+        inputMap = settings(inputMap);
+      }
+
+      inputMap.setIfEmpty(MatFormFieldInputKeys.dialogTitle, title);
+      inputMap.setIfEmpty(MatFormFieldInputKeys.saveLabel, yes);
+      inputMap.setIfEmpty(MatFormFieldInputKeys.cancelLabel, no);
+      inputMap.setIfEmpty(MatFormFieldInputKeys.styleWidth, "100%");
+
+      let dialog = matDialog.open(MatFormFieldInputDynamicFormComponent, {
+        data: {
+          value: value,
+          blankValue: blankValue,
+          readonly: true,
+          inputMap
+        },
+        width: width,
+        height: height,
+        disableClose: disableClose
+      });
+
+      dialog.afterClosed().subscribe({
+        next: (result) => {
+          if (result) resolve(result);
+          else reject(result);
+        },
+        error: (error) => {
+          reject(error);
+        }
+      });
+    });
+  }
+
+  async openDynamicFormDialog<T>(
+    value: T,
+    blankValue: T,
+    {
+      matDialog = this.matDialog,
+      title,
+      width = '99vh',
+      height = '80vh',
+      disableClose = false,
+      yes = 'save',
+      no = 'cancel',
+      settings
+    }: DialogSetting
+  ) {
+    return DialogUtils.openDynamicFormDialog<T>(
+      value,
+      blankValue,
+      { matDialog, title, width, height, disableClose, yes, no, settings },
+    );
   }
 
   // -------------------------User Access Dialog-------------------------
@@ -262,7 +333,7 @@ export class DialogUtils {
     title: string = 'User Access',
     yes: string = 'Save',
     no: string = 'Cancel',
-    width: string = '99%',
+    width: string = '99vh',
     disableClose: boolean = false
   ) {
     return DialogUtils.openUserAccessDialog(
@@ -292,7 +363,7 @@ export class DialogUtils {
     title: string = 'User Access',
     yes: string = 'Save',
     no: string = 'Cancel',
-    width: string = '99%',
+    width: string = '99vh',
     disableClose: boolean = false
   ) {
     return new Promise<T>((resolve, reject) => {

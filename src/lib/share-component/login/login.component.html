@@ -1,24 +1,24 @@
-@if (!openIdLogin) {
-  <ul class="margin-center-li-center" appMatFormFieldGroup (onAllInputCheck)="validForm = $event" [formSummitClick]="loginButton">
+@if (!openIdLogin()) {
+  <ul class="margin-center-li-center" appMatFormFieldGroup (onAllInputCheck)="validForm.set($event)" [formSummitButton]="loginButton">
     <li>
       <app-mat-form-field-input
-        label="Username or email"
         [(value)]="username"
-        [required]="true"
-        styleWidth="50%">
-      </app-mat-form-field-input>
+        [inputMap]="inputField('1').set(inputKeys.label, 'Username or email')
+                                   .set(inputKeys.required, true)
+                                   .set(inputKeys.styleWidth, '50%')"  
+      ></app-mat-form-field-input>
     </li>
     <li>
       <app-mat-form-field-input
-        label="Password"
         [(value)]="password"
-        [required]="true"
-        styleWidth="50%"
-        [showVisibleSwitch]="true">
-      </app-mat-form-field-input>
+        [inputMap]="inputField('2').set(inputKeys.label, 'Password')
+                                   .set(inputKeys.required, true)
+                                   .set(inputKeys.showVisibleSwitch, true)
+                                   .set(inputKeys.styleWidth, '50%')"  
+      ></app-mat-form-field-input>
     </li>
     <li>
-      <button #loginButton [style.width]="'50%'" matButton="filled" (click)="login()" [disabled]="!validForm">Login</button>
+      <button #loginButton [style.width]="'50%'" matButton="filled" (click)="login()" [disabled]="!validForm()">Login</button>
     </li>
     @for (provider of ensibleOpenIDProviders; track provider) {
       <li>
@@ -30,7 +30,7 @@
   }
 
 
-  @if (openIdLogin) {
+  @if (openIdLogin()) {
     <ul class="margin-center">
       <li>
         <h1>{{loading}}</h1>

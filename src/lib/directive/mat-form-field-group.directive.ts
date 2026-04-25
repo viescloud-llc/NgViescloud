@@ -16,7 +16,7 @@ export class MatFormFieldGroupDirective implements AfterContentInit, AfterConten
   onFormSummit: EventEmitter<void> = new EventEmitter();
 
   @Input()
-  formSummitClick?: HTMLButtonElement | MatButton;
+  formSummitButton?: HTMLButtonElement | MatButton;
 
   @ContentChildren(MatFormFieldComponent, { descendants: true })
   matFormFields!: QueryList<MatFormFieldComponent>;
@@ -44,11 +44,11 @@ export class MatFormFieldGroupDirective implements AfterContentInit, AfterConten
         e.onEnter.subscribe(
           res => {
             this.onFormSummit.emit()
-            if(this.formSummitClick && !this.formSummitClick.disabled) {
-              if(this.formSummitClick instanceof HTMLButtonElement)
-                this.formSummitClick.click();
+            if(this.formSummitButton && !this.formSummitButton.disabled) {
+              if(this.formSummitButton instanceof HTMLButtonElement)
+                this.formSummitButton.click();
               else
-                this.formSummitClick._elementRef.nativeElement.click();
+                this.formSummitButton._elementRef.nativeElement.click();
             }
           }
         )

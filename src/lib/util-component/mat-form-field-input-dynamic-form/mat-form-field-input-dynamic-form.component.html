@@ -1,0 +1,24 @@
+@if(isDialog())  {
+  <h1 mat-dialog-title>{{getInputValue(inputKeys.dialogTitle)}}</h1>
+}
+<ul class="margin-center" appMatFormFieldGroup (onAllInputCheck)="validInput.set($event)" [formSummitButton]="saveButton">
+  <li>
+    <app-mat-form-field-input-dynamic
+    [(value)]="value"
+    [blankObject]="blankObject"
+    [inputMap]="inputMap"
+    ></app-mat-form-field-input-dynamic>
+  </li>
+  <li class="flex-row-container-auto">
+    <button #saveButton matButton="filled" (click)="save()" [disabled]="!validInput() || !isValueChange()">{{ getInputValue(inputKeys.saveLabel) }}</button>
+    @if (!getInputValue(inputKeys.hideRevertButton)) {
+      <button matButton="filled" class="accent" (click)="revert()" [disabled]="!validInput() || !isValueChange()">{{ getInputValue(inputKeys.revertLabel) }}</button>
+    }
+    @if (!getInputValue(inputKeys.hideRemoveButton)) {
+      <button matButton="filled" class="warn" (click)="remove()">{{ getInputValue(inputKeys.removeLabel) }}</button>
+    }
+    @if(isDialog()) {
+      <button matButton="filled" class="warn" (click)="cancel()">{{ getInputValue(inputKeys.cancelLabel) }}</button>
+    }
+  </li>
+</ul>

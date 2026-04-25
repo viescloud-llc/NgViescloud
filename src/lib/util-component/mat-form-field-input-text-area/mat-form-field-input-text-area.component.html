@@ -1,14 +1,14 @@
 <mat-form-field
   [appearance]="getAppearance()"
-  [color]="matColor"
+  [color]="getInputValue(inputKeys.matColor)"
   [style.width.ch]="getSize(value ? value.toString() : '')"
-  [style.width]="styleWidth">
+  [style.width]="getInputValue(inputKeys.styleWidth)">
 
-  <mat-label>{{label}}</mat-label>
+  <mat-label>{{getInputValue(inputKeys.label)}}</mat-label>
   <textarea
     #input
     matInput
-    [ngStyle]="getInputColorNgStyle()"
+    [ngStyle]="getInputValueColorNgStyle()"
     [ngModel]="getValue()"
     (ngModelChange)="setValue($event)"
     (ngModelChange)="emitValueWithCondition();"
@@ -16,52 +16,52 @@
     (paste)="emitValueWithCondition()"
     (focus)="focusEmit()"
     (focusout)="focusoutEmit()"
-    [placeholder]="placeholder"
-    [required]="required"
-    [disabled]="disable"
-    [maxlength]="maxlength"
-    [rows]="rows"
-    [cols]="cols"
-    [cdkTextareaAutosize]="autoResizeHeight && !showResizeVerticalButton"
+    [placeholder]="getInputValue(inputKeys.placeholder)"
+    [required]="getInputValue(inputKeys.required)"
+    [disabled]="getInputValue(inputKeys.disable)"
+    [maxlength]="getInputValue(inputKeys.maxlength)"
+    [rows]="getInputValue(inputKeys.rows)"
+    [cols]="getInputValue(inputKeys.cols)"
+    [cdkTextareaAutosize]="getInputValue(inputKeys.autoResizeHeight) && !getInputValue(inputKeys.showResizeVerticalButton)"
     [style.overflow]="'auto'"
-    [style.resize]="showResizeVerticalButton ? 'vertical' : 'none'"
-    [readonly]="readonly">
+    [style.resize]="getInputValue(inputKeys.showResizeVerticalButton) ? 'vertical' : 'none'"
+    [readonly]="getInputValue(inputKeys.readonly)">
   </textarea>
-  <mat-error>{{label}} can't be empty</mat-error>
-  @if (error) {
-    <mat-hint style="color: red;" align="start">{{error}}</mat-hint>
+  <mat-error>{{getInputValue(inputKeys.label)}} can't be empty</mat-error>
+  @if (getInputValue(inputKeys.error)) {
+    <mat-hint style="color: red;" align="start">{{getInputValue(inputKeys.error)}}</mat-hint>
   }
-  @if (manuallyEmitValue && isValueChange()) {
+  @if (getInputValue(inputKeys.manuallyEmitValue) && isValueChange()) {
     <mat-hint style="color: goldenrod;" align="start">Press apply icon to apply input</mat-hint>
   }
-  @if (isValueString() && maxlength) {
-    <mat-hint align="end">{{value.toString().length}} / {{maxlength}}</mat-hint>
+  @if (isValueString() && getInputValue(inputKeys.maxlength)) {
+    <mat-hint align="end">{{value.toString().length}} / {{getInputValue(inputKeys.maxlength)}}</mat-hint>
   }
 
-  @if (manuallyEmitValue && isValueChange()) {
+  @if (getInputValue(inputKeys.manuallyEmitValue) && isValueChange()) {
     <button matSuffix mat-icon-button (click)="emitValue()">
       <mat-icon>check_circle_outline</mat-icon>
     </button>
   }
 
-  @if (showClearIcon && value && !disable && !readonly) {
+  @if (getInputValue(inputKeys.showClearIcon) && value && !getInputValue(inputKeys.disable) && !getInputValue(inputKeys.readonly)) {
     <button matSuffix mat-icon-button (click)="clear()">
       <mat-icon>close</mat-icon>
     </button>
   }
 
-  @if (showEnterIcon && value && !disable) {
+  @if (getInputValue(inputKeys.showEnterIcon) && value && !getInputValue(inputKeys.disable)) {
     <button matSuffix mat-icon-button (click)="emitEnter();">
       <mat-icon>chat_bubble</mat-icon>
     </button>
   }
 
-  @if (value && !disable && showGoto) {
+  @if (value && !getInputValue(inputKeys.disable) && getInputValue(inputKeys.showGoto)) {
     <button matSuffix mat-icon-button (click)="openLink(value.toString())">
       <mat-icon>public</mat-icon>
     </button>
   }
-  @if (showCopyToClipboard && !disable) {
-    <app-copy-to-clipboard-util matSuffix [copyValue]="value.toString()" [displayMessage]="copyDisplayMessage"></app-copy-to-clipboard-util>
+  @if (getInputValue(inputKeys.showCopyToClipboard) && !getInputValue(inputKeys.disable)) {
+    <app-copy-to-clipboard-util matSuffix [copyValue]="value.toString()" [displayMessage]="getInputValue(inputKeys.copyDisplayMessage)"></app-copy-to-clipboard-util>
   }
 </mat-form-field>

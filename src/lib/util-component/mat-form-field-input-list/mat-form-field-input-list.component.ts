@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, forwardRef } from '@angular/core';
+import { Component, EventEmitter, Input, Output, forwardRef, signal } from '@angular/core';
 import { MatFormFieldComponent } from '../mat-form-field/mat-form-field.component';
 import { ConfirmDialog } from '../../dialog/confirm-dialog/confirm-dialog.component';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
@@ -19,36 +19,9 @@ export class MatFormFieldInputListComponent extends MatFormFieldComponent {
   @Output()
   override valueChange: EventEmitter<any[]> = new EventEmitter();
 
-  @Input()
-  showSizeInput: boolean = true;
+  listLength = signal<number>(0);
 
-  @Input()
-  showRemoveItemButton: boolean = true;
-
-  @Input()
-  showAddItemButton: boolean = true;
-
-  @Input()
-  showDragAndDropButton: boolean = true;
-
-  @Input()
-  maxSize: number = 100;
-
-  @Input()
-  minSize: number = 0;
-
-  listLength!: number;
-
-  validForm: boolean = false;
-
-  @Input()
-  blankObjectType!: string;
-
-  @Input()
-  expanded: boolean = false;
-
-  @Input()
-  focusOutAutoFillFn?: (value: any, index: number) => any;
+  validForm = signal(false);
 
   @Output()
   expandedChange: EventEmitter<boolean> = new EventEmitter<boolean>();
@@ -56,15 +29,15 @@ export class MatFormFieldInputListComponent extends MatFormFieldComponent {
   override ngOnInit() {
     super.ngOnInit();
 
-    if(this.readonly) {
-      this.showSizeInput = false;
-      this.showRemoveItemButton = false;
-      this.showAddItemButton = false;
-      this.validForm = true;
-      this.showDragAndDropButton = false;
+    if(this.getInputValue(this.inputKeys.readonly)) {
+      this.setInputValue(this.inputKeys.showSizeInput, false);
+      this.setInputValue(this.inputKeys.showRemoveItemButton, false);
+      this.setInputValue(this.inputKeys.showAddItemButton, false);
+      this.setInputValue(this.inputKeys.showDragAndDropButton, false);
+      this.validForm.set(true);
     }
 
-    this.listLength = this.value.length;
+    this.listLength.set(this.value.length);
     this.updateBlankObjectType();
   }
 
@@ -72,31 +45,39 @@ export class MatFormFieldInputListComponent extends MatFormFieldComponent {
     let superCheck = super.isValidInput();
     if(!superCheck)
       return superCheck;
-    else if(this.value.length < this.minSize)
+    else if(this.value.length < this.getInputValue(this.inputKeys.minSize))
       return false;
     else
-      return this.validForm;
+      return this.validForm();
   }
 
-  updateListLength() {
-    if(this.reachMaxSize())
-      this.listLength = this.maxSize;
-
-    while(this.value.length < this.listLength)
-      this.value.push(this.cloneBlankObject());
-
-    if(this.value.length > this.listLength) {
-      let deleteSize = this.value.length - this.listLength
-      this.value.splice(this.listLength - 1, deleteSize);
+  updateListLength(length: number) {
+    if(length > this.getInputValue(this.inputKeys.maxSize) || this.reachMaxSize()) {
+      this.listLength.set(this.getInputValue(this.inputKeys.maxSize));
+      length = this.getInputValue(this.inputKeys.maxSize);
     }
 
-    this.listLength = this.value.length;
+    this.listLength.set(length);
+
+    while(this.value.length < this.listLength()) {
+      this.value.push(this.cloneBlankObject());
+    }
+
+    while(this.value.length > this.listLength()) {
+      let deleteSize = this.value.length - this.listLength()
+      this.value.splice(this.listLength() - 1, deleteSize);
+    }
+
+    this.listLength.set(this.value.length);
   }
 
   addNewItem() {
-    if(!this.reachMaxSize())
+    if(!this.reachMaxSize()) {
       this.value.push(this.cloneBlankObject());
-    this.listLength = this.value.length;
+    }
+    this.listLength.set(this.value.length);
+    // this.valueChange.emit(this.getValue());
+    this.emitValue();
   }
 
   clone(obj: any): any {
@@ -105,13 +86,16 @@ export class MatFormFieldInputListComponent extends MatFormFieldComponent {
 
   cloneBlankObject() {
     let clone = structuredClone(this.blankObject);
-    if(this.blankObjectType === 'object')
+    if(this.updateBlankObjectType() === 'object') {
       Object.setPrototypeOf(clone, this.blankObject);
+    }
     return clone;
   }
 
   remove(index: number): void {
     this.value.splice(index, 1);
+    this.value=[...this.value];
+    this.valueChange.emit(this.value);
   }
 
   removeWithWarning(index: number): void {
@@ -131,7 +115,7 @@ export class MatFormFieldInputListComponent extends MatFormFieldComponent {
   }
 
   reachMaxSize(): boolean {
-    return this.value.length >= this.maxSize;
+    return this.value.length >= this.getInputValue(this.inputKeys.maxSize);
   }
 
   getKeyAndValueList(obj: Object) {
@@ -143,25 +127,13 @@ export class MatFormFieldInputListComponent extends MatFormFieldComponent {
     return list;
   }
 
-  updateBlankObjectType() {
-    if(Array.isArray(this.blankObject)) {
-      if(this.blankObject.length > 0)
-        this.blankObject = this.blankObject[0];
-      this.blankObjectType = typeof this.blankObject;
-    }
-    else if(typeof this.blankObject === 'object')
-      this.blankObjectType = 'object';
-    else
-      this.blankObjectType = typeof this.blankObject;
-  }
-
   drop(event: CdkDragDrop<any[]>) {
     moveItemInArray(this.value, event.previousIndex, event.currentIndex);
   }
 
   getFocusOutAutoFillFn(index: number) {
-    if(this.focusOutAutoFillFn)
-      return (value: any) => this.focusOutAutoFillFn!(value, index);
+    if(this.getInputValue(this.inputKeys.listFocusOutAutoFillFn))
+      return (value: any) => this.getInputValue(this.inputKeys.listFocusOutAutoFillFn)!(value, index);
     else
       return undefined;
   }

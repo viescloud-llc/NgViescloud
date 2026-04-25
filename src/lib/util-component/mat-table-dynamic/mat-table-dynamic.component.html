@@ -45,8 +45,8 @@
       <li>
         <app-mat-form-field-input-dynamic
           [(value)]="selectedRow"
-          [styleWidth]="styleWidth"
           [blankObject]="blankObject"
+          [inputMap]="inputMap.clone().set(inputKeys.styleWidth, '100%')"
         ></app-mat-form-field-input-dynamic>
       </li>
       <li [class]="styleWidth === '100%' ? 'flex-row-container-auto' : ''">

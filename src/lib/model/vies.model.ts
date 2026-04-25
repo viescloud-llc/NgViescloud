@@ -34,6 +34,14 @@ export enum MatchCaseEnum {
     NONE = "NONE"
 }
 
+export enum FileType {
+    IMAGE = "IMAGE",
+    VIDEO = "VIDEO",
+    AUDIO = "AUDIO",
+    FILE = "FILE",
+    FOLDER = "FOLDER",
+    UNKNOWN = "UNKNOWN"
+}
 
 export class PathNode<T> {
     value?: T;
@@ -165,3 +173,13 @@ export interface VFile {
   value?: any;
 }
 
+export interface ViesForm<T> {
+    save(input?: T): void;
+    revert(input?: T): void;
+    remove(): void;
+}
+
+export interface ViesListForm<T> extends ViesForm<T> {
+    add(input?: T): void;
+    addAll(input?: T[]): void;
+}

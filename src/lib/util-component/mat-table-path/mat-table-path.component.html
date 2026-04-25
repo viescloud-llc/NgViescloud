@@ -5,13 +5,14 @@
 }
 
 <app-mat-form-field-input
-  label="Current Path"
   [(value)]="currentPath"
   (onValueChange)="checkValidPath()"
-  [styleWidth]="'100%'"
-  [focusOutAutoFillFn]="formatDash"
-  [readonly]="readonlyPathInput"
-  [readonlyOnFocusHint]="'Path is readonly'"
+  [inputMap]="inputMap.clone()
+                      .set(inputKeys.label, 'Current Path')
+                      .set(inputKeys.styleWidth, '100%')
+                      .set(inputKeys.focusOutAutoFillFn, formatDash)
+                      .set(inputKeys.readonly, readonlyPathInput)
+                      .set(inputKeys.readonlyOnFocusHintLeft, 'Path is readonly')"
 ></app-mat-form-field-input>
 <br>
   <app-mat-table

@@ -7,32 +7,32 @@
     <li><h4>Change Password</h4></li>
     <li>
       <app-mat-form-field-input
-        [label]="'Current password'"
         [(value)]="currentPassword"
         [blankObject]="''"
-        [required]="true"
-        styleWidth="100%"
-        [showVisibleSwitch]="true"
+        [inputMap]="inputField('1').set(inputKeys.label, 'Current password')
+                                   .set(inputKeys.showVisibleSwitch, true)
+                                   .set(inputKeys.styleWidth, '100%')
+                                   .set(inputKeys.required, true)"
       ></app-mat-form-field-input>
     </li>
     <li>
       <app-mat-form-field-input
-        [label]="'New password'"
         [(value)]="newPassword"
         [blankObject]="''"
-        [required]="true"
-        styleWidth="100%"
-        [showVisibleSwitch]="true"
+        [inputMap]="inputField('2').set(inputKeys.label, 'New password')
+                                   .set(inputKeys.showVisibleSwitch, true)
+                                   .set(inputKeys.styleWidth, '100%')
+                                   .set(inputKeys.required, true)"
       ></app-mat-form-field-input>
     </li>
     <li>
       <app-mat-form-field-input
-        [label]="'Confirm new password'"
         [(value)]="reNewPassword"
         [blankObject]="''"
-        [required]="true"
-        styleWidth="100%"
-        [showVisibleSwitch]="true"
+        [inputMap]="inputField('3').set(inputKeys.label, 'Confirm new password')
+                                   .set(inputKeys.showVisibleSwitch, true)
+                                   .set(inputKeys.styleWidth, '100%')
+                                   .set(inputKeys.required, true)"
       ></app-mat-form-field-input>
     </li>
     @if (error) {
@@ -50,12 +50,12 @@
       <li><h4>Change Alias</h4></li>
       <li>
         <app-mat-form-field-input
-          label="Alias"
           [(value)]="alias"
           [blankObject]="''"
-          [required]="true"
-          styleWidth="100%"
-          [disable]="false"
+          [inputMap]="inputField('4').set(inputKeys.label, 'Alias')
+                                     .set(inputKeys.required, true)
+                                     .set(inputKeys.styleWidth, '100%')
+                                     .set(inputKeys.disable, false)"
         ></app-mat-form-field-input>
       </li>
       <li class="flex-row-container-auto">

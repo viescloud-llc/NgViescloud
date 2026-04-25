@@ -25,11 +25,10 @@ export class MatTableLazyDynamicComponent<T extends object, S> extends MatTableD
   sendPageIndexChangeSubject = new Subject<void>();
 
   constructor(
-    cd: ChangeDetectorRef,
     rxjsUtils: RxJSUtils,
     dialogUtils: DialogUtils
   ) {
-    super(cd, rxjsUtils, dialogUtils);
+    super(rxjsUtils, dialogUtils);
   }
 
   override init() {

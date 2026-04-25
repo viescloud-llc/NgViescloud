@@ -2,7 +2,9 @@ import { Injectable } from "@angular/core";
 import { ViesService } from "./rest.service";
 import { HttpClient, HttpHeaders, HttpParams, HttpResponse } from "@angular/common/http";
 import { RouteUtils } from "../util/Route.utils";
-import { Observable, throwError } from "rxjs";
+import { map, Observable, throwError } from "rxjs";
+import { VFile } from "../model/vies.model";
+import { FileUtils } from "../util/File.utils";
 
 @Injectable({
     providedIn: 'root'
@@ -213,4 +215,43 @@ export class ViesHttpClientService extends ViesService {
     }): Observable<HttpResponse<T>> {
         return this.request<T>({url: request.url, method: 'DELETE', headers: request.headers, queryParams: request.queryParams, body: request.body, responseType: request.responseType});
     }
+
+    getBlobAsVFile(request: {
+        url: string,
+        headers?: Map<string, string>,
+        queryParams?: Map<string, string>,
+        body?: any
+      },
+      options?: { generateObjectUrl?: boolean }): Observable<HttpResponse<VFile>> {
+        return this.get<Blob>({ ...request, responseType: 'blob' }).pipe(map((response) => {
+            let contentType = response.headers.get('Content-Type');
+            let extension = '';
+            let fileName = request.url.substring(request.url.lastIndexOf('/') + 1);
+
+            if (!contentType) {
+                // If Content-Type is not provided, derive it from the file name
+                extension = fileName.split('.').pop()?.toLowerCase() || '';
+                contentType = FileUtils.mapExtensionToContentType(extension);
+            } else {
+                // If Content-Type is provided, extract extension from it
+                extension = contentType.split('/')[1];
+            }
+
+            const blob = response.body!;
+
+            let vFile: VFile = {
+                name: fileName,
+                type: contentType || '',
+                extension: extension,
+                rawFile: blob,
+                originalLink: request.url,
+                objectUrl: options?.generateObjectUrl ? URL.createObjectURL(blob) : '',
+            };
+
+            // Return new HttpResponse with VFile as body
+            return response.clone({
+                body: vFile
+            });
+        }))
+      }
 }

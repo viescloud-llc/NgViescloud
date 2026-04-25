@@ -6,6 +6,7 @@ import { DataUtils } from '../../util/Data.utils';
 import { User, UserGroup } from '../../model/authenticator.model';
 import { UserGroupService } from '../../service/user-group.service';
 import { UserService } from '../../service/user.service';
+import { ViesMatFormFieldMap } from '../../abtract/ViesMatFormFieldMap';
 
 @Component({
   selector: 'app-user-list',
@@ -13,7 +14,7 @@ import { UserService } from '../../service/user.service';
   styleUrls: ['./user-list.component.scss'],
   standalone: false
 })
-export class UserListComponent implements OnInit {
+export class UserListComponent extends ViesMatFormFieldMap implements OnInit {
   users = signal<User[]>([]);
   blankUser = new User();
   userGroups = signal<UserGroup[]>([]);
@@ -30,7 +31,9 @@ export class UserListComponent implements OnInit {
     private userGroupService: UserGroupService,
     private rxjs: RxJSUtils,
     private dialogUtils: DialogUtils
-  ) { }
+  ) { 
+    super();
+  }
 
   ngOnInit(): void {
     this.selectedUser = undefined;
