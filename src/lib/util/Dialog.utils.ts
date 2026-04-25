@@ -16,6 +16,8 @@ import {
 import { UserAccessInputType } from '../util-component/mat-form-field-input-user-access/mat-form-field-input-user-access.component';
 import { UserAccessDialog } from '../dialog/user-access-dialog/user-access-dialog.component';
 import { DialogResponse, DialogSetting } from '../model/dialog.model';
+import { MatFormField } from '@angular/material/form-field';
+import { MatFormFieldInputKeys, MatFormFields } from '../model/utils.model';
 
 @Injectable({
   providedIn: 'root',
@@ -253,7 +255,7 @@ export class DialogUtils {
       yes = 'save',
       no = 'cancel',
       settings
-    }: DialogSetting
+    }: DialogSetting,
   ) {
     if(!matDialog) {
       throw new Error('matDialog is required');
@@ -262,16 +264,23 @@ export class DialogUtils {
     const { MatFormFieldInputDynamicFormComponent } = await import('../util-component/mat-form-field-input-dynamic-form/mat-form-field-input-dynamic-form.component');
 
     return new Promise<DialogResponse<T>>((resolve, reject) => {
+      let inputMap = new MatFormFields().addInputDefault();
+      
+      if(settings) {
+        inputMap = settings(inputMap);
+      }
+
+      inputMap.setIfEmpty(MatFormFieldInputKeys.dialogTitle, title);
+      inputMap.setIfEmpty(MatFormFieldInputKeys.saveLabel, yes);
+      inputMap.setIfEmpty(MatFormFieldInputKeys.cancelLabel, no);
+      inputMap.setIfEmpty(MatFormFieldInputKeys.styleWidth, "100%");
+
       let dialog = matDialog.open(MatFormFieldInputDynamicFormComponent, {
         data: {
           value: value,
           blankValue: blankValue,
-          title: title,
-          yes: yes,
-          no: no,
-          styleWidth: "100%",
           readonly: true,
-          settings
+          inputMap
         },
         width: width,
         height: height,

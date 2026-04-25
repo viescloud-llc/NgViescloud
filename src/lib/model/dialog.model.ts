@@ -1,4 +1,5 @@
 import { MatDialog } from "@angular/material/dialog";
+import { MatFormFields } from "./utils.model";
 
 export interface DialogSetting {
   matDialog?: MatDialog;
@@ -8,7 +9,7 @@ export interface DialogSetting {
   disableClose?: boolean;
   yes?: string;
   no?: string;
-  settings?: any;
+  settings?: (inputMap: MatFormFields) => MatFormFields;
 }
 
 export class DialogResponse<T> {

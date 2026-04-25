@@ -7,6 +7,7 @@ import { ProductMediaComponent } from '../product-media/product-media.component'
 import { FileUtils } from '../../../lib/util/File.utils';
 import { FileType, VFile } from '../../../lib/model/vies.model';
 import { ObjectStorageService } from '../../../lib/service/object-storage-manager.service';
+import { MatFormFieldInputKeys, MatFormFields } from '../../../lib/model/utils.model';
 
 @Component({
   selector: 'app-product-media-list',
@@ -71,10 +72,8 @@ export class ProductMediaListComponent {
         title: 'Add new media',
         yes: 'save',
         no: 'cancel',
-        settings: {
-          hideRevertButton: true,
-          hideRemoveButton: true
-        }
+        settings: inputMap => inputMap.set(MatFormFieldInputKeys.hideRevertButton, true)
+                                      .set(MatFormFieldInputKeys.hideRemoveButton, true)
       }
     ).then(res => {
       if(res.sucess && this.updateMediaUrlToLocalFile(res.result)) {

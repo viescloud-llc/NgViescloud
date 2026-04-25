@@ -9,15 +9,5 @@ import { MatFormFieldFormComponent } from '../mat-form-field-form/mat-form-field
   standalone: false
 })
 export class MatFormFieldInputDynamicFormComponent extends MatFormFieldFormComponent {
-
   validInput = signal<boolean>(false);
-
-  hideRevertButton = input<boolean>(false);
-  _hideRevertButton = linkedSignal(() => this.hideRevertButton());
-
-  hideRemoveButton = input<boolean>(false);
-  _hideRemoveButton = linkedSignal(() => this.hideRemoveButton());
-
-  indent = input<boolean>(false);
-  _indent = linkedSignal(() => this.indent());
 }

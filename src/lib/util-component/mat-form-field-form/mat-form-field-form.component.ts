@@ -13,35 +13,12 @@ import { DialogResponse } from '../../model/dialog.model';
 })
 export class MatFormFieldFormComponent extends MatFormFieldComponent {
 
-  isConfirmDelete = input<boolean>(true);
-  _isConfirmDelete = linkedSignal(() => this.isConfirmDelete());
-
-  isConfirmRevert = input<boolean>(false);
-  _isConfirmRevert = linkedSignal(() => this.isConfirmRevert());
-
-  isConfirmSave = input<boolean>(false);
-  _isConfirmSave = linkedSignal(() => this.isConfirmSave());
-
-  saveLabel = input<string>('Save');
-  _saveLabel = linkedSignal(() => this.saveLabel());
-
-  revertLabel = input<string>('Revert');
-  _revertLabel = linkedSignal(() => this.revertLabel());
-
-  removeLabel = input<string>('Delete');
-  _removeLabel = linkedSignal(() => this.removeLabel());
-
   onDelete = output<void>();
   onRevert = output<void>();
   onSave = output<void>();
 
   //dialog
-  isDialog = signal(false);
-  dialogTitle = signal<string>('');
-  dialogWidth = signal<string>('99%');
-  dialogYes = computed(() => this._saveLabel());
-  dialogNo = signal<string>('no');
-
+  isDialog = computed(() => this.getInputValue(this.inputKeys.isDialog));
   dialogData?: any;
   dialogRef?: MatDialogRef<MatFormFieldFormComponent> = inject(MatDialogRef<MatFormFieldFormComponent>, { optional: true }) ?? undefined;
   
@@ -59,21 +36,17 @@ export class MatFormFieldFormComponent extends MatFormFieldComponent {
     super.ngOnInit();
 
     if(this.dialogData) {
-      this.isDialog.set(true);
+      this.dialogData.inputMap ? this.inputMap = this.dialogData.inputMap : undefined;
+      this.setInputValue(this.inputKeys.isDialog, true);
       this.dialogData.value ? this.value = this.dialogData.value : undefined;
       this.dialogData.blankValue ? this.blankObject = this.dialogData.blankValue : undefined;
-      this.dialogData.title ? this.dialogTitle.set(this.dialogData.title) : undefined;
-      this.dialogData.width ? this.dialogWidth.set(this.dialogData.width) : undefined;
-      this.dialogData.yes ? this._saveLabel.set(this.dialogData.yes) : undefined;
-      this.dialogData.no ? this.dialogNo.set(this.dialogData.no) : undefined;
-      this.dialogData.settings ? ReflectionUtils.syncDialogData(this, this.dialogData.settings) : undefined;
     }
 
     this.value = structuredClone(this.value);
   }
 
   save(): void {
-    if(this._isConfirmSave()) {
+    if(this.getInputValue(this.inputKeys.isConfirmSave)) {
       this.dialogUtils.openConfirmDialog("Save", "Are you sure you want to save?", "Yes", "No").then(res => {
         if(res) {
           this.valueChange.emit(this.value);
@@ -97,7 +70,7 @@ export class MatFormFieldFormComponent extends MatFormFieldComponent {
     }
   }
   revert(): void {
-    if(this._isConfirmRevert()) {
+    if(this.getInputValue(this.inputKeys.isConfirmRevert)) {
       this.dialogUtils.openConfirmDialog("Revert", "Are you sure you want to revert?", "Yes", "No").then(res => {
         if(res) {
           this.value = structuredClone(this.valueCopy);
@@ -112,7 +85,7 @@ export class MatFormFieldFormComponent extends MatFormFieldComponent {
   }
 
   remove(): void {
-    if(this._isConfirmDelete()) {
+    if(this.getInputValue(this.inputKeys.isConfirmDelete)) {
       this.dialogUtils.openConfirmDialog("Delete", "Are you sure you want to delete?", "Yes", "No").then(res => {
         if(res) {
           this.onDelete.emit();

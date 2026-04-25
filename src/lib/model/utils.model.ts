@@ -86,7 +86,9 @@ export const MatFormFieldInput = {
   disable:               { key: 'disable',              value: field<boolean>(false)      },
   fakeDisable:           { key: 'fakeDisable',          value: field<boolean>(false)      },
   width:                 { key: 'width',                value: field<number>(40)          },
+  height:                { key: 'height',               value: field<number | null>(null) },
   styleWidth:            { key: 'styleWidth',           value: field<string>('')          },
+  styleHeight:           { key: 'styleHeight',          value: field<string>('')          },
   autoResize:            { key: 'autoResize',           value: field<boolean>(false)      },
   defaultErrorTextColor: { key: 'defaultErrorTextColor',value: field<string>('red')       },
   readonly:              { key: 'readonly',             value: field<boolean>(false)      },
@@ -166,6 +168,24 @@ export const MatFormFieldInput = {
   indent:                  { key: 'indent',                  value: field<boolean>(true) },
   matOptions:              { key: 'matOptions',              value: field<MatOption<any>[] | undefined>(undefined) },
   objectLabel:             { key: 'objectLabel',             value: field<string | undefined>(undefined) },
+
+  // dialog
+  isDialog:                { key: 'isDialog',                value: field<boolean>(false) },
+  dialogTitle:             { key: 'dialogTitle',             value: field<string>('') },
+
+  // MatFormFieldFormComponent
+  isConfirmDelete:         { key: 'isConfirmDelete',         value: field<boolean>(true) },
+  isConfirmRevert:         { key: 'isConfirmRevert',         value: field<boolean>(false) },
+  isConfirmSave:           { key: 'isConfirmSave',           value: field<boolean>(false) },
+  saveLabel:               { key: 'saveLabel',               value: field<string>('Save') },
+  revertLabel:             { key: 'revertLabel',             value: field<string>('Revert') },
+  removeLabel:             { key: 'removeLabel',             value: field<string>('Delete') },
+  cancelLabel:             { key: 'cancelLabel',             value: field<string>('Cancel') },
+
+  // MatFormFieldInputDynamicForm
+  hideRevertButton:        { key: 'hideRevertButton',        value: field<boolean>(false) },
+  hideRemoveButton:        { key: 'hideRemoveButton',        value: field<boolean>(false) },
+
 } as const;
 
 export const MatFormFieldInputKeys = toKeys(MatFormFieldInput);
@@ -179,6 +199,8 @@ export type MatFormFieldTypeMap = {
 export class MatFormFields {
 
   private map = new Map<String | string, any>();
+  public readonly inputKeys = MatFormFieldInputKeys;
+  public readonly outputKeys = MatFormFieldOutputKeys;
 
   static new() {
     return new MatFormFields();
