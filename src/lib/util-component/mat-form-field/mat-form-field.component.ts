@@ -1,12 +1,13 @@
-import { AfterContentChecked, ChangeDetectorRef, Component, DoCheck, EventEmitter, inject, input, Input, isSignal, linkedSignal, OnChanges, OnInit, Output, signal, SimpleChanges, WritableSignal } from '@angular/core';
+import { AfterContentChecked, ChangeDetectorRef, Component, DoCheck, EventEmitter, inject, input, Input, isSignal, linkedSignal, OnChanges, OnInit, Output, Signal, signal, SimpleChanges } from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
 import { MatFormFieldAppearance } from '@angular/material/form-field';
 import { UtilsService } from '../../service/utils.service';
 import { RgbColor } from '../../model/rgb.model';
 import { DialogUtils } from '../../util/Dialog.utils';
 import { DataUtils } from '../../util/Data.utils';
-import { BehaviorSubject } from 'rxjs';
 import { ViesService } from '../../service/rest.service';
+import { MatFormFields, MatFormFieldTypeMap } from '../../model/utils.model';
+import { ViesMatFormFieldMap } from '../../abtract/ViesMatFormFieldMap';
 
 @Component({
   selector: 'app-mat-form-field',
@@ -14,7 +15,7 @@ import { ViesService } from '../../service/rest.service';
   styleUrls: ['./mat-form-field.component.scss'],
   standalone: false
 })
-export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChecked, DoCheck {
+export class MatFormFieldComponent extends ViesMatFormFieldMap implements OnInit, OnChanges, AfterContentChecked, DoCheck {
 
   @Input()
   value: string | number | any = '';
@@ -27,52 +28,16 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
   @Output()
   onValueChange: EventEmitter<void> = new EventEmitter();
 
+  @Input()
+  inputMap = new MatFormFields().addInputDefault();
+  
+  @Input()
+  outputMap = new MatFormFields().addOutputDefault();
+
   @Output()
   onEnter: EventEmitter<void> = new EventEmitter();
 
-  @Input()
-  error: string = '';
-
   internalError = '';
-
-  @Input()
-  matColor: ThemePalette = 'primary';
-
-  @Input()
-  appearance: string = 'fill';
-
-  @Input()
-  label: string = '';
-
-  @Input()
-  placeholder: string = '';
-
-  @Input()
-  required: boolean = false;
-
-  @Input()
-  disable: boolean = false;
-
-  @Input()
-  fakeDisable: boolean = false;
-
-  @Input()
-  width: number = 40;
-
-  @Input()
-  styleWidth?: string;
-
-  @Input()
-  autoResize: boolean = false;
-
-  @Input()
-  defaultErrorTextColor = 'red';
-  
-  readonly = input<boolean>(false);
-  _readonly = linkedSignal(() => this.readonly());
-
-  @Input()
-  readonlyOnFocusHint: string = 'Read only';
 
   @Output()
   onFocusout: EventEmitter<void> = new EventEmitter();
@@ -86,6 +51,7 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
   //dynamic type
   @Input()
   blankObject?: any;
+  blankObjectType = signal<string>('');
 
   isFocus = false;
 
@@ -111,6 +77,8 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
       this.setValue(structuredClone(this.blankObject));
       this.setValueCopy(structuredClone(this.blankObject));
     }
+
+    this.updateBlankObjectType();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -138,6 +106,26 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
 
   setValueCopy(value: any) {
     DataUtils.setAnyValue(this.valueCopy, value, () => this.value = value);
+  }
+
+  getInputValue<K extends keyof MatFormFieldTypeMap>(key: K) {
+    return this.inputMap.getValue(key);
+  }
+
+  setInputValue<K extends keyof MatFormFieldTypeMap>(key: K, value: MatFormFieldTypeMap[K] | Signal<MatFormFieldTypeMap[K]>) {
+    this.inputMap.set(key, value);
+  }
+
+  setInputValueIfEmpty<K extends keyof MatFormFieldTypeMap>(key: K, value: MatFormFieldTypeMap[K] | Signal<MatFormFieldTypeMap[K]>) {
+    this.inputMap.setIfEmpty(key, value);
+  }
+
+  increaseInputValue<K extends keyof MatFormFieldTypeMap>(key: K) {
+    return this.inputMap.increaseValue(key);
+  }
+
+  decreaseInputValue<K extends keyof MatFormFieldTypeMap>(key: K) {
+    return this.inputMap.decreaseValue(key);
   }
 
   emitValue(value?: any): void {
@@ -175,13 +163,13 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
   }
 
   isValidInput(): boolean {
-    if (this.required && !this.getValue())
+    if (this.getInputValue(this.inputKeys.required) && !this.getValue())
       return false;
 
     if(this.internalError)
       return false;
 
-    if (this.error)
+    if (this.getInputValue(this.inputKeys.error))
       return false;
 
     return true;
@@ -190,18 +178,18 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
   getSize(data: string): number {
     let offset = 10;
 
-    if (!this.autoResize)
-      return this.width;
+    if (!this.getInputValue(this.inputKeys.autoResize))
+      return this.getInputValue(this.inputKeys.width);
 
     if (data.length <= 10)
-      return this.width;
+      return this.getInputValue(this.inputKeys.width);
     else
       return data.length + offset;
   }
 
   getAppearance(): MatFormFieldAppearance {
     let appearance: MatFormFieldAppearance = 'fill';
-    switch (this.appearance.toLowerCase()) {
+    switch (this.getInputValue(this.inputKeys.appearance).toLowerCase()) {
       case 'fill':
       case '1':
         appearance = 'fill'
@@ -274,14 +262,30 @@ export class MatFormFieldComponent implements OnInit, OnChanges, AfterContentChe
     return this.getValue() instanceof RgbColor || (this.blankObject && this.blankObject instanceof RgbColor);
   }
 
-  getInputColorNgStyle() {
-    if(this.error) {
+  getInputValueColorNgStyle() {
+    if(this.getInputValue(this.inputKeys.error)) {
       return {
-        color: this.defaultErrorTextColor
+        color: this.getInputValue(this.inputKeys.defaultErrorTextColor)
       }
     }
     else
      return {};
+  }
+
+  updateBlankObjectType() {
+    if(Array.isArray(this.blankObject)) {
+      if(this.blankObject.length > 0)
+        this.blankObject = this.blankObject[0];
+      this.blankObjectType.set(typeof this.blankObject);
+    }
+    else if(typeof this.blankObject === 'object') {
+      this.blankObjectType.set('object');
+    }
+    else {
+      this.blankObjectType.set(typeof this.blankObject);
+    }
+
+    return this.blankObjectType();
   }
 
   trackByIndex(index: number, obj: any): any {

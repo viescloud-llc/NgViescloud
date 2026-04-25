@@ -3,12 +3,14 @@ import { RxJSUtils } from '../../lib/util/RxJS.utils';
 import { ProductService } from '../shared/service/product/product.service';
 import { RouteUtils } from '../../lib/util/Route.utils';
 import { E } from '@angular/cdk/keycodes';
-import { Product } from '../shared/model/product.model';
+import { Product, Tag } from '../shared/model/product.model';
 import { DialogUtils } from '../../lib/util/Dialog.utils';
 import { NgComponentModule } from "../../lib/module/ng-component.module";
 import { MatAnchor } from '@angular/material/button';
 import { ProductMediaListComponent } from "./product-media-list/product-media-list.component";
 import { DataUtils } from '../../lib/util/Data.utils';
+import { MatFormFields } from '../../lib/model/utils.model';
+import { ViesMatFormFieldMap } from '../../lib/abtract/ViesMatFormFieldMap';
 
 @Component({
   selector: 'app-product',
@@ -16,7 +18,7 @@ import { DataUtils } from '../../lib/util/Data.utils';
   styleUrls: ['./product.component.scss'],
   imports: [NgComponentModule, ProductMediaListComponent]
 })
-export class ProductComponent implements OnInit {
+export class ProductComponent extends ViesMatFormFieldMap implements OnInit {
 
   protected readonly rxjsUtils = inject(RxJSUtils)
   protected readonly productService = inject(ProductService)

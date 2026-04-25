@@ -8,7 +8,7 @@
     <app-mat-form-field-input-dynamic
     [(value)]="product"
     [blankObject]="blankProduct"
-    [styleWidth]="'100%'"
+    [inputMap]="inputField('1').set(inputKeys.indent, false).set(inputKeys.styleWidth, '100%')"
     ></app-mat-form-field-input-dynamic>
   </li>
   <li>

@@ -1,10 +1,12 @@
-import { AfterContentInit, AfterViewInit, ChangeDetectorRef, Component, ContentChild, ContentChildren, Directive, EventEmitter, Input, OnChanges, OnInit, Output, QueryList, signal, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
+import { AfterContentInit, AfterViewInit, ChangeDetectorRef, Component, ContentChild, ContentChildren, Directive, EventEmitter, inject, Input, OnChanges, OnInit, Output, QueryList, signal, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
 import { MatColumnDef, MatTable, MatTableDataSource } from '@angular/material/table';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatColumn, MatTableSettingType } from '../../model/mat.model';
 import { DataUtils } from '../../util/Data.utils';
 import { SelectionModel } from '@angular/cdk/collections';
+import { MatFormFields } from '../../model/utils.model';
+import { ViesMatFormFieldMap } from '../../abtract/ViesMatFormFieldMap';
 
 @Component({
   selector: 'app-mat-table',
@@ -12,7 +14,13 @@ import { SelectionModel } from '@angular/cdk/collections';
   styleUrls: ['./mat-table.component.scss'],
   standalone: false
 })
-export class MatTableComponent<T extends object> implements OnInit, OnChanges, AfterViewInit, AfterContentInit {
+export class MatTableComponent<T extends object> extends ViesMatFormFieldMap implements OnInit, OnChanges, AfterViewInit, AfterContentInit {
+
+  @Input()
+  inputMap = new MatFormFields().addInputDefault();
+
+  @Input()
+  outputMap = new MatFormFields().addOutputDefault();
 
   @Input()
   filterDisplay: number = 0;
@@ -82,9 +90,7 @@ export class MatTableComponent<T extends object> implements OnInit, OnChanges, A
 
   disabledPaginator = signal(false);
 
-  constructor(
-    protected cd: ChangeDetectorRef
-  ) { }
+  protected cd: ChangeDetectorRef = inject(ChangeDetectorRef);
   
   ngAfterContentInit(): void {
     let elements = this.columnDefs?.toArray();

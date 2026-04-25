@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { AfterContentChecked, ChangeDetectorRef, Component, inject, Inject, signal } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { UserAccessInputType } from '../../util-component/mat-form-field-input-user-access/mat-form-field-input-user-access.component';
 import { MatOption } from '../../model/mat.model';
@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 import { UserAccess, SharedUser, SharedGroup, AccessPermission } from '../../model/authenticator.model';
 import { RxJSUtils } from '../../util/RxJS.utils';
 import { FixChangeDetection } from '../../abtract/FixChangeDetection';
+import { ViesMatFormFieldMap } from '../../abtract/ViesMatFormFieldMap';
 
 @Component({
   selector: 'app-user-access-dialog',
@@ -13,19 +14,21 @@ import { FixChangeDetection } from '../../abtract/FixChangeDetection';
   styleUrls: ['./user-access-dialog.component.scss'],
   standalone: false
 })
-export class UserAccessDialog extends FixChangeDetection {
+export class UserAccessDialog extends ViesMatFormFieldMap implements AfterContentChecked {
 
   value!: UserAccess | SharedUser[] | SharedGroup[] | AccessPermission[];
   inputType!: UserAccessInputType[] | UserAccessInputType;
   userIdOptions: MatOption<String>[] = [];
   groupIdOptions: MatOption<String>[] = [];
-  readonly: boolean = false;
+  readonly = signal<boolean>(false);
 
   title: string = 'User Access';
   yes: string = 'Save';
   no: string = 'Cancel';
 
   validForm: boolean = false;
+
+  protected cd: ChangeDetectorRef = inject(ChangeDetectorRef);
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: {
@@ -56,7 +59,7 @@ export class UserAccessDialog extends FixChangeDetection {
       this.no = data.no;
 
     if(data.readonly)
-      this.readonly = data.readonly;
+      this.readonly.set(data.readonly);
 
     if(data.userIdOptions instanceof Observable) {
       data.userIdOptions.pipe(this.rxjsUtils.waitLoadingDialog()).subscribe(e => this.userIdOptions = e);
@@ -71,5 +74,9 @@ export class UserAccessDialog extends FixChangeDetection {
     else {
       this.groupIdOptions = data.groupIdOptions;
     }
+  }
+
+  ngAfterContentChecked(): void {
+    this.cd.detectChanges();
   }
 }

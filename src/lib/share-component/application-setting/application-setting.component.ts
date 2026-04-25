@@ -5,6 +5,7 @@ import { AuthenticatorService } from '../../service/authenticator.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialog } from '../../dialog/confirm-dialog/confirm-dialog.component';
 import { DataUtils } from '../../util/Data.utils';
+import { ViesMatFormFieldMap } from '../../abtract/ViesMatFormFieldMap';
 
 @Component({
   selector: 'app-application-setting',
@@ -12,7 +13,7 @@ import { DataUtils } from '../../util/Data.utils';
   styleUrls: ['./application-setting.component.scss'],
   standalone: false
 })
-export class ApplicationSettingComponent implements OnInit, OnDestroy {
+export class ApplicationSettingComponent extends ViesMatFormFieldMap implements OnInit, OnDestroy {
 
   generalSetting!: GeneralSetting;
   generalSettingCopy!: GeneralSetting;
@@ -23,6 +24,7 @@ export class ApplicationSettingComponent implements OnInit, OnDestroy {
     public authenticatorService: AuthenticatorService,
     private matDialog: MatDialog
   ) { 
+    super();
     settingService.onGeneralSettingChange.subscribe({
       next: () => {
         this.ngOnInit();

@@ -1,31 +1,30 @@
-<mat-expansion-panel [expanded]="expanded" (expandedChange)="expandedChange.emit($event)" [ngStyle]="{width: styleWidth || 'max-content'}" appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
+<mat-expansion-panel [expanded]="getInputValue(inputKeys.expanded)" (expandedChange)="expandedChange.emit($event)" [ngStyle]="{width: getInputValue(inputKeys.styleWidth) || 'max-content'}" appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
   <mat-expansion-panel-header>
     <mat-panel-title>
-      {{label}}
+      {{getInputValue(inputKeys.label)}}
     </mat-panel-title>
-    <mat-panel-description [style.color]="minSize > 0 && getKeyPairsSize() <= 0 ? 'red' : ''">
-      Size: {{getKeyPairsSize()}} {{minSize > 0 ? '*' : ''}}
+    <mat-panel-description [style.color]="getInputValue(inputKeys.minSize) > 0 && getKeyPairsSize() <= 0 ? 'red' : ''">
+      Size: {{getKeyPairsSize()}} {{getInputValue(inputKeys.minSize) > 0 ? '*' : ''}}
     </mat-panel-description>
   </mat-expansion-panel-header>
   <br>
     <ul>
-      @if (showSizeInput) {
+      @if (getInputValue(inputKeys.showSizeInput)) {
         <li>
           <app-mat-form-field-input
-            [label]="'Number of ' + label"
             [value]="getKeyPairsSize()"
             (valueChange)="listLength = $event"
             (onValueChange)="updateListLength()"
-            defaultType="number"
-            [showMinMaxHint]="true"
-            min="0"
-            [max]="maxSize.toString()"
-            [required]="true"
-            [styleWidth]="styleWidth"
-            [manuallyEmitValue]="true"
-            [showClearIcon]="false"
-            [onFocusoutEmitValueOnly]="false"
-            [readonly]="_readonly()"
+            [inputMap]="inputMap.clone()
+                                .set(inputKeys.label, 'Number of ' + getInputValue(inputKeys.label))
+                                .set(inputKeys.defaultType, 'number')
+                                .set(inputKeys.showMinMaxHint, true)
+                                .set(inputKeys.min, 0)
+                                .set(inputKeys.max, getInputValue(inputKeys.maxSize))
+                                .set(inputKeys.manuallyEmitValue, true)
+                                .set(inputKeys.showClearIcon, false)
+                                .set(inputKeys.onFocusoutEmitValueOnly, false)
+                                .set(inputKeys.required, true)"
           ></app-mat-form-field-input>
         </li>
       }
@@ -39,10 +38,10 @@
                 [(value)]="keypair.key"
                 [blankObject]="getBlankKey()"
                 (onValueChange)="applyValue()"
-                [styleWidth]="'100%'"
-                [required]="true"
-                [readonly]="_readonly()"
-                [indent]="false"
+                [inputMap]="inputMap.clone()
+                                    .set(inputKeys.required, true)
+                                    .set(inputKeys.indent, false)
+                                    .set(inputKeys.styleWidth, '100%')"
               ></app-mat-form-field-input-dynamic>
             </details>
           </li>
@@ -53,16 +52,15 @@
                 [(value)]="keypair.value"
                 [blankObject]="getBlankValue()"
                 (onValueChange)="applyValue()"
-                [styleWidth]="'100%'"
-                [required]="required"
-                [readonly]="_readonly()"
-                [indent]="false"
+                [inputMap]="inputMap.clone()
+                                    .set(inputKeys.indent, false)
+                                    .set(inputKeys.styleWidth, '100%')"
               ></app-mat-form-field-input-dynamic>
             </details>
           </li>
           <li class="flex-row-container-auto">
-            @if (showRemoveItemButton) {
-              <button (click)="remove(i)" matButton="filled" class="warn">Remove this {{label}}</button>
+            @if (getInputValue(inputKeys.showRemoveItemButton)) {
+              <button (click)="remove(i)" matButton="filled" class="warn">Remove this {{getInputValue(inputKeys.label)}}</button>
             }
           </li>
           <hr>
@@ -73,24 +71,21 @@
                 [(value)]="keypair.key"
                 [blankObject]="getBlankKey()"
                 (onValueChange)="applyValue()"
-                [styleWidth]="'100%'"
-                [required]="true"
-                [readonly]="_readonly()"
-                [style.width]="showRemoveItemButton && !readonly ? '44%' : ''"
+                [inputMap]="inputMap.clone()
+                                    .set(inputKeys.required, true)
+                                    .set(inputKeys.styleWidth, '100%')"
+                [style.width]="getInputValue(inputKeys.showRemoveItemButton) && !getInputValue(inputKeys.readonly) ? '44%' : ''"
               ></app-mat-form-field-input-dynamic>
               <app-mat-form-field-input-dynamic
                 label="value"
-                [placeholder]="placeholder"
                 [(value)]="keypair.value"
                 [blankObject]="getBlankValue()"
                 (onValueChange)="applyValue()"
-                [styleWidth]="'100%'"
-                [required]="required"
-                [readonly]="_readonly()"
-                [style.width]="showRemoveItemButton && !_readonly() ? '44%' : ''"
+                [inputMap]="inputMap.clone().set(inputKeys.styleWidth, '100%')"
+                [style.width]="getInputValue(inputKeys.showRemoveItemButton) && !getInputValue(inputKeys.readonly) ? '44%' : ''"
               ></app-mat-form-field-input-dynamic>
-              @if (showRemoveItemButton) {
-                <span style="width: 5%;"><button mat-icon-button color="warn" (click)="remove(i)" [disabled]="readonly"><mat-icon>remove_circle</mat-icon></button></span>
+              @if (getInputValue(inputKeys.showRemoveItemButton)) {
+                <span style="width: 5%;"><button mat-icon-button color="warn" (click)="remove(i)" [disabled]="getInputValue(inputKeys.readonly)"><mat-icon>remove_circle</mat-icon></button></span>
               }
             </li>
           }
@@ -100,9 +95,9 @@
           <div style="color: red;" class="text-center"><hr><b>!Duplicate key found!</b><hr></div>
         }
 
-        @if (showAddItemButton) {
+        @if (getInputValue(inputKeys.showAddItemButton)) {
           <li class="flex-row-container-auto">
-            <button matButton="filled" (click)="addNewItem()" [disabled]="reachMaxSize()">Add new {{label}}</button>
+            <button matButton="filled" (click)="addNewItem()" [disabled]="reachMaxSize()">Add new {{getInputValue(inputKeys.label)}}</button>
           </li>
         }
       </ul>

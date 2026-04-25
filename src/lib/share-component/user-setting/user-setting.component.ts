@@ -1,7 +1,8 @@
 import { RxJSUtils } from '../../util/RxJS.utils';
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { DialogUtils } from '../../util/Dialog.utils';
 import { AuthenticatorService } from '../../service/authenticator.service';
+import { ViesMatFormFieldMap } from '../../abtract/ViesMatFormFieldMap';
 
 @Component({
   selector: 'app-user-setting',
@@ -9,7 +10,7 @@ import { AuthenticatorService } from '../../service/authenticator.service';
   styleUrls: ['./user-setting.component.scss'],
   standalone: false
 })
-export class UserSettingComponent implements OnInit {
+export class UserSettingComponent extends ViesMatFormFieldMap implements OnInit {
 
   currentPassword = '';
   newPassword = '';
@@ -21,11 +22,9 @@ export class UserSettingComponent implements OnInit {
   validForm = false;
   validForm2 = false;
 
-  constructor(
-    private ensibleAuthenticatorService: AuthenticatorService,
-    private rxjsUtils: RxJSUtils,
-    private dialogUtils: DialogUtils
-  ) { }
+  ensibleAuthenticatorService = inject(AuthenticatorService);
+  rxjsUtils: RxJSUtils = inject(RxJSUtils);
+  dialogUtils: DialogUtils = inject(DialogUtils);
 
   ngOnInit(): void {
     this.currentPassword = '';

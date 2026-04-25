@@ -1,66 +1,80 @@
-<mat-form-field [appearance]="getAppearance()" [color]="matColor"  [style.width.ch]="getSize(value ? value.toString() : '')" [style.width]="styleWidth">
-  <mat-label>{{label}}</mat-label>
+<mat-form-field [appearance]="getAppearance()" [color]="getInputValue(inputKeys.matColor)"  [style.width.ch]="getSize(value ? value.toString() : '')" [style.width]="getInputValue(inputKeys.styleWidth)">
+  <mat-label>{{getInputValue(inputKeys.label)}}</mat-label>
 
   <input
     #input
     matInput
-    [ngStyle]="getInputColorNgStyle()"
-    [type]="defaultType"
+    [ngStyle]="getInputValueColorNgStyle()"
+    [type]="getInputValue(inputKeys.defaultType)"
     (keyup.enter)="emitEnter()"
     (keydown)="addKey($event)"
     (focus)="focusEmit()"
     (focusout)="focusoutEmitValue()"
-    [placeholder]="placeholder"
-    [maxlength]="maxlength"
+    [placeholder]="getInputValue(inputKeys.placeholder)"
+    [maxlength]="getInputValue(inputKeys.maxlength)"
     [formControl]="formControl"
     [matAutocomplete]="auto"
-    [readonly]="_readonly()">
-
+    [readonly]="getInputValue(inputKeys.readonly)">
   <mat-error>{{getFormControlError()}}</mat-error>
-  @if (error) {
-    <mat-hint style="color: red;" align="start">{{error}}</mat-hint>
+  
+  @if (isFocus && getInputValue(inputKeys.readonly) && getInputValue(inputKeys.readonlyOnFocusHintLeft)) {
+    <mat-hint style="color: goldenrod;" align="start">{{getInputValue(inputKeys.readonlyOnFocusHintLeft)}}</mat-hint>
   }
-  @if (manuallyEmitValue && isValueChange()) {
-    <mat-hint style="color: goldenrod;" align="start">{{manuallyEmitValueHint}}</mat-hint>
+  @else if (getInputValue(inputKeys.error)) {
+    <mat-hint style="color: red;" align="start">{{getInputValue(inputKeys.error)}}</mat-hint>
   }
-  @if (isValueString() && maxlength) {
-    <mat-hint align="end">{{value.toString().length}} / {{maxlength}}</mat-hint>
+  @else if (getInputValue(inputKeys.manuallyEmitValue) && isValueChange()) {
+    <mat-hint style="color: goldenrod;" align="start">{{getInputValue(inputKeys.manuallyEmitValueHint)}}</mat-hint>
   }
-  @if (showMinMaxHint && isValueNumber() && value) {
+  @else if (getInputValue(inputKeys.customIconLabel) && getInputValue(inputKeys.customIconHint) && value) {
+    <mat-hint style="color: goldenrod;" align="start">{{getInputValue(inputKeys.customIconHint)}}</mat-hint>
+  }
+  @else {
+    <mat-hint style="color: yellow;" align="start">
+      <ng-content select="[matHint]"></ng-content>
+    </mat-hint>
+  }
+
+  @if (isFocus && getInputValue(inputKeys.readonly) && getInputValue(inputKeys.readonlyOnFocusHintRight)) {
+    <mat-hint style="color: goldenrod;" align="end">{{getInputValue(inputKeys.readonlyOnFocusHintRight)}}</mat-hint>
+  }
+  @else if (isValueString() && getInputValue(inputKeys.maxlength)) {
+    <mat-hint align="end">{{value.toString().length}} / {{getInputValue(inputKeys.maxlength)}}</mat-hint>
+  }
+  @else if (getInputValue(inputKeys.showMinMaxHint) && isValueNumber() && value) {
     <mat-hint align="end">
-      @if (min) {
-        {{min + '\<'}}
+      @if (getInputValue(inputKeys.min)) {
+        {{getInputValue(inputKeys.min) + '\<'}}
       }
-      <span [ngStyle]="getInputHintColorNgStyle()">{{value}}</span>
-      @if (max) {
-        {{'\<' + max}}
+      <span [ngStyle]="getInputValueHintColorNgStyle()">{{value}}</span>
+      @if (getInputValue(inputKeys.max)) {
+        {{'\<' + getInputValue(inputKeys.max)}}
       }
     </mat-hint>
   }
-  @if (customIconLabel && customIconHint && value) {
-    <mat-hint style="color: goldenrod;" align="start">{{customIconHint}}</mat-hint>
-  }
-  @if (isFocus && _readonly() && readonlyOnFocusHint) {
-    <mat-hint style="color: goldenrod;" align="start">{{readonlyOnFocusHint}}</mat-hint>
+  @else {
+    <mat-hint style="color: yellow;" align="end">
+      <ng-content select="[matHintEnd]"></ng-content>
+    </mat-hint>
   }
 
-  @if (customIconLabel) {
+  @if (getInputValue(inputKeys.customIconLabel)) {
     <button matSuffix mat-icon-button (click)="emitCustomIcon()">
-      <mat-icon [style.color]="getCustomIconLabelColor()">{{customIconLabel}}</mat-icon>
+      <mat-icon [style.color]="getCustomIconLabelColor()">{{getInputValue(inputKeys.customIconLabel)}}</mat-icon>
     </button>
   }
-  @if (manuallyEmitValue && isValueChange()) {
-    <button matSuffix mat-icon-button (click)="emitValue()" [matTooltip]="'Apply ' + label">
+  @if (getInputValue(inputKeys.manuallyEmitValue) && isValueChange()) {
+    <button matSuffix mat-icon-button (click)="emitValue()" [matTooltip]="'Apply ' + getInputValue(inputKeys.label)">
       <mat-icon>check_circle_outline</mat-icon>
     </button>
   }
-  @if (showClearIcon && value && !disable && !readonly) {
-    <button matSuffix mat-icon-button (click)="clear()" [matTooltip]="'Clear ' + label">
+  @if (getInputValue(inputKeys.showClearIcon) && value && !getInputValue(inputKeys.disable) && !getInputValue(inputKeys.readonly)) {
+    <button matSuffix mat-icon-button (click)="clear()" [matTooltip]="'Clear ' + getInputValue(inputKeys.label)">
       <mat-icon>close</mat-icon>
     </button>
   }
-  @if (value && !disable && showGoto) {
-    <button matSuffix mat-icon-button (click)="openLink(value.toString())" [matTooltip]="'Go to ' + label">
+  @if (value && !getInputValue(inputKeys.disable) && getInputValue(inputKeys.showGoto)) {
+    <button matSuffix mat-icon-button (click)="openLink(value.toString())" [matTooltip]="'Go to ' + getInputValue(inputKeys.label)">
       <mat-icon>public</mat-icon>
     </button>
   }
@@ -68,18 +82,12 @@
   <span matSuffix viescloudClickStopPropagation>
     <ng-content select="button"></ng-content>
   </span>
-  <mat-hint style="color: yellow;" align="start">
-    <ng-content select="[matHint]"></ng-content>
-  </mat-hint>
-  <mat-hint style="color: yellow;" align="end">
-    <ng-content select="[matHintEnd]"></ng-content>
-  </mat-hint>
 
-  @if (showVisibleSwitch && !disable) {
-    <app-input-type-switch matSuffix [switch]="switchVisibility" [htmlInputElement]="input" [trueValue]="defaultType" [falseValue]="switchType" [onIcon]="onIcon" [offIcon]="offIcon"></app-input-type-switch>
+  @if (getInputValue(inputKeys.showVisibleSwitch) && !getInputValue(inputKeys.disable)) {
+    <app-input-type-switch matSuffix [switch]="getInputValue(inputKeys.switchVisibility)" [htmlInputElement]="input" [trueValue]="getInputValue(inputKeys.defaultType)" [falseValue]="getInputValue(inputKeys.switchType)" [onIcon]="getInputValue(inputKeys.onIcon)" [offIcon]="getInputValue(inputKeys.offIcon)"></app-input-type-switch>
   }
-  @if (showCopyToClipboard && !disable) {
-    <app-copy-to-clipboard-util matSuffix [copyValue]="value.toString()" [displayMessage]="copyDisplayMessage"></app-copy-to-clipboard-util>
+  @if (getInputValue(inputKeys.showCopyToClipboard) && !getInputValue(inputKeys.disable)) {
+    <app-copy-to-clipboard-util matSuffix [copyValue]="value.toString()" [displayMessage]="getInputValue(inputKeys.copyDisplayMessage)"></app-copy-to-clipboard-util>
   }
 
   <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">

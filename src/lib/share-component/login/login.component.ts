@@ -11,6 +11,7 @@ import { StringUtils } from '../../util/String.utils';
 import { FileUtils } from '../../util/File.utils';
 import { RouteUtils } from '../../util/Route.utils';
 import { environment } from '../../../environments/environment.prod';
+import { ViesMatFormFieldMap } from '../../abtract/ViesMatFormFieldMap';
 
 @Component({
   selector: 'viescloud-login',
@@ -18,7 +19,7 @@ import { environment } from '../../../environments/environment.prod';
   styleUrls: ['./login.component.scss'],
   standalone: false
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent extends ViesMatFormFieldMap implements OnInit {
 
   public static defaultStateKey = "ensible_auth_state";
 
@@ -38,7 +39,9 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private ensibleOpenidService: OpenIdProviderService,
     private rxjsUtils: RxJSUtils
-  ) { }
+  ) { 
+    super();
+  }
 
   async ngOnInit() {
     let code = RouteUtils.getQueryParam('code');

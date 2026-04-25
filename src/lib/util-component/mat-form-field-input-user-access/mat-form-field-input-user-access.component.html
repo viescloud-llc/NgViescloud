@@ -3,13 +3,13 @@
     @if (containInputType(UserAccessInputType.OWNER_USER_ID)) {
       <li>
         <app-mat-form-field-input
-          [label]="'Owner User ID'"
-          [placeholder]="'e.g 1, 2, 3, book, book2, book3'"
           [(value)]="ownerUserId"
           blankObject="''"
-          styleWidth="100%"
-          [required]="true"
-          [readonly]="_readonly()"
+          [inputMap]="inputMap.clone()
+                              .set(inputKeys.label, 'Owner User ID')
+                              .set(inputKeys.placeholder, 'e.g 1, 2, 3, book, book2, book3')
+                              .set(inputKeys.styleWidth, '100%')
+                              .set(inputKeys.required, true)"
         ></app-mat-form-field-input>
         <hr>
         </li>
@@ -22,28 +22,28 @@
             <ul>
               <li>
                 <app-mat-form-field-input-option
-                  label="User"
                   [(value)]="sharedUser.userId"
                   [options]="userIdOptions"
-                  [required]="true"
-                  styleWidth="100%"
                   [noneLabel]="''"
-                  [customOptionLabel]="'Remove'"
-                  [customOptionLabelColor]="'red'"
                   (onCustomOptionSelected)="removeSharedUser(i)"
-                  [readonly]="_readonly()"
+                  [inputMap]="inputMap.clone()
+                                      .set(inputKeys.label, 'User')
+                                      .set(inputKeys.styleWidth, '100%')
+                                      .set(inputKeys.customOptionLabel, 'Remove')
+                                      .set(inputKeys.customOptionLabelColor, 'red')
+                                      .set(inputKeys.required, true)"
                 ></app-mat-form-field-input-option>
               </li>
               <li>
                 <app-mat-form-field-input-list-option
-                  label="Permissions"
                   [(value)]="sharedUser.permissions"
                   [options]="permissionOptions"
-                  styleWidth="100%"
-                  [showSizeInput]="false"
-                  [minSize]="1"
-                  [uniqueValue]="true"
-                  [readonly]="_readonly()"
+                  [inputMap]="inputMap.clone()
+                                      .set(inputKeys.label, 'Permissions')
+                                      .set(inputKeys.showSizeInput, false)
+                                      .set(inputKeys.minSize, 1)
+                                      .set(inputKeys.uniqueValue, true)
+                                      .set(inputKeys.styleWidth, '100%')"
                 ></app-mat-form-field-input-list-option>
               </li>
             </ul>
@@ -51,7 +51,7 @@
             </li>
           }
           <li class="flex-row-container-auto">
-            @if (!readonly && (sharedUsers).length < userIdOptions.length) {
+            @if (!getInputValue(inputKeys.readonly) && (sharedUsers).length < userIdOptions.length) {
               <button matButton="filled" (click)="addNewSharedUser()">New share user</button>
             }
           </li>
@@ -65,28 +65,28 @@
                 <ul>
                   <li>
                     <app-mat-form-field-input-option
-                      label="Group"
                       [(value)]="sharedGroup.groupId"
                       [options]="groupIdOptions"
-                      [required]="true"
-                      styleWidth="100%"
                       [noneLabel]="''"
-                      [customOptionLabel]="'Remove'"
-                      [customOptionLabelColor]="'red'"
                       (onCustomOptionSelected)="removeSharedGroup(i)"
-                      [readonly]="_readonly()"
+                      [inputMap]="inputMap.clone()
+                                          .set(inputKeys.label, 'Group')
+                                          .set(inputKeys.styleWidth, '100%')
+                                          .set(inputKeys.customOptionLabel, 'Remove')
+                                          .set(inputKeys.customOptionLabelColor, 'red')
+                                          .set(inputKeys.required, true)"
                     ></app-mat-form-field-input-option>
                   </li>
                   <li>
                     <app-mat-form-field-input-list-option
-                      label="Permissions"
                       [(value)]="sharedGroup.permissions"
                       [options]="permissionOptions"
-                      styleWidth="100%"
-                      [showSizeInput]="false"
-                      [uniqueValue]="true"
-                      [minSize]="1"
-                      [readonly]="_readonly()"
+                      [inputMap]="inputMap.clone()
+                                          .set(inputKeys.label, 'Permissions')
+                                          .set(inputKeys.showSizeInput, false)
+                                          .set(inputKeys.uniqueValue, true)
+                                          .set(inputKeys.minSize, 1)
+                                          .set(inputKeys.styleWidth, '100%')"
                     ></app-mat-form-field-input-list-option>
                   </li>
                 </ul>
@@ -94,7 +94,7 @@
                 </li>
               }
               <li class="flex-row-container-auto">
-                @if (!readonly && (sharedGroups).length < groupIdOptions.length) {
+                @if (!getInputValue(inputKeys.readonly) && (sharedGroups).length < groupIdOptions.length) {
                   <button matButton="filled" (click)="addNewSharedGroup()">New share group</button>
                 }
               </li>
@@ -104,14 +104,14 @@
               @if (containInputType(UserAccessInputType.SHARED_OTHERS)) {
                 <li>
                   <app-mat-form-field-input-list-option
-                    label="Shared to others"
                     [(value)]="sharedOthers"
                     [options]="permissionOptions"
-                    styleWidth="100%"
-                    [expanded]="true"
-                    [showSizeInput]="false"
-                    [uniqueValue]="true"
-                    [readonly]="_readonly()"
+                    [inputMap]="inputMap.clone()
+                                        .set(inputKeys.label, 'Shared to others')
+                                        .set(inputKeys.expanded, true)
+                                        .set(inputKeys.showSizeInput, false)
+                                        .set(inputKeys.uniqueValue, true)
+                                        .set(inputKeys.styleWidth, '100%')"
                   ></app-mat-form-field-input-list-option>
                 </li>
               }
@@ -119,7 +119,7 @@
           </ng-template>
 
           @if (showExpansionPanel) {
-            <mat-expansion-panel [expanded]="expanded" (expandedChange)="expandedChange.emit($event)" [ngStyle]="{width: styleWidth || 'max-content'}">
+            <mat-expansion-panel [expanded]="expanded" (expandedChange)="expandedChange.emit($event)" [ngStyle]="{width: getInputValue(inputKeys.styleWidth) || 'max-content'}">
               <mat-expansion-panel-header>
                 <mat-panel-title>
                   {{label}}

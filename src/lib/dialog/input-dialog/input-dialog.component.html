@@ -2,21 +2,22 @@
 <div mat-dialog-content>
   @if (!data.multipleLine) {
     <app-mat-form-field-input
-      [label]="label"
       [value]="input" (valueChange)="input = $event.toString()"
-      [placeholder]="data.placeholder ?? ''"
-      [autoResize]="true"
-      styleWidth="100%"
+      [inputMap]="inputField('1').set(inputKeys.styleWidth, '100%')
+                                 .set(inputKeys.autoResize, true)
+                                 .set(inputKeys.label, label)
+                                 .set(inputKeys.placeholder, data.placeholder ?? '')"
     ></app-mat-form-field-input>
   }
   @if (data.multipleLine) {
     <app-mat-form-field-input-text-area
-      [label]="label"
       [value]="input" (valueChange)="input = $event.toString()"
-      [placeholder]="data.placeholder ?? ''"
-      cols="50"
-      rows="10"
-      styleWidth="100%"
+      [inputMap]="inputField('2').set(inputKeys.styleWidth, '100%')
+                                 .set(inputKeys.autoResize, true)
+                                 .set(inputKeys.label, label)
+                                 .set(inputKeys.cols, 50)
+                                 .set(inputKeys.rows, 10)
+                                 .set(inputKeys.placeholder, data.placeholder ?? '')"
     ></app-mat-form-field-input-text-area>
   }
 </div>

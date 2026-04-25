@@ -21,12 +21,6 @@ export class MatFormFieldInputOptionComponent<T> extends MatFormFieldComponent {
   noneLabel = 'None';
 
   @Input()
-  customOptionLabel = '';
-
-  @Input()
-  customOptionLabelColor = '';
-
-  @Input()
   noneLabelValue: T | undefined = this.blankObject;
 
   @Input()
@@ -77,7 +71,7 @@ export class MatFormFieldInputOptionComponent<T> extends MatFormFieldComponent {
   }
 
   override isValidInput(): boolean {
-    if (this.required)
+    if (this.getInputValue(this.inputKeys.required))
       return this.options.some(e => DataUtils.isEqual(e.value, this.value)) && super.isValidInput();
     else
       return true;

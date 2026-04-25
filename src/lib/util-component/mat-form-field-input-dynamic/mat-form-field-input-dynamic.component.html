@@ -3,35 +3,24 @@
     <!-- Number Input -->
     @case (DynamicMatInputType.NUMBER) {
       <app-mat-form-field-input
-        [label]="label"
-        [placeholder]="placeholder"
         [value]="value"
         (valueChange)="emitValue($event)"
         (onValueChange)="onValueChange.emit()"
-        [styleWidth]="styleWidth"
-        [disable]="disable"
-        [required]="required"
-        defaultType="number"
         [blankObject]="0"
-        [readonly]="_readonly()"
+        [inputMap]="inputMap.clone().set(inputKeys.defaultType, 'number')"
       ></app-mat-form-field-input>
     }
 
     <!-- Boolean Input (not slide toggle) -->
     @case (DynamicMatInputType.BOOLEAN) {
       <app-mat-form-field-input-option
-        [label]="label"
-        [placeholder]="placeholder"
         [value]="value"
         (valueChange)="emitValue($event)"
         (onValueChange)="onValueChange.emit()"
         [options]="options"
-        noneLabel=""
-        [styleWidth]="styleWidth"
-        [disable]="disable"
-        [required]="required"
+        [noneLabel]="''"
         [blankObject]="blankObject"
-        [readonly]="_readonly()"
+        [inputMap]="inputMap.clone()"
       ></app-mat-form-field-input-option>
     }
 
@@ -39,91 +28,67 @@
     @case (DynamicMatInputType.BOOLEAN_SLIDE_TOGGLE) {
       <mat-slide-toggle
         style="margin: 0.05rem;"
-        [color]="matColor"
+        [color]="getInputValue(inputKeys.matColor)"
         [ngModel]="value"
         (ngModelChange)="emitValue($event)"
         (toggleChange)="emitValue()"
-        [disabled]="disable"
-        [required]="required">
-        {{label}}
+        [disabled]="getInputValue(inputKeys.disable)"
+        [required]="getInputValue(inputKeys.required)">
+        {{getInputValue(inputKeys.label)}}
       </mat-slide-toggle>
     }
 
     <!-- Options Input -->
     @case (DynamicMatInputType.OPTIONS) {
       <app-mat-form-field-input-option
-        [label]="label"
-        [placeholder]="placeholder"
         [value]="value"
         (valueChange)="emitValue($event)"
         (onValueChange)="onValueChange.emit()"
-        [options]="matOptions!"
-        noneLabel=""
-        [styleWidth]="styleWidth"
-        [disable]="disable"
-        [required]="required"
+        [options]="getInputValue(inputKeys.matOptions)!"
+        [noneLabel]="''"
         [blankObject]="blankObject"
-        [readonly]="_readonly()"
+        [inputMap]="inputMap"
       ></app-mat-form-field-input-option>
     }
 
     <!-- String Input (Single Line) -->
     @case (DynamicMatInputType.STRING) {
       <app-mat-form-field-input
-        [label]="label"
-        [placeholder]="placeholder"
         [value]="value" 
         (valueChange)="emitValue($event)"
         (onValueChange)="onValueChange.emit()"
-        [required]="required"
-        [showVisibleSwitch]="isPassword"
-        [validateEmail]="isEmail"
-        [autoFillHttps]="isHttps"
-        [showGoto]="showGotoButton"
-        [styleWidth]="styleWidth"
-        [disable]="disable"
-        [required]="required"
         [blankObject]="''"
-        [readonly]="_readonly()"
+        [inputMap]="inputMap.clone()
+                            .set(inputKeys.showVisibleSwitch, getInputValue(inputKeys.isPassword))
+                            .set(inputKeys.validateEmail, getInputValue(inputKeys.isEmail))
+                            .set(inputKeys.autoFillHttps, getInputValue(inputKeys.isHttps))
+                            .set(inputKeys.showGoto, getInputValue(inputKeys.showGotoButton))"
       ></app-mat-form-field-input>
     }
 
     <!-- String Input (Multiple Lines) -->
     @case (DynamicMatInputType.STRING_MULTIPLE_LINE) {
       <app-mat-form-field-input-text-area
-        [label]="label"
-        [placeholder]="placeholder"
         [value]="value" 
         (valueChange)="emitValue($event)"
         (onValueChange)="onValueChange.emit()"
-        [required]="required"
-        [styleWidth]="styleWidth"
-        [disable]="disable"
-        [required]="required"
         [blankObject]="''"
-        [readonly]="_readonly()"
+        [inputMap]="inputMap"
       ></app-mat-form-field-input-text-area>
     }
 
     <!-- Record input -->
     @case (DynamicMatInputType.RECORD) {
       <app-mat-form-field-input-record
-      [label]="label"
-      [placeholder]="placeholder"
       [value]="value"
       (valueChange)="emitValue($event)"
       (onValueChange)="onValueChange.emit()"
-      [required]="required"
-      [styleWidth]="styleWidth"
-      [disable]="disable"
-      [required]="required"
       [blankObject]="blankObject"
-      [showSizeInput]="showListSizeInput"
-      [showAddItemButton]="showListAddItemButton"
-      [showRemoveItemButton]="showListRemoveItemButton"
-      [blankObject]="blankObject"
-      [readonly]="_readonly()"
-      [minSize]="listRequired ? 1 : 0"
+      [inputMap]="inputMap.clone()
+                          .set(inputKeys.showAddItemButton, getInputValue(inputKeys.showListAddItemButton))
+                          .set(inputKeys.showRemoveItemButton, getInputValue(inputKeys.showListRemoveItemButton))
+                          .set(inputKeys.minSize, getInputValue(inputKeys.listRequired) ? 1 : 0)
+                          .set(inputKeys.showSizeInput, getInputValue(inputKeys.showListSizeInput))"
       ></app-mat-form-field-input-record>
       <br>
     }
@@ -131,16 +96,11 @@
     <!-- rgb color Input -->
     @case (DynamicMatInputType.RGB_COLOR) {
       <app-mat-form-field-input-rgb-color-picker
-      [label]="label"
-      [placeholder]="placeholder"
       [value]="value"
       (valueChange)="emitValue($event)"
       (onValueChange)="onValueChange.emit()"
-      [styleWidth]="styleWidth"
-      [disable]="disable"
-      [required]="required"
       [blankObject]="blankObject"
-      [readonly]="_readonly()"
+      [inputMap]="inputMap"
       ></app-mat-form-field-input-rgb-color-picker>
       <br>
     }
@@ -148,63 +108,36 @@
     <!-- Array Input -->
     @case (DynamicMatInputType.ARRAY) {
       <app-mat-form-field-input-list
-        [label]="label"
-        [placeholder]="placeholder"
         [value]="value"
         (valueChange)="emitValue($event)"
         (onValueChange)="onValueChange.emit()"
-        [required]="required"
-        [styleWidth]="styleWidth"
-        [disable]="disable"
-        [required]="required"
         [blankObject]="blankObject"
-        [showSizeInput]="showListSizeInput"
-        [showAddItemButton]="showListAddItemButton"
-        [showRemoveItemButton]="showListRemoveItemButton"
-        [blankObject]="blankObject"
-        [readonly]="_readonly()"
-        [minSize]="listRequired ? 1 : 0"
+        [inputMap]="inputMap.clone()
+                            .set(inputKeys.showAddItemButton, getInputValue(inputKeys.showListAddItemButton))
+                            .set(inputKeys.showRemoveItemButton, getInputValue(inputKeys.showListRemoveItemButton))
+                            .set(inputKeys.minSize, getInputValue(inputKeys.listRequired) ? 1 : 0)
+                            .set(inputKeys.showSizeInput, getInputValue(inputKeys.showListSizeInput))"
       ></app-mat-form-field-input-list>
       <br>
     }
 
     <!-- Object Input -->
     @case (DynamicMatInputType.OBJECT) {
-      <ul [class]="indent ? '' : 'no-indented-ul'">
-        <li [class]="indent ? '' : 'no-indented-li'">
-          @if (objectLabel) {
-            <h2 class="text-center">{{objectLabel}}</h2>
+      <ul [class]="getInputValue(inputKeys.indent) ? '' : 'no-indented-ul'">
+        <li [class]="getInputValue(inputKeys.indent) ? '' : 'no-indented-li'">
+          @if (getInputValue(inputKeys.objectLabel)) {
+            <h2 class="text-center">{{getInputValue(inputKeys.objectLabel)}}</h2>
           }
         </li>
         @for (item of items; track trackByIndex($index, item); let i = $index) {
-          <li [class]="indent ? '' : 'no-indented-li'">
+          <li [class]="getInputValue(inputKeys.indent) ? '' : 'no-indented-li'">
             <app-mat-form-field-input-dynamic
-              [label]="item.label"
-              [placeholder]="item.placeholder"
               [value]="item.value" 
               (valueChange)="item.setValueFn($event); emitValue()"
-              [styleWidth]="styleWidth"
-              [isSlideToggle]="containSetting(item, MatItemSettingType.SLIDE_TOGGLE)"
-              [disable]="containSetting(item, MatItemSettingType.DISABLE)"
-              [required]="containSetting(item, MatItemSettingType.REQUIRE)"
-              [isTextArea]="containSetting(item, MatItemSettingType.TEXT_AREA)"
-              [isOptions]="containSetting(item, MatItemSettingType.OPTIONS)"
-              [isEmail]="containSetting(item, MatItemSettingType.VALIDATE_EMAIL)"
-              [isHttps]="containSetting(item, MatItemSettingType.AUTO_FILL_HTTPS)"
-              [showListSizeInput]="containSetting(item, MatItemSettingType.LIST_SHOW_LIST_SIZE_INPUT)"
-              [showListAddItemButton]="containSetting(item, MatItemSettingType.LIST_SHOW_ADD_ITEM_BUTTON)"
-              [showListRemoveItemButton]="containSetting(item, MatItemSettingType.LIST_SHOW_REMOVE_ITEM_BUTTON)"
-              [isRecord]="containSetting(item, MatItemSettingType.RECORD)"
-              [showGotoButton]="containSetting(item, MatItemSettingType.SHOW_GOTO_BUTTON)"
-              [readonly]="containSetting(item, MatItemSettingType.READ_ONLY)"
-              [listRequired]="containSetting(item, MatItemSettingType.LIST_REQUIRE)"
-              [matOptions]="item.matOptions"
-              [isBlankObjectArray]="item.isBlankObjectArray"
               (onValueChange)="onValueChange.emit()"
-              [indent]="indent"
               [blankObject]="item.blankObject"
-              [objectLabel]="item.key"
               [selfRef]="item"
+              [inputMap]="item.inputMap"
             ></app-mat-form-field-input-dynamic>
           </li>
         }

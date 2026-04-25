@@ -1,5 +1,6 @@
 import { DataUtils } from "../util/Data.utils";
 import { ViesUtils } from "../util/Vies.utils";
+import { MatFormFields } from "./utils.model";
 
 export enum MatType {
     OBJECT = 'object',
@@ -159,15 +160,14 @@ export class MatList<T> {
 
 export class MatFromFieldInputDynamicItem {
     ref: any;
-    blankObject: any;
-    key: string = '';
-    label: string = '';
-    placeholder = '';
     value: any;
+    key: string = '';
+    blankObject: any;
+    isBlankObjectArray: boolean = false;
     settings: MatItemSetting[] = [];
     index?: number;
     matOptions: MatOption<any>[] = [];
-    isBlankObjectArray: boolean = false;
+    inputMap: MatFormFields = MatFormFields.new().addInputDefault();
 
     constructor() {}
 

@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Input, Output, ViewChild, forwardRef, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild, forwardRef, OnChanges, SimpleChanges, computed } from '@angular/core';
 import { MatFormFieldComponent } from '../mat-form-field/mat-form-field.component';
 
 @Component({
@@ -21,54 +21,13 @@ export class MatFormFieldInputTextAreaComponent extends MatFormFieldComponent {
   @Output()
   override valueChange: EventEmitter<string> = new EventEmitter();
 
-  @Input()
-  maxlength: string = '';
-
-  @Input()
-  rows: string = ''; // min height
-
-  @Input()
-  cols: string = ''; //min width
-
-  @Input()
-  autoResizeHeight: boolean = true;
-
-  @Input()
-  showGoto: boolean = false;
-
-  @Input()
-  showClearIcon: boolean = true;
-
-  @Input()
-  showEnterIcon: boolean = false;
-
-  @Input()
-  showCopyToClipboard: boolean = false;
-
-  @Input()
-  showGenerateValue: boolean = false;
-
-  @Input()
-  alwayUppercase: boolean = false;
-
-  @Input()
-  alwayLowercase: boolean = false;
-
-  @Input()
-  manuallyEmitValue: boolean = false;
-
-  @Input()
-  showResizeVerticalButton: boolean = false;
-
-  @Input()
-  autoScrollToBottom: boolean = false;
-
-  //input copy
-  @Input()
-  copyDisplayMessage: string = this.value.toString();
+  override ngOnInit(): void {
+    super.ngOnInit();
+    this.setInputValueIfEmpty(this.inputKeys.copyDisplayMessage, computed(() => this.value.toString()));
+  }
 
   override ngOnChanges(changes: SimpleChanges): void {
-    if(changes['value'] && this.autoScrollToBottom) {
+    if(changes['value'] && this.getInputValue(this.inputKeys.autoScrollToBottom)) {
       this.scrollToBottom();
     }
   }
@@ -76,10 +35,10 @@ export class MatFormFieldInputTextAreaComponent extends MatFormFieldComponent {
   override emitValue(): void {
     let value = this.value;
 
-    if (this.alwayLowercase && typeof value === 'string')
+    if (this.getInputValue(this.inputKeys.alwayLowercase) && typeof value === 'string')
       value = value.toLowerCase();
 
-    if (this.alwayUppercase && typeof value === 'string')
+    if (this.getInputValue(this.inputKeys.alwayUppercase) && typeof value === 'string')
       value = value.toUpperCase();
 
     this.valueChange.emit(value);
@@ -94,7 +53,7 @@ export class MatFormFieldInputTextAreaComponent extends MatFormFieldComponent {
   }
 
   emitValueWithCondition(): void {
-    if(this.manuallyEmitValue)
+    if(this.getInputValue(this.inputKeys.manuallyEmitValue))
       return;
 
     this.emitValue();
@@ -103,7 +62,7 @@ export class MatFormFieldInputTextAreaComponent extends MatFormFieldComponent {
   override clear(): void {
     this.value = ''
 
-    if(this.manuallyEmitValue)
+    if(this.getInputValue(this.inputKeys.manuallyEmitValue))
       return;
 
     this.valueChange.emit(this.value);
@@ -111,18 +70,18 @@ export class MatFormFieldInputTextAreaComponent extends MatFormFieldComponent {
 
   override getSize(data: string): number {
     let offset = 10;
-    if (this.showCopyToClipboard)
+    if (this.getInputValue(this.inputKeys.showCopyToClipboard))
       offset += 5;
-    if (this.showGenerateValue)
+    if (this.getInputValue(this.inputKeys.showGenerateValue))
       offset += 5;
-    if (this.showGoto)
+    if (this.getInputValue(this.inputKeys.showGoto))
       offset += 5;
 
-    if (!this.autoResize)
-      return this.width;
+    if (!this.getInputValue(this.inputKeys.autoResize))
+      return this.getInputValue(this.inputKeys.width);
 
     if (data.length <= 10)
-      return this.width;
+      return this.getInputValue(this.inputKeys.width);
     else
       return data.length + offset;
   }

@@ -18,18 +18,16 @@ export class MatFormFieldInputListOptionComponent<T> extends MatFormFieldInputLi
   @Input()
   options: MatOption<T>[] = [];
 
-  @Input()
-  uniqueValue: boolean = false;
-
   override ngOnInit(): void {
     super.ngOnInit();
     
-    if(this.uniqueValue)
-      this.maxSize = this.options.length;
+    if(this.getInputValue(this.inputKeys.uniqueValue)) {
+      this.setInputValue(this.inputKeys.maxSize, this.options.length);
+    }
   }
 
   override cloneBlankObject() {
-    if(this.uniqueValue) {
+    if(this.getInputValue(this.inputKeys.uniqueValue)) {
       let index = this.options.findIndex(e => !e.disable);
       if(index !== -1)
         return structuredClone(this.options[index].value);
@@ -42,7 +40,7 @@ export class MatFormFieldInputListOptionComponent<T> extends MatFormFieldInputLi
 
   getOptons() {
 
-    if(this.uniqueValue) {
+    if(this.getInputValue(this.inputKeys.uniqueValue)) {
       this.options.forEach(e => {
         e.disable = this.value.some(f => DataUtils.isEqual(f, e.value));
       })

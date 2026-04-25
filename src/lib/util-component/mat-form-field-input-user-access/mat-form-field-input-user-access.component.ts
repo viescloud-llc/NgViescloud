@@ -24,7 +24,7 @@ export class MatFormFieldInputUserAccessComponent<T extends UserAccess | SharedU
   declare value: T;
   declare valueCopy: T;
   override valueChange: EventEmitter<T> = new EventEmitter<T>;
-  override label: string = 'User Access';
+  label: string = 'User Access';
 
   @Input()
   inputType: UserAccessInputType[] | UserAccessInputType = UserAccessInputType.ALL;

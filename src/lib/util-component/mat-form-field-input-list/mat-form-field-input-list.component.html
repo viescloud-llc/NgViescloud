@@ -1,31 +1,29 @@
-<mat-expansion-panel [expanded]="expanded" (expandedChange)="expandedChange.emit($event)" [ngStyle]="{width: styleWidth || 'max-content'}" appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
+<mat-expansion-panel [expanded]="getInputValue(inputKeys.expanded)" (expandedChange)="expandedChange.emit($event)" [ngStyle]="{width: getInputValue(inputKeys.styleWidth) || 'max-content'}" appMatFormFieldGroup (onAllInputCheck)="validForm.set($event)">
   <mat-expansion-panel-header>
     <mat-panel-title>
-      {{label}}
+      {{getInputValue(inputKeys.label)}}
     </mat-panel-title>
-    <mat-panel-description [style.color]="minSize > 0 && value.length <= 0 ? 'red' : ''">
-      Size: {{value.length}} {{minSize > 0 ? '*' : ''}}
+    <mat-panel-description [style.color]="getInputValue(inputKeys.minSize) > 0 && value.length <= 0 ? 'red' : ''">
+      Size: {{value.length}} {{getInputValue(inputKeys.minSize) > 0 ? '*' : ''}}
     </mat-panel-description>
   </mat-expansion-panel-header>
   <br>
     <ul>
-      @if (showSizeInput) {
+      @if (getInputValue(inputKeys.showSizeInput)) {
         <li>
           <app-mat-form-field-input
-            [label]="'Number of ' + label"
             [value]="value.length"
-            (valueChange)="listLength = $event"
-            (onValueChange)="updateListLength()"
-            defaultType="number"
-            [showMinMaxHint]="true"
-            min="0"
-            [max]="maxSize.toString()"
-            [required]="true"
-            [styleWidth]="styleWidth"
-            [manuallyEmitValue]="true"
-            [showClearIcon]="false"
-            [onFocusoutEmitValueOnly]="false"
-            [readonly]="_readonly()"
+            (valueChange)="updateListLength($event)"
+            [inputMap]="inputMap.clone()
+                                .set(inputKeys.defaultType, 'number')
+                                .set(inputKeys.showMinMaxHint, true)
+                                .set(inputKeys.min, 0)
+                                .set(inputKeys.max, getInputValue(inputKeys.maxSize))
+                                .set(inputKeys.manuallyEmitValue, true)
+                                .set(inputKeys.showClearIcon, false)
+                                .set(inputKeys.onFocusoutEmitValueOnly, false)
+                                .set(inputKeys.label, 'Number of ' + getInputValue(inputKeys.label))
+                                .set(inputKeys.required, true)"
           ></app-mat-form-field-input>
         </li>
       }
@@ -36,22 +34,20 @@
           [cdkDropListData]="value"
           (cdkDropListDropped)="drop($event)">
 
-          @if (blankObjectType =='object') {
+          @if (blankObjectType() == 'object') {
             @for (item of value; track $index) {
               <app-mat-form-field-input-dynamic
-                [label]="label"
                 [value]="item" 
                 (valueChange)="value[$index] = $event; emitValue()"
                 (onValueChange)="onValueChange.emit()"
                 [blankObject]="blankObject"
-                styleWidth="100%"
-                [readonly]="_readonly()"
+                [inputMap]="inputMap.clone([inputKeys.readonly, inputKeys.required, inputKeys.disable]).set(inputKeys.styleWidth, '100%')"
               ></app-mat-form-field-input-dynamic>
-              @if (showRemoveItemButton) {
-                <button (click)="removeWithWarning($index)" matButton="filled" class="warn">Remove this {{label}}</button>
+              @if (getInputValue(inputKeys.showRemoveItemButton)) {
+                <button (click)="removeWithWarning($index)" matButton="filled" class="warn">Remove this {{getInputValue(inputKeys.label)}}</button>
               }
-              @if (showDragAndDropButton) {
-                <button matButton="filled" cdkDragHandle>Rearrange this {{label}}</button>
+              @if (getInputValue(inputKeys.showDragAndDropButton)) {
+                <button matButton="filled" cdkDragHandle>Rearrange this {{getInputValue(inputKeys.label)}}</button>
               }
               <hr>
               }
@@ -59,22 +55,20 @@
               @for (item of value; track $index) {
                 <li cdkDrag>
                   <app-mat-form-field-input
-                    [label]="label + ' ' + ($index + 1)"
-                    [placeholder]="placeholder"
                     [value]="item" 
                     (valueChange)="value[$index] = $event; emitValue()"
                     (onValueChange)="onValueChange.emit()"
-                    styleWidth="100%"
-                    [focusOutAutoFillFn]="getFocusOutAutoFillFn($index)"
-                    [required]="required"
-                    [readonly]="_readonly()">
-                    @if (!_readonly()) {
-                      <button matSuffix mat-icon-button [matTooltip]="'remove this ' + label + ' item'" (click)="remove($index)" style="color: red;">
+                    [inputMap]="inputMap.clone()
+                                        .set(inputKeys.styleWidth, '100%')
+                                        .set(inputKeys.focusOutAutoFillFn, getFocusOutAutoFillFn($index))
+                                        .set(inputKeys.label, getInputValue(inputKeys.label) + ' ' + ($index + 1))">
+                    @if (!getInputValue(inputKeys.readonly)) {
+                      <button matSuffix mat-icon-button [matTooltip]="'remove this ' + getInputValue(inputKeys.label) + ' item'" (click)="remove($index)" style="color: red;">
                         <mat-icon>remove_circle</mat-icon>
                       </button>
                     }
-                    @if (showDragAndDropButton) {
-                      <button matSuffix mat-icon-button cdkDragHandle [matTooltip]="'rearrange this ' + label + ' item'">
+                    @if (getInputValue(inputKeys.showDragAndDropButton)) {
+                      <button matSuffix mat-icon-button cdkDragHandle [matTooltip]="'rearrange this ' + getInputValue(inputKeys.label) + ' item'">
                         <mat-icon>drag_indicator</mat-icon>
                       </button>
                     }
@@ -86,9 +80,9 @@
           </div>
         </div>
 
-        @if (showAddItemButton) {
+        @if (getInputValue(inputKeys.showAddItemButton)) {
           <li>
-            <button matButton="filled" style="width: 100%;" (click)="addNewItem()" [disabled]="reachMaxSize()">Add new {{label}}</button>
+            <button matButton="filled" style="width: 100%;" (click)="addNewItem()" [disabled]="reachMaxSize()">Add new {{getInputValue(inputKeys.label)}}</button>
           </li>
         }
       </ul>

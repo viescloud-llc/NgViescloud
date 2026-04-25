@@ -55,11 +55,10 @@ export class MatTableDynamicComponent<T extends object, S> extends MatTableCompo
   newRow = false;
 
   constructor(
-    cd: ChangeDetectorRef,
     protected rxjsUtils: RxJSUtils,
     protected dialogUtils: DialogUtils
   ) {
-      super(cd);
+      super();
   }
 
   override ngOnInit(): void {
