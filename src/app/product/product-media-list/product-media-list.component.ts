@@ -7,7 +7,7 @@ import { ProductMediaComponent } from '../product-media/product-media.component'
 import { FileUtils } from '../../../lib/util/File.utils';
 import { FileType, VFile } from '../../../lib/model/vies.model';
 import { ObjectStorageService } from '../../../lib/service/object-storage-manager.service';
-import { MatFormFieldInputKeys, MatFormFields } from '../../../lib/model/utils.model';
+import { MatFormFieldInputKeys } from '../../../lib/model/mat.model';
 
 @Component({
   selector: 'app-product-media-list',

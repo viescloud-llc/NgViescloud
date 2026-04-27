@@ -16,8 +16,7 @@ import {
 import { UserAccessInputType } from '../util-component/mat-form-field-input-user-access/mat-form-field-input-user-access.component';
 import { UserAccessDialog } from '../dialog/user-access-dialog/user-access-dialog.component';
 import { DialogResponse, DialogSetting } from '../model/dialog.model';
-import { MatFormField } from '@angular/material/form-field';
-import { MatFormFieldInputKeys, MatFormFields } from '../model/utils.model';
+import { MatFormFieldInputKeys, MatFormFields } from '../model/mat.model';
 
 @Injectable({
   providedIn: 'root',

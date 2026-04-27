@@ -3,9 +3,8 @@ import { MatColumnDef, MatTable, MatTableDataSource } from '@angular/material/ta
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatColumn, MatTableSettingType } from '../../model/mat.model';
-import { DataUtils } from '../../util/Data.utils';
 import { SelectionModel } from '@angular/cdk/collections';
-import { MatFormFields } from '../../model/utils.model';
+import { MatFormFields } from '../../model/mat.model';
 import { ViesMatFormFieldMap } from '../../abtract/ViesMatFormFieldMap';
 
 @Component({

@@ -1,6 +1,6 @@
-import { Component, Input, SimpleChanges, forwardRef, input } from '@angular/core';
+import { Component, Input, SimpleChanges, forwardRef } from '@angular/core';
 import { MatFormFieldComponent } from '../mat-form-field/mat-form-field.component';
-import { MatFromFieldInputDynamicItem, MatItemSetting, MatItemSettingType, MatOption } from '../../model/mat.model';
+import { MatFormFieldInputKeys, MatFormFieldTypeMap, MatFromFieldInputDynamicItem, MatItemSetting, MatItemSettingType, MatOption } from '../../model/mat.model';
 import { ViesService } from '../../service/rest.service';
 
 export enum DynamicMatInputType {
@@ -172,6 +172,13 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
         item.inputMap.set(this.inputKeys.readonly, this.containSetting(item, MatItemSettingType.READ_ONLY));
         item.inputMap.set(this.inputKeys.listRequired, this.containSetting(item, MatItemSettingType.LIST_REQUIRE));
 
+        item.settings.forEach(setting => {
+          let type = setting.type;
+          let value = setting.value;
+          
+          item.inputMap.set(type as keyof MatFormFieldTypeMap, value);
+        })
+
         this.items.push(item);
       }
       defaultIndex++;
@@ -236,6 +243,13 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
       let name = key + typeName;
       if (Object.hasOwn(prototype, name) && !!prototype[name]) {
         settings.push(new MatItemSetting(typeName));
+      }
+    }
+    for(let typeName in MatFormFieldInputKeys) {
+      let name = key + typeName;
+      let value = prototype[name];
+      if (Object.hasOwn(prototype, name)) {
+        settings.push(new MatItemSetting(typeName, value));
       }
     }
 

@@ -1,9 +1,8 @@
 import { AfterContentChecked, ChangeDetectorRef, Component, EventEmitter, inject, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { MatTableDisplayLabel, MatTableHide } from '../../model/mat.model';
-import { FixChangeDetection } from '../../abtract/FixChangeDetection';
+import { MatTableHide } from '../../model/mat.model';
 import { RouteUtils } from '../../util/Route.utils';
 import { FileUtils } from '../../util/File.utils';
-import { MatFormFields } from '../../model/utils.model';
+import { MatFormFields } from '../../model/mat.model';
 import { ViesMatFormFieldMap } from '../../abtract/ViesMatFormFieldMap';
 
 class customRow<T> {

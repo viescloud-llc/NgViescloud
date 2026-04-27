@@ -1,5 +1,5 @@
 import { MatDialog } from "@angular/material/dialog";
-import { MatFormFields } from "./utils.model";
+import { MatFormFields } from "./mat.model";
 
 export interface DialogSetting {
   matDialog?: MatDialog;

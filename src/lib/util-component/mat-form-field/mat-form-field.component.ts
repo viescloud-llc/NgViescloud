@@ -1,12 +1,11 @@
 import { AfterContentChecked, ChangeDetectorRef, Component, DoCheck, EventEmitter, inject, input, Input, isSignal, linkedSignal, OnChanges, OnInit, Output, Signal, signal, SimpleChanges } from '@angular/core';
-import { ThemePalette } from '@angular/material/core';
 import { MatFormFieldAppearance } from '@angular/material/form-field';
 import { UtilsService } from '../../service/utils.service';
 import { RgbColor } from '../../model/rgb.model';
 import { DialogUtils } from '../../util/Dialog.utils';
 import { DataUtils } from '../../util/Data.utils';
 import { ViesService } from '../../service/rest.service';
-import { MatFormFields, MatFormFieldTypeMap } from '../../model/utils.model';
+import { MatFormFields, MatFormFieldTypeMap } from '../../model/mat.model';
 import { ViesMatFormFieldMap } from '../../abtract/ViesMatFormFieldMap';
 
 @Component({

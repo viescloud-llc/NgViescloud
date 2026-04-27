@@ -40,6 +40,8 @@ export class ProductComponent extends ViesMatFormFieldMap implements OnInit {
         }
       })
     }
+
+    console.log(this.blankProduct);
   }
 
   printProduct(product?: Product) {

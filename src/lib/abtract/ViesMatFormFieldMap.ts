@@ -1,4 +1,4 @@
-import { MatFormFieldInput, MatFormFieldInputKeys, MatFormFieldOutput, MatFormFieldOutputKeys, MatFormFields, MatFormFieldTypeMap } from "../model/utils.model";
+import { MatFormFieldInput, MatFormFieldInputKeys, MatFormFieldOutput, MatFormFieldOutputKeys, MatFormFields, MatFormFieldTypeMap } from "../model/mat.model";
 import { StringUtils } from "../util/String.utils";
 
 export abstract class ViesMatFormFieldMap {
