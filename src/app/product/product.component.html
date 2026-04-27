@@ -1,7 +1,8 @@
 <ul class="margin-center">
   <li>
     <app-product-media-list
-    [(productMedias)]="product().medias"
+    [productMedias]="product().medias"
+    (productMediasChange)="product.set({...product(), medias: $event})"
     ></app-product-media-list>
   </li>
   <li>

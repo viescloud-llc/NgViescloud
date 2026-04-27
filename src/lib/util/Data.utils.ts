@@ -418,11 +418,52 @@ export class DataUtils {
     }
   }
 
+  /**
+   * Deeply unwraps all signals in an object structure, returning a plain object
+   * that can be safely cloned with structuredClone
+   */
+  static deepUnwrapSignals(object: any): any {
+    // Handle null/undefined
+    if (object === null || object === undefined) {
+      return object;
+    }
+
+    // Unwrap BehaviorSubject
+    if (object instanceof BehaviorSubject) {
+      return DataUtils.deepUnwrapSignals(object.value);
+    }
+
+    // Unwrap signals
+    if (isSignal(object)) {
+      return DataUtils.deepUnwrapSignals(object());
+    }
+
+    // Handle arrays
+    if (Array.isArray(object)) {
+      return object.map(item => DataUtils.deepUnwrapSignals(item));
+    }
+
+    // Handle plain objects
+    if (typeof object === 'object' && object.constructor === Object) {
+      const unwrapped: any = {};
+      for (const key in object) {
+        if (object.hasOwnProperty(key)) {
+          unwrapped[key] = DataUtils.deepUnwrapSignals(object[key]);
+        }
+      }
+      return unwrapped;
+    }
+
+    // Handle primitive types and other objects (like Date, custom classes, etc.)
+    return object;
+  }
+
   static isWriteableSignal(object: any): object is WritableSignal<any> {
     return isSignal(object) && typeof (object as any).set === 'function';
   }
 
   static setAnyValue(object: any, value: any, defaultSet: () => void, avoidImpureWrite = false) {
+    value = DataUtils.getAnyValue(value);
     if(object instanceof BehaviorSubject) {
       object.next(value);
     }

@@ -2,14 +2,11 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { RxJSUtils } from '../../lib/util/RxJS.utils';
 import { ProductService } from '../shared/service/product/product.service';
 import { RouteUtils } from '../../lib/util/Route.utils';
-import { E } from '@angular/cdk/keycodes';
-import { Product, Tag } from '../shared/model/product.model';
+import { Product } from '../shared/model/product.model';
 import { DialogUtils } from '../../lib/util/Dialog.utils';
 import { NgComponentModule } from "../../lib/module/ng-component.module";
-import { MatAnchor } from '@angular/material/button';
 import { ProductMediaListComponent } from "./product-media-list/product-media-list.component";
 import { DataUtils } from '../../lib/util/Data.utils';
-import { MatFormFields } from '../../lib/model/utils.model';
 import { ViesMatFormFieldMap } from '../../lib/abtract/ViesMatFormFieldMap';
 
 @Component({
@@ -45,7 +42,12 @@ export class ProductComponent extends ViesMatFormFieldMap implements OnInit {
     }
   }
 
-  printProduct() {
-    console.log(this.product());
+  printProduct(product?: Product) {
+    if(product) {
+      console.log(product);
+    }
+    else {
+      console.log(this.product());
+    }
   }
 }
