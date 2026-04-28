@@ -1,11 +1,10 @@
-import { Directive, EventEmitter, Input, Output } from "@angular/core";
+import { Directive, effect, InjectionToken, isWritableSignal, model, Signal, signal, WritableSignal } from "@angular/core";
 import { TrackByIndex } from "./TrackByIndex";
 import { FixChangeDetection } from "./FixChangeDetection";
 import { DataUtils } from "../util/Data.utils";
 import { UtilsService } from "../service/utils.service";
-import { RgbColor } from "../model/rgb.model";
 
-type Value<T> = T | null | undefined;
+// type Value<T> = T | null | undefined;
 
 @Directive({
     selector: '[valueTracking]',
@@ -13,22 +12,30 @@ type Value<T> = T | null | undefined;
 })
 export class ValueTracking<T> extends FixChangeDetection implements TrackByIndex {
 
-    @Input()
-    value: Value<T>;
-    valueCopy: T | null | undefined;
+    value = model.required<T>()
+    valueCopy = signal<T | null | undefined>(null);
 
-    @Output()
-    valueChange = new EventEmitter<T>();
+    public static track<T>(value: WritableSignal<T> | T) {
+        let valueTracking = new ValueTracking<T>();
+        valueTracking.updateValue(value);
 
-    public updateValue(value?: Value<T>) {
-        if(value) {
-            this.value = value;
-            this.valueCopy = structuredClone(value);
-        }
-        else {
-            this.value = structuredClone(this.value);
-            this.valueCopy = structuredClone(this.value);
-        }
+        effect(() => {
+            valueTracking.value.set(DataUtils.getAnyValue(value));
+        });
+
+        effect(() => {
+            if(value && isWritableSignal(value)) {
+                value.set(valueTracking.value());
+            }
+        });
+
+        return valueTracking;
+    }
+
+    public updateValue(value?: Signal<T> | T) {
+        this.value.set(DataUtils.getAnyValue(value));
+        this.valueCopy.set(structuredClone(DataUtils.getAnyValue(value)));
+        return this;
     }
 
     public trackByIndex(index: number, obj: any): any {
@@ -36,47 +43,47 @@ export class ValueTracking<T> extends FixChangeDetection implements TrackByIndex
     }
 
     public isValueChange() {
-        return DataUtils.isNotEqual(this.value, this.valueCopy);
+        return DataUtils.isNotEqual(this.value(), this.valueCopy());
     }
 
     public isValueNotChange() {
-        return DataUtils.isEqual(this.value, this.valueCopy);
+        return DataUtils.isEqual(this.value(), this.valueCopy());
     }
 
     public isValueEnum(): boolean {
-        return UtilsService.isEnum(this.value);
+        return UtilsService.isEnum(this.value());
     }
 
     public isValueString(): boolean {
-        return typeof this.value === 'string';
+        return typeof this.value() === 'string';
     }
 
     public isValueMultipleStringLine(): boolean {
-        return typeof this.value === 'string' && this.value.includes("\n");
+        return (typeof this.value() === 'string' && this.value() && this.value()!.toString().includes("\n")) === true;
     }
 
     public isValueNonMultipleStringLine(): boolean {
-        return typeof this.value === 'string' && !this.value.includes("\n");
+        return (typeof this.value() === 'string' && this.value() && !this.value()!.toString().includes("\n")) === true;
     }
 
     public isValueNumber(): boolean {
-        return typeof this.value === 'number';
+        return typeof this.value() === 'number';
     }
 
     public isValueBoolean(): boolean {
-        return typeof this.value === 'boolean';
+        return typeof this.value() === 'boolean';
     }
 
     public resetValue(): void {
-        this.value = structuredClone(this.valueCopy);
+        this.value.set(structuredClone(this.valueCopy()!));
     }
 
     public isValueArray(): boolean {
-        return Array.isArray(this.value);
+        return Array.isArray(this.value());
     }
 
     public isValueObject(): boolean {
-        return typeof this.value === 'object';
+        return typeof this.value() === 'object';
     }
 
     public isValuePrimitive(): boolean {
@@ -84,5 +91,9 @@ export class ValueTracking<T> extends FixChangeDetection implements TrackByIndex
             return false;
         else
             return true;
+    }
+
+    public revert() {
+        this.value.set(structuredClone(this.valueCopy()!));
     }
 }

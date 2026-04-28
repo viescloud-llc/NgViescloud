@@ -174,7 +174,7 @@ export class MatFormFieldInputComponent extends MatFormFieldComponent implements
   }
 
   override emitValue(): void {
-    let value = structuredClone(this.value);
+    let value = structuredClone(this.getValue());
 
     if (this.getInputValue(this.inputKeys.alwayLowercase) && typeof value === 'string')
       value = value.toLowerCase();
@@ -182,17 +182,20 @@ export class MatFormFieldInputComponent extends MatFormFieldComponent implements
     if (this.getInputValue(this.inputKeys.alwayUppercase) && typeof value === 'string')
       value = value.toUpperCase();
 
-    if (this.isValueNumber() && this.getInputValue(this.inputKeys.min) && +value < this.getInputValue(this.inputKeys.min)!)
+    if (this.isValueNumber() && this.getInputValue(this.inputKeys.min) && +value < this.getInputValue(this.inputKeys.min)!) {
       value = this.getInputValue(this.inputKeys.min);
+    }
 
     if (this.isValueNumber() && this.getInputValue(this.inputKeys.max) && +value > this.getInputValue(this.inputKeys.max)!) {
       value = this.getInputValue(this.inputKeys.max);
     }
 
-    if(this.getInputValue(this.inputKeys.defaultType) === 'number' && !value)
+    if(this.getInputValue(this.inputKeys.defaultType) === 'number' && !value) {
       this.valueChange.emit(0);
-    else
+    }
+    else {
       this.valueChange.emit(value);
+    }
 
     this.onValueChange.emit();
 
@@ -258,8 +261,9 @@ export class MatFormFieldInputComponent extends MatFormFieldComponent implements
   }
 
   emitValueWithCondition(): void {
-    if (this.getInputValue(this.inputKeys.manuallyEmitValue))
+    if (this.getInputValue(this.inputKeys.manuallyEmitValue)) {
       return;
+    }
 
     this.emitValue();
   }

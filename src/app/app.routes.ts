@@ -8,13 +8,10 @@ import { UserGroupListComponent } from '../lib/share-component/user-group-list/u
 import { UserListComponent } from '../lib/share-component/user-list/user-list.component';
 import { UserSettingComponent } from '../lib/share-component/user-setting/user-setting.component';
 import { HomeComponent } from './home/home.component';
-import { ProductListComponent } from './product/product-list/product-list.component';
-import { ProductComponent } from './product/product.component';
 
 export const APP_ROUTES = {
   home: "home",
   login: "login",
-  productList: "product/list",
   setting: "setting",
   applicationSetting: "setting/application-setting",
   accountSetting: "setting/account",
@@ -22,6 +19,18 @@ export const APP_ROUTES = {
   userGroupsSetting: "setting/user/groups",
   openidProviderSetting: "setting/openid-provider",
   oauth2: "oauth2",
+  
+  productList: "product/list",
+  productAttributeDefinitionList: "product/attribute/definition/list",
+  productAttributeOptionList: "product/attribute/option/list",
+
+  productAttributeOption(id: number) {
+    return `product/attribute/option/${id}`;
+  },
+
+  productAttributeDefinition(id: number) {
+    return `product/attribute/definition/${id}`;
+  },
 
   product(id: number) {
     return `product/${id}`;
@@ -42,11 +51,42 @@ export const routes: Routes = [
     children: [
       {
         path: "list",
-        component: ProductListComponent
+        loadComponent: () => import('./product/product-list/product-list.component').then(m => m.ProductListComponent)
       },
       {
         path: ":productId",
-        component: ProductComponent
+        loadComponent: () => import('./product/product.component').then(m => m.ProductComponent)
+      },
+      {
+        path: "attribute",
+        children: [
+          {
+            path: "definition",
+            children: [
+              {
+                path: "list",
+                loadComponent: () => import('./product/attribute-definition-list/attribute-definition-list.component').then(m => m.AttributeDefinitionListComponent)
+              },
+              {
+                path: ":attributeDefinitionId",
+                loadComponent: () => import('./product/attribute-definition/attribute-definition.component').then(m => m.AttributeDefinitionComponent)
+              }
+            ]
+          },
+          {
+            path: "option",
+            children: [
+              {
+                path: "list",
+                loadComponent: () => import('./product/attribute-option-list/attribute-option-list.component').then(m => m.AttributeOptionListComponent)
+              },
+              {
+                path: ":attributeOptionId",
+                loadComponent: () => import('./product/attribute-option/attribute-option.component').then(m => m.AttributeOptionComponent)
+              }
+            ]
+          }
+        ]
       }
     ]
   },

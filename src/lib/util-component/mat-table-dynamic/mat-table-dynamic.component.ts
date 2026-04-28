@@ -6,6 +6,7 @@ import { DataUtils } from '../../util/Data.utils';
 import { RxJSUtils } from '../../util/RxJS.utils';
 import { DialogUtils } from '../../util/Dialog.utils';
 import { MatDialog } from '@angular/material/dialog';
+import { ValueTracking } from '../../abtract/valueTracking.directive';
 
 @Component({
   selector: 'app-mat-table-dynamic',
@@ -48,11 +49,10 @@ export class MatTableDynamicComponent<T extends object, S> extends MatTableCompo
   onDeleteFn: EventEmitter<T> = new EventEmitter<T>();
   
   fetchSubscription?: any = null;
-  selectedRow: T | null = null
+  selectedRow = new ValueTracking<T | null>().updateValue(null);
   selectedRows: T[] = [];
-  selectedRowCopy: T | null = null
-  validForm = false;
-  newRow = false;
+  validForm = signal<boolean>(false);
+  newRow = signal<boolean>(false);
 
   constructor(
     protected rxjsUtils: RxJSUtils,
@@ -82,7 +82,7 @@ export class MatTableDynamicComponent<T extends object, S> extends MatTableCompo
 
   protected updateRow(row: T) {
     this.matRowsSignal.set(this.matRowsSignal().map(r => {
-      if(DataUtils.isEqual(r, this.selectedRowCopy)) {
+      if(DataUtils.isEqual(r, this.selectedRow.valueCopy())) {
         return row;
       }
       else {
@@ -94,9 +94,8 @@ export class MatTableDynamicComponent<T extends object, S> extends MatTableCompo
   }
 
   selectRow(row: T | null) {
-    this.newRow = false;
-    this.selectedRow = structuredClone(row);
-    this.selectedRowCopy = structuredClone(this.selectedRow);
+    this.newRow.set(false);
+    this.selectedRow.updateValue(row);
   }
 
   override editRow(row: T): void {
@@ -119,7 +118,7 @@ export class MatTableDynamicComponent<T extends object, S> extends MatTableCompo
 
   addNewRow() {
     this.selectRow(DataUtils.purgeValue(this.blankObject));
-    this.newRow = true;
+    this.newRow.set(true);
   }
 
   protected pushNewRow(row: T) {
@@ -128,21 +127,21 @@ export class MatTableDynamicComponent<T extends object, S> extends MatTableCompo
   }
 
   cloneRow() {
-    if(this.selectedRow && this.cloneFn) {
-      this.selectRow(structuredClone(this.cloneFn(this.selectedRow)));
-      this.newRow = true;
+    if(this.selectedRow.value() && this.cloneFn) {
+      this.selectRow(structuredClone(this.cloneFn(this.selectedRow.value()!)));
+      this.newRow.set(true);
     }
   }
 
   save() {
-    if(this.selectedRow) {
-      this.onAddOrSaveFn.emit(this.selectedRow);
+    if(this.selectedRow.value()) {
+      this.onAddOrSaveFn.emit(this.selectedRow.value()!);
 
       if(this.addOrSaveFn && this.service) {
-        FunctionUtils.toObservable(this.addOrSaveFn, [this.selectedRow, this.service]).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+        FunctionUtils.toObservable(this.addOrSaveFn, [this.selectedRow.value()!, this.service]).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
           next: res => {
             if(res != null && res != undefined) {
-              if(this.newRow) {
+              if(this.newRow()) {
                 this.pushNewRow(res);
               }
               else {
@@ -150,7 +149,7 @@ export class MatTableDynamicComponent<T extends object, S> extends MatTableCompo
               }
             }
             else {
-              this.editRow(this.selectedRow!);
+              this.editRow(this.selectedRow.value()!);
             }
           },
           error: err => {
@@ -162,11 +161,7 @@ export class MatTableDynamicComponent<T extends object, S> extends MatTableCompo
   }
 
   revert() {
-    this.selectedRow = structuredClone(this.selectedRowCopy);
-  }
-
-  isValueChange() {
-    return DataUtils.isNotEqual(this.selectedRow, this.selectedRowCopy);
+    this.selectedRow.revert();
   }
 
   protected removeRowFromTable(row: T) {
@@ -188,7 +183,7 @@ export class MatTableDynamicComponent<T extends object, S> extends MatTableCompo
 
         await firstValueFrom(FunctionUtils.toObservable(this.deleteFn, [selectedRow, this.service]).pipe(this.rxjsUtils.waitLoadingDialog()))
         .then(res => {
-            this.removeRowFromTable(structuredClone(this.selectedRowCopy!));
+            this.removeRowFromTable(structuredClone(this.selectedRow.valueCopy()!));
             this.selectRow(null);
         })
         .catch(err => {

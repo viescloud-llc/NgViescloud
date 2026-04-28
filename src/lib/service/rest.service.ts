@@ -3,7 +3,7 @@ import { HttpClient } from "@angular/common/http";
 import { UtilsService } from "./utils.service";
 import { MatDialog } from "@angular/material/dialog";
 import { ObjectDialog, ObjectDialogData } from "../dialog/object-dialog/object-dialog.component";
-import { Injectable } from "@angular/core";
+import { computed, Injectable, signal } from "@angular/core";
 import { RxJSUtils } from "../util/RxJS.utils";
 import { HttpParamsBuilder } from "../model/utils.model";
 import { RouteUtils } from "../util/Route.utils";
@@ -25,15 +25,24 @@ export abstract class ViesService {
         return ViesService.getUri();
     }
 
-    protected abstract getPrefixes(): string[];
+    protected abstract getPrefixes(): string[] | string;
+
+    private prefixPath = computed(() => {
+        let prefixes = this.getPrefixes();
+        if (typeof prefixes === 'string') {
+            return prefixes.startsWith('/')
+                ? prefixes
+                : `/${prefixes}`;
+        }
+
+        return prefixes
+            .map(e => e.replace(/^\/+|\/+$/g, ''))
+            .map(e => `/${e}`)
+            .join('');
+    })
 
     protected getPrefixPath(): string {
-        let prefixes = this.getPrefixes();
-        let path = "";
-        prefixes.forEach(e => {
-            path += `/${e}`;
-        });
-        return path;
+        return this.prefixPath();
     }
 
     public getPrefixUri(): string {

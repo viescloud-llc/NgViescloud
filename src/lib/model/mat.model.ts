@@ -442,6 +442,23 @@ export const MatTableDisplayValue = (displayValueFn: Function) => {
     }
 }
 
+export const MatTableSettings = (settings: {label?: string, displayValueFn?: Function, hide?: boolean, index?: number}) => {
+    return function MatTableSettings(object: any, key: any) {
+        if(settings.label) {
+            addValue(object, key, MatTableSettingType.DISPLAY_LABEL.toString(), settings.label, null);
+        }
+        if(settings.displayValueFn) {
+            addValue(object, key, MatTableSettingType.DISPLAY_VALUE_FN.toString(), settings.displayValueFn, null);
+        }
+        if(settings.hide) {
+            addValue(object, key, MatTableSettingType.HIDE.toString(), settings.hide, true);
+        }
+        if(settings.index) {
+            addValue(object, key, MatTableSettingType.INDEX.toString(), settings.index, 0);
+        }
+    }
+}
+
 export const addGetPrototype = (object: any) => {
     Object.defineProperty(object, "getPrototype", {
         value: function a() {},

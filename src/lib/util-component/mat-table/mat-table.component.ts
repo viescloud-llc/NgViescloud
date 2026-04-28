@@ -2,7 +2,7 @@ import { AfterContentInit, AfterViewInit, ChangeDetectorRef, Component, ContentC
 import { MatColumnDef, MatTable, MatTableDataSource } from '@angular/material/table';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { MatColumn, MatTableSettingType } from '../../model/mat.model';
+import { MatColumn, MatFormFieldInput, MatInputSettings, MatItemSettingType, MatTableSettingType } from '../../model/mat.model';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatFormFields } from '../../model/mat.model';
 import { ViesMatFormFieldMap } from '../../abtract/ViesMatFormFieldMap';
@@ -14,12 +14,6 @@ import { ViesMatFormFieldMap } from '../../abtract/ViesMatFormFieldMap';
   standalone: false
 })
 export class MatTableComponent<T extends object> extends ViesMatFormFieldMap implements OnInit, OnChanges, AfterViewInit, AfterContentInit {
-
-  @Input()
-  inputMap = new MatFormFields().addInputDefault();
-
-  @Input()
-  outputMap = new MatFormFields().addOutputDefault();
 
   @Input()
   filterDisplay: number = 0;
@@ -161,9 +155,15 @@ export class MatTableComponent<T extends object> extends ViesMatFormFieldMap imp
 
   private getDisplayLabel(key: string): string {
     let prototype = Object.getPrototypeOf(this.blankObject!);
-    let name = key + MatTableSettingType.DISPLAY_LABEL.toString();
-    if (Object.hasOwn(prototype, name))
-      return prototype[name] as string;
+    let name1 = key + MatTableSettingType.DISPLAY_LABEL.toString();
+    let name2 = key + MatItemSettingType.CUSTOM_LABEL.toString();
+    let name3 = key + MatFormFieldInput.label.key;
+    if (Object.hasOwn(prototype, name1))
+      return prototype[name1] as string;
+    else if (Object.hasOwn(prototype, name2))
+      return prototype[name2] as string;
+    else if (Object.hasOwn(prototype, name3))
+      return prototype[name3] as string;
     else
       return key;
   }

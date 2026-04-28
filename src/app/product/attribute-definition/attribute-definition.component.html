@@ -1,0 +1,13 @@
+<ul class="margin-center" appMatFormFieldGroup (onAllInputCheck)="validForm.set($event)">
+  <li>
+    <app-mat-form-field-input-dynamic
+    [(value)]="attributeDefinition"
+    [blankObject]="blankAttributeDefinition"
+    [inputMap]="inputField('1').set(inputKeys.indent, false).set(inputKeys.styleWidth, '100%')"
+    ></app-mat-form-field-input-dynamic>
+  </li>
+  <li class="flex-row-container-auto">
+    <button matButton="filled" (click)="save()" [disabled]="attributeDefinitionTrack.isValueNotChange() || !validForm()">Save</button>
+    <button matButton="filled" class="warn" (click)="revert()" [disabled]="!attributeDefinitionTrack.isValueChange()">Revert</button>
+  </li>
+</ul>

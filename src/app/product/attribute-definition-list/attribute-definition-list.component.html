@@ -1,0 +1,13 @@
+<ul class="margin-center">
+  <li>
+    <app-mat-table
+    [matRows]="attributeDefinitionList()"
+    [blankObject]="blankAttributeDefinition"
+    (onEditRow)="selectAttributeDefinition($event)"
+    ></app-mat-table>
+  </li>
+  <br>
+  <li class="flex-row-container-auto">
+    <button matButton="filled" (click)="addAttributeDefinition()">Add attribute definition</button>
+  </li>
+</ul>

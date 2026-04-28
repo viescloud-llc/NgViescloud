@@ -1,0 +1,13 @@
+<ul class="margin-center">
+  <li>
+    <app-mat-table
+    [matRows]="attributeOptionList()"
+    [blankObject]="blankAttributeOption"
+    (onEditRow)="selectedAttributeOption.set($event)"
+    ></app-mat-table>
+  </li>
+  <br>
+  <li class="flex-row-container-auto">
+    <button matButton="filled" (click)="addAttributeOption()">Add attribute option</button>
+  </li>
+</ul>

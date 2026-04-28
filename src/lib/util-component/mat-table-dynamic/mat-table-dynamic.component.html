@@ -1,4 +1,4 @@
-@if (!selectedRow) {
+@if (!selectedRow.value()) {
   <ul>
     <li>
       <button mat-icon-button color="primary" (click)="init()" [matTooltip]="'Refresh'">
@@ -40,28 +40,28 @@
     </ul>
   }
 
-  @if (selectedRow) {
-    <ul appMatFormFieldGroup (onAllInputCheck)="validForm = $event">
+  @if (selectedRow.value()) {
+    <ul appMatFormFieldGroup (onAllInputCheck)="validForm.set($event)">
       <li>
         <app-mat-form-field-input-dynamic
-          [(value)]="selectedRow"
+          [(value)]="selectedRow.value"
           [blankObject]="blankObject"
-          [inputMap]="inputMap.clone().set(inputKeys.styleWidth, '100%')"
+          [inputMap]="inputField('1').set(inputKeys.styleWidth, '100%')"
         ></app-mat-form-field-input-dynamic>
       </li>
       <li [class]="styleWidth === '100%' ? 'flex-row-container-auto' : ''">
         @if (addOrSaveFn) {
-          <button matButton="filled" (click)="save()" [disabled]="!isValueChange() || !validForm">Save</button>
+          <button matButton="filled" (click)="save()" [disabled]="!selectedRow.isValueChange() || !validForm">Save</button>
         }
         @if (addOrSaveFn) {
-          <button matButton="filled" class="warn" (click)="revert()" [disabled]="!isValueChange()">Revert</button>
+          <button matButton="filled" class="warn" (click)="revert()" [disabled]="!selectedRow.isValueChange()">Revert</button>
         }
         @if (!newRow && cloneFn) {
           <button matButton="filled" (click)="cloneRow()">Clone</button>
         }
-        <button matButton="filled" class="warn" (click)="selectRow(null)">{{ !addOrSaveFn ? 'Close' : !isValueChange() ? 'Cancel | Back' : 'Discard' }}</button>
+        <button matButton="filled" class="warn" (click)="selectRow(null)">{{ !addOrSaveFn ? 'Close' : !selectedRow.isValueChange() ? 'Cancel | Back' : 'Discard' }}</button>
         @if (deleteFn && !newRow) {
-          <button matButton="filled" class="warn" (click)="deleteRow(selectedRow)">Delete</button>
+          <button matButton="filled" class="warn" (click)="deleteRow(selectedRow.value()!)">Delete</button>
         }
       </li>
     </ul>

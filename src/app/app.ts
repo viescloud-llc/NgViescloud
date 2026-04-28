@@ -52,6 +52,29 @@ export class App extends ViescloudApplication {
       ]
     },
     {
+      title: 'Attribute',
+      hideChildren: true,
+      hideConditional: () => !this.authenticatorService.isAuthenticatedSync() || !this.authenticatorService.hasUserGroup(this.ADMIN_GROUP),
+      children: [
+        {
+          title: 'options',
+          routerLink: APP_ROUTES.productAttributeOptionList
+        },
+        {
+          title: 'add option',
+          routerLink: APP_ROUTES.productAttributeOption(0)
+        },
+        {
+          title: 'definitions',
+          routerLink: APP_ROUTES.productAttributeDefinitionList
+        },
+        {
+          title: 'add definition',
+          routerLink: APP_ROUTES.productAttributeDefinition(0)
+        },
+      ]
+    },
+    {
       title: 'Settings',
       hideChildren: true,
       children: [

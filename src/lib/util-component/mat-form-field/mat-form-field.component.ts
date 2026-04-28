@@ -128,7 +128,7 @@ export class MatFormFieldComponent extends ViesMatFormFieldMap implements OnInit
   }
 
   emitValue(value?: any): void {
-    if(value) {
+    if(value === '' || value === 0 || value) {
       this.setValue(value);
     }
 

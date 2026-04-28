@@ -17,9 +17,9 @@ import { ViesMatFormFieldMap } from '../../lib/abtract/ViesMatFormFieldMap';
 })
 export class ProductComponent extends ViesMatFormFieldMap implements OnInit {
 
-  protected readonly rxjsUtils = inject(RxJSUtils)
-  protected readonly productService = inject(ProductService)
-  protected readonly dialogUtils = inject(DialogUtils)
+  protected readonly rxjsUtils = inject(RxJSUtils);
+  protected readonly dialogUtils = inject(DialogUtils);
+  protected readonly productService = inject(ProductService);
 
   product = signal<Product>(DataUtils.purgeValue(new Product()));
   readonly blankProduct = new Product();

@@ -50,7 +50,7 @@ export class MatTableLazyDynamicComponent<T extends object, S> extends MatTableD
 
   protected override updateRow(row: T): void {
     this.matRowsPage.content = this.matRowsPage.content.map(r => {
-      if(DataUtils.isEqual(r, this.selectedRowCopy)) {
+      if(DataUtils.isEqual(r, this.selectedRow.valueCopy())) {
         return row!;
       }
       else {

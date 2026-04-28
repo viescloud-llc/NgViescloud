@@ -1,4 +1,4 @@
-import { MatInputDisable, MatInputEnum, MatInputHide, MatInputItemSetting, MatInputRequire, MatInputSetting, MatInputSettings, MatItemSettingType } from "../../../lib/model/mat.model";
+import { MatInputDisable, MatInputEnum, MatInputHide, MatInputItemSetting, MatInputRequire, MatInputSetting, MatInputSettings, MatItemSettingType, MatTableHide } from "../../../lib/model/mat.model";
 import { MatFormFieldInputKeys } from "../../../lib/model/mat.model";
 
 export enum ProductAttributeType {
@@ -38,13 +38,13 @@ export class AttributeOption {
     // attributeDefinition: AttributeDefinition = new AttributeDefinition(); // this will prevent circular dependency
 
     @MatInputSettings(
-        {},
+        {require: true},
         {type: MatFormFieldInputKeys.label, value: 'Value (accual value)'}
     )
     value: string = '';
 
     @MatInputSettings(
-        {},
+        {require: true},
         {type: MatFormFieldInputKeys.label, value: 'Display Value (label)'}
     )
     displayValue: string = '';
@@ -64,22 +64,48 @@ export class AttributeDefinition {
     id: number = 0;
 
     @MatInputSettings(
-        {},
+        {require: true},
         {type: MatFormFieldInputKeys.label, value: 'Name'}
     )
     name: string = '';
 
     @MatInputSettings(
-        {},
+        {require: true},
         {type: MatFormFieldInputKeys.label, value: 'Display Name (label)'}
     )
     displayName: string = '';
 
     @MatInputEnum(ProductAttributeType)
+    @MatInputSettings(
+        {},
+        {type: MatFormFieldInputKeys.label, value: 'Type'}
+    )
     type: ProductAttributeType = ProductAttributeType.TEXT;
+
+    @MatInputSettings(
+        {},
+        {type: MatFormFieldInputKeys.label, value: 'Unit'},
+        {type: MatFormFieldInputKeys.placeholder, value: 'e.g "cm", "kg", "%"'},
+    )
     unit: string = ''; // e.g., "cm", "kg", "%"
+
+    @MatInputSettings(
+        {},
+        {type: MatFormFieldInputKeys.label, value: 'Required'}
+    )
     required: boolean = false;
+
+    @MatInputSettings(
+        {},
+        {type: MatFormFieldInputKeys.label, value: 'Variant Level'}
+    )
     variantLevel: boolean = false; // true if this attribute creates variants
+
+    @MatInputSettings(
+        {hide: true},
+        {type: MatFormFieldInputKeys.label, value: 'Option'}
+    )
+    @MatTableHide()
     options: AttributeOption[] = [new AttributeOption()];
 }
 

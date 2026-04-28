@@ -18,9 +18,12 @@ export class DataUtils {
     return !DataUtils.isEqual(obj1, obj2);
   }
 
-  static isEqual<T>(obj1: T, obj2: T): boolean {
+  static isEqual<T>(obj1Ref: T, obj2Ref: T): boolean {
+    let obj1 = DataUtils.getAnyValue(obj1Ref);
+    let obj2 = DataUtils.getAnyValue(obj2Ref);
+
     // If both references are the same, return true
-    if (obj1 === obj2) return true;
+    if (obj1Ref === obj2Ref || obj1 === obj2) return true;
 
     if (JSON.stringify(obj1) === JSON.stringify(obj2))
         return true
