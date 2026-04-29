@@ -102,8 +102,10 @@ export class AttributeDefinition {
     variantLevel: boolean = false; // true if this attribute creates variants
 
     @MatInputSettings(
-        {hide: true},
-        {type: MatFormFieldInputKeys.label, value: 'Option'}
+        {},
+        {type: MatFormFieldInputKeys.label, value: 'Option'},
+        {type: MatFormFieldInputKeys.showListAddItemButton, value: true},
+        {type: MatFormFieldInputKeys.showListRemoveItemButton, value: true},
     )
     @MatTableHide()
     options: AttributeOption[] = [new AttributeOption()];

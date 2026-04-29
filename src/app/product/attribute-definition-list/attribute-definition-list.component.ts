@@ -23,7 +23,6 @@ export class AttributeDefinitionListComponent extends ViesMatFormFieldMap implem
 
   attributeDefinitionList = signal<AttributeDefinition[]>([]);
   blankAttributeDefinition = new AttributeDefinition();
-  selectedAttributeDefinition = signal<AttributeDefinition | null>(null);
 
   ngOnInit(): void {
     this.attributeDefinitionService.getAll().pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
@@ -37,7 +36,7 @@ export class AttributeDefinitionListComponent extends ViesMatFormFieldMap implem
   }
 
   selectAttributeDefinition(attributeDefinition: AttributeDefinition) {
-    this.selectedAttributeDefinition.set(attributeDefinition);
+    this.router.navigate([APP_ROUTES.productAttributeDefinition(attributeDefinition.id)]);
   }
 
   addAttributeDefinition() {

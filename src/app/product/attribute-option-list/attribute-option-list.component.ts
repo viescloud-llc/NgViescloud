@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { DialogUtils } from '../../../lib/util/Dialog.utils';
 import { RxJSUtils } from '../../../lib/util/RxJS.utils';
 import { AttributeOptionService } from '../../shared/service/attribute-option/attribute-option.service';
@@ -13,7 +13,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./attribute-option-list.component.scss'],
   imports: [NgComponentModule]
 })
-export class AttributeOptionListComponent {
+export class AttributeOptionListComponent implements OnInit {
 
   readonly attributeOptionService = inject(AttributeOptionService);
   readonly rxjsUtils = inject(RxJSUtils);
@@ -26,5 +26,16 @@ export class AttributeOptionListComponent {
 
   addAttributeOption() {
     this.router.navigate([APP_ROUTES.productAttributeOption(0)]);
+  }
+
+  ngOnInit(): void {
+    this.attributeOptionService.getAll().pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+      next: res => {
+        this.attributeOptionList.set([...res]);
+      },
+      error: err => {
+        this.dialogUtils.openErrorMessageFromError(err);
+      }
+    })
   }
 }

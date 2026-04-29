@@ -15,7 +15,7 @@ export class ValueTracking<T> extends FixChangeDetection implements TrackByIndex
     value = model.required<T>()
     valueCopy = signal<T | null | undefined>(null);
 
-    public static track<T>(value: WritableSignal<T> | T) {
+    public static track<T>(value?: WritableSignal<T> | T) {
         let valueTracking = new ValueTracking<T>();
         valueTracking.updateValue(value);
 
@@ -32,10 +32,24 @@ export class ValueTracking<T> extends FixChangeDetection implements TrackByIndex
         return valueTracking;
     }
 
+    /**
+     * Update value and valueCopy
+     * @param value value to update
+     * @returns 
+     */
     public updateValue(value?: Signal<T> | T) {
         this.value.set(DataUtils.getAnyValue(value));
         this.valueCopy.set(structuredClone(DataUtils.getAnyValue(value)));
         return this;
+    }
+
+    /**
+     * Overhead method for {@link updateValue}
+     * @param value 
+     * @returns 
+     */
+    public set(value?: Signal<T> | T) {
+        return this.updateValue(value);
     }
 
     public trackByIndex(index: number, obj: any): any {

@@ -1,9 +1,11 @@
-import { Component, model, signal } from '@angular/core';
+import { Component, inject, model, signal, WritableSignal } from '@angular/core';
 import { NgComponentModule } from '../../../lib/module/ng-component.module';
 import { AttributeDefinition } from '../../shared/model/product.model';
 import { DataUtils } from '../../../lib/util/Data.utils';
-import { ViesMatFormFieldMap } from '../../../lib/abtract/ViesMatFormFieldMap';
-import { ValueTracking } from '../../../lib/abtract/valueTracking.directive';
+import { AttributeDefinitionService } from '../../shared/service/attribute-definition/attribute-definition.service';
+import { ViesRestApi } from '../../../lib/abtract/ViesRestApi';
+import { RouteUtils } from '../../../lib/util/Route.utils';
+import { APP_ROUTES } from '../../app.routes';
 
 @Component({
   selector: 'app-attribute-definition',
@@ -11,23 +13,24 @@ import { ValueTracking } from '../../../lib/abtract/valueTracking.directive';
   styleUrls: ['./attribute-definition.component.scss'],
   imports: [NgComponentModule]
 })
-export class AttributeDefinitionComponent extends ViesMatFormFieldMap {
+export class AttributeDefinitionComponent extends ViesRestApi<AttributeDefinition, AttributeDefinitionService> {
 
-  attributeDefinition = model<AttributeDefinition>(DataUtils.purgeArray(new AttributeDefinition()));
-  attributeDefinitionTrack = ValueTracking.track(this.attributeDefinition);
-  blankAttributeDefinition = new AttributeDefinition();
-
+  service = inject(AttributeDefinitionService);
   validForm = signal<boolean>(false);
 
-  save() {
-    
+  // override get service(): AttributeDefinitionService {
+  //   return inject(AttributeDefinitionService);
+  // }
+
+  // override getValue(): WritableSignal<AttributeDefinition> {
+  //   return this.attributeDefinition;
+  // }
+
+  override getRouteId() {
+    return RouteUtils.getPathVariableAsInteger(APP_ROUTES.productAttributeDefinition(0).split('/').at(-2)!);
   }
 
   delete() {
 
-  }
-
-  revert() {
-    this.attributeDefinitionTrack.revert();
   }
 }
