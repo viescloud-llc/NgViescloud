@@ -111,6 +111,7 @@ export class AttributeDefinition {
     options: AttributeOption[] = [new AttributeOption()];
 }
 
+//TODO: update model from backend
 export class ProductAttribute {
     @MatInputSettings(
         {disable: true},
@@ -207,6 +208,7 @@ export class ProductMedia {
     isPrimary: boolean = false;
 }
 
+//TODO: update model from backend
 export class ProductVariantAttribute {
     @MatInputSettings(
         {disable: true},
@@ -272,6 +274,7 @@ export class ProductVariant {
     attributeValues: ProductVariantAttribute[] = [new ProductVariantAttribute()];
 }
 
+//TODO: update model from backend
 export class Product {
     @MatInputSettings(
         {disable: true}, 
