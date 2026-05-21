@@ -22,10 +22,6 @@ export class MatFormFieldInputListOptionComponent<T> extends MatFormFieldInputLi
 
   override ngOnInit(): void {
     super.ngOnInit();
-    
-    if(this.getInputValue(this.inputKeys.uniqueValue)) {
-      this.setInputValue(this.inputKeys.maxSize, this.options.length);
-    }
   }
 
   override cloneBlankObject() {
@@ -50,7 +46,23 @@ export class MatFormFieldInputListOptionComponent<T> extends MatFormFieldInputLi
     return this.options;
   }
 
+  override reachMaxSize(): boolean {
+    if(this.getInputValue(this.inputKeys.uniqueValue)) {
+      return super.reachMaxSize() || this.value.length === this.options.length;
+    }
+    else {
+      return super.reachMaxSize();
+    }
+  }
+
+  getSearchOptions() {
+    return this.getOptons().filter(e => !e.disable);
+  }
+
   addFromSearchOption(option: T) {
-    
+    if(option) {
+      this.value.push(option);
+      this.searchOption.set(null);
+    }
   }
 }

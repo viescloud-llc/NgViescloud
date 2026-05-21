@@ -91,9 +91,10 @@
     <app-copy-to-clipboard-util matSuffix [copyValue]="getValueAsString()" [displayMessage]="getInputValue(inputKeys.copyDisplayMessage)"></app-copy-to-clipboard-util>
   }
 
-  <mat-autocomplete 
-    [autoActiveFirstOption]="options() && getInputValue(inputKeys.optionsAutoActiveFirst)" 
-    [requireSelection]="options() && getInputValue(inputKeys.optionsrequireSelection)" 
+  <mat-autocomplete
+    [autoActiveFirstOption]="options() && getInputValue(inputKeys.optionsAutoActiveFirst)"
+    [requireSelection]="options() && getInputValue(inputKeys.optionsrequireSelection)"
+    [displayWith]="displayFn"
     #auto="matAutocomplete">
     @for (option of filteredOptions | async; track option) {
       <mat-option [value]="option.value">

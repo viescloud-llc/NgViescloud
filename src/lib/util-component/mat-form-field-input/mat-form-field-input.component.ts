@@ -3,6 +3,7 @@ import { MatFormFieldComponent } from '../mat-form-field/mat-form-field.componen
 import { merge, Observable, Subject, Subscription, map, max, startWith } from 'rxjs';
 import { FormControl, ValidatorFn, Validators } from '@angular/forms';
 import { isMatOption, MatOption } from '../../model/mat.model';
+import { DataUtils } from '../../util/Data.utils';
 
 @Component({
   selector: 'app-mat-form-field-input',
@@ -94,6 +95,26 @@ export class MatFormFieldInputComponent<T> extends MatFormFieldComponent impleme
   onInputTyping(event: Event) {
     this.inputText$.next((event.target as HTMLInputElement).value);
   }
+
+  displayFn = (value: T | null | undefined): string => {
+    if (value === null || value === undefined) {
+      return '';
+    }
+    if (typeof value === 'string' || typeof value === 'number') {
+      return value.toString();
+    }
+    if (isMatOption(value)) {
+      return value.valueLabel;
+    }
+
+    for (const opt of this.options()) {
+      if (isMatOption(opt) && DataUtils.isEqual(opt.value, value)) {
+        return opt.valueLabel;
+      }
+    }
+
+    return '';
+  };
 
   private _filter(value: any): MatOption<T>[] {
     if(this.options().length === 0) {
@@ -235,10 +256,34 @@ export class MatFormFieldInputComponent<T> extends MatFormFieldComponent impleme
 
     this.onValueChange.emit();
 
+    if (this.getInputValue(this.inputKeys.manuallyEmitValue)) {
+      this.resetAfterManualEmit();
+    }
+  }
+
+  private resetAfterManualEmit(): void {
+    const cleared = this.getInputValue(this.inputKeys.defaultType) === 'number' ? 0 : null;
+    this.setValue(cleared as T);
+    this.setValueCopy(cleared);
+    this.isUpdatingFromParent.set(true);
+    this.formControl.setValue(cleared, { emitEvent: false });
+    this.isUpdatingFromParent.set(false);
+  }
+
+  override emitEnter(): void {
+    super.emitEnter();
+
+    if (this.getInputValue(this.inputKeys.manuallyEmitValue) && this.isValueChange()) {
+      this.emitValue();
+    }
   }
 
   focusoutEmitValue() {
     this.focusoutEmit();
+
+    if (this.getInputValue(this.inputKeys.manuallyEmitValue)) {
+      return;
+    }
 
     if(this.getInputValue(this.inputKeys.autoFillHttps)) {
       this.onAutoFillHttps();
@@ -387,17 +432,6 @@ export class MatFormFieldInputComponent<T> extends MatFormFieldComponent impleme
   }
 
   getValueAsString() {
-    if(this.isValueString()) {
-      return this.getValue();
-    }
-    else if(this.isValueNumber()) {
-      return this.getValue().toString();
-    }
-    else if(isMatOption(this.value)) {
-      return this.value.valueLabel;
-    }
-    else {
-      return '';
-    }
+    return this.displayFn(this.getValue());
   }
 }

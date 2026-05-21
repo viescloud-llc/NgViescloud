@@ -19,7 +19,7 @@
                                 .set(inputKeys.defaultType, 'number')
                                 .set(inputKeys.showMinMaxHint, true)
                                 .set(inputKeys.min, 0)
-                                .set(inputKeys.max, getInputValue(inputKeys.maxSize))
+                                .set(inputKeys.max, getInputValue(inputKeys.max))
                                 .set(inputKeys.manuallyEmitValue, true)
                                 .set(inputKeys.showClearIcon, false)
                                 .set(inputKeys.onFocusoutEmitValueOnly, false)
@@ -28,12 +28,12 @@
         </li>
       }
 
-      @if (getInputValue(inputKeys.showSearchOption)) {
+      @if (getInputValue(inputKeys.showSearchOption) && getSearchOptions() && getSearchOptions().length > 0) {
         <li>
           <app-mat-form-field-input
           [value]="searchOption()"
-          (valueChange)="addFromSearchOption($event); searchOption.set($event)"
-          [options]="getOptons()"
+          (valueChange)="addFromSearchOption($event);"
+          [options]="getSearchOptions()"
           [inputMap]="inputMap.clone().set(inputKeys.manuallyEmitValue, true)
                                       .set(inputKeys.manuallyEmitValueHint, 'Press enter to add from search option')
                                       .set(inputKeys.styleWidth, '100%')
@@ -42,6 +42,7 @@
                                       .set(inputKeys.optionsrequireSelection, true)"
           ></app-mat-form-field-input>
         </li>
+        <hr>
       }
 
       <ng-container>
@@ -61,7 +62,7 @@
 
       @if (!getInputValue(inputKeys.readonly)) {
         <li class="flex-row-container-auto">
-          <button matButton="filled" (click)="addNewItem()">Add new {{getInputValue(inputKeys.label)}}</button>
+          <button matButton="filled" (click)="addNewItem()" [disabled]="reachMaxSize()">Add new {{getInputValue(inputKeys.label)}}</button>
         </li>
       }
     </ul>
