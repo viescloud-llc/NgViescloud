@@ -107,7 +107,73 @@ export type AuthEvent = {
     user?: User;
 }
 
-export class DateTime {
+export class ViesDate {
+    year?: number = 0;
+    month?: number = 0;
+    day?: number = 0;
+
+    bypassMax?: boolean = false;
+    zoneId?: string = '';
+
+    maxDayThisMonth?: number = 0;
+    date?: string = '';
+
+    static now(): ViesDate {
+        const now = new Date();
+
+        const year = now.getFullYear();
+        const month = now.getMonth() + 1; // getMonth() is 0-based
+        const day = now.getDate();
+        const maxDayThisMonth = new Date(year, month, 0).getDate(); // Get max day of current month
+        const zoneId = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+        const date = now.toISOString().split('T')[0].replaceAll('-', '/');  // YYYY/MM/DD
+
+        return {
+            year,
+            month,
+            day,
+            maxDayThisMonth,
+            date,
+            zoneId
+        }
+    }
+}
+
+export class ViesTime {
+    hour?: number = 0;
+    minute?: number = 0;
+    second?: number = 0;
+    millis?: number = 0;
+
+    bypassMax?: boolean = false;
+    zoneId?: string = '';
+
+    time?: string = '';
+
+    static now(): ViesTime {
+        const now = new Date();
+
+        const hour = now.getHours();
+        const minute = now.getMinutes();
+        const second = now.getSeconds();
+        const millis = now.getMilliseconds();
+        const zoneId = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+        const time = now.toISOString().split('T')[1].split('.')[0] + '.' + millis; // HH:MM:SS.MMM
+
+        return {
+            hour,
+            minute,
+            second,
+            millis,
+            time,
+            zoneId
+        }
+    }
+}
+
+export class ViesDateTime {
     id?: number = 0;
     year?: number = 0;
     month?: number = 0;
@@ -127,7 +193,7 @@ export class DateTime {
     zonedDayTime?: string = '';
     maxDayThisMonth?: number = 0;
 
-    static now(): DateTime {
+    static now(): ViesDateTime {
         const now = new Date();
 
         const year = now.getFullYear();
@@ -144,7 +210,7 @@ export class DateTime {
         const date = now.toISOString().split('T')[0];  // "YYYY-MM-DD"
         const dateTime = `${date} | ${time}`;
 
-        let newDateTime = new DateTime();
+        let newDateTime = new ViesDateTime();
         newDateTime.year = year;
         newDateTime.month = month;
         newDateTime.day = day;

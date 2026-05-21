@@ -6,31 +6,21 @@ import { AttributeDefinitionService } from '../../shared/service/attribute-defin
 import { ViesRestApi } from '../../../lib/abtract/ViesRestApi';
 import { RouteUtils } from '../../../lib/util/Route.utils';
 import { APP_ROUTES } from '../../app.routes';
+import { AttributeOptionComponent } from "../attribute-option/attribute-option.component";
+import { AttributeOptionListComponent } from '../attribute-option-list/attribute-option-list.component';
 
 @Component({
   selector: 'app-attribute-definition',
   templateUrl: './attribute-definition.component.html',
   styleUrls: ['./attribute-definition.component.scss'],
-  imports: [NgComponentModule]
+  imports: [NgComponentModule, AttributeOptionListComponent]
 })
 export class AttributeDefinitionComponent extends ViesRestApi<AttributeDefinition, AttributeDefinitionService> {
 
   service = inject(AttributeDefinitionService);
   validForm = signal<boolean>(false);
 
-  // override get service(): AttributeDefinitionService {
-  //   return inject(AttributeDefinitionService);
-  // }
-
-  // override getValue(): WritableSignal<AttributeDefinition> {
-  //   return this.attributeDefinition;
-  // }
-
   override getRouteId() {
     return RouteUtils.getPathVariableAsInteger(APP_ROUTES.productAttributeDefinition(0).split('/').at(-2)!);
-  }
-
-  delete() {
-
   }
 }

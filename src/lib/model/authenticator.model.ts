@@ -1,6 +1,6 @@
 import { ReflectionUtils } from "../util/Reflection.utils";
 import { MatColumn, MatInputDisable, MatInputHide, MatTableHide, MatTableDisplayLabel, MatInputItemSetting, MatInputRequire, MatItemSettingType } from "./mat.model";
-import { DateTime } from "./vies.model";
+import { ViesDateTime } from "./vies.model";
 
 export enum AccessPermission {
     READ = "READ",

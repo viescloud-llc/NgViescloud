@@ -27,6 +27,23 @@
           ></app-mat-form-field-input>
         </li>
       }
+
+      @if (getInputValue(inputKeys.showSearchOption)) {
+        <li>
+          <app-mat-form-field-input
+          [value]="searchOption()"
+          (valueChange)="addFromSearchOption($event); searchOption.set($event)"
+          [options]="getOptons()"
+          [inputMap]="inputMap.clone().set(inputKeys.manuallyEmitValue, true)
+                                      .set(inputKeys.manuallyEmitValueHint, 'Press enter to add from search option')
+                                      .set(inputKeys.styleWidth, '100%')
+                                      .set(inputKeys.label, 'Search ' + getInputValue(inputKeys.label))
+                                      .set(inputKeys.optionsAutoActiveFirst, true)
+                                      .set(inputKeys.optionsrequireSelection, true)"
+          ></app-mat-form-field-input>
+        </li>
+      }
+
       <ng-container>
         @for (item of value; track trackByIndex(i, item); let i = $index) {
           <app-mat-form-field-input-option
@@ -41,8 +58,11 @@
           ></app-mat-form-field-input-option>
         }
       </ng-container>
-      @if (!getInputValue(inputKeys.readonly) && !reachMaxSize()) {
-        <li><button matButton="filled" style="width: 100%;" (click)="addNewItem()">Add new {{getInputValue(inputKeys.label)}}</button></li>
+
+      @if (!getInputValue(inputKeys.readonly)) {
+        <li class="flex-row-container-auto">
+          <button matButton="filled" (click)="addNewItem()">Add new {{getInputValue(inputKeys.label)}}</button>
+        </li>
       }
     </ul>
   </mat-expansion-panel>

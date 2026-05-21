@@ -1,4 +1,4 @@
-import { Component, Input, forwardRef, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, Input, forwardRef, OnInit, Output, EventEmitter, signal } from '@angular/core';
 import { MatFormFieldInputListComponent } from '../mat-form-field-input-list/mat-form-field-input-list.component';
 import { MatFormFieldComponent } from '../mat-form-field/mat-form-field.component';
 import { MatOption } from '../../model/mat.model';
@@ -17,6 +17,8 @@ export class MatFormFieldInputListOptionComponent<T> extends MatFormFieldInputLi
 
   @Input()
   options: MatOption<T>[] = [];
+
+  searchOption = signal<T | null>(null);
 
   override ngOnInit(): void {
     super.ngOnInit();
@@ -39,7 +41,6 @@ export class MatFormFieldInputListOptionComponent<T> extends MatFormFieldInputLi
   }
 
   getOptons() {
-
     if(this.getInputValue(this.inputKeys.uniqueValue)) {
       this.options.forEach(e => {
         e.disable = this.value.some(f => DataUtils.isEqual(f, e.value));
@@ -47,5 +48,9 @@ export class MatFormFieldInputListOptionComponent<T> extends MatFormFieldInputLi
     }
 
     return this.options;
+  }
+
+  addFromSearchOption(option: T) {
+    
   }
 }

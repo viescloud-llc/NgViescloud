@@ -41,28 +41,28 @@
         <li>
           <app-mat-form-field-input
             [(value)]="selectedOpenIdProvider.usernameMapping"
+            [options]="claimSupporteds"
             [inputMap]="inputField('3').set(inputKeys.styleWidth, '100%')
                                        .set(inputKeys.label, 'Map new user (username)')
-                                       .set(inputKeys.placeholder, 'e.g username, preferred_username')
-                                       .set(inputKeys.inputOptions, claimSupporteds)"
+                                       .set(inputKeys.placeholder, 'e.g username, preferred_username')"
           ></app-mat-form-field-input>
         </li>
         <li>
           <app-mat-form-field-input
             [(value)]="selectedOpenIdProvider.emailMapping"
+            [options]="claimSupporteds"
             [inputMap]="inputField('4').set(inputKeys.styleWidth, '100%')
                                        .set(inputKeys.label, 'Map new user (email)')
-                                       .set(inputKeys.placeholder, 'e.g email')
-                                       .set(inputKeys.inputOptions, claimSupporteds)"
+                                       .set(inputKeys.placeholder, 'e.g email')"
           ></app-mat-form-field-input>
         </li>
         <li>
           <app-mat-form-field-input
             [(value)]="selectedOpenIdProvider.aliasMapping"
+            [options]="claimSupporteds"
             [inputMap]="inputField('5').set(inputKeys.styleWidth, '100%')
                                        .set(inputKeys.label, 'Map new user (alias)')
-                                       .set(inputKeys.placeholder, 'e.g name, nickname, preferred_username')
-                                       .set(inputKeys.inputOptions, claimSupporteds)"
+                                       .set(inputKeys.placeholder, 'e.g name, nickname, preferred_username')"
           ></app-mat-form-field-input>
         </li>
         <li>

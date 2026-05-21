@@ -1,4 +1,4 @@
-<mat-form-field [appearance]="getAppearance()" [color]="getInputValue(inputKeys.matColor)"  [style.width.ch]="getSize(value ? value.toString() : '')" [style.width]="getInputValue(inputKeys.styleWidth)">
+<mat-form-field [appearance]="getAppearance()" [color]="getInputValue(inputKeys.matColor)"  [style.width.ch]="getSize(value ? getValueAsString() : '')" [style.width]="getInputValue(inputKeys.styleWidth)">
   <mat-label>{{getInputValue(inputKeys.label)}}</mat-label>
 
   <input
@@ -8,6 +8,7 @@
     [type]="getInputValue(inputKeys.defaultType)"
     (keyup.enter)="emitEnter()"
     (keydown)="addKey($event)"
+    (input)="onInputTyping($event)"
     (focus)="focusEmit()"
     (focusout)="focusoutEmitValue()"
     [placeholder]="getInputValue(inputKeys.placeholder)"
@@ -39,7 +40,7 @@
     <mat-hint style="color: goldenrod;" align="end">{{getInputValue(inputKeys.readonlyOnFocusHintRight)}}</mat-hint>
   }
   @else if (isValueString() && getInputValue(inputKeys.maxlength)) {
-    <mat-hint align="end">{{value.toString().length}} / {{getInputValue(inputKeys.maxlength)}}</mat-hint>
+    <mat-hint align="end">{{getValueAsString().length}} / {{getInputValue(inputKeys.maxlength)}}</mat-hint>
   }
   @else if (getInputValue(inputKeys.showMinMaxHint) && isValueNumber() && value) {
     <mat-hint align="end">
@@ -74,7 +75,7 @@
     </button>
   }
   @if (value && !getInputValue(inputKeys.disable) && getInputValue(inputKeys.showGoto)) {
-    <button matSuffix mat-icon-button (click)="openLink(value.toString())" [matTooltip]="'Go to ' + getInputValue(inputKeys.label)">
+    <button matSuffix mat-icon-button (click)="openLink(getValueAsString())" [matTooltip]="'Go to ' + getInputValue(inputKeys.label)">
       <mat-icon>public</mat-icon>
     </button>
   }
@@ -87,13 +88,16 @@
     <app-input-type-switch matSuffix [switch]="getInputValue(inputKeys.switchVisibility)" [htmlInputElement]="input" [trueValue]="getInputValue(inputKeys.defaultType)" [falseValue]="getInputValue(inputKeys.switchType)" [onIcon]="getInputValue(inputKeys.onIcon)" [offIcon]="getInputValue(inputKeys.offIcon)"></app-input-type-switch>
   }
   @if (getInputValue(inputKeys.showCopyToClipboard) && !getInputValue(inputKeys.disable)) {
-    <app-copy-to-clipboard-util matSuffix [copyValue]="value.toString()" [displayMessage]="getInputValue(inputKeys.copyDisplayMessage)"></app-copy-to-clipboard-util>
+    <app-copy-to-clipboard-util matSuffix [copyValue]="getValueAsString()" [displayMessage]="getInputValue(inputKeys.copyDisplayMessage)"></app-copy-to-clipboard-util>
   }
 
-  <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
-    @for (option of filteredOptions  | async; track option) {
-      <mat-option [value]="option">
-        {{option}}
+  <mat-autocomplete 
+    [autoActiveFirstOption]="options() && getInputValue(inputKeys.optionsAutoActiveFirst)" 
+    [requireSelection]="options() && getInputValue(inputKeys.optionsrequireSelection)" 
+    #auto="matAutocomplete">
+    @for (option of filteredOptions | async; track option) {
+      <mat-option [value]="option.value">
+        {{option.valueLabel}}
       </mat-option>
     }
   </mat-autocomplete>

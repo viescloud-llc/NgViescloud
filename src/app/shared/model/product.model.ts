@@ -1,14 +1,17 @@
+import { Currency } from "../../../lib/model/currency.model";
 import { MatInputDisable, MatInputEnum, MatInputHide, MatInputItemSetting, MatInputRequire, MatInputSetting, MatInputSettings, MatItemSettingType, MatTableHide } from "../../../lib/model/mat.model";
 import { MatFormFieldInputKeys } from "../../../lib/model/mat.model";
+import { ViesDate, ViesDateTime, ViesTime } from "../../../lib/model/vies.model";
 
 export enum ProductAttributeType {
     TEXT = "TEXT",
     NUMBER = "NUMBER",
     BOOLEAN = "BOOLEAN",
     SELECT = "SELECT",
-    MULTISELECT = "MULTISELECT",
+    MULTI_SELECT = "MULTI_SELECT",
     DATE = "DATE",
-    JSON = "JSON"
+    TIME = "TIME",
+    DATE_TIME = "DATE_TIME"
 }
 
 export enum ProductStatus {
@@ -27,6 +30,17 @@ export enum ProductVariantStatus {
 export enum ProductMediaType {
     IMAGE = "IMAGE",
     VIDEO = "VIDEO"
+}
+
+export class AttributeValue {
+    textValue: string = '';
+    numberValue: number = 0;
+    booleanValue: boolean = false;
+    dateValue: ViesDate = new ViesDate();
+    timeValue: ViesTime = new ViesTime();
+    dateTimeValue: ViesDateTime = new ViesDateTime();
+    selectValue: AttributeOption = new AttributeOption();
+    multiSelectValues: AttributeOption[] = [new AttributeOption()];
 }
 
 export class AttributeOption {
@@ -102,7 +116,7 @@ export class AttributeDefinition {
     variantLevel: boolean = false; // true if this attribute creates variants
 
     @MatInputSettings(
-        {},
+        {hide: true},
         {type: MatFormFieldInputKeys.label, value: 'Option'},
         {type: MatFormFieldInputKeys.showListAddItemButton, value: true},
         {type: MatFormFieldInputKeys.showListRemoveItemButton, value: true},
@@ -111,34 +125,63 @@ export class AttributeDefinition {
     options: AttributeOption[] = [new AttributeOption()];
 }
 
-//TODO: update model from backend
 export class ProductAttribute {
     @MatInputSettings(
         {disable: true},
         {type: MatFormFieldInputKeys.label, value: 'ID'}
     )
     id: number = 0;
+
+    @MatInputSettings(
+        {hide: true},
+    )
     AttributeDefinition: AttributeDefinition = new AttributeDefinition();
 
     @MatInputSettings(
-        {},
-        {type: MatFormFieldInputKeys.label, value: 'Value'}
+        {hide: true},
     )
-    value: string = '';
+    attributeValue: AttributeValue = new AttributeValue();
 }
 
 export class Category {
-    @MatInputDisable()
+    @MatInputSettings(
+        {disable: true},
+        {type: MatFormFieldInputKeys.label, value: 'ID'}
+    )
     id: number = 0;
+
+    @MatInputSettings(
+        {},
+        {type: MatFormFieldInputKeys.label, value: 'Name'}
+    )
     name: string = '';
-    @MatInputItemSetting(MatItemSettingType.TEXT_AREA)
+
+    @MatInputSettings(
+        {},
+        {type: MatFormFieldInputKeys.label, value: 'Description'},
+        {type: MatFormFieldInputKeys.isTextArea, value: true}
+    )
     description: string = '';
-    @MatInputHide()
+
+    @MatInputSettings(
+        {hide: true},
+    )
     parentCategoryId: number = 0;
+
+    @MatInputSettings(
+        {hide: true},
+    )
     attributeDefinitions: AttributeDefinition[] = [new AttributeDefinition()];
-    @MatInputHide()
+
+
+    @MatInputSettings(
+        {hide: true},
+    )
     parentCategory?: Category;
-    @MatInputHide()
+
+    @MatInputSettings(
+        {hide: true},
+    )
     childrenCategories?: Category[];
 }
 
@@ -208,7 +251,6 @@ export class ProductMedia {
     isPrimary: boolean = false;
 }
 
-//TODO: update model from backend
 export class ProductVariantAttribute {
     @MatInputSettings(
         {disable: true},
@@ -216,14 +258,15 @@ export class ProductVariantAttribute {
     )
     id: number = 0;
 
+    @MatInputSettings(
+        {hide: true}
+    )
     attributeDefinition: AttributeDefinition = new AttributeDefinition();
 
     @MatInputSettings(
-        {},
-        {type: MatFormFieldInputKeys.label, value: 'Value'}
+        {hide: true}
     )
-    value: string = '';
-    attributeOption: AttributeOption = new AttributeOption();
+    attributeValue: AttributeValue = new AttributeValue();
 }
 
 export class ProductVariant {
@@ -299,6 +342,9 @@ export class Product {
 
     @MatInputHide()
     category: Category = new Category();
+
+    @MatInputEnum(Currency)
+    currency: Currency = Currency.USD;
 
     @MatInputSettings(
         {}, 

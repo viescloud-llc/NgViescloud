@@ -1,6 +1,6 @@
 import { AfterContentInit, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, forwardRef } from '@angular/core';
 import { MatFormFieldComponent } from '../mat-form-field/mat-form-field.component';
-import { DateTime } from "../../model/vies.model";
+import { ViesDateTime } from "../../model/vies.model";
 import { AuthenticatorService } from '../../service/authenticator.service';
 import { ThemePalette } from '@angular/material/core';
 import { DialogUtils } from '../../util/Dialog.utils';
@@ -17,12 +17,12 @@ export const TYPE = {DATE: 'DATE', TIME: 'TIME', DATE_TIME: 'DATE_TIME'};
 export class MatFormFieldInputTimeComponent extends MatFormFieldComponent {
 
   @Input()
-  declare value: DateTime;
-  declare valueCopy: DateTime;
+  declare value: ViesDateTime;
+  declare valueCopy: ViesDateTime;
 
   @Input()
-  toValue!: DateTime;
-  toValueCopy!: DateTime;
+  toValue!: ViesDateTime;
+  toValueCopy!: ViesDateTime;
 
   startDate?: Date;
   endDate?: Date;
@@ -36,10 +36,10 @@ export class MatFormFieldInputTimeComponent extends MatFormFieldComponent {
   timeZone = 'EST';
 
   @Output()
-  override valueChange: EventEmitter<DateTime> = new EventEmitter();
+  override valueChange: EventEmitter<ViesDateTime> = new EventEmitter();
 
   @Output()
-  tovalueChange: EventEmitter<DateTime> = new EventEmitter();
+  tovalueChange: EventEmitter<ViesDateTime> = new EventEmitter();
 
   @Input()
   type: string = TYPE.DATE;
@@ -66,7 +66,7 @@ export class MatFormFieldInputTimeComponent extends MatFormFieldComponent {
   }
 
   async now() {
-    let time = DateTime.now();
+    let time = ViesDateTime.now();
     this.value = time; 
     this.valueCopy = structuredClone(time);
     this.toValue = structuredClone(time);

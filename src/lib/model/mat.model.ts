@@ -88,6 +88,19 @@ export interface MatOption<T> {
     disable?: boolean
 }
 
+export function isMatOption<T = any>(obj: any): obj is MatOption<T> {
+    return (
+        obj !== null &&
+        typeof obj === 'object' &&
+        'value' in obj &&
+        typeof obj.valueLabel === 'string' &&
+        (
+            obj.disable === undefined ||
+            typeof obj.disable === 'boolean'
+        )
+    );
+}
+
 export class MatListItem<T> {
     constructor(private ref?: T, public key?: string, private setter?: (ref: T, value: T) => void, private getter?: (ref: T) => any, public disable: boolean = false) { }
 
@@ -535,7 +548,6 @@ export const MatFormFieldInput = {
   readonlyOnFocusHintRight:   { key: 'readonlyOnFocusHintRight', value: field<string>('') },
 
   // MatFormFieldInput
-  inputOptions:          { key: 'inputOptions',         value: field<string[]>([]) },
   maxlength:             { key: 'maxlength',            value: field<number | null>(null) },
   minlength:             { key: 'minlength',            value: field<number | null>(null) },
   showGoto:              { key: 'showGoto',             value: field<boolean>(false) },
@@ -562,6 +574,8 @@ export const MatFormFieldInput = {
   validateEmail:         { key: 'validateEmail',        value: field<boolean>(false) },
   autoFillHttps:         { key: 'autoFillHttps',        value: field<boolean>(false) },
   focusOutAutoFillFn:    { key: 'focusOutAutoFillFn',   value: field<((value: any) => any) | undefined>(undefined) },
+  optionsAutoActiveFirst:{ key: 'optionsAutoActiveFirst',value: field<boolean>(true) },
+  optionsrequireSelection:{ key: 'optionsrequireSelection',value: field<boolean>(false) },
 
   // MatFormFieldInputTextArea
   rows:                  { key: 'rows',                 value: field<number | undefined>(undefined) }, // min height
@@ -589,6 +603,7 @@ export const MatFormFieldInput = {
 
   // MatFormFieldInputListOption
   uniqueValue:            { key: 'uniqueValue',          value: field<boolean>(false) },
+  showSearchOption:       { key: 'showSearchOption',     value: field<boolean>(false) },
 
   // MatFormFieldInputDynamic
   isPassword:              { key: 'isPassword',              value: field<boolean>(false) },

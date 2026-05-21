@@ -1,6 +1,6 @@
 import { ReflectionUtils } from "../util/Reflection.utils";
 import { SharedUser, UserAccess } from "./authenticator.model";
-import { DateTime } from "./vies.model";
+import { ViesDateTime } from "./vies.model";
 
 export class Metadata extends UserAccess {
     id?:                    number = 0;
@@ -9,8 +9,8 @@ export class Metadata extends UserAccess {
     size?:                  number = 0;
     path?:                  string = '';
     temporaryAccessLink:    string = '';
-    createdAt?:             DateTime = new DateTime();
-    updatedAt?:             DateTime = new DateTime();
+    createdAt?:             ViesDateTime = new ViesDateTime();
+    updatedAt?:             ViesDateTime = new ViesDateTime();
 
     constructor() {
         super();

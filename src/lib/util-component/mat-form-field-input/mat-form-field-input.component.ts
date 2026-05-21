@@ -1,7 +1,8 @@
-import { Component, EventEmitter, Input, OnDestroy, Output, SimpleChanges, computed, forwardRef, signal } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, Output, SimpleChanges, computed, forwardRef, input, signal } from '@angular/core';
 import { MatFormFieldComponent } from '../mat-form-field/mat-form-field.component';
-import { Observable, Subscription, map, max, startWith } from 'rxjs';
+import { merge, Observable, Subject, Subscription, map, max, startWith } from 'rxjs';
 import { FormControl, ValidatorFn, Validators } from '@angular/forms';
+import { isMatOption, MatOption } from '../../model/mat.model';
 
 @Component({
   selector: 'app-mat-form-field-input',
@@ -10,11 +11,17 @@ import { FormControl, ValidatorFn, Validators } from '@angular/forms';
   providers: [{ provide: MatFormFieldComponent, useExisting: forwardRef(() => MatFormFieldInputComponent) }],
   standalone: false
 })
-export class MatFormFieldInputComponent extends MatFormFieldComponent implements OnDestroy {
+export class MatFormFieldInputComponent<T> extends MatFormFieldComponent implements OnDestroy {
   
+  declare value: T;
+  declare valueCopy: T;
+
+  options = input<T[] | MatOption<T>[]>([]);
+
   // mat option
   formControl!: FormControl;
-  filteredOptions!: Observable<string[]>;
+  filteredOptions!: Observable<MatOption<T>[]>;
+  private inputText$ = new Subject<string>();
 
   private valueChangesSubscription?: Subscription;
   private isUpdatingFromParent = signal(false);
@@ -26,7 +33,12 @@ export class MatFormFieldInputComponent extends MatFormFieldComponent implements
   override ngOnInit(): void {
     super.ngOnInit();
     
-    this.setInputValueIfEmpty(this.inputKeys.copyDisplayMessage, computed(() => this.value.toString()));
+    this.setInputValueIfEmpty(this.inputKeys.copyDisplayMessage, computed(() => {
+      if(this.isValueString() || this.isValueNumber()) {
+        return this.getValue().toString();
+      }
+      return '';
+    }));
 
     this.formControl = new FormControl(this.getValue());
 
@@ -73,10 +85,41 @@ export class MatFormFieldInputComponent extends MatFormFieldComponent implements
   }
 
   private initFilteredOptions() {
-    this.filteredOptions = this.formControl.valueChanges.pipe(
-      startWith(''),
-      map(value => this._filter(value || ''))
+    this.filteredOptions = merge(this.formControl.valueChanges, this.inputText$).pipe(
+      startWith(this.formControl.value ?? ''),
+      map(value => this._filter(value))
     );
+  }
+
+  onInputTyping(event: Event) {
+    this.inputText$.next((event.target as HTMLInputElement).value);
+  }
+
+  private _filter(value: any): MatOption<T>[] {
+    if(this.options().length === 0) {
+      return [];
+    }
+
+    const filterValue = (value ?? '').toString().toLowerCase();
+
+    return this.options().map(e => {
+      if(isMatOption(e)) {
+        return e as MatOption<T>;
+      }
+      else  {
+        let valueLabel: string = "UNKOWN";
+        if(typeof e === 'string' || typeof e === 'number') {
+          valueLabel = e.toString();
+        }
+
+        let matOption: MatOption<T> = {
+          value: e as T,
+          valueLabel: valueLabel
+        }
+        return matOption;
+      }
+    })
+    .filter(option => option.valueLabel.toLowerCase().includes(filterValue));
   }
 
   private addValidator() {
@@ -164,14 +207,7 @@ export class MatFormFieldInputComponent extends MatFormFieldComponent implements
     return '';
   }
 
-  private _filter(value: any): string[] {
-    let filterValue = value;
 
-    if (typeof filterValue === 'string')
-      filterValue = value.toLowerCase();
-
-    return this.getInputValue(this.inputKeys.inputOptions).filter(option => option.toLowerCase().includes(filterValue));
-  }
 
   override emitValue(): void {
     let value = structuredClone(this.getValue());
@@ -348,5 +384,20 @@ export class MatFormFieldInputComponent extends MatFormFieldComponent implements
       return 'red';
     else
       return '';
+  }
+
+  getValueAsString() {
+    if(this.isValueString()) {
+      return this.getValue();
+    }
+    else if(this.isValueNumber()) {
+      return this.getValue().toString();
+    }
+    else if(isMatOption(this.value)) {
+      return this.value.valueLabel;
+    }
+    else {
+      return '';
+    }
   }
 }

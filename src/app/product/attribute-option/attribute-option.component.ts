@@ -8,6 +8,8 @@ import { AttributeOptionService } from '../../shared/service/attribute-option/at
 import { RxJSUtils } from '../../../lib/util/RxJS.utils';
 import { DialogUtils } from '../../../lib/util/Dialog.utils';
 import { RouteUtils } from '../../../lib/util/Route.utils';
+import { ViesRestApi } from '../../../lib/abtract/ViesRestApi';
+import { APP_ROUTES } from '../../app.routes';
 
 @Component({
   selector: 'app-attribute-option',
@@ -15,61 +17,13 @@ import { RouteUtils } from '../../../lib/util/Route.utils';
   styleUrls: ['./attribute-option.component.scss'],
   imports: [NgComponentModule]
 })
-export class AttributeOptionComponent extends ViesMatFormFieldMap implements OnInit {
+export class AttributeOptionComponent extends ViesRestApi<AttributeOption, AttributeOptionService> implements OnInit {
 
-  attributeOptionService = inject(AttributeOptionService);
-  rxjsUtils = inject(RxJSUtils);
-  dialogUtils = inject(DialogUtils);
-
-  attributeOption = model<AttributeOption>(DataUtils.purgeArray(new AttributeOption()));
-  attributeOptionTrack = ValueTracking.track(this.attributeOption);
-  blankAttributeOption = new AttributeOption();
-  
+  service: AttributeOptionService = inject(AttributeOptionService);
   validForm = signal<boolean>(false);
 
-  id = computed(() => {
-    return this.attributeOption().id;
-  });
-
-  ngOnInit(): void {
-    let id = RouteUtils.getPathVariableAsInteger("option");
-    if(!this.id() && id) {
-      this.attributeOptionService.get(id).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
-        next: res => {
-          this.attributeOption.set(res);
-        },
-        error: err => {
-          this.dialogUtils.openErrorMessageFromError(err);
-        }
-      })
-    }
+  override getRouteId(): string | number | null | undefined {
+    return RouteUtils.getPathVariableAsInteger(APP_ROUTES.productAttributeOption(0).split('/').at(-2)!);
   }
 
-  save() {
-    if(this.id()) {
-      this.attributeOptionService.put(this.attributeOption().id, this.attributeOption()).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
-        next: res => {
-          this.attributeOption.set(res);
-        },
-        error: err => {
-          this.dialogUtils.openErrorMessageFromError(err);
-        }
-      })
-    }
-    else {
-      this.attributeOptionService.post(this.attributeOption()).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
-        next: res => {
-          this.attributeOption.set(res);
-        },
-        error: err => {
-          this.dialogUtils.openErrorMessageFromError(err);
-        }
-      });
-    }
-
-  }
-
-  revert() {
-    this.attributeOptionTrack.revert();
-  }
 }
