@@ -88,7 +88,7 @@ export type AliasChangeRequest = {
 export type Oauth2LoginRequest = {
     code: string;
     redirectUri: string;
-    openIdProviderId: number;
+    openIdProviderId: string;
 }
 
 export type AuthResponse = {

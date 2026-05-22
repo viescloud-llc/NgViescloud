@@ -52,7 +52,7 @@ export class UserAccess {
 
 export class UserGroup {
     @MatInputDisable()
-    id: number = 0;
+    id: string = '';
 
     @MatInputRequire()
     name: string = '';
@@ -63,7 +63,7 @@ export class UserGroup {
 
 export class User {
     @MatInputDisable()
-    id: number = 0;
+    id: string = '';
 
     @MatInputDisable()
     sub: string = '';

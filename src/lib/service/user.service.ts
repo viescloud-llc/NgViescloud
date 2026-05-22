@@ -43,7 +43,7 @@ export class UserService extends ViesRestService<User> {
       let options: MatOption<string>[] = [];
       res.forEach(e => {
         options.push({
-          value: e.id + '',
+          value: e.id,
           valueLabel: `id: ${e.id} - ${e.alias} <${e.email}>`
         });
       })

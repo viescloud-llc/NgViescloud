@@ -223,9 +223,11 @@ export abstract class ViesRestService<T extends Object> extends ViesService {
     }
 
     private parseId(id: any) {
-        if (typeof id === 'string')
-            return parseInt(id);
-        else
+        if (typeof id === 'string') {
+            if (id === '') return null;
+            if (/^-?\d+$/.test(id)) return parseInt(id);
             return id;
+        }
+        return id;
     }
 }

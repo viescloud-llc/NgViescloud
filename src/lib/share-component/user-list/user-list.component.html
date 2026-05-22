@@ -49,8 +49,8 @@
           <li>
             <app-mat-form-field-input
               [(value)]="selectedUser.password"
-              [inputMap]="inputField('3').set(inputKeys.label, 'Password' + (selectedUser.id === 0 ? '' : ' \(Leave blank if you don\'t want to change password\)'))
-                                         .set(inputKeys.required, selectedUser.id === 0)
+              [inputMap]="inputField('3').set(inputKeys.label, 'Password' + (!selectedUser.id ? '' : ' \(Leave blank if you don\'t want to change password\)'))
+                                         .set(inputKeys.required, !selectedUser.id)
                                          .set(inputKeys.showVisibleSwitch, true)
                                          .set(inputKeys.styleWidth, '100%')"
             ></app-mat-form-field-input>

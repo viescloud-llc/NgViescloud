@@ -5,7 +5,6 @@ import { User, UserGroup } from '../model/authenticator.model';
 import { Observable, Subscription, catchError, filter, finalize, first, interval, map, switchMap, tap, throwError } from 'rxjs';
 import { ViesService } from './rest.service';
 import { AliasChangeRequest, AuthEvent, AuthResponse, LoginRequest, Oauth2LoginRequest, PasswordChangeRequest, RefreshTokenRequest, RegisterRequest } from '../model/vies.model';
-import { StringUtils } from '../util/String.utils';
 import { OpenIDProvider } from '../model/open-id.model';
 import { Router } from '@angular/router';
 import { DialogUtils } from '../util/Dialog.utils';
@@ -480,11 +479,7 @@ export class AuthenticatorService implements OnDestroy {
       return false;
     }
 
-    if (StringUtils.isNumber(userGroupNameOrId)) {
-      return userGroups.some(group => group.id === Number(userGroupNameOrId));
-    } else {
-      return userGroups.some(group => group.name === userGroupNameOrId);
-    }
+    return userGroups.some(group => group.id === userGroupNameOrId || group.name === userGroupNameOrId);
   }
 
   // ========================================

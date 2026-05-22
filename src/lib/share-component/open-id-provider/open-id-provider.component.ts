@@ -163,7 +163,7 @@ export class OpenIdProviderComponent extends ViesMatFormFieldMap implements OnIn
   }
 
   addUserGroup() {
-    this.UserGroupService.openDialog(this.dialogUtils.matDialog, 0, this.blankUserGroup).subscribe({
+    this.UserGroupService.openDialog(this.dialogUtils.matDialog, '', this.blankUserGroup).subscribe({
       next: res => {
         this.fetchUserGroups();
       }

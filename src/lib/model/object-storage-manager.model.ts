@@ -3,7 +3,7 @@ import { SharedUser, UserAccess } from "./authenticator.model";
 import { ViesDateTime } from "./vies.model";
 
 export class Metadata extends UserAccess {
-    id?:                    number = 0;
+    id?:                    string = '';
     fileName?:              string = '';
     contentType?:           string = '';
     size?:                  number = 0;

@@ -95,7 +95,7 @@ export class UserListComponent extends ViesMatFormFieldMap implements OnInit {
   }
 
   addUserGroup() {
-    this.userGroupService.openDialog(this.dialogUtils.matDialog, 0, this.blankUserGroup).subscribe({
+    this.userGroupService.openDialog(this.dialogUtils.matDialog, '', this.blankUserGroup).subscribe({
       next: res => {
         this.fetchUserGroups();
       }

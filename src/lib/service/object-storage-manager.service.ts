@@ -44,7 +44,7 @@ export abstract class ObjectStorage {
       return `${this.getURI()}${this.getPrefixPath()}`;
   }
 
-  getFile(requestParams: { id?: number, path?: string, fileName?: string, width?: number, height?: number }) {
+  getFile(requestParams: { id?: string, path?: string, fileName?: string, width?: number, height?: number }) {
     let params = new HttpParamsBuilder();
     params.setIfValid('id', requestParams.id);
     params.setIfValid('path', requestParams.path);
@@ -62,7 +62,7 @@ export abstract class ObjectStorage {
     return this.getFile({ fileName: fileName, width: width, height: height });
   }
 
-  getFileById(id: number, width?: number, height?: number): Observable<Blob> {
+  getFileById(id: string, width?: number, height?: number): Observable<Blob> {
     return this.getFile({ id: id, width: width, height: height });
   }
 
@@ -88,7 +88,7 @@ export abstract class ObjectStorage {
       );
   }
 
-  getFileMetaData(requestParams: { id?: number, path?: string, fileName?: string, generateTemporaryDirectAccessLink?: boolean, directAccessLinkType?: 'GET' | 'POST' | 'PUT' | 'DELETE', linkDurationMinutes?: number }) {
+  getFileMetaData(requestParams: { id?: string, path?: string, fileName?: string, generateTemporaryDirectAccessLink?: boolean, directAccessLinkType?: 'GET' | 'POST' | 'PUT' | 'DELETE', linkDurationMinutes?: number }) {
     let params = new HttpParamsBuilder();
     params.setIfValid('id', requestParams.id);
     params.setIfValid('path', requestParams.path);
@@ -116,11 +116,11 @@ export abstract class ObjectStorage {
     return this.getFileMetaData({ fileName: fileName });
   }
 
-  getFileMetadataById(id: number) {
+  getFileMetadataById(id: string) {
     return this.getFileMetaData({ id: id });
   }
 
-  putFile(vFile: VFile, requestParams: { id?: number, path?: string, fileName?: string, width?: number, height?: number }) {
+  putFile(vFile: VFile, requestParams: { id?: string, path?: string, fileName?: string, width?: number, height?: number }) {
     let params = new HttpParamsBuilder();
     params.setIfValid('id', requestParams.id);
     params.setIfValid('path', requestParams.path);
@@ -137,7 +137,7 @@ export abstract class ObjectStorage {
       return throwError(() => new Error('File can not be null'));
   }
 
-  putFileById(id: number, vFile: VFile) {
+  putFileById(id: string, vFile: VFile) {
     return this.putFile(vFile, { id: id });
   }
 
@@ -159,7 +159,7 @@ export abstract class ObjectStorage {
       throw Error('File can not be null');
   }
 
-  patchMetaData(metadata: Metadata, requestParams: { id?: number, path?: string, fileName?: string }) {
+  patchMetaData(metadata: Metadata, requestParams: { id?: string, path?: string, fileName?: string }) {
     let params = new HttpParamsBuilder();
     params.setIfValid('id', requestParams.id);
     params.setIfValid('path', requestParams.path);
@@ -167,7 +167,7 @@ export abstract class ObjectStorage {
     return this.httpClient.patch<Metadata>(`${this.getPrefixUri()}/metadata`, metadata, { params: params.build() }).pipe(first());
   }
 
-  patchMetadataById(metadata: Metadata, id: number) {
+  patchMetadataById(metadata: Metadata, id: string) {
     return this.patchMetaData(metadata, { id: id });
   }
 
@@ -179,7 +179,7 @@ export abstract class ObjectStorage {
     return this.patchMetaData(metadata, { path: path });
   }
 
-  deleteFile(requestParams: { id?: number, path?: string, fileName?: string }) {
+  deleteFile(requestParams: { id?: string, path?: string, fileName?: string }) {
     let params = new HttpParamsBuilder();
     params.setIfValid('id', requestParams.id);
     params.setIfValid('path', requestParams.path);
@@ -187,7 +187,7 @@ export abstract class ObjectStorage {
     return this.httpClient.delete<void>(`${this.getPrefixUri()}/file`, { params: params.build() }).pipe(first());
   }
 
-  deleteFileById(id: number) {
+  deleteFileById(id: string) {
     return this.deleteFile({ id: id });
   }
 

@@ -34,7 +34,7 @@ export class UserGroupService extends ViesRestService<UserGroup> {
       let options: MatOption<string>[] = [];
       res.forEach(e => {
         options.push({
-          value: e.id + '',
+          value: e.id,
           valueLabel: e.name
         });
       })

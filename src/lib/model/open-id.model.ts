@@ -28,7 +28,7 @@ export interface OpenIdWellKnown {
 export class OpenIDProvider {
 
   @MatInputHide()
-  id:                    number = 0;
+  id:                    string = '';
 
   @MatInputHide()
   @MatTableHide()
