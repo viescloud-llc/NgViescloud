@@ -48,7 +48,8 @@
       <ng-container>
         @for (item of value; track trackByIndex(i, item); let i = $index) {
           <app-mat-form-field-input-option
-            [value]="value[i]" (valueChange)="value[i] = $event"
+            [value]="value[i]" (valueChange)="value[i] = $event; emitValue()"
+            (onValueChange)="onValueChange.emit()"
             [options]="getOptons()"
             [noneLabel]="''"
             (onCustomOptionSelected)="remove(i)"

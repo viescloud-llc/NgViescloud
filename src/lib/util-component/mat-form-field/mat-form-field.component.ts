@@ -104,7 +104,7 @@ export class MatFormFieldComponent extends ViesMatFormFieldMap implements OnInit
   }
 
   setValueCopy(value: any) {
-    DataUtils.setAnyValue(this.valueCopy, value, () => this.value = value);
+    DataUtils.setAnyValue(this.valueCopy, value, () => this.valueCopy = value);
   }
 
   getInputValue<K extends keyof MatFormFieldTypeMap>(key: K) {

@@ -24,40 +24,40 @@
         <button matButton="filled" (click)="addUserGroup()" >Add user group</button>
       </li>
       <hr>
-        <li>
-          <app-mat-form-field-input-list-option
-            label="User Groups"
-            [(value)]="selectedUser.userGroups"
-            [options]="userGroupsOptions()"
-            [inputMap]="inputField('1').set(inputKeys.label, 'User Groups')
-                                       .set(inputKeys.styleWidth, '100%')
-                                       .set(inputKeys.showSizeInput, false)
-                                       .set(inputKeys.minSize, 1)
-                                       .set(inputKeys.uniqueValue, true)
-                                       .set(inputKeys.required, true)"
-          ></app-mat-form-field-input-list-option>
-          <br>
-          </li>
-          <li>
-            <app-mat-form-field-input-dynamic
-              [(value)]="selectedUser"
-              [blankObject]="blankUser"
-              [inputMap]="inputField('2').set(inputKeys.styleWidth, '100%')
-                                         .set(inputKeys.indent, false)"
-            ></app-mat-form-field-input-dynamic>
-          </li>
-          <li>
-            <app-mat-form-field-input
-              [(value)]="selectedUser.password"
-              [inputMap]="inputField('3').set(inputKeys.label, 'Password' + (!selectedUser.id ? '' : ' \(Leave blank if you don\'t want to change password\)'))
-                                         .set(inputKeys.required, !selectedUser.id)
-                                         .set(inputKeys.showVisibleSwitch, true)
-                                         .set(inputKeys.styleWidth, '100%')"
-            ></app-mat-form-field-input>
-          </li>
-          <li class="flex-row-container-auto">
-            <button matButton="filled" (click)="save()" [disabled]="!isValueChange() || !validForm">Save</button>
-            <button matButton="filled" class="warn" (click)="revert()" [disabled]="!isValueChange() || !validForm">revert</button>
-          </li>
-        </ul>
-      }
+      <li>
+        <app-mat-form-field-input-list-option
+          label="User Groups"
+          [(value)]="selectedUser.userGroups"
+          [options]="userGroupsOptions()"
+          [inputMap]="inputField('1').set(inputKeys.label, 'User Groups')
+                                      .set(inputKeys.styleWidth, '100%')
+                                      .set(inputKeys.showSizeInput, false)
+                                      .set(inputKeys.minSize, 1)
+                                      .set(inputKeys.uniqueValue, true)
+                                      .set(inputKeys.required, true)"
+        ></app-mat-form-field-input-list-option>
+        <br>
+      </li>
+      <li>
+        <app-mat-form-field-input-dynamic
+          [(value)]="selectedUser"
+          [blankObject]="blankUser"
+          [inputMap]="inputField('2').set(inputKeys.styleWidth, '100%')
+                                      .set(inputKeys.indent, false)"
+        ></app-mat-form-field-input-dynamic>
+      </li>
+      <li>
+        <app-mat-form-field-input
+          [(value)]="selectedUser.password"
+          [inputMap]="inputField('3').set(inputKeys.label, 'Password' + (!selectedUser.id ? '' : ' \(Leave blank if you don\'t want to change password\)'))
+                                      .set(inputKeys.required, !selectedUser.id)
+                                      .set(inputKeys.showVisibleSwitch, true)
+                                      .set(inputKeys.styleWidth, '100%')"
+        ></app-mat-form-field-input>
+      </li>
+      <li class="flex-row-container-auto">
+        <button matButton="filled" (click)="save()" [disabled]="!isValueChange() || !validForm">Save</button>
+        <button matButton="filled" class="warn" (click)="revert()" [disabled]="!isValueChange() || !validForm">revert</button>
+      </li>
+    </ul>
+  }

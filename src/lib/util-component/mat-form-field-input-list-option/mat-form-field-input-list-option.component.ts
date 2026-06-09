@@ -63,6 +63,7 @@ export class MatFormFieldInputListOptionComponent<T> extends MatFormFieldInputLi
     if(option) {
       this.value.push(option);
       this.searchOption.set(null);
+      this.emitValue();
     }
   }
 }
