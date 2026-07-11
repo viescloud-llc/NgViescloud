@@ -1,0 +1,36 @@
+<ul class="margin-center">
+
+  <li class="filter-row">
+    <app-mat-form-field-input
+      [value]="searchTerm()"
+      (valueChange)="searchTerm.set($event)"
+      [inputMap]="inputField('prod-search')
+                    .set(inputKeys.label, 'Search products')
+                    .set(inputKeys.placeholder, 'By name or SKU…')
+                    .set(inputKeys.showClearIcon, true)
+                    .set(inputKeys.styleWidth, '100%')"
+    ></app-mat-form-field-input>
+
+    <app-mat-form-field-input-option
+      [value]="statusFilter()"
+      (valueChange)="statusFilter.set($event)"
+      [options]="statusOptions"
+      [noneLabel]="''"
+      [inputMap]="inputField('prod-status-filter')
+                    .set(inputKeys.label, 'Status')
+                    .set(inputKeys.styleWidth, '200px')"
+    ></app-mat-form-field-input-option>
+  </li>
+
+  <li>
+    <app-mat-table
+      [matRows]="filteredProducts()"
+      [blankObject]="blankProduct"
+      (onEditRow)="selectProduct($event)"
+    ></app-mat-table>
+  </li>
+  <br>
+  <li class="flex-row-container-auto">
+    <button matButton="filled" (click)="addProduct()">Add product</button>
+  </li>
+</ul>

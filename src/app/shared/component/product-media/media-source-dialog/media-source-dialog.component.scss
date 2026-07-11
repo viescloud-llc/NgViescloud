@@ -1,0 +1,103 @@
+.dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 480px;
+  max-width: 720px;
+}
+
+.mode-radio {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+
+  .grow {
+    flex: 1 1 auto;
+  }
+}
+
+.storage-choice {
+  padding: 0.75rem 1rem;
+  border-left: 3px solid var(--mat-sys-tertiary, goldenrod);
+  background: var(--mat-sys-surface-container-low, rgba(255, 255, 255, 0.03));
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-radius: 4px;
+
+  .hint {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--mat-sys-on-surface-variant, inherit);
+
+    em {
+      font-style: italic;
+      opacity: 0.75;
+    }
+  }
+
+  .storage-radio {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+}
+
+.file-picker-btn {
+  cursor: pointer;
+}
+
+.file-name {
+  font-size: 0.9rem;
+  color: var(--mat-sys-on-surface-variant, inherit);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 320px;
+}
+
+.preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  border: 1px dashed var(--mat-sys-outline-variant, rgba(255, 255, 255, 0.15));
+  border-radius: 4px;
+  background: var(--mat-sys-surface-container-lowest, rgba(0, 0, 0, 0.12));
+  overflow: hidden;
+}
+
+.preview-media {
+  max-width: 100%;
+  max-height: 320px;
+  object-fit: contain;
+}
+
+.preview-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--mat-sys-on-surface-variant, inherit);
+  font-size: 0.9rem;
+
+  mat-icon {
+    font-size: 2.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  &.failed {
+    color: var(--mat-sys-error, tomato);
+  }
+}
+
+.type-select {
+  align-self: flex-start;
+  min-width: 200px;
+}

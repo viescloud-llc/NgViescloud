@@ -176,6 +176,50 @@ export class DialogUtils {
     });
   }
 
+  // Pre-formatted confirmation for cascade-delete flows. Resolves true on confirm,
+  // false on cancel (instead of throwing) so callers can `if (await ...)` cleanly.
+  //
+  // `deps`: list of dependent counts that will also be deleted, e.g.
+  //   [{ label: 'variants', count: 6 }, { label: 'attributes', count: 12 }]
+  //
+  // Renders as: "Deleting this Product will also delete 6 variants, 12 attributes.
+  //              This cannot be undone. Continue?"
+  //
+  // Skip deps with `count === 0` automatically; if all deps are zero, the message
+  // is just "Deleting this {entityLabel}. This cannot be undone. Continue?".
+  openCascadeDeleteConfirm(
+    entityLabel: string,
+    deps: { label: string; count: number }[] = []
+  ): Promise<boolean> {
+    return DialogUtils.openCascadeDeleteConfirm(this.matDialog, entityLabel, deps);
+  }
+
+  static async openCascadeDeleteConfirm(
+    matDialog: MatDialog,
+    entityLabel: string,
+    deps: { label: string; count: number }[] = []
+  ): Promise<boolean> {
+    const nonZero = deps.filter(d => d.count > 0);
+    const depsClause = nonZero.length
+      ? ` will also delete ${nonZero.map(d => `${d.count} ${d.label}`).join(', ')}.`
+      : '.';
+    const message = `Deleting this ${entityLabel}${depsClause} This cannot be undone. Continue?`;
+
+    try {
+      const result = await DialogUtils.openConfirmDialog(
+        matDialog,
+        `Delete ${entityLabel}?`,
+        message,
+        'Delete',
+        'Cancel'
+      );
+      return !!result;
+    } catch {
+      // openConfirmDialog rejects on cancel — treat as "no".
+      return false;
+    }
+  }
+
   openInputDialog(
     title: string,
     label: string,

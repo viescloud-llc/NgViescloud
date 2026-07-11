@@ -1,0 +1,95 @@
+@switch (definition.type) {
+  @case (Type.TEXT) {
+    <app-mat-form-field-input
+      [value]="textCopy()"
+      (valueChange)="onTextChange($event)"
+      [inputMap]="inputField('avf-text')
+                    .set(inputKeys.label, label())
+                    .set(inputKeys.placeholder, definition.unit || '')
+                    .set(inputKeys.styleWidth, '100%')"
+    ></app-mat-form-field-input>
+  }
+
+  @case (Type.NUMBER) {
+    <!-- BigDecimal-as-string per the wire contract; we keep defaultType as text so
+         Angular doesn't coerce to a JS number and drop precision. -->
+    <app-mat-form-field-input
+      [value]="numberCopy()"
+      (valueChange)="onNumberChange($event)"
+      [inputMap]="inputField('avf-number')
+                    .set(inputKeys.label, label() + (definition.unit ? ' (' + definition.unit + ')' : ''))
+                    .set(inputKeys.styleWidth, '100%')"
+    ></app-mat-form-field-input>
+  }
+
+  @case (Type.BOOLEAN) {
+    <mat-slide-toggle
+      [ngModel]="booleanCopy()"
+      (ngModelChange)="onBooleanChange($event)">
+      {{ label() }}
+    </mat-slide-toggle>
+  }
+
+  @case (Type.SELECT) {
+    <app-mat-form-field-input-option
+      [value]="selectCopy()"
+      (valueChange)="onSelectChange($event)"
+      [options]="matOptions()"
+      [noneLabel]="''"
+      [inputMap]="inputField('avf-select')
+                    .set(inputKeys.label, label())
+                    .set(inputKeys.styleWidth, '100%')"
+    ></app-mat-form-field-input-option>
+  }
+
+  @case (Type.MULTI_SELECT) {
+    <app-mat-form-field-input-list-option
+      [value]="multiSelectCopy()"
+      (valueChange)="onMultiSelectChange($event)"
+      [options]="matOptions()"
+      [inputMap]="inputField('avf-multi')
+                    .set(inputKeys.label, label())
+                    .set(inputKeys.showSizeInput, false)
+                    .set(inputKeys.showSearchOption, true)
+                    .set(inputKeys.uniqueValue, true)
+                    .set(inputKeys.styleWidth, '100%')"
+    ></app-mat-form-field-input-list-option>
+  }
+
+  @case (Type.DATE) {
+    <app-mat-form-field-input-time
+      [value]="dateTimeCopy()"
+      (valueChange)="onDateChange($event)"
+      [type]="'DATE'"
+      [inputMap]="inputField('avf-date')
+                    .set(inputKeys.label, label())
+                    .set(inputKeys.styleWidth, '100%')"
+    ></app-mat-form-field-input-time>
+  }
+
+  @case (Type.TIME) {
+    <app-mat-form-field-input-time
+      [value]="dateTimeCopy()"
+      (valueChange)="onTimeChange($event)"
+      [type]="'TIME'"
+      [inputMap]="inputField('avf-time')
+                    .set(inputKeys.label, label())
+                    .set(inputKeys.styleWidth, '100%')"
+    ></app-mat-form-field-input-time>
+  }
+
+  @case (Type.DATE_TIME) {
+    <app-mat-form-field-input-time
+      [value]="dateTimeCopy()"
+      (valueChange)="onDateTimeChange($event)"
+      [type]="'DATE_TIME'"
+      [inputMap]="inputField('avf-datetime')
+                    .set(inputKeys.label, label())
+                    .set(inputKeys.styleWidth, '100%')"
+    ></app-mat-form-field-input-time>
+  }
+
+  @default {
+    <span class="avf-unknown">Unknown attribute type: {{ definition.type }}</span>
+  }
+}

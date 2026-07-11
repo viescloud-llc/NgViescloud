@@ -1,0 +1,25 @@
+<h2 mat-dialog-title>Quick-add tag</h2>
+
+<mat-dialog-content>
+  <p class="hint">
+    Creates a new tag and adds it to the current product's selection. You can
+    edit its description later from the Tags list page.
+  </p>
+
+  <ul appMatFormFieldGroup (onAllInputCheck)="validForm.set($event)">
+    <li>
+      <app-mat-form-field-input-dynamic
+        [(value)]="draft"
+        [blankObject]="blankTag"
+        [inputMap]="inputField('tag-quick-add')
+                      .set(inputKeys.indent, false)
+                      .set(inputKeys.styleWidth, '100%')"
+      ></app-mat-form-field-input-dynamic>
+    </li>
+  </ul>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button matButton (click)="cancel()">Cancel</button>
+  <button matButton="filled" (click)="save()" [disabled]="!validForm()">Create &amp; add tag</button>
+</mat-dialog-actions>

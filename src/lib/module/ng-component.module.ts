@@ -41,6 +41,7 @@ import { MatTableDynamicViesServiceComponent } from '../util-component/mat-table
 import { MatTableLazyDynamicComponent } from '../util-component/mat-table-lazy-dynamic/mat-table-lazy-dynamic.component';
 import { MatFormFieldInputDynamicFormComponent } from '../util-component/mat-form-field-input-dynamic-form/mat-form-field-input-dynamic-form.component';
 import { MatFormFieldFormComponent } from '../util-component/mat-form-field-form/mat-form-field-form.component';
+import { MoneyComponent } from '../util-component/money/money.component';
 
 const UTILS = [
   CopyToClipboardUtilComponent,
@@ -73,7 +74,8 @@ const UTILS = [
   MatTablePathComponent,
   MatTablePathLazyComponent,
   MatTableDynamicViesServiceComponent,
-  MatTableLazyDynamicComponent
+  MatTableLazyDynamicComponent,
+  MoneyComponent
 ]
 
 const COMPONENTS = [

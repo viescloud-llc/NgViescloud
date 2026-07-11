@@ -128,7 +128,13 @@ export class MatFormFieldComponent extends ViesMatFormFieldMap implements OnInit
   }
 
   emitValue(value?: any): void {
-    if(value === '' || value === 0 || value) {
+    // Set the value when an actual value is provided. The previous check
+    // `value === '' || value === 0 || value` excluded boolean `false` (and `null`),
+    // which broke boolean toggles — picking FALSE in a boolean dropdown would
+    // leave the field stuck on its previous value because setValue(false) was
+    // never called and the subsequent emit re-emitted the stale TRUE.
+    // Treat only `undefined` and `null` as "no value provided" sentinels.
+    if(value !== undefined && value !== null) {
       this.setValue(value);
     }
 

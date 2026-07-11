@@ -1,0 +1,117 @@
+.product-tabs {
+  min-height: 60vh;
+}
+
+.tab-body {
+  padding: 1rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.tab-hint {
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  border-left: 3px solid var(--mat-sys-tertiary, goldenrod);
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: var(--mat-sys-on-surface-variant, inherit);
+
+  strong {
+    color: var(--mat-sys-tertiary, goldenrod);
+  }
+}
+
+// Prominent "unlock this section by saving first" hint shown on Attributes /
+// Variants / Media tabs when the product hasn't been persisted yet.
+.save-first-hint {
+  margin: 2rem 0.5rem;
+  padding: 1.25rem 1.5rem;
+  border-left: 4px solid var(--mat-sys-primary, #7c4dff);
+  border-radius: 4px;
+  background: var(--mat-sys-surface-container-low, rgba(255, 255, 255, 0.03));
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--mat-sys-on-surface, inherit);
+
+  strong {
+    color: var(--mat-sys-primary, #7c4dff);
+    display: block;
+    margin-bottom: 0.25rem;
+    font-size: 1.05rem;
+  }
+
+  em {
+    font-style: normal;
+    font-weight: 600;
+  }
+}
+
+.empty-hint {
+  margin: 1rem 0.5rem;
+  padding: 0.75rem 1rem;
+  border-left: 3px solid var(--mat-sys-outline-variant, #666);
+  color: var(--mat-sys-on-surface-variant, inherit);
+  font-style: italic;
+}
+
+.picker-row {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+
+  app-mat-form-field-input,
+  app-mat-form-field-input-list-option {
+    flex: 1 1 auto;
+  }
+
+  button {
+    flex: 0 0 auto;
+    margin-top: 0.25rem;
+  }
+}
+
+.attr-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.5rem;
+  border: 1px solid var(--mat-sys-outline-variant, rgba(255, 255, 255, 0.08));
+  border-radius: 4px;
+
+  // Autocomplete definition picker — needs enough width for Material's floating
+  // label AND the manual-emit check icon to render without clipping. Fixed-width
+  // caused the label to disappear and left just a chevron + typed text visible.
+  .attr-def-picker {
+    flex: 0 0 320px;
+    min-width: 0; // allow children to shrink inside a flex container
+  }
+
+  .attr-value {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+}
+
+.variant-row,
+.media-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  padding: 0.5rem;
+  border: 1px solid var(--mat-sys-outline-variant, rgba(255, 255, 255, 0.08));
+  border-radius: 4px;
+
+  .variant-form,
+  .media-form {
+    flex: 1 1 auto;
+  }
+}
+
+
+.add-row {
+  padding: 0.5rem 0;
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}

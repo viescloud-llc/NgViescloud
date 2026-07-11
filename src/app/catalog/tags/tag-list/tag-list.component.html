@@ -1,0 +1,13 @@
+<ul class="margin-center">
+  <li>
+    <app-mat-table
+      [matRows]="tagList()"
+      [blankObject]="blankTag"
+      (onEditRow)="selectTag($event)"
+    ></app-mat-table>
+  </li>
+  <br>
+  <li class="flex-row-container-auto">
+    <button matButton="filled" (click)="addTag()">Add tag</button>
+  </li>
+</ul>

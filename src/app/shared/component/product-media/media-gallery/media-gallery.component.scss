@@ -1,0 +1,213 @@
+.gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-height: 320px;
+}
+
+.gallery-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+
+  .title {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 3rem 1rem;
+  border: 1px dashed var(--mat-sys-outline-variant, rgba(255, 255, 255, 0.12));
+  border-radius: 6px;
+  color: var(--mat-sys-on-surface-variant, inherit);
+
+  mat-icon {
+    font-size: 3rem;
+    width: 3rem;
+    height: 3rem;
+  }
+
+  p {
+    margin: 0;
+    text-align: center;
+
+    em {
+      font-style: normal;
+      font-weight: 600;
+      color: var(--mat-sys-primary, #7c4dff);
+    }
+  }
+}
+
+.gallery-body {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 1rem;
+  align-items: stretch;
+
+  @media (max-width: 720px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Vertical strip of thumbnails on the left. On narrow viewports it becomes a
+// horizontal scroller above the preview so the layout collapses gracefully.
+.thumb-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 480px;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+
+  @media (max-width: 720px) {
+    flex-direction: row;
+    max-height: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-right: 0;
+    padding-bottom: 0.25rem;
+  }
+}
+
+.thumb {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  padding: 0;
+  border: 2px solid var(--mat-sys-outline-variant, rgba(255, 255, 255, 0.15));
+  border-radius: 4px;
+  background: var(--mat-sys-surface-container-lowest, rgba(0, 0, 0, 0.12));
+  cursor: pointer;
+  overflow: hidden;
+  flex: 0 0 auto;
+
+  &.selected {
+    border-color: var(--mat-sys-primary, #7c4dff);
+    box-shadow: 0 0 0 2px rgba(124, 77, 255, 0.25);
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  @media (max-width: 720px) {
+    width: 96px;
+    height: 96px;
+  }
+}
+
+.thumb-video,
+.thumb-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: var(--mat-sys-on-surface-variant, inherit);
+
+  mat-icon {
+    font-size: 2rem;
+    width: 2rem;
+    height: 2rem;
+  }
+}
+
+.primary-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: var(--mat-sys-tertiary-container, goldenrod);
+  color: var(--mat-sys-on-tertiary-container, #000);
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.detail-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.big-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+  max-height: 480px;
+  border: 1px solid var(--mat-sys-outline-variant, rgba(255, 255, 255, 0.12));
+  border-radius: 6px;
+  background: var(--mat-sys-surface-container-lowest, rgba(0, 0, 0, 0.15));
+  overflow: hidden;
+
+  img,
+  video {
+    max-width: 100%;
+    max-height: 480px;
+    object-fit: contain;
+    display: block;
+  }
+}
+
+.preview-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--mat-sys-on-surface-variant, inherit);
+  padding: 2rem;
+  text-align: center;
+
+  mat-icon {
+    font-size: 3rem;
+    width: 3rem;
+    height: 3rem;
+  }
+
+  em {
+    font-style: normal;
+    font-weight: 600;
+    color: var(--mat-sys-primary, #7c4dff);
+  }
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+
+  .spacer {
+    flex: 1 1 auto;
+  }
+
+  .warn {
+    color: var(--mat-sys-error, tomato);
+  }
+}
+
+.metadata-form {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}

@@ -37,40 +37,56 @@ export class App extends ViescloudApplication {
       ]
     },
     {
-      title: 'Products',
+      title: 'Catalog',
       hideChildren: true,
       hideConditional: () => !this.authenticatorService.isAuthenticatedSync() || !this.authenticatorService.hasUserGroup(this.ADMIN_GROUP),
       children: [
         {
-          title: 'list',
-          routerLink: APP_ROUTES.productList
+          title: 'Products',
+          routerLink: APP_ROUTES.catalogProductList
         },
         {
-          title: 'add',
-          routerLink: APP_ROUTES.product(0)
+          title: 'New Product',
+          routerLink: APP_ROUTES.catalogProduct('')
+        },
+        {
+          title: 'Categories',
+          routerLink: APP_ROUTES.catalogCategoryList
+        },
+        {
+          title: 'New Category',
+          routerLink: APP_ROUTES.catalogCategory('')
+        },
+        {
+          title: 'Tags',
+          routerLink: APP_ROUTES.catalogTagList
+        },
+        {
+          title: 'New Tag',
+          routerLink: APP_ROUTES.catalogTag('')
         }
       ]
     },
     {
-      title: 'Attribute',
+      title: 'Schema',
       hideChildren: true,
       hideConditional: () => !this.authenticatorService.isAuthenticatedSync() || !this.authenticatorService.hasUserGroup(this.ADMIN_GROUP),
       children: [
         {
-          title: 'options',
-          routerLink: APP_ROUTES.productAttributeOptionList
+          title: 'Attribute Definitions',
+          routerLink: APP_ROUTES.schemaAttributeDefinitionList
         },
         {
-          title: 'add option',
-          routerLink: APP_ROUTES.productAttributeOption(0)
+          title: 'New Attribute Definition',
+          routerLink: APP_ROUTES.schemaAttributeDefinition('')
         },
         {
-          title: 'definitions',
-          routerLink: APP_ROUTES.productAttributeDefinitionList
+          title: 'Attribute Options',
+          routerLink: APP_ROUTES.schemaAttributeOptionList
         },
         {
-          title: 'add definition',
-          routerLink: APP_ROUTES.productAttributeDefinition(0)
+          title: 'New Attribute Option',
+          routerLink: APP_ROUTES.schemaAttributeOption('')
         },
       ]
     },

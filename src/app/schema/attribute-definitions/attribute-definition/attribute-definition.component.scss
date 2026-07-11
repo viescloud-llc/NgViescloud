@@ -1,0 +1,45 @@
+.schema-hint {
+  margin: 0.5rem 1rem;
+  padding: 0.5rem 0.75rem;
+  border-left: 3px solid var(--mat-sys-tertiary, goldenrod);
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: var(--mat-sys-on-surface-variant, inherit);
+
+  strong {
+    color: var(--mat-sys-tertiary, goldenrod);
+  }
+}
+
+.return-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  border-left: 4px solid var(--mat-sys-primary, #7c4dff);
+  background: var(--mat-sys-surface-container-low, rgba(255, 255, 255, 0.03));
+  border-radius: 4px;
+  color: var(--mat-sys-on-surface, inherit);
+  font-size: 0.95rem;
+
+  button {
+    flex: 0 0 auto;
+  }
+}
+
+.option-add-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+
+  app-mat-form-field-input {
+    flex: 1 1 auto;
+  }
+
+  button {
+    flex: 0 0 auto;
+    margin-top: 0.25rem;
+  }
+}

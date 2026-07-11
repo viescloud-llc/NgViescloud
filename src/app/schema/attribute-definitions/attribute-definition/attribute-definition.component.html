@@ -1,0 +1,83 @@
+<ul class="margin-center" appMatFormFieldGroup (onAllInputCheck)="validForm.set($event)">
+
+  <!-- Return-to-product banner. Shown only when the admin arrived here via the
+       "Create new attribute definition" button on the product editor — the
+       query param carried the originating product's UUID. Give a one-click way
+       back so they don't lose their place. -->
+  @if (returnToProductId()) {
+    <li class="return-banner">
+      <span>You're creating this definition from a product editor.</span>
+      <button matButton="filled" (click)="backToProduct()" type="button">
+        Back to product
+      </button>
+    </li>
+  }
+
+  <!-- Main definition fields (name, displayName, type, unit) auto-rendered from
+       the @MatInput* decorators on AttributeDefinition.
+
+       NOTE: not using `[(value)]` two-way binding here because the dynamic form
+       mutates `value` in place and re-emits the SAME reference — `model().set(sameRef)`
+       is a no-op under Angular's default Object.is equality, so signal-based
+       reactivity (e.g. the `showOptions` computed below) never re-evaluates.
+       We spread on every emit to force a new top-level reference. -->
+  <li>
+    <app-mat-form-field-input-dynamic
+      [value]="value()"
+      (valueChange)="onMainFormChange($event)"
+      [blankObject]="blankValue"
+      [inputMap]="inputField('def')
+                    .set(inputKeys.indent, false)
+                    .set(inputKeys.styleWidth, '100%')"
+    ></app-mat-form-field-input-dynamic>
+  </li>
+
+  <!-- Owned options editor — only meaningful for SELECT / MULTI_SELECT. -->
+  @if (showOptions()) {
+    <!-- Add-from-existing search + create-new popup, sitting above the inline list.
+         The search clones the picked option (id cleared) into the local list so
+         the cascade-save on the parent treats it as a new owned row. The popup
+         button opens a focused form that also appends to the local list. -->
+    <li class="option-add-row">
+      <app-mat-form-field-input
+        [value]="searchPick()"
+        (valueChange)="addFromExisting($event)"
+        [options]="globalMatOptions()"
+        [inputMap]="inputField('opt-search')
+                      .set(inputKeys.label, 'Add from existing option')
+                      .set(inputKeys.placeholder, 'Search by value or display label…')
+                      .set(inputKeys.manuallyEmitValue, true)
+                      .set(inputKeys.manuallyEmitValueHint, 'Press enter to add the picked option')
+                      .set(inputKeys.optionsAutoActiveFirst, true)
+                      .set(inputKeys.optionsrequireSelection, true)
+                      .set(inputKeys.styleWidth, '100%')"
+      ></app-mat-form-field-input>
+
+      <button matButton="filled" (click)="openCreateOptionDialog()" type="button">
+        Create new option
+      </button>
+    </li>
+
+    <!-- Inline list of options owned by this definition. Each row is rendered as
+         the AttributeOption form via @MatInput* decorators; drag reorder is
+         normalized to sortOrder at save (see save() override). -->
+    <li>
+      <app-mat-form-field-input-list
+        [(value)]="value()!.options!"
+        [blankObject]="blankOption"
+        [inputMap]="inputField('opts')
+                      .set(inputKeys.label, 'Options')
+                      .set(inputKeys.styleWidth, '100%')
+                      .set(inputKeys.showAddItemButton, true)
+                      .set(inputKeys.showRemoveItemButton, true)
+                      .set(inputKeys.showDragAndDropButton, true)"
+      ></app-mat-form-field-input-list>
+    </li>
+  }
+
+  <li class="flex-row-container-auto">
+    <button matButton="filled" (click)="save()" [disabled]="_value.isValueNotChange() || !validForm()">Save</button>
+    <button matButton="filled" class="warn" (click)="revert()" [disabled]="!_value.isValueChange()">Revert</button>
+    <button matButton="filled" class="warn" (click)="remove()" [disabled]="!id()">Delete</button>
+  </li>
+</ul>

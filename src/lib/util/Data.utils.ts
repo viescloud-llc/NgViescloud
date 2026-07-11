@@ -368,6 +368,15 @@ export class DataUtils {
    * check if the object has a prototype with a matching property name
    * with the suffix of MatItemSettingType.RECORD, if true, set the property
    * with an empty object.
+   *
+   * Additionally, clear backend-managed timestamp fields (`createdAt`,
+   * `updatedAt`) inherited from `TrackedTimeStamp` / `TrackedTimeStampUserAccess`.
+   * Those fields default to `new ViesDateTime()` on the model class, which
+   * would otherwise land in POST payloads and either confuse validation or be
+   * silently overwritten by the backend. Setting to `undefined` drops them
+   * from `JSON.stringify` output entirely, so POST requests carry no
+   * fabricated timestamp values.
+   *
    * @param obj the object to purge
    * @returns the purged object
    */
@@ -383,6 +392,13 @@ export class DataUtils {
         break;
       }
     }
+
+    // Strip backend-managed timestamps. Field-name-based (not type-based) so
+    // this works whether the value is currently a ViesDateTime, null, or the
+    // default. Only clears own properties — inherited getters on foreign
+    // objects aren't touched.
+    if (Object.hasOwn(obj, 'createdAt')) (obj as any).createdAt = undefined;
+    if (Object.hasOwn(obj, 'updatedAt')) (obj as any).updatedAt = undefined;
 
     return obj;
   }

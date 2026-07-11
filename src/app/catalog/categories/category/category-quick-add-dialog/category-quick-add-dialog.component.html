@@ -1,0 +1,25 @@
+<h2 mat-dialog-title>Quick-add parent category</h2>
+
+<mat-dialog-content>
+  <p class="hint">
+    Creates a new root category and sets it as the parent of the one you're editing.
+    You can flesh out its own parent, attributes, etc. by editing it later.
+  </p>
+
+  <ul appMatFormFieldGroup (onAllInputCheck)="validForm.set($event)">
+    <li>
+      <app-mat-form-field-input-dynamic
+        [(value)]="draft"
+        [blankObject]="blankCategory"
+        [inputMap]="inputField('cat-quick-add')
+                      .set(inputKeys.indent, false)
+                      .set(inputKeys.styleWidth, '100%')"
+      ></app-mat-form-field-input-dynamic>
+    </li>
+  </ul>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button matButton (click)="cancel()">Cancel</button>
+  <button matButton="filled" (click)="save()" [disabled]="!validForm()">Create &amp; set as parent</button>
+</mat-dialog-actions>

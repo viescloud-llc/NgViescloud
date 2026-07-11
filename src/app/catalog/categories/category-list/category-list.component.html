@@ -1,0 +1,54 @@
+<ul class="margin-center">
+
+  <!-- Search bar. Filter is client-side substring match on `name`. Matches include
+       their ancestors so the tree structure stays intact around the hit. -->
+  <li>
+    <app-mat-form-field-input
+      [value]="searchTerm()"
+      (valueChange)="searchTerm.set($event)"
+      [inputMap]="inputField('cat-search')
+                    .set(inputKeys.label, 'Search categories')
+                    .set(inputKeys.placeholder, 'Type to filter by name…')
+                    .set(inputKeys.showClearIcon, true)
+                    .set(inputKeys.styleWidth, '100%')"
+    ></app-mat-form-field-input>
+  </li>
+
+  <li>
+    <mat-tree #treeView [dataSource]="tree()" [childrenAccessor]="getChildren" class="category-tree">
+
+      <!-- Leaf node (no children). Indented via matTreeNodePadding for visual alignment with branches. -->
+      <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
+        <button mat-icon-button disabled aria-label="Leaf node">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+        <span class="cat-name">{{ node.category.name }}</span>
+        @if (node.category.id !== '__orphans__') {
+          <button matButton (click)="selectCategory(node.category)">Edit</button>
+          <button matButton (click)="createChild(node.category)">+ Add child</button>
+        }
+      </mat-tree-node>
+
+      <!-- Branch node (has children). Toggle button expands/collapses. -->
+      <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding>
+        <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.category.name">
+          <mat-icon>{{ treeView.isExpanded(node) ? 'expand_more' : 'chevron_right' }}</mat-icon>
+        </button>
+        <span class="cat-name">{{ node.category.name }}</span>
+        @if (node.category.id !== '__orphans__') {
+          <button matButton (click)="selectCategory(node.category)">Edit</button>
+          <button matButton (click)="createChild(node.category)">+ Add child</button>
+        }
+      </mat-tree-node>
+
+    </mat-tree>
+
+    @if (searchTerm() && filteredCategories().length === 0) {
+      <p class="empty-hint">No categories match "{{ searchTerm() }}".</p>
+    }
+  </li>
+  <br>
+  <li class="flex-row-container-auto">
+    <button matButton="filled" (click)="addCategory()">Add category</button>
+  </li>
+</ul>

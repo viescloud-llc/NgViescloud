@@ -1,0 +1,8 @@
+// Sit the navigation progress bar right under the header. `position: sticky`
+// keeps it at the top of the scroll area so the bar is visible no matter where
+// the user has scrolled when they kick off a lazy-load navigation.
+.app-nav-progress {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}

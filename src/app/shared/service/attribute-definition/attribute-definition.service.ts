@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ViesRestService } from '../../../../lib/service/rest.service';
-import { AttributeDefinition } from '../../model/product.model';
+import { AttributeDefinition } from '../../model/attribute.model';
 
 @Injectable({
   providedIn: 'root'

@@ -1,0 +1,13 @@
+.filter-row {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+
+  app-mat-form-field-input {
+    flex: 1 1 auto;
+  }
+
+  app-mat-form-field-input-option {
+    flex: 0 0 auto;
+  }
+}

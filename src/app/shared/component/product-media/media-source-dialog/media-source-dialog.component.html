@@ -1,0 +1,138 @@
+<h2 mat-dialog-title>
+  {{ data.initial ? 'Replace media' : 'Add media' }}
+</h2>
+
+<mat-dialog-content class="dialog-body">
+
+  <!-- Source mode: URL vs local upload. Radio, not a tab strip, because the
+       two flows are short and swapping needlessly re-renders would drop any
+       preview the admin has already loaded. -->
+  <mat-radio-group
+    class="mode-radio"
+    [value]="mode()"
+    (change)="onModeChange($event.value)"
+  >
+    <mat-radio-button value="url">From URL</mat-radio-button>
+    <mat-radio-button value="upload">Upload file</mat-radio-button>
+  </mat-radio-group>
+
+  <!-- ============= URL MODE ============= -->
+  @if (mode() === 'url') {
+    <div class="row">
+      <mat-form-field appearance="outline" class="grow">
+        <mat-label>Media URL</mat-label>
+        <input
+          matInput
+          type="url"
+          [ngModel]="urlInput()"
+          (ngModelChange)="urlInput.set($event)"
+          placeholder="https://example.com/image.jpg"
+        />
+      </mat-form-field>
+      <button matButton="filled"
+              (click)="loadUrlPreview()"
+              [disabled]="!urlInput().trim() || previewStatus() === 'loading'"
+              type="button">
+        Load preview
+      </button>
+    </div>
+
+    <!-- Storage choice — only relevant once we've confirmed the URL resolves.
+         Hidden until a preview loads to keep the initial dialog small. -->
+    @if (previewStatus() === 'ok-direct' || previewStatus() === 'ok-proxied') {
+      <div class="storage-choice">
+        <p class="hint">
+          @if (previewStatus() === 'ok-proxied') {
+            The URL couldn't be fetched by the browser directly (usually CORS),
+            so it was loaded through our backend. Choose how to save it:
+          } @else {
+            The URL loaded successfully. Choose how to save it:
+          }
+        </p>
+        <mat-radio-group
+          [value]="storageChoice()"
+          (change)="storageChoice.set($event.value)"
+          class="storage-radio"
+        >
+          <mat-radio-button value="external">
+            Keep the original URL <em>(no upload)</em>
+          </mat-radio-button>
+          <mat-radio-button value="upload">
+            Save a copy on our service
+          </mat-radio-button>
+        </mat-radio-group>
+      </div>
+    }
+  }
+
+  <!-- ============= UPLOAD MODE ============= -->
+  @if (mode() === 'upload') {
+    <div class="row">
+      <!-- Constrained accept to image/video which are the only ProductMediaType
+           values right now. Keeping it broad enough for the browser's file
+           dialog to still show everything (accept is advisory, not enforced). -->
+      <label matButton="filled" class="file-picker-btn">
+        Choose file…
+        <input
+          type="file"
+          accept="image/*,video/*"
+          (change)="onFilePicked($event)"
+          hidden
+        />
+      </label>
+      @if (stagedFile()?.name) {
+        <span class="file-name">{{ stagedFile()?.name }}</span>
+      }
+    </div>
+  }
+
+  <!-- ============= PREVIEW AREA ============= -->
+  <div class="preview">
+    @if (previewStatus() === 'loading') {
+      <div class="preview-placeholder">
+        <mat-progress-spinner mode="indeterminate" diameter="32"></mat-progress-spinner>
+      </div>
+    } @else if (previewStatus() === 'failed') {
+      <div class="preview-placeholder failed">
+        <mat-icon>broken_image</mat-icon>
+        <span>Preview failed to load. Check the URL and try again.</span>
+      </div>
+    } @else if (previewUrl()) {
+      @if (mediaType() === ProductMediaType.VIDEO) {
+        <video [src]="previewUrl()" controls class="preview-media"></video>
+      } @else {
+        <img [src]="previewUrl()" alt="preview" class="preview-media" />
+      }
+    } @else {
+      <div class="preview-placeholder">
+        <mat-icon>image</mat-icon>
+        <span>No preview yet.</span>
+      </div>
+    }
+  </div>
+
+  <!-- Media type override. Auto-inferred from the fetched content-type, but
+       the admin can force IMAGE/VIDEO if the sniffing was wrong. -->
+  <mat-form-field appearance="outline" class="type-select">
+    <mat-label>Media Type</mat-label>
+    <mat-select
+      [value]="mediaType()"
+      (selectionChange)="mediaType.set($event.value)"
+    >
+      @for (t of mediaTypeValues; track t) {
+        <mat-option [value]="t">{{ t }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button matButton (click)="cancel()" type="button">Cancel</button>
+  <button matButton="filled"
+          (click)="save()"
+          [disabled]="!canSave()"
+          type="button">
+    Save
+  </button>
+</mat-dialog-actions>

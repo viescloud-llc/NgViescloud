@@ -28,6 +28,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatChipsModule } from '@angular/material/chips';
 import { DragDropModule } from '@angular/cdk/drag-drop';
@@ -64,6 +65,7 @@ const list = [
   MatSlideToggleModule,
   MatSliderModule,
   MatProgressSpinnerModule,
+  MatProgressBarModule,
   MatTooltipModule,
   MatChipsModule,
   DragDropModule,

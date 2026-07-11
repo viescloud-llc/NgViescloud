@@ -62,6 +62,18 @@ export class Pageable<T> {
     _metadata: PageableMetadata<T> = new PageableMetadata();
 }
 
+// Flat pagination shape returned by Spring controllers built on the newer Vies framework
+// (e.g. the Venzora backend). Use this for any list endpoint that hands back
+// `{ content, page, size, totalElements, totalPages }` directly. `Pageable<T>` above is the
+// older nested shape; both coexist until consumers migrate.
+export interface PageResponse<T> {
+    content: T[];
+    page: number;          // 0-based current page
+    size: number;          // requested page size
+    totalElements: number;
+    totalPages: number;
+}
+
 
 export type LoginRequest = {
     username?: string;
@@ -119,24 +131,32 @@ export class ViesDate {
     date?: string = '';
 
     static now(): ViesDate {
-        const now = new Date();
+        return ViesDate.fromJsDate(new Date());
+    }
 
-        const year = now.getFullYear();
-        const month = now.getMonth() + 1; // getMonth() is 0-based
-        const day = now.getDate();
-        const maxDayThisMonth = new Date(year, month, 0).getDate(); // Get max day of current month
+    static fromJsDate(d: Date): ViesDate {
+        const year = d.getFullYear();
+        const month = d.getMonth() + 1; // getMonth() is 0-based
+        const day = d.getDate();
+        const maxDayThisMonth = new Date(year, month, 0).getDate();
         const zoneId = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const date = d.toISOString().split('T')[0].replaceAll('-', '/'); // YYYY/MM/DD
 
-        const date = now.toISOString().split('T')[0].replaceAll('-', '/');  // YYYY/MM/DD
+        const out = new ViesDate();
+        out.year = year;
+        out.month = month;
+        out.day = day;
+        out.maxDayThisMonth = maxDayThisMonth;
+        out.date = date;
+        out.zoneId = zoneId;
+        return out;
+    }
 
-        return {
-            year,
-            month,
-            day,
-            maxDayThisMonth,
-            date,
-            zoneId
-        }
+    // Static so it works on plain object literals from the wire too, not only class instances.
+    // Midnight local time on the given date.
+    static toJsDate(dt?: ViesDate | null): Date {
+        if (!dt) return new Date(NaN);
+        return new Date(dt.year ?? 1970, (dt.month ?? 1) - 1, dt.day ?? 1);
     }
 }
 
@@ -152,24 +172,33 @@ export class ViesTime {
     time?: string = '';
 
     static now(): ViesTime {
-        const now = new Date();
+        return ViesTime.fromJsDate(new Date());
+    }
 
-        const hour = now.getHours();
-        const minute = now.getMinutes();
-        const second = now.getSeconds();
-        const millis = now.getMilliseconds();
+    static fromJsDate(d: Date): ViesTime {
+        const hour = d.getHours();
+        const minute = d.getMinutes();
+        const second = d.getSeconds();
+        const millis = d.getMilliseconds();
         const zoneId = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const time = d.toISOString().split('T')[1].split('.')[0] + '.' + millis; // HH:MM:SS.MMM
 
-        const time = now.toISOString().split('T')[1].split('.')[0] + '.' + millis; // HH:MM:SS.MMM
+        const out = new ViesTime();
+        out.hour = hour;
+        out.minute = minute;
+        out.second = second;
+        out.millis = millis;
+        out.time = time;
+        out.zoneId = zoneId;
+        return out;
+    }
 
-        return {
-            hour,
-            minute,
-            second,
-            millis,
-            time,
-            zoneId
-        }
+    // Returns today's date with the given time-of-day. Useful for binding to mat-timepicker etc.
+    static toJsDate(t?: ViesTime | null): Date {
+        if (!t) return new Date(NaN);
+        const d = new Date();
+        d.setHours(t.hour ?? 0, t.minute ?? 0, t.second ?? 0, t.millis ?? 0);
+        return d;
     }
 }
 
@@ -194,38 +223,53 @@ export class ViesDateTime {
     maxDayThisMonth?: number = 0;
 
     static now(): ViesDateTime {
-        const now = new Date();
+        return ViesDateTime.fromJsDate(new Date());
+    }
 
-        const year = now.getFullYear();
-        const month = now.getMonth() + 1; // getMonth() is 0-based
-        const day = now.getDate();
-        const hour = now.getHours();
-        const minute = now.getMinutes();
-        const second = now.getSeconds();
-        const millis = now.getMilliseconds();
-        const maxDayThisMonth = new Date(year, month, 0).getDate(); // Get max day of current month
+    static fromJsDate(d: Date): ViesDateTime {
+        const year = d.getFullYear();
+        const month = d.getMonth() + 1;
+        const day = d.getDate();
+        const hour = d.getHours();
+        const minute = d.getMinutes();
+        const second = d.getSeconds();
+        const millis = d.getMilliseconds();
+        const maxDayThisMonth = new Date(year, month, 0).getDate();
         const zoneId = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-        const time = now.toTimeString().split(' ')[0]; // "HH:MM:SS"
-        const date = now.toISOString().split('T')[0];  // "YYYY-MM-DD"
+        const time = d.toTimeString().split(' ')[0]; // "HH:MM:SS"
+        const date = d.toISOString().split('T')[0];  // "YYYY-MM-DD"
         const dateTime = `${date} | ${time}`;
 
-        let newDateTime = new ViesDateTime();
-        newDateTime.year = year;
-        newDateTime.month = month;
-        newDateTime.day = day;
-        newDateTime.hour = hour;
-        newDateTime.minute = minute;
-        newDateTime.second = second;
-        newDateTime.millis = millis;
-        newDateTime.zoneId = zoneId;
-        newDateTime.time = time;
-        newDateTime.date = date;
-        newDateTime.dateTime = dateTime;
-        newDateTime.offsetDayTime = now.toISOString();
-        newDateTime.zonedDayTime = now.toISOString();
-        newDateTime.maxDayThisMonth = maxDayThisMonth;
-        return newDateTime;
+        const out = new ViesDateTime();
+        out.year = year;
+        out.month = month;
+        out.day = day;
+        out.hour = hour;
+        out.minute = minute;
+        out.second = second;
+        out.millis = millis;
+        out.zoneId = zoneId;
+        out.time = time;
+        out.date = date;
+        out.dateTime = dateTime;
+        out.offsetDayTime = d.toISOString();
+        out.zonedDayTime = d.toISOString();
+        out.maxDayThisMonth = maxDayThisMonth;
+        return out;
+    }
+
+    static toJsDate(dt?: ViesDateTime | null): Date {
+        if (!dt) return new Date(NaN);
+        return new Date(
+            dt.year ?? 1970,
+            (dt.month ?? 1) - 1,
+            dt.day ?? 1,
+            dt.hour ?? 0,
+            dt.minute ?? 0,
+            dt.second ?? 0,
+            dt.millis ?? 0
+        );
     }
 }
 

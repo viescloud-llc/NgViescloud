@@ -1,0 +1,247 @@
+<ul class="margin-center" appMatFormFieldGroup (onAllInputCheck)="validForm.set($event)">
+  <li>
+    <mat-tab-group [preserveContent]="true" class="product-tabs">
+
+      <!-- =====================================================================
+           BASICS
+           name, description, currency, basePrice, baseSku, status via decorator-driven
+           dynamic form; category + tags via dedicated pickers.
+           ================================================================== -->
+      <mat-tab label="Basics">
+        <div class="tab-body">
+
+          <!-- Main scalar fields — auto-rendered from Product's @MatInput* decorators. -->
+          <app-mat-form-field-input-dynamic
+            [value]="value()"
+            (valueChange)="onMainFormChange($event)"
+            [blankObject]="blankValue"
+            [inputMap]="inputField('prod-main')
+                          .set(inputKeys.indent, false)
+                          .set(inputKeys.styleWidth, '100%')"
+          ></app-mat-form-field-input-dynamic>
+
+          <!-- Category picker: searchable autocomplete over all categories with
+               ancestry path in the label. Quick-add button reuses the same
+               CategoryQuickAddDialog from the Category editor. -->
+          <div class="picker-row">
+            <app-mat-form-field-input
+              [value]="selectedCategory()"
+              (valueChange)="onCategoryChange($event)"
+              [options]="categoryOptions()"
+              [inputMap]="inputField('prod-cat')
+                            .set(inputKeys.label, 'Category')
+                            .set(inputKeys.placeholder, 'Search categories…')
+                            .set(inputKeys.manuallyEmitValue, true)
+                            .set(inputKeys.manuallyEmitValueHint, 'Press enter to set')
+                            .set(inputKeys.optionsAutoActiveFirst, true)
+                            .set(inputKeys.optionsrequireSelection, true)
+                            .set(inputKeys.showClearIcon, true)
+                            .set(inputKeys.styleWidth, '100%')"
+            ></app-mat-form-field-input>
+            <button matButton="filled" (click)="openCreateCategoryDialog()" type="button">
+              Quick-add category
+            </button>
+          </div>
+
+          <!-- Tags multi-select — pick from the global Tag pool. Server upserts
+               the join rows on PUT. Quick-add button opens a popup for creating
+               a NEW Tag which POSTs immediately and appends to both the global
+               pool and this product's selection. -->
+          <div class="picker-row">
+            <app-mat-form-field-input-list-option
+              [value]="value()?.tags || []"
+              (valueChange)="onTagsChange($event)"
+              [options]="tagOptions()"
+              [inputMap]="inputField('prod-tags')
+                            .set(inputKeys.label, 'Tags')
+                            .set(inputKeys.styleWidth, '100%')
+                            .set(inputKeys.showSizeInput, false)
+                            .set(inputKeys.showSearchOption, true)
+                            .set(inputKeys.uniqueValue, true)"
+            ></app-mat-form-field-input-list-option>
+            <button matButton="filled" (click)="openCreateTagDialog()" type="button">
+              Quick-add tag
+            </button>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- =====================================================================
+           PRODUCT-LEVEL ATTRIBUTES
+           Each row is a pair of (definition picker, polymorphic value editor).
+           The backend no longer distinguishes product-level vs variant-level
+           definitions — the same pool is available on both this tab and the
+           Variants tab; the admin decides where to attach each definition.
+           ================================================================== -->
+      <mat-tab label="Attributes">
+        <div class="tab-body">
+          @if (isNewProduct()) {
+            <p class="save-first-hint">
+              <strong>Save the product first.</strong>
+              Attributes attach to the parent product's UUID, so this section
+              unlocks once you've filled out <em>Basics</em> and clicked <em>Save</em>.
+            </p>
+          } @else {
+          <p class="tab-hint">
+            <strong>Product-level attributes</strong> apply once per product
+            (e.g. Material, Country of Origin). Variant-level attributes
+            (Size, Color, …) go under the Variants tab.
+          </p>
+
+          @for (attr of value()?.attributes ?? []; track $index; let i = $index) {
+            <div class="attr-row">
+              <!-- Searchable definition picker (autocomplete). Uses the STABLE
+                   class-level `productLevelDefinitionOptions()` computed so the
+                   options reference doesn't thrash across CD cycles (the
+                   original "nothing happens" bug).
+                   NOT using `manuallyEmitValue` — combined with `requireSelection`
+                   the lib clears the input's formControl after emit, leaving the
+                   picker visually blank even though the value was set. Straight
+                   autocomplete-with-require-selection commits on option click /
+                   Enter cleanly. -->
+              <app-mat-form-field-input
+                [value]="attributeDefinitionValueFor(attr)"
+                (valueChange)="onProductAttributeDefinitionChange(i, $event)"
+                [options]="productLevelDefinitionOptions()"
+                class="attr-def-picker"
+                [inputMap]="inputField('attr-def-' + i)
+                              .set(inputKeys.label, 'Attribute')
+                              .set(inputKeys.placeholder, 'Search attribute definitions…')
+                              .set(inputKeys.optionsAutoActiveFirst, true)
+                              .set(inputKeys.optionsrequireSelection, true)
+                              .set(inputKeys.showClearIcon, true)
+                              .set(inputKeys.styleWidth, '100%')"
+              ></app-mat-form-field-input>
+
+              <!-- The polymorphic value editor. Renders the right control based
+                   on the picked definition's type and clears stale slots on
+                   emit. Only renders once a definition is picked. -->
+              @if (attr.attributeDefinition && attr.attributeDefinition.id) {
+                <app-attribute-value-field
+                  [definition]="attr.attributeDefinition"
+                  [value]="attr.attributeValue"
+                  (valueChange)="onProductAttributeValueChange(i, $event)"
+                  class="attr-value"
+                ></app-attribute-value-field>
+              }
+
+              <button mat-icon-button (click)="removeProductAttribute(i)"
+                      [matTooltip]="'Remove attribute'"
+                      type="button">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          }
+
+          <div class="add-row">
+            <button matButton="filled" (click)="addProductAttribute()" type="button">
+              Add attribute
+            </button>
+            <button matButton (click)="createNewAttributeDefinition()" type="button">
+              Create new attribute definition
+            </button>
+          </div>
+          }
+        </div>
+      </mat-tab>
+
+      <!-- =====================================================================
+           MEDIA
+           Amazon-style gallery (thumbnails + big preview + metadata form).
+           The gallery owns the Add/Replace flow via MediaSourceDialog, which
+           handles both "from URL" (with CORS-fallback via ViesHttpClientService)
+           and "from local upload" (via ObjectStorageService). isPrimary
+           uniqueness is enforced inside the gallery, so this parent just needs
+           to hand it the collection and receive the updated one back.
+           ================================================================== -->
+      <mat-tab label="Media">
+        <div class="tab-body">
+          @if (isNewProduct()) {
+            <p class="save-first-hint">
+              <strong>Save the product first.</strong>
+              Media rows attach to the parent product's UUID. Fill out
+              <em>Basics</em>, click <em>Save</em>, then come back here to add
+              images or videos.
+            </p>
+          } @else {
+            <app-product-media-gallery
+              [medias]="value()?.medias ?? []"
+              (mediasChange)="onMediasChange($event)"
+            ></app-product-media-gallery>
+          }
+        </div>
+      </mat-tab>
+
+      <!-- =====================================================================
+           VARIANTS
+           List-only table view. Edit/Add both navigate to the standalone
+           ProductVariantComponent at /catalog/products/:pid/variants/… . This
+           is the ONLY entry point into the variant editor by design (see the
+           `navigateTo*Variant()` handlers in the TS). No inline creation —
+           duplication happens on the variant editor via its Clone button.
+           ================================================================== -->
+      <mat-tab label="Variants">
+        <div class="tab-body">
+          @if (isNewProduct()) {
+            <p class="save-first-hint">
+              <strong>Save the product first.</strong>
+              Variants need the parent product's UUID before they can be created.
+              Fill out <em>Basics</em>, click <em>Save</em>, then come back here to
+              build them.
+            </p>
+          } @else {
+
+          <p class="tab-hint">
+            Each variant is a small version of the product with its own SKU,
+            price, stock, attributes, and media. Click <em>Add variant</em> to
+            create one, or click a row to edit it — variants open in a dedicated
+            editor page.
+          </p>
+
+          <!-- Unsaved-changes gate. Persistent hint + disabled buttons so the
+               admin can't accidentally navigate to the variant editor with
+               pending product changes. Guard also enforced in the handler. -->
+          @if (_value.isValueChange()) {
+            <p class="save-first-hint">
+              <strong>You have unsaved product changes.</strong>
+              Save or revert them first — variants can only be added or edited
+              when the product form is clean.
+            </p>
+          }
+
+          <div class="add-row">
+            <button matButton="filled"
+                    (click)="navigateToNewVariant()"
+                    [disabled]="_value.isValueChange()"
+                    type="button">
+              Add variant
+            </button>
+          </div>
+
+          <!-- Variants table. Click a row to open the standalone editor. -->
+          <h3>Variants ({{ value()?.variants?.length ?? 0 }})</h3>
+          @if ((value()?.variants ?? []).length === 0) {
+            <p class="empty-hint">No variants yet.</p>
+          } @else {
+            <app-mat-table
+              [matRows]="value()!.variants!"
+              [blankObject]="blankProductVariant"
+              (onEditRow)="navigateToEditVariant($event)"
+            ></app-mat-table>
+          }
+          }
+        </div>
+      </mat-tab>
+
+    </mat-tab-group>
+  </li>
+
+  <!-- Save / Revert / Delete — outside the tabs so the actions are always in view.
+       Save issues a PUT with the full product graph (variants, attributes, media)
+       — the backend cascade-saves them per intent § 5.1. -->
+  <li class="flex-row-container-auto">
+    <button matButton="filled" (click)="save()" [disabled]="_value.isValueNotChange() || !validForm()">Save</button>
+    <button matButton="filled" class="warn" (click)="revert()" [disabled]="!_value.isValueChange()">Revert</button>
+    <button matButton="filled" class="warn" (click)="remove()" [disabled]="!id()">Delete</button>
+  </li>
+</ul>

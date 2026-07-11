@@ -1,18 +1,7 @@
 import { Currency } from "../../../lib/model/currency.model";
-import { MatInputDisable, MatInputEnum, MatInputHide, MatInputItemSetting, MatInputRequire, MatInputSetting, MatInputSettings, MatItemSettingType, MatTableHide } from "../../../lib/model/mat.model";
-import { MatFormFieldInputKeys } from "../../../lib/model/mat.model";
-import { ViesDate, ViesDateTime, ViesTime } from "../../../lib/model/vies.model";
-
-export enum ProductAttributeType {
-    TEXT = "TEXT",
-    NUMBER = "NUMBER",
-    BOOLEAN = "BOOLEAN",
-    SELECT = "SELECT",
-    MULTI_SELECT = "MULTI_SELECT",
-    DATE = "DATE",
-    TIME = "TIME",
-    DATE_TIME = "DATE_TIME"
-}
+import { MatInputDisable, MatInputDisplayLabel, MatInputEnum, MatInputHide, MatInputItemSetting, MatInputListSetting, MatInputRequire, MatItemSettingType, MatTableHide } from "../../../lib/model/mat.model";
+import { AttributeDefinition, ProductAttribute, ProductVariantAttribute } from "./attribute.model";
+import { TrackedTimeStamp } from "./tracked.model";
 
 export enum ProductStatus {
     DRAFT = "DRAFT",
@@ -27,360 +16,226 @@ export enum ProductVariantStatus {
     OUT_OF_STOCK = "OUT_OF_STOCK"
 }
 
+// How a variant's `price` field is interpreted at read time. Server resolves
+// this into `effectivePrice`; the frontend only echoes it for preview.
+export enum VariantPriceMode {
+    NORMAL = "NORMAL",                        // price IS the effective price
+    FLAT_ADJUSTMENT = "FLAT_ADJUSTMENT",      // price is a signed delta on product.basePrice
+    PERCENT_ADJUSTMENT = "PERCENT_ADJUSTMENT" // price is a signed % on product.basePrice
+}
+
 export enum ProductMediaType {
     IMAGE = "IMAGE",
     VIDEO = "VIDEO"
 }
 
-export class AttributeValue {
-    textValue: string = '';
-    numberValue: number = 0;
-    booleanValue: boolean = false;
-    dateValue: ViesDate = new ViesDate();
-    timeValue: ViesTime = new ViesTime();
-    dateTimeValue: ViesDateTime = new ViesDateTime();
-    selectValue: AttributeOption = new AttributeOption();
-    multiSelectValues: AttributeOption[] = [new AttributeOption()];
-}
+export class Tag {
+    @MatInputDisable()
+    @MatInputDisplayLabel('ID')
+    id: string = '';
 
-export class AttributeOption {
-    @MatInputSettings(
-        {disable: true},
-        {type: MatFormFieldInputKeys.label, value: 'ID'}
-    )
-    id: number = 0;
-    // attributeDefinition: AttributeDefinition = new AttributeDefinition(); // this will prevent circular dependency
-
-    @MatInputSettings(
-        {require: true},
-        {type: MatFormFieldInputKeys.label, value: 'Value (accual value)'}
-    )
-    value: string = '';
-
-    @MatInputSettings(
-        {require: true},
-        {type: MatFormFieldInputKeys.label, value: 'Display Value (label)'}
-    )
-    displayValue: string = '';
-
-    @MatInputSettings(
-        {},
-        {type: MatFormFieldInputKeys.label, value: 'Sort Order'}
-    )
-    sortOrder: number = 0;
-}
-
-export class AttributeDefinition {
-    @MatInputSettings(
-        {disable: true},
-        {type: MatFormFieldInputKeys.label, value: 'ID'}
-    )
-    id: number = 0;
-
-    @MatInputSettings(
-        {require: true},
-        {type: MatFormFieldInputKeys.label, value: 'Name'}
-    )
+    @MatInputDisplayLabel('Name', 'e.g "Tshirt" or "Jeans"')
+    @MatInputRequire()
     name: string = '';
 
-    @MatInputSettings(
-        {require: true},
-        {type: MatFormFieldInputKeys.label, value: 'Display Name (label)'}
-    )
-    displayName: string = '';
-
-    @MatInputEnum(ProductAttributeType)
-    @MatInputSettings(
-        {},
-        {type: MatFormFieldInputKeys.label, value: 'Type'}
-    )
-    type: ProductAttributeType = ProductAttributeType.TEXT;
-
-    @MatInputSettings(
-        {},
-        {type: MatFormFieldInputKeys.label, value: 'Unit'},
-        {type: MatFormFieldInputKeys.placeholder, value: 'e.g "cm", "kg", "%"'},
-    )
-    unit: string = ''; // e.g., "cm", "kg", "%"
-
-    @MatInputSettings(
-        {},
-        {type: MatFormFieldInputKeys.label, value: 'Required'}
-    )
-    required: boolean = false;
-
-    @MatInputSettings(
-        {},
-        {type: MatFormFieldInputKeys.label, value: 'Variant Level'}
-    )
-    variantLevel: boolean = false; // true if this attribute creates variants
-
-    @MatInputSettings(
-        {hide: true},
-        {type: MatFormFieldInputKeys.label, value: 'Option'},
-        {type: MatFormFieldInputKeys.showListAddItemButton, value: true},
-        {type: MatFormFieldInputKeys.showListRemoveItemButton, value: true},
-    )
-    @MatTableHide()
-    options: AttributeOption[] = [new AttributeOption()];
-}
-
-export class ProductAttribute {
-    @MatInputSettings(
-        {disable: true},
-        {type: MatFormFieldInputKeys.label, value: 'ID'}
-    )
-    id: number = 0;
-
-    @MatInputSettings(
-        {hide: true},
-    )
-    AttributeDefinition: AttributeDefinition = new AttributeDefinition();
-
-    @MatInputSettings(
-        {hide: true},
-    )
-    attributeValue: AttributeValue = new AttributeValue();
+    @MatInputDisplayLabel('Description', 'Internal-only description of the tag.')
+    @MatInputItemSetting(MatItemSettingType.TEXT_AREA, true)
+    description: string = '';
 }
 
 export class Category {
-    @MatInputSettings(
-        {disable: true},
-        {type: MatFormFieldInputKeys.label, value: 'ID'}
-    )
-    id: number = 0;
+    @MatInputDisable()
+    @MatInputDisplayLabel('ID')
+    id: string = '';
 
-    @MatInputSettings(
-        {},
-        {type: MatFormFieldInputKeys.label, value: 'Name'}
-    )
+    @MatInputDisplayLabel('Name')
+    @MatInputRequire()
     name: string = '';
 
-    @MatInputSettings(
-        {},
-        {type: MatFormFieldInputKeys.label, value: 'Description'},
-        {type: MatFormFieldInputKeys.isTextArea, value: true}
-    )
+    @MatInputDisplayLabel('Description')
+    @MatInputItemSetting(MatItemSettingType.TEXT_AREA, true)
     description: string = '';
 
-    @MatInputSettings(
-        {hide: true},
-    )
-    parentCategoryId: number = 0;
+    // UUID of the parent — plain column on the backend, no FK. Cycle/orphan checks are client-side.
+    @MatInputHide()
+    parentCategoryId: string = '';
 
-    @MatInputSettings(
-        {hide: true},
-    )
+    // Which attribute definitions apply to products in this category.
+    @MatInputHide()
+    @MatTableHide()
     attributeDefinitions: AttributeDefinition[] = [new AttributeDefinition()];
 
-
-    @MatInputSettings(
-        {hide: true},
-    )
+    // @Transient on the backend — only present if the server enriches the response. Build the tree client-side from parentCategoryId.
+    @MatInputHide()
+    @MatTableHide()
     parentCategory?: Category;
 
-    @MatInputSettings(
-        {hide: true},
-    )
+    @MatInputHide()
+    @MatTableHide()
     childrenCategories?: Category[];
 }
 
-export class Tag {
-    @MatInputSettings(
-        {disable: true}, 
-        {type: MatFormFieldInputKeys.label, value: 'ID'}
-    )
-    id: number = 0;
-
-    @MatInputSettings(
-        {}, 
-        {type: MatFormFieldInputKeys.label, value: 'Name'},
-        {type: MatFormFieldInputKeys.placeholder, value: 'e.g "Tshirt" or "Jeans"'}
-    )
-    name: string = '';
-    
-    @MatInputSettings(
-        {}, 
-        {type: MatFormFieldInputKeys.label, value: 'Description'},
-        {type: MatFormFieldInputKeys.isTextArea, value: true},
-        {type: MatFormFieldInputKeys.placeholder, value: 'Give a detailed description of the tag. (this is only for internal use)'}
-    )
-    description: string = '';
-}
-
 export class ProductMedia {
-    @MatInputSettings(
-        {disable: true},
-        {type: MatFormFieldInputKeys.label, value: 'ID'}
-    )
-    id: number = 0;
+    @MatInputDisable()
+    @MatInputDisplayLabel('ID')
+    id: string = '';
 
-    @MatInputSettings(
-        {require: true},
-        {type: MatFormFieldInputKeys.label, value: 'URL'},
-        {type: MatFormFieldInputKeys.placeholder, value: 'e.g "https://example.com/image.jpg"'}
-    )
+    // Media attaches to EITHER a Product or a ProductVariant; the other side is null.
+    @MatInputHide()
+    @MatTableHide()
+    product?: Product;
+
+    @MatInputHide()
+    @MatTableHide()
+    productVariant?: ProductVariant;
+
+    // url and objectStorageDataId are managed by the media picker/gallery UI
+    // (from-URL / from-upload flow) rather than typed by the admin, so both are
+    // rendered as READ-ONLY in the metadata form — visible so the admin can
+    // see what's stored, but not editable directly (use the Replace button on
+    // the gallery instead). `url` holds whatever the storefront should render:
+    // either the original external link the admin pasted, or the vies backend
+    // link generated after uploading to object storage. `objectStorageDataId`
+    // is the id of the underlying stored file when the media was uploaded (or
+    // a remote URL was ingested via the backend service); empty when the admin
+    // chose to keep the raw external URL.
+    @MatInputDisable()
+    @MatInputDisplayLabel('URL')
+    @MatTableHide()
     url: string = '';
 
+    @MatInputDisable()
+    @MatInputDisplayLabel('Object Storage Data ID')
+    @MatTableHide()
+    objectStorageDataId: string = '';
+
     @MatInputEnum(ProductMediaType)
+    @MatInputDisplayLabel('Media Type')
     mediaType: ProductMediaType = ProductMediaType.IMAGE;
 
-    @MatInputSettings(
-        {},
-        {type: MatFormFieldInputKeys.label, value: 'Alt Text'},
-        {type: MatFormFieldInputKeys.placeholder, value: 'e.g "image of a tshirt"'}
-    )
+    @MatInputDisplayLabel('Alt Text', 'e.g "image of a tshirt"')
     altText: string = '';
 
-    @MatInputSettings(
-        {},
-        {type: MatFormFieldInputKeys.label, value: 'Caption'},
-    )
+    @MatInputDisplayLabel('Caption')
     caption: string = '';
 
-    @MatInputSettings(
-        {},
-        {type: MatFormFieldInputKeys.label, value: 'Sort Order'}
-    )
+    @MatInputDisplayLabel('Sort Order')
     sortOrder: number = 0;
 
-    @MatInputSettings(
-        {},
-        {type: MatFormFieldInputKeys.label, value: 'Is Primary'}
-    )
+    @MatInputDisplayLabel('Is Primary')
     isPrimary: boolean = false;
 }
 
-export class ProductVariantAttribute {
-    @MatInputSettings(
-        {disable: true},
-        {type: MatFormFieldInputKeys.label, value: 'ID'}
-    )
-    id: number = 0;
+export class ProductVariant extends TrackedTimeStamp {
+    @MatInputDisable()
+    @MatInputDisplayLabel('ID')
+    id: string = '';
 
-    @MatInputSettings(
-        {hide: true}
-    )
-    attributeDefinition: AttributeDefinition = new AttributeDefinition();
+    // Back-ref to parent product — omit on PUT to avoid recursion.
+    @MatInputHide()
+    @MatTableHide()
+    product?: Product;
 
-    @MatInputSettings(
-        {hide: true}
-    )
-    attributeValue: AttributeValue = new AttributeValue();
-}
-
-export class ProductVariant {
-    @MatInputSettings(
-        {disable: true},
-        {type: MatFormFieldInputKeys.label, value: 'ID'}
-    )
-    id: number = 0;
-
-    @MatInputSettings(
-        {},
-        {type: MatFormFieldInputKeys.label, value: 'SKU (Stock Keeping Unit)'},
-    )
+    @MatInputDisplayLabel('SKU (Stock Keeping Unit)')
     sku: string = '';
 
-    @MatInputSettings(
-        {},
-        {type: MatFormFieldInputKeys.label, value: 'Variant Name'},
-        {type: MatFormFieldInputKeys.placeholder, value: 'e.g "Blue T-Shirt" or "Black T-Shirt"'}
-    )
+    @MatInputDisplayLabel('Variant Name', 'e.g "Blue T-Shirt" or "Black T-Shirt"')
     variantName: string = '';
 
-    @MatInputSettings(
-        {},
-        {type: MatFormFieldInputKeys.label, value: 'Price'},
-    )
-    price: number = 0;
+    // Raw price input — meaning depends on `priceMode`. Server resolves this
+    // + priceMode into `effectivePrice` at read time. Hidden from the dynamic
+    // form and the mat-table because the variant editor renders a custom
+    // Pricing section (label/hint adapts to mode) and the variants table
+    // shows the resolved `effectivePrice` instead. BigDecimal-as-string.
+    @MatInputHide()
+    @MatTableHide()
+    price?: string = '0';
 
-    @MatInputSettings(
-        {},
-        {type: MatFormFieldInputKeys.label, value: 'Stock Quantity'},
-    )
+    // Selects how `price` is interpreted. Defaults to NORMAL so existing
+    // one-mode variants keep working. Same reason for hiding from form/table
+    // as `price` — it's rendered in the custom Pricing section.
+    @MatInputHide()
+    @MatTableHide()
+    priceMode: VariantPriceMode = VariantPriceMode.NORMAL;
+
+    // Server-computed resolved price. READ-ONLY: never send back on PUT/POST
+    // (the save flow strips it). Hidden from the dynamic form (rendered as a
+    // live preview in the custom Pricing section), but VISIBLE in the
+    // variants table on the product page so admins can compare variants at
+    // a glance.
+    @MatInputHide()
+    @MatInputDisplayLabel('Effective Price')
+    effectivePrice?: string;
+
+    // Long on the backend, but always small enough for a JS number.
+    @MatInputDisplayLabel('Stock Quantity')
     stockQuantity: number = 0;
 
-    @MatInputSettings(
-        {},
-        {type: MatFormFieldInputKeys.label, value: 'Weight'},
-    )
-    weight: number = 0;
+    @MatInputDisplayLabel('Weight')
+    weight: string = '0';
 
     @MatInputEnum(ProductVariantStatus)
-    @MatInputSettings(
-        {},
-        {type: MatFormFieldInputKeys.label, value: 'Status'},
-    )
+    @MatInputDisplayLabel('Status')
     status: ProductVariantStatus = ProductVariantStatus.ACTIVE;
+
+    @MatInputHide()
+    @MatTableHide()
+    @MatInputListSetting(false, true, true)
     medias: ProductMedia[] = [new ProductMedia()];
+
+    @MatInputHide()
+    @MatTableHide()
+    @MatInputListSetting(false, true, true)
     attributeValues: ProductVariantAttribute[] = [new ProductVariantAttribute()];
 }
 
-//TODO: update model from backend
-export class Product {
-    @MatInputSettings(
-        {disable: true}, 
-        {type: MatFormFieldInputKeys.label, value: 'ID'}
-    )
-    id: number = 0;
+export class Product extends TrackedTimeStamp {
+    @MatInputDisable()
+    @MatInputDisplayLabel('ID')
+    id: string = '';
 
-    @MatInputSettings(
-        {require: true}, 
-        {type: MatFormFieldInputKeys.label, value: 'Name'}, 
-        {type: MatFormFieldInputKeys.placeholder, value: 'e.g "Blue T-Shirt" or "Black T-Shirt"'}
-    )
+    @MatInputDisplayLabel('Name', 'e.g "Blue T-Shirt" or "Black T-Shirt"')
     name: string = '';
 
-    @MatInputSettings(
-        {}, 
-        {type: MatFormFieldInputKeys.isTextArea, value: true},
-        {type: MatFormFieldInputKeys.label, value: 'Description'}, 
-        {type: MatFormFieldInputKeys.placeholder, value: 'Give a detailed description of the product.'}
-    )
+    @MatInputDisplayLabel('Description', 'Give a detailed description of the product.')
+    @MatInputItemSetting(MatItemSettingType.TEXT_AREA, true)
     description: string = '';
 
     @MatInputHide()
+    @MatTableHide()
     category: Category = new Category();
 
     @MatInputEnum(Currency)
+    @MatInputDisplayLabel('Currency')
     currency: Currency = Currency.USD;
 
-    @MatInputSettings(
-        {}, 
-        {type: MatFormFieldInputKeys.label, value: 'Base Price'}
-    )
-    basePrice: number = 0;
+    // BigDecimal — keep as string.
+    @MatInputDisplayLabel('Base Price')
+    basePrice: string = '0';
 
-    @MatInputSettings(
-        {}, 
-        {type: MatFormFieldInputKeys.label, value: 'Base SKU (Stock Keeping Unit)'},
-        {type: MatFormFieldInputKeys.placeholder, value: 'e.g "TSHIRT-BLUE" or "TSHIRT-BLACK"'}
-    )
+    @MatInputDisplayLabel('Base SKU (Stock Keeping Unit)', 'e.g "TSHIRT-BLUE" or "TSHIRT-BLACK"')
     baseSku: string = '';
 
     @MatInputEnum(ProductStatus)
-    @MatInputSettings(
-        {}, 
-        {type: MatFormFieldInputKeys.label, value: 'Status'}
-    )
+    @MatInputDisplayLabel('Status')
     status: ProductStatus = ProductStatus.DRAFT;
 
-    @MatInputSettings(
-        {}, 
-        {type: MatFormFieldInputKeys.label, value: 'Tags'},
-        {type: MatFormFieldInputKeys.showListAddItemButton, value: true},
-        {type: MatFormFieldInputKeys.showListRemoveItemButton, value: true},
-    )
-    tags: Tag[] = [new Tag()];
-    
+    // Hidden from the dynamic form because the product editor renders tags via
+    // a dedicated multi-select picker against the global Tag pool (better UX
+    // than inline sub-form editing).
     @MatInputHide()
+    @MatTableHide()
+    tags: Tag[] = [new Tag()];
+
+    @MatInputHide()
+    @MatTableHide()
     variants: ProductVariant[] = [new ProductVariant()];
 
     @MatInputHide()
+    @MatTableHide()
     attributes: ProductAttribute[] = [new ProductAttribute()];
 
     @MatInputHide()
+    @MatTableHide()
     medias: ProductMedia[] = [new ProductMedia()];
 }
-

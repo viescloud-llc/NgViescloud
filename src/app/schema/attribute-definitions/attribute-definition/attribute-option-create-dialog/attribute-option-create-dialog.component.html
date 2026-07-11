@@ -1,0 +1,25 @@
+<h2 mat-dialog-title>Create new option</h2>
+
+<mat-dialog-content>
+  <p class="hint">
+    The option will be added to this attribute definition. It is persisted when
+    you save the parent definition.
+  </p>
+
+  <ul appMatFormFieldGroup (onAllInputCheck)="validForm.set($event)">
+    <li>
+      <app-mat-form-field-input-dynamic
+        [(value)]="draft"
+        [blankObject]="blankOption"
+        [inputMap]="inputField('opt-create')
+                      .set(inputKeys.indent, false)
+                      .set(inputKeys.styleWidth, '100%')"
+      ></app-mat-form-field-input-dynamic>
+    </li>
+  </ul>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button matButton (click)="cancel()">Cancel</button>
+  <button matButton="filled" (click)="save()" [disabled]="!validForm()">Add option</button>
+</mat-dialog-actions>

@@ -1,0 +1,144 @@
+<div class="gallery">
+
+  <!-- Header row: sits above both columns so "Add media" is always visible
+       regardless of what's selected. -->
+  <div class="gallery-header">
+    <h3 class="title">Media ({{ medias().length }})</h3>
+    <button matButton="filled" (click)="openAdd()" type="button">
+      <mat-icon>add_photo_alternate</mat-icon>
+      Add media
+    </button>
+  </div>
+
+  @if (isEmpty()) {
+    <div class="empty-state">
+      <mat-icon>collections</mat-icon>
+      <p>No media yet. Click <em>Add media</em> to upload a file or paste a URL.</p>
+    </div>
+  } @else {
+
+  <!-- Two-column body: thumbnails rail on the left, big preview + metadata on
+       the right. Collapses to a single column on narrow viewports (styled in
+       the SCSS). -->
+  <div class="gallery-body">
+
+    <!-- ============================ THUMBNAILS ============================ -->
+    <div class="thumb-rail">
+      @for (m of medias(); track $index; let i = $index) {
+        <button
+          class="thumb"
+          [class.selected]="selectedIndex() === i"
+          (click)="select(i)"
+          type="button"
+          [attr.aria-label]="'Media ' + (i + 1)"
+        >
+          @if (m.mediaType === ProductMediaType.VIDEO) {
+            <div class="thumb-video">
+              <mat-icon>play_circle</mat-icon>
+            </div>
+          } @else if (m.url) {
+            <img [src]="previewSrc(m)" alt="thumbnail" />
+          } @else {
+            <div class="thumb-empty">
+              <mat-icon>image</mat-icon>
+            </div>
+          }
+
+          @if (m.isPrimary) {
+            <span class="primary-badge" matTooltip="Primary media">
+              <mat-icon>star</mat-icon>
+            </span>
+          }
+        </button>
+      }
+    </div>
+
+    <!-- ============================ PREVIEW + ACTIONS + METADATA ========== -->
+    <div class="detail-pane">
+
+      <!-- BIG PREVIEW -->
+      <div class="big-preview">
+        @if (selected(); as m) {
+          @if (m.url) {
+            @if (m.mediaType === ProductMediaType.VIDEO) {
+              <video [src]="previewSrc(m)" controls></video>
+            } @else {
+              <img [src]="previewSrc(m)" [alt]="m.altText || 'preview'" />
+            }
+          } @else {
+            <div class="preview-placeholder">
+              <mat-icon>image</mat-icon>
+              <span>No source set. Click <em>Replace</em> to add one.</span>
+            </div>
+          }
+        }
+      </div>
+
+      <!-- ACTIONS TOOLBAR
+           Replace opens the media source dialog again with the current row's
+           values prefilled (reusable flow — same UI as Add). Move up/down
+           reorders + resyncs sortOrder. Star toggles primary uniqueness. -->
+      <div class="actions">
+        <button matButton="filled"
+                (click)="openReplace()"
+                [disabled]="!hasSelection()"
+                type="button">
+          <mat-icon>swap_horiz</mat-icon>
+          Replace
+        </button>
+        <button matButton
+                (click)="markPrimary()"
+                [disabled]="!hasSelection() || (selected()?.isPrimary ?? false)"
+                type="button">
+          <mat-icon>star</mat-icon>
+          Set as primary
+        </button>
+        <button matButton
+                (click)="moveSelected(-1)"
+                [disabled]="!hasSelection() || selectedIndex() === 0"
+                matTooltip="Move up in sort order"
+                type="button">
+          <mat-icon>arrow_upward</mat-icon>
+        </button>
+        <button matButton
+                (click)="moveSelected(1)"
+                [disabled]="!hasSelection() || selectedIndex() === medias().length - 1"
+                matTooltip="Move down in sort order"
+                type="button">
+          <mat-icon>arrow_downward</mat-icon>
+        </button>
+        <span class="spacer"></span>
+        <button matButton
+                class="warn"
+                (click)="removeSelected()"
+                [disabled]="!hasSelection()"
+                type="button">
+          <mat-icon>delete</mat-icon>
+          Delete
+        </button>
+      </div>
+
+      <!-- METADATA FORM
+           Auto-rendered from ProductMedia's decorators — url and
+           objectStorageDataId are @MatInputHide()'d so only altText, caption,
+           sortOrder, mediaType, and isPrimary appear here. Owned by the
+           gallery, not the parent, so the parent doesn't need to know which
+           fields the picker manages vs which it doesn't. -->
+      @if (selected(); as m) {
+        <ul appMatFormFieldGroup class="metadata-form">
+          <li>
+            <app-mat-form-field-input-dynamic
+              [value]="m"
+              (valueChange)="onMetadataChange($event)"
+              [blankObject]="blankMedia"
+              [inputMap]="inputField('media-meta-' + selectedIndex())
+                            .set(inputKeys.indent, false)
+                            .set(inputKeys.styleWidth, '100%')"
+            ></app-mat-form-field-input-dynamic>
+          </li>
+        </ul>
+      }
+    </div>
+  </div>
+  }
+</div>

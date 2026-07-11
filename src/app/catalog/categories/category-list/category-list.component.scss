@@ -1,0 +1,23 @@
+.category-tree {
+  background: transparent;
+
+  mat-tree-node {
+    min-height: 40px;
+    gap: 0.5rem;
+  }
+
+  .cat-name {
+    flex: 1 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.empty-hint {
+  margin: 1rem 0.5rem;
+  padding: 0.75rem 1rem;
+  border-left: 3px solid var(--mat-sys-outline-variant, #666);
+  color: var(--mat-sys-on-surface-variant, inherit);
+  font-style: italic;
+}

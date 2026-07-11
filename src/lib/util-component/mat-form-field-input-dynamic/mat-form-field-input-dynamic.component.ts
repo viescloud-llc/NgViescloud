@@ -275,19 +275,50 @@ export class MatFormFieldInputDynamicComponent extends MatFormFieldComponent {
     return item.containSetting(matItemSettingType);
   }
 
+  // The declared type wins. blankObject reflects the model's typed field
+  // (e.g. `basePrice: string = '0'`), which is authoritative — the runtime
+  // value can drift from that on the wire: BigDecimal fields declared as
+  // string arrive from the backend as JSON numbers (`0.5`, `12`); nullable
+  // strings arrive as `null`; booleans stored as tinyints in some DBs arrive
+  // as `0`/`1`. Deciding by the runtime type would drop those into "Unknown
+  // input type"; deciding by the declared type keeps the UI stable and lets
+  // the input control coerce the display.
+  //
+  // If blankObject itself is null/undefined (rare, only when the parent
+  // dynamic form couldn't resolve a blank for this key), fall back to the
+  // runtime value's type so we still render something sensible.
+  private declaredTypeIs(kind: 'string' | 'number' | 'boolean'): boolean {
+    if (this.blankObject !== null && this.blankObject !== undefined) {
+      return typeof this.blankObject === kind;
+    }
+    return typeof this.getValue() === kind;
+  }
+
   override isValueMultipleStringLine(): boolean {
-      return (super.isValueMultipleStringLine() || this.getInputValue(this.inputKeys.isTextArea)) && !this.getInputValue(this.inputKeys.isOptions);
+    if (!this.declaredTypeIs('string')) return false;
+    const v = this.getValue();
+    const isMulti = (typeof v === 'string' && v.includes('\n'))
+                 || (typeof this.blankObject === 'string' && this.blankObject.includes('\n'));
+    return (isMulti || this.getInputValue(this.inputKeys.isTextArea))
+        && !this.getInputValue(this.inputKeys.isOptions);
   }
 
   override isValueNonMultipleStringLine(): boolean {
-    return (super.isValueNonMultipleStringLine() && !this.getInputValue(this.inputKeys.isTextArea)) && !this.getInputValue(this.inputKeys.isOptions);
+    if (!this.declaredTypeIs('string')) return false;
+    const v = this.getValue();
+    const isMulti = (typeof v === 'string' && v.includes('\n'))
+                 || (typeof this.blankObject === 'string' && this.blankObject.includes('\n'));
+    return !isMulti
+        && !this.getInputValue(this.inputKeys.isTextArea)
+        && !this.getInputValue(this.inputKeys.isOptions);
   }
 
   override isValueNumber(): boolean {
-    if(this.blankObject)
-      return typeof this.blankObject === 'number' && !this.getInputValue(this.inputKeys.isOptions);
-    else
-      return super.isValueNumber() && !this.getInputValue(this.inputKeys.isOptions);
+    return this.declaredTypeIs('number') && !this.getInputValue(this.inputKeys.isOptions);
+  }
+
+  override isValueBoolean(): boolean {
+    return this.declaredTypeIs('boolean');
   }
 
   override isValueArray(): boolean {

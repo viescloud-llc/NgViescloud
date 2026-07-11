@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AttributeOption } from '../../model/product.model';
+import { AttributeOption } from '../../model/attribute.model';
 import { ViesRestService } from '../../../../lib/service/rest.service';
 
 @Injectable({

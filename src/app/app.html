@@ -11,6 +11,9 @@
     (onLogout)="authenticatorService.logOutManually()"
     (onLogin)="router.navigate([environment.endpoint_login])"
     ></vies-eco-header>
+    @if (isLazyChunkLoading()) {
+      <mat-progress-bar mode="indeterminate" class="app-nav-progress"></mat-progress-bar>
+    }
     <router-outlet></router-outlet>
   </mat-drawer-content>
 </mat-drawer-container>

@@ -119,8 +119,13 @@ export class RouteUtils {
     // Get the current URL using window.location.href
     const url = RouteUtils.getCurrentUrl();
 
-    // Split the URL into segments
-    const segments = url.split('/').filter((segment) => segment); // Remove empty segments
+    // Strip the query string and hash before splitting into path segments so
+    // callers reading a path variable don't get `myId?queryParam=foo` back.
+    // Without this, e.g. `/catalog/categories/new?parentId=xyz` would return
+    // `new?parentId=xyz` for the `categories` path variable and downstream
+    // `service.get(id)` calls would hit an invalid URL server-side.
+    const pathOnly = url.split('?')[0].split('#')[0];
+    const segments = pathOnly.split('/').filter((segment) => segment); // Remove empty segments
 
     // Find the index of the variable name
     const index = segments.indexOf(variableName);
