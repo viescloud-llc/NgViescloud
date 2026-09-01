@@ -76,13 +76,18 @@ export class ProductVariantComponent extends ViesRestApi<ProductVariant, Product
     { value: VariantPriceMode.PERCENT_ADJUSTMENT, label: 'Adjust base by percent' }
   ];
 
-  // Parent product's basePrice — needed for the client-side effectivePrice
-  // preview under adjustment modes. Fetched on init; live-updates the preview
-  // when it lands. If the fetch fails or is skipped (new-variant flow with no
-  // saved parent yet), preview falls back per the spec:
+  // Parent product — fetched on init. Feeds the "Editing a variant of X"
+  // banner (variants carry no product back-ref on the wire anymore) and the
+  // client-side effectivePrice preview (basePrice) under adjustment modes.
+  // If the fetch fails, the preview falls back per the spec:
   //   • basePrice missing → effectivePrice = raw price
   //   • adjustment mode + null price → effectivePrice = basePrice (delta 0)
-  parentBasePrice = signal<string | undefined>(undefined);
+  parentProduct = signal<Product | null>(null);
+
+  parentBasePrice = computed<string | undefined>(() => {
+    const base = this.parentProduct()?.basePrice;
+    return base === undefined || base === null ? undefined : String(base);
+  });
 
   // Adapt the price input's label to the current mode. Keeps a single input
   // field but shifts its meaning between "the price" and "adjustment".
@@ -137,18 +142,18 @@ export class ProductVariantComponent extends ViesRestApi<ProductVariant, Product
     if (pid && pid !== 'new') this.productId.set(pid);
 
     this.refreshAttributeDefinitions();
-    this.refreshParentBasePrice();
+    this.refreshParentProduct();
   }
 
-  // Fetch the parent product just for its basePrice — feeds the client-side
-  // effectivePrice preview under adjustment modes. Failures are swallowed:
-  // the preview simply falls back to the raw price (per spec).
-  private refreshParentBasePrice() {
+  // Fetch the parent product — feeds the banner name + the effectivePrice
+  // preview. Failures are swallowed: the banner falls back to a generic
+  // label and the preview to the raw price (per spec).
+  private refreshParentProduct() {
     const pid = this.productId();
     if (!pid) return;
     this.productService.get(pid).subscribe({
-      next: p => this.parentBasePrice.set(p?.basePrice),
-      error: () => { /* preview falls back; not a save-blocker */ }
+      next: p => this.parentProduct.set(p),
+      error: () => { /* banner/preview fall back; not a save-blocker */ }
     });
   }
 
@@ -200,7 +205,6 @@ export class ProductVariantComponent extends ViesRestApi<ProductVariant, Product
     cloned.medias?.forEach(m => { m.id = ''; });
     cloned.createdAt = undefined;
     cloned.updatedAt = undefined;
-    delete cloned.product;
 
     this._value.set(cloned);
 
@@ -401,13 +405,13 @@ export class ProductVariantComponent extends ViesRestApi<ProductVariant, Product
         parent.variants.map(v => v.id).filter((id): id is string => !!id)
       );
 
-      // Strip the child's back-reference to avoid recursion in the JSON
-      // payload — the parent context is implicit from nesting. Also drop
-      // `effectivePrice`, which is read-only / server-computed; per the spec
-      // the backend ignores it if sent, but stripping keeps payloads clean.
+      // Drop `effectivePrice` (read-only / server-computed; the backend
+      // ignores it if sent, but stripping keeps payloads clean) and coerce an
+      // empty-string price to undefined — price is BigDecimal on the wire and
+      // Jackson rejects "" (adjustment modes treat missing price as delta 0).
       const cleaned = structuredClone(draft) as ProductVariant;
-      delete cleaned.product;
       delete cleaned.effectivePrice;
+      if (cleaned.price === '') cleaned.price = undefined;
 
       // (3) splice into parent.variants
       if (existingId) {

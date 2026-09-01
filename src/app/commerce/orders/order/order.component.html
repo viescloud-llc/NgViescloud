@@ -1,0 +1,352 @@
+<ul class="margin-center" appMatFormFieldGroup (onAllInputCheck)="validForm.set($event)">
+
+  <!-- Return-to-list banner, always visible so admins have an obvious exit. -->
+  <li class="return-banner">
+    <span>
+      Editing order <strong>{{ value()?.orderNumber || '(no number)' }}</strong>
+      — status
+      <strong class="status-badge">{{ value()?.status }}</strong>
+    </span>
+    <button matButton="filled" (click)="backToList()" type="button">
+      Back to orders
+    </button>
+  </li>
+
+  <li>
+    <mat-tab-group [preserveContent]="true" class="order-tabs">
+
+      <!-- =====================================================================
+           BASICS
+           Server-managed scalars (orderNumber, userId, checkoutOrderId,
+           currency, all totals) are @MatInputDisable on the model and render
+           read-only. Status is editable, but changes should go through the
+           "Advance workflow" buttons below so the transition is legal.
+           ================================================================== -->
+      <mat-tab label="Basics">
+        <div class="tab-body">
+          <app-mat-form-field-input-dynamic
+            [value]="value()"
+            (valueChange)="onMainFormChange($event)"
+            [blankObject]="blankValue"
+            [inputMap]="inputField('order-basics')
+                          .set(inputKeys.indent, false)
+                          .set(inputKeys.styleWidth, '100%')"
+          ></app-mat-form-field-input-dynamic>
+
+          <!-- Status transitions. Buttons appear only for states legally
+               reachable from the current one; terminal states show none. -->
+          <div class="status-transitions">
+            <h3 class="section-title">Advance workflow</h3>
+            @if (availableTransitions().length === 0) {
+              <p class="empty-hint">
+                <strong>{{ value()?.status }}</strong> is a terminal state — no further transitions available.
+              </p>
+            } @else {
+              <p class="tab-hint">
+                Click a button to stage the transition; the change is not committed until you press <em>Save</em>.
+              </p>
+              <div class="transition-row">
+                @for (t of availableTransitions(); track t) {
+                  <button matButton="filled"
+                          (click)="advanceStatus(t)"
+                          type="button">
+                    → {{ transitionLabel(t) }}
+                  </button>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- Fulfillment actions — spin off a shipment or an RMA pre-linked
+               to this order. Both open the respective creation page with
+               ?orderId= so the link is stamped automatically. -->
+          <div class="status-transitions">
+            <h3 class="section-title">Fulfillment actions</h3>
+            <div class="transition-row">
+              <button matButton="filled" (click)="createShipment()" type="button">
+                Create shipment
+              </button>
+              <button matButton="filled" (click)="createReturn()" type="button">
+                Create return
+              </button>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- =====================================================================
+           PAYMENT
+           Read-only view of the LIBRARY checkout module's CheckoutOrder,
+           resolved via checkoutOrderId. Fetched on demand — the shape isn't
+           mirrored in this repo, so scalar fields render generically and the
+           transaction audit log lists whatever the server returns.
+           ================================================================== -->
+      <mat-tab label="Payment">
+        <div class="tab-body">
+          @if (!value()?.checkoutOrderId) {
+            <p class="empty-hint">
+              This order has no linked payment record (missing checkout order id).
+            </p>
+          } @else {
+            <p class="tab-hint">
+              Payment state lives in the checkout service — this panel is
+              read-only. Refunds are issued from the linked
+              <em>Return</em> (Fulfillment actions → Create return).
+            </p>
+
+            <div class="transition-row">
+              <button matButton="filled"
+                      (click)="loadPaymentInfo()"
+                      [disabled]="paymentLoadState() === 'loading'"
+                      type="button">
+                {{ paymentLoadState() === 'loaded' ? 'Refresh payment info' : 'Load payment info' }}
+              </button>
+            </div>
+
+            @if (paymentLoadState() === 'failed') {
+              <p class="empty-hint">Failed to load the payment record. Try again.</p>
+            }
+
+            @if (paymentLoadState() === 'loaded') {
+              <div class="metadata-panel">
+                <h3 class="section-title">Checkout order</h3>
+                <table class="metadata-table">
+                  <tbody>
+                    @for (e of paymentScalarEntries(); track e.key) {
+                      <tr>
+                        <td class="key">{{ e.key }}</td>
+                        <td class="value">{{ e.value }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="metadata-panel">
+                <h3 class="section-title">Purchased items ({{ paymentLineItems().length }})</h3>
+                @if (paymentLineItems().length === 0) {
+                  <p class="empty-hint">No line items on the payment record.</p>
+                }
+                @for (item of paymentLineItems(); track $index) {
+                  <table class="metadata-table tx-table">
+                    <tbody>
+                      @for (e of lineItemEntries(item); track e.key) {
+                        <tr>
+                          <td class="key">{{ e.key }}</td>
+                          <td class="value">{{ e.value }}</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                }
+              </div>
+            }
+          }
+        </div>
+      </mat-tab>
+
+      <!-- =====================================================================
+           ITEMS
+           Read-only line-items snapshot. Product-side changes never
+           retroactively update this — that's why OrderFulfillmentItem carries
+           `productSnapshot` (a frozen JSON blob).
+           ================================================================== -->
+      <mat-tab label="Items">
+        <div class="tab-body">
+          <p class="tab-hint">
+            Line items captured at checkout. This is a snapshot — later product
+            or price changes don't affect what's shown here.
+          </p>
+
+          @if ((value()?.items ?? []).length === 0) {
+            <p class="empty-hint">No items on this order.</p>
+          } @else {
+            <app-mat-table
+              [matRows]="value()!.items!"
+              [blankObject]="blankOrderItem"
+            ></app-mat-table>
+          }
+        </div>
+      </mat-tab>
+
+      <!-- =====================================================================
+           ADDRESSES
+           Shipping + billing. Locked at checkout — dynamic form is rendered
+           disabled via inputMap so admins can inspect but not edit.
+           ================================================================== -->
+      <mat-tab label="Addresses">
+        <div class="tab-body">
+          <p class="tab-hint">
+            Addresses are locked at checkout time.
+          </p>
+
+          <div class="address-block">
+            <h3 class="section-title">Shipping address</h3>
+            @if (value()?.shippingAddress) {
+              <app-mat-form-field-input-dynamic
+                [value]="value()!.shippingAddress"
+                [blankObject]="blankAddress"
+                [inputMap]="inputField('ship-addr')
+                              .set(inputKeys.indent, false)
+                              .set(inputKeys.disable, true)
+                              .set(inputKeys.styleWidth, '100%')"
+              ></app-mat-form-field-input-dynamic>
+            } @else {
+              <p class="empty-hint">No shipping address on this order.</p>
+            }
+          </div>
+
+          <div class="address-block">
+            <h3 class="section-title">Billing address</h3>
+            @if (value()?.billingAddress) {
+              <app-mat-form-field-input-dynamic
+                [value]="value()!.billingAddress"
+                [blankObject]="blankAddress"
+                [inputMap]="inputField('bill-addr')
+                              .set(inputKeys.indent, false)
+                              .set(inputKeys.disable, true)
+                              .set(inputKeys.styleWidth, '100%')"
+              ></app-mat-form-field-input-dynamic>
+            } @else {
+              <p class="empty-hint">No billing address on this order.</p>
+            }
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- =====================================================================
+           METADATA
+           Two-panel viewer per intent § 5.11:
+             1. System audit (checkout.*, discount.*, tax.*, shipping.*) —
+                read-only history.
+             2. Manager notes (notes.*) — editable list grouped by topic, with
+                an "Add note" form at the bottom.
+           A third catch-all section shows any keys with unrecognized prefixes
+           (defensive — never expected in normal flows).
+           ================================================================== -->
+      <mat-tab label="Metadata">
+        <div class="tab-body">
+
+          <!-- System audit -->
+          <div class="metadata-panel">
+            <h3 class="section-title">System audit (read-only)</h3>
+            @if (systemMetadataEntries().length === 0) {
+              <p class="empty-hint">No system metadata captured on this order.</p>
+            } @else {
+              <table class="metadata-table">
+                <thead>
+                  <tr>
+                    <th>Key</th>
+                    <th>Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (e of systemMetadataEntries(); track e.key) {
+                    <tr>
+                      <td class="key">{{ e.key }}</td>
+                      <td class="value">{{ e.value }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            }
+          </div>
+
+          <!-- Manager notes -->
+          <div class="metadata-panel">
+            <h3 class="section-title">Manager notes</h3>
+            <p class="tab-hint">
+              Free-form notes namespaced under <code>notes.&lt;topic&gt;</code>.
+              Changes commit when you press <em>Save</em>.
+            </p>
+
+            @if (notesMetadataEntries().length === 0) {
+              <p class="empty-hint">No notes yet.</p>
+            } @else {
+              @for (e of notesMetadataEntries(); track e.key) {
+                <div class="note-row">
+                  <app-mat-form-field-input
+                    [value]="e.value"
+                    (valueChange)="updateNote(e.key, $event)"
+                    [inputMap]="inputField('note-' + e.key)
+                                  .set(inputKeys.label, notesTopicDisplay(e.key))
+                                  .set(inputKeys.isTextArea, true)
+                                  .set(inputKeys.styleWidth, '100%')"
+                    class="note-body"
+                  ></app-mat-form-field-input>
+                  <button mat-icon-button
+                          (click)="removeNote(e.key)"
+                          [matTooltip]="'Remove note'"
+                          type="button">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                </div>
+              }
+            }
+
+            <!-- Add note -->
+            <div class="add-note">
+              <app-mat-form-field-input
+                [value]="newNoteTopic()"
+                (valueChange)="newNoteTopic.set($event)"
+                [inputMap]="inputField('new-note-topic')
+                              .set(inputKeys.label, 'Topic')
+                              .set(inputKeys.placeholder, 'e.g. shipping-delay')
+                              .set(inputKeys.styleWidth, '260px')"
+              ></app-mat-form-field-input>
+
+              <app-mat-form-field-input
+                [value]="newNoteBody()"
+                (valueChange)="newNoteBody.set($event)"
+                [inputMap]="inputField('new-note-body')
+                              .set(inputKeys.label, 'Note')
+                              .set(inputKeys.placeholder, 'What happened?')
+                              .set(inputKeys.isTextArea, true)
+                              .set(inputKeys.styleWidth, '100%')"
+                class="grow"
+              ></app-mat-form-field-input>
+
+              <button matButton="filled"
+                      (click)="addNote()"
+                      [disabled]="!canAddNote()"
+                      type="button">
+                Add note
+              </button>
+            </div>
+          </div>
+
+          <!-- Catch-all for unrecognized prefixes -->
+          @if (otherMetadataEntries().length > 0) {
+            <div class="metadata-panel">
+              <h3 class="section-title">Other metadata (read-only)</h3>
+              <table class="metadata-table">
+                <thead>
+                  <tr>
+                    <th>Key</th>
+                    <th>Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (e of otherMetadataEntries(); track e.key) {
+                    <tr>
+                      <td class="key">{{ e.key }}</td>
+                      <td class="value">{{ e.value }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      </mat-tab>
+
+    </mat-tab-group>
+  </li>
+
+  <!-- Save / Revert / Delete — always in view below the tabs. -->
+  <li class="flex-row-container-auto">
+    <button matButton="filled" (click)="save()" [disabled]="_value.isValueNotChange() || !validForm()">Save</button>
+    <button matButton="filled" class="warn" (click)="revert()" [disabled]="!_value.isValueChange()">Revert</button>
+    <button matButton="filled" class="warn" (click)="remove()" [disabled]="!id()">Delete</button>
+  </li>
+</ul>

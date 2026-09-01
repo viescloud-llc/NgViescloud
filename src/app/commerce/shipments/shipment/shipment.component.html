@@ -1,0 +1,92 @@
+<ul class="margin-center" appMatFormFieldGroup (onAllInputCheck)="validForm.set($event)">
+
+  <li class="return-banner">
+    <span>
+      @if (id()) {
+        Editing shipment <strong>{{ value()?.trackingNumber || '(no tracking number)' }}</strong>
+      } @else {
+        Creating a new shipment
+      }
+    </span>
+    <button matButton="filled" (click)="backToList()" type="button">
+      Back to shipments
+    </button>
+  </li>
+
+  <!-- Order link. Pick on create; read-only chip once saved. -->
+  <li class="order-link-block">
+    <h3 class="section-title">Order</h3>
+    @if (id() || hasOrderLink()) {
+      <div class="linked-order">
+        <span>
+          Linked to order
+          <strong>{{ selectedOrder()?.orderNumber || value()?.orderFulfillment?.id }}</strong>
+        </span>
+        <button matButton (click)="goToLinkedOrder()" type="button">
+          Open order
+        </button>
+      </div>
+    }
+    @if (!id()) {
+      <app-mat-form-field-input
+        [value]="selectedOrder()"
+        (valueChange)="onOrderChange($event)"
+        [options]="orderOptions()"
+        [inputMap]="inputField('shipment-order')
+                      .set(inputKeys.label, 'Order')
+                      .set(inputKeys.placeholder, 'Search by order number…')
+                      .set(inputKeys.optionsAutoActiveFirst, true)
+                      .set(inputKeys.optionsrequireSelection, true)
+                      .set(inputKeys.showClearIcon, true)
+                      .set(inputKeys.styleWidth, '100%')"
+      ></app-mat-form-field-input>
+    }
+  </li>
+
+  <!-- Main scalar fields (tracking number, carrier, status, notes, url). -->
+  <li>
+    <app-mat-form-field-input-dynamic
+      [value]="value()"
+      (valueChange)="onMainFormChange($event)"
+      [blankObject]="blankValue"
+      [inputMap]="inputField('shipment-main')
+                    .set(inputKeys.indent, false)
+                    .set(inputKeys.styleWidth, '100%')"
+    ></app-mat-form-field-input-dynamic>
+  </li>
+
+  <!-- Delivery dates — both REQUIRED by the backend (non-nullable columns). -->
+  <li class="dates-block">
+    <h3 class="section-title">Delivery dates</h3>
+    <p class="tab-hint">
+      Both dates are required. For not-yet-delivered shipments, set
+      <em>actual delivery</em> to your best estimate and correct it on arrival.
+    </p>
+    <div class="dates-row">
+      @if (value()?.estimatedDeliveryDate) {
+        <app-mat-form-field-input-time
+          [value]="value()!.estimatedDeliveryDate"
+          (valueChange)="onEstimatedDateChange($event)"
+          type="DATE"
+          [inputMap]="inputField('shipment-est-date')
+                        .set(inputKeys.label, 'Estimated delivery date')"
+        ></app-mat-form-field-input-time>
+      }
+      @if (value()?.actualDeliveryDate) {
+        <app-mat-form-field-input-time
+          [value]="value()!.actualDeliveryDate"
+          (valueChange)="onActualDateChange($event)"
+          type="DATE"
+          [inputMap]="inputField('shipment-act-date')
+                        .set(inputKeys.label, 'Actual delivery date')"
+        ></app-mat-form-field-input-time>
+      }
+    </div>
+  </li>
+
+  <li class="flex-row-container-auto">
+    <button matButton="filled" (click)="save()" [disabled]="_value.isValueNotChange() || !validForm()">Save</button>
+    <button matButton="filled" class="warn" (click)="revert()" [disabled]="!_value.isValueChange()">Revert</button>
+    <button matButton="filled" class="warn" (click)="remove()" [disabled]="!id()">Delete</button>
+  </li>
+</ul>

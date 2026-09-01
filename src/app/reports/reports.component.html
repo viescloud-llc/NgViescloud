@@ -1,0 +1,282 @@
+<ul class="margin-center">
+
+  <!-- ==========================================================================
+       PERIOD PICKER — one from/to drives every report below.
+       ======================================================================= -->
+  <li class="period-block">
+    <h3 class="section-title">Report period</h3>
+    <div class="period-row">
+      <app-mat-form-field-input-time
+        [value]="fromDate()"
+        (valueChange)="onFromChange($event)"
+        type="DATE"
+        [inputMap]="inputField('report-from').set(inputKeys.label, 'From')"
+      ></app-mat-form-field-input-time>
+      <app-mat-form-field-input-time
+        [value]="toDate()"
+        (valueChange)="onToChange($event)"
+        type="DATE"
+        [inputMap]="inputField('report-to').set(inputKeys.label, 'To')"
+      ></app-mat-form-field-input-time>
+
+      <div class="presets">
+        <button matButton (click)="setPresetDays(7)" type="button">7 days</button>
+        <button matButton (click)="setPresetDays(30)" type="button">30 days</button>
+        <button matButton (click)="setPresetDays(90)" type="button">90 days</button>
+        <button matButton (click)="setPresetThisMonth()" type="button">This month</button>
+        <button matButton (click)="setPresetThisYear()" type="button">This year</button>
+      </div>
+
+      <button matButton="filled"
+              (click)="runReports()"
+              [disabled]="loadState() === 'loading'"
+              type="button">
+        {{ loadState() === 'loading' ? 'Loading…' : 'Run reports' }}
+      </button>
+      <button matButton
+              (click)="downloadOrdersCsv()"
+              [disabled]="exportingOrders()"
+              type="button">
+        {{ exportingOrders() ? 'Exporting…' : 'Export raw orders CSV' }}
+      </button>
+    </div>
+  </li>
+
+  @if (loadState() === 'idle') {
+    <li><p class="empty-hint">Pick a period and press <strong>Run reports</strong>.</p></li>
+  }
+
+  @if (loadState() === 'loaded') {
+
+    <!-- ========================================================================
+         TAX FILING — the highest-value report. Grouped by jurisdiction; the
+         matching rule column is resolved against the CURRENT registry and is
+         informational only (historical record lives in order metadata.tax.*).
+         ===================================================================== -->
+    <li class="report-block">
+      <div class="block-header">
+        <h3 class="section-title">Tax filing</h3>
+        <button matButton="filled" (click)="downloadTaxCsv()" type="button">Download CSV</button>
+      </div>
+      <p class="tab-hint">
+        <em>Matching rule</em> is resolved against the current tax-rule registry —
+        informational only. The authoritative record of what was charged lives in
+        each order's <code>metadata.tax.*</code>.
+      </p>
+      @for (cur of taxReport()?.byCurrency ?? []; track cur.currency) {
+        <h4 class="currency-heading">{{ cur.currency }}</h4>
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th>Jurisdiction</th>
+              <th class="num">Orders</th>
+              <th class="num">Gross sales</th>
+              <th class="num">Taxable</th>
+              <th class="num">Tax collected</th>
+              <th class="num">Tax refunded</th>
+              <th class="num">Net tax</th>
+              <th class="num">Eff. rate</th>
+              <th>Matching rule</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (j of cur.jurisdictions; track $index) {
+              <tr>
+                <td>{{ jurisdictionLabel(j) }}</td>
+                <td class="num">{{ j.orderCount }}</td>
+                <td class="num">{{ j.grossSales }}</td>
+                <td class="num">{{ j.taxableAmount }}</td>
+                <td class="num">{{ j.taxCollected }}</td>
+                <td class="num">{{ j.taxRefunded }}</td>
+                <td class="num strong">{{ j.netTaxCollected }}</td>
+                <td class="num">{{ j.effectiveRate }}</td>
+                <td>{{ j.matchingRule?.name || '—' }}</td>
+              </tr>
+            }
+            <tr class="totals">
+              <td>Total</td>
+              <td class="num">{{ cur.totals.orderCount }}</td>
+              <td class="num">{{ cur.totals.grossSales }}</td>
+              <td></td>
+              <td class="num">{{ cur.totals.taxCollected }}</td>
+              <td class="num">{{ cur.totals.taxRefunded }}</td>
+              <td class="num strong">{{ cur.totals.netTaxCollected }}</td>
+              <td></td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      } @empty {
+        <p class="empty-hint">No captured orders in this period.</p>
+      }
+    </li>
+
+    <!-- ========================================================================
+         SALES SUMMARY — KPI cards per currency.
+         ===================================================================== -->
+    <li class="report-block">
+      <h3 class="section-title">Sales summary</h3>
+      @for (cur of salesSummary()?.byCurrency ?? []; track cur.currency) {
+        <h4 class="currency-heading">{{ cur.currency }}</h4>
+        <div class="kpi-row">
+          <div class="kpi"><span class="kpi-label">Orders</span><span class="kpi-value">{{ cur.orderCount }}</span></div>
+          <div class="kpi"><span class="kpi-label">Gross revenue</span><span class="kpi-value">{{ cur.grossRevenue }}</span></div>
+          <div class="kpi"><span class="kpi-label">Avg order</span><span class="kpi-value">{{ cur.averageOrderValue }}</span></div>
+          <div class="kpi"><span class="kpi-label">Discounts</span><span class="kpi-value">{{ cur.discounts }}</span></div>
+          <div class="kpi"><span class="kpi-label">Tax</span><span class="kpi-value">{{ cur.tax }}</span></div>
+          <div class="kpi"><span class="kpi-label">Shipping</span><span class="kpi-value">{{ cur.shipping }}</span></div>
+          <div class="kpi"><span class="kpi-label">Refunds</span><span class="kpi-value">{{ cur.refundCount }} / {{ cur.refundAmount }}</span></div>
+        </div>
+      } @empty {
+        <p class="empty-hint">No sales in this period.</p>
+      }
+    </li>
+
+    <!-- ========================================================================
+         SALES TIMESERIES — table per currency (chart rendering deferred).
+         ===================================================================== -->
+    <li class="report-block">
+      <h3 class="section-title">Sales over time ({{ salesTimeseries()?.bucket }})</h3>
+      @for (cur of salesTimeseries()?.byCurrency ?? []; track cur.currency) {
+        <h4 class="currency-heading">{{ cur.currency }}</h4>
+        <table class="report-table">
+          <thead>
+            <tr><th>Bucket</th><th class="num">Orders</th><th class="num">Revenue</th><th class="num">Tax</th></tr>
+          </thead>
+          <tbody>
+            @for (pt of cur.points; track pt.bucket) {
+              <tr>
+                <td>{{ pt.bucket }}</td>
+                <td class="num">{{ pt.orderCount }}</td>
+                <td class="num">{{ pt.revenue }}</td>
+                <td class="num">{{ pt.tax }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      } @empty {
+        <p class="empty-hint">No datapoints in this period.</p>
+      }
+    </li>
+
+    <!-- ========================================================================
+         LEADERBOARDS — top products / categories side by side.
+         ===================================================================== -->
+    <li class="report-block">
+      <h3 class="section-title">Leaderboards</h3>
+      <div class="leaderboards">
+        <div class="leaderboard">
+          <h4 class="currency-heading">Top products</h4>
+          @for (cur of topProducts()?.byCurrency ?? []; track cur.currency) {
+            <table class="report-table">
+              <thead>
+                <tr><th>Product ({{ cur.currency }})</th><th class="num">Units</th><th class="num">Revenue</th></tr>
+              </thead>
+              <tbody>
+                @for (p of cur.products; track p.productId) {
+                  <tr><td>{{ p.name }}</td><td class="num">{{ p.unitsSold }}</td><td class="num">{{ p.revenue }}</td></tr>
+                }
+              </tbody>
+            </table>
+          } @empty {
+            <p class="empty-hint">No product sales.</p>
+          }
+        </div>
+        <div class="leaderboard">
+          <h4 class="currency-heading">Top categories</h4>
+          @for (cur of topCategories()?.byCurrency ?? []; track cur.currency) {
+            <table class="report-table">
+              <thead>
+                <tr><th>Category ({{ cur.currency }})</th><th class="num">Units</th><th class="num">Revenue</th></tr>
+              </thead>
+              <tbody>
+                @for (c of cur.categories; track c.categoryId) {
+                  <tr><td>{{ c.name }}</td><td class="num">{{ c.unitsSold }}</td><td class="num">{{ c.revenue }}</td></tr>
+                }
+              </tbody>
+            </table>
+          } @empty {
+            <p class="empty-hint">No category sales.</p>
+          }
+        </div>
+      </div>
+    </li>
+
+    <!-- ========================================================================
+         GEOGRAPHY — orders/revenue per location.
+         ===================================================================== -->
+    <li class="report-block">
+      <h3 class="section-title">Geography ({{ geography()?.groupBy }})</h3>
+      @for (cur of geography()?.byCurrency ?? []; track cur.currency) {
+        <h4 class="currency-heading">{{ cur.currency }}</h4>
+        <table class="report-table">
+          <thead>
+            <tr><th>Location</th><th class="num">Orders</th><th class="num">Revenue</th></tr>
+          </thead>
+          <tbody>
+            @for (loc of cur.locations; track $index) {
+              <tr>
+                <td>{{ [loc.country, loc.state, loc.city].join(' / ') }}</td>
+                <td class="num">{{ loc.orderCount }}</td>
+                <td class="num">{{ loc.revenue }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      } @empty {
+        <p class="empty-hint">No geographic data.</p>
+      }
+    </li>
+
+    <!-- ========================================================================
+         ORDER PIPELINE + REFUNDS + CUSTOMERS — three compact panels.
+         ===================================================================== -->
+    <li class="report-block">
+      <div class="panels">
+        <div class="panel">
+          <h4 class="currency-heading">Order pipeline ({{ orderStatus()?.totalOrders }} total)</h4>
+          <table class="report-table">
+            <thead><tr><th>Status</th><th class="num">Count</th><th class="num">%</th></tr></thead>
+            <tbody>
+              @for (row of orderStatusRows(); track row.status) {
+                <tr><td>{{ row.status }}</td><td class="num">{{ row.count }}</td><td class="num">{{ row.percent }}</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div class="panel">
+          <h4 class="currency-heading">Refunds</h4>
+          <table class="report-table">
+            <thead><tr><th>Currency</th><th class="num">Orders</th><th class="num">Refunds</th><th class="num">Refunded</th><th class="num">Rate</th></tr></thead>
+            <tbody>
+              @for (cur of refunds()?.byCurrency ?? []; track cur.currency) {
+                <tr>
+                  <td>{{ cur.currency }}</td>
+                  <td class="num">{{ cur.totalOrders }}</td>
+                  <td class="num">{{ cur.refundCount }}</td>
+                  <td class="num">{{ cur.totalRefunded }}</td>
+                  <td class="num">{{ cur.refundRate }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div class="panel">
+          <h4 class="currency-heading">Customers ({{ customers()?.totalCustomers }} total)</h4>
+          @for (cur of customers()?.byCurrency ?? []; track cur.currency) {
+            <table class="report-table">
+              <thead><tr><th>User ({{ cur.currency }})</th><th class="num">Orders</th><th class="num">Revenue</th></tr></thead>
+              <tbody>
+                @for (c of cur.topByRevenue; track c.userId) {
+                  <tr><td class="mono">{{ c.userId }}</td><td class="num">{{ c.orderCount }}</td><td class="num">{{ c.revenue }}</td></tr>
+                }
+              </tbody>
+            </table>
+          }
+        </div>
+      </div>
+    </li>
+  }
+</ul>

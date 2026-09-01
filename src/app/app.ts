@@ -68,6 +68,93 @@ export class App extends ViescloudApplication {
       ]
     },
     {
+      title: 'Commerce',
+      hideChildren: true,
+      hideConditional: () => !this.authenticatorService.isAuthenticatedSync() || !this.authenticatorService.hasUserGroup(this.ADMIN_GROUP),
+      children: [
+        {
+          title: 'Orders',
+          routerLink: APP_ROUTES.commerceOrderList
+        },
+        {
+          title: 'Shipments',
+          routerLink: APP_ROUTES.commerceShipmentList
+        },
+        {
+          title: 'Returns',
+          routerLink: APP_ROUTES.commerceReturnList
+        },
+        {
+          title: 'Discounts',
+          routerLink: APP_ROUTES.commerceDiscountList
+        }
+      ]
+    },
+    {
+      title: 'Rules',
+      hideChildren: true,
+      hideConditional: () => !this.authenticatorService.isAuthenticatedSync() || !this.authenticatorService.hasUserGroup(this.ADMIN_GROUP),
+      children: [
+        {
+          title: 'Shipping Rules',
+          routerLink: APP_ROUTES.rulesShippingList
+        },
+        {
+          title: 'Tax Rules',
+          routerLink: APP_ROUTES.rulesTaxList
+        }
+      ]
+    },
+    {
+      title: 'Inventory',
+      hideChildren: true,
+      hideConditional: () => !this.authenticatorService.isAuthenticatedSync() || !this.authenticatorService.hasUserGroup(this.ADMIN_GROUP),
+      children: [
+        {
+          title: 'Stock',
+          routerLink: APP_ROUTES.inventoryStock
+        },
+        {
+          title: 'Stock Movements',
+          routerLink: APP_ROUTES.inventoryMovements
+        }
+      ]
+    },
+    {
+      title: 'Shop (Test)',
+      hideChildren: true,
+      hideConditional: () => !this.authenticatorService.isAuthenticatedSync(),
+      children: [
+        {
+          title: 'Products',
+          routerLink: APP_ROUTES.shopProducts
+        },
+        {
+          title: 'Cart',
+          routerLink: APP_ROUTES.shopCart
+        },
+        {
+          title: 'My Orders',
+          routerLink: APP_ROUTES.shopOrders
+        }
+      ]
+    },
+    {
+      title: 'Insights',
+      hideChildren: true,
+      hideConditional: () => !this.authenticatorService.isAuthenticatedSync() || !this.authenticatorService.hasUserGroup(this.ADMIN_GROUP),
+      children: [
+        {
+          title: 'Reports',
+          routerLink: APP_ROUTES.reports
+        },
+        {
+          title: 'Reviews',
+          routerLink: APP_ROUTES.reviews
+        }
+      ]
+    },
+    {
       title: 'Schema',
       hideChildren: true,
       hideConditional: () => !this.authenticatorService.isAuthenticatedSync() || !this.authenticatorService.hasUserGroup(this.ADMIN_GROUP),

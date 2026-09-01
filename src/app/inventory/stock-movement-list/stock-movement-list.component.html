@@ -1,0 +1,38 @@
+<ul class="margin-center">
+
+  <li>
+    <p class="tab-hint">
+      Append-only audit log. To correct a mistake, add a compensating
+      <strong>adjustment</strong> from the Stock page — history is never edited.
+    </p>
+  </li>
+
+  <li class="filter-row">
+    <app-mat-form-field-input
+      [value]="searchTerm()"
+      (valueChange)="searchTerm.set($event)"
+      [inputMap]="inputField('movement-search')
+                    .set(inputKeys.label, 'Search movements')
+                    .set(inputKeys.placeholder, 'By reason or reference…')
+                    .set(inputKeys.showClearIcon, true)
+                    .set(inputKeys.styleWidth, '100%')"
+    ></app-mat-form-field-input>
+
+    <app-mat-form-field-input-option
+      [value]="typeFilter()"
+      (valueChange)="typeFilter.set($event)"
+      [options]="typeOptions"
+      [noneLabel]="''"
+      [inputMap]="inputField('movement-type-filter')
+                    .set(inputKeys.label, 'Type')
+                    .set(inputKeys.styleWidth, '200px')"
+    ></app-mat-form-field-input-option>
+  </li>
+
+  <li>
+    <app-mat-table
+      [matRows]="filteredMovements()"
+      [blankObject]="blankMovement"
+    ></app-mat-table>
+  </li>
+</ul>

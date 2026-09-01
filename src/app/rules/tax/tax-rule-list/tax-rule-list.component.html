@@ -1,0 +1,98 @@
+<ul class="margin-center">
+
+  <li>
+    <p class="tab-hint">
+      Rules are listed in <strong>evaluation order</strong> — most specific
+      first (count of non-empty matchers), then priority. The first active rule
+      whose every non-empty matcher equals the shipping address wins.
+    </p>
+  </li>
+
+  <li>
+    <app-mat-table
+      [matRows]="sortedRules()"
+      [blankObject]="blankRule"
+      (onEditRow)="selectRule($event)"
+    ></app-mat-table>
+  </li>
+  <br>
+
+  <!-- Actions: add / export / import -->
+  <li class="flex-row-container-auto">
+    <button matButton="filled" (click)="addRule()">Add tax rule</button>
+    <button matButton="filled" (click)="exportRules()">Export JSON</button>
+  </li>
+
+  <li class="import-block">
+    <h3 class="section-title">Import rules</h3>
+    <p class="tab-hint">
+      Upload a JSON array of tax rules. <strong>Append</strong> inserts new rules
+      alongside the existing ones; <strong>Replace</strong> deletes every existing
+      rule first (transactional — a bad rule rolls the whole import back).
+    </p>
+    <div class="import-row">
+      <mat-radio-group [value]="importMode()" (change)="importMode.set($event.value)" class="mode-radio">
+        <mat-radio-button value="append">Append</mat-radio-button>
+        <mat-radio-button value="replace">Replace all</mat-radio-button>
+      </mat-radio-group>
+      <label matButton="filled" class="file-picker-btn">
+        Choose file…
+        <input type="file" accept="application/json,.json" (change)="onImportFilePicked($event)" hidden />
+      </label>
+    </div>
+  </li>
+
+  <!-- Test pad — client-side reproduction of the matcher. Informational only. -->
+  <li class="test-pad">
+    <h3 class="section-title">Test pad</h3>
+    <p class="tab-hint">
+      Type a shipping address to see which rule would match. Client-side echo of
+      the backend algorithm — informational only.
+    </p>
+    <div class="test-row">
+      <app-mat-form-field-input
+        [value]="testCountry()"
+        (valueChange)="testCountry.set($event)"
+        [inputMap]="inputField('test-country')
+                      .set(inputKeys.label, 'Country')
+                      .set(inputKeys.placeholder, 'US')
+                      .set(inputKeys.styleWidth, '140px')"
+      ></app-mat-form-field-input>
+      <app-mat-form-field-input
+        [value]="testState()"
+        (valueChange)="testState.set($event)"
+        [inputMap]="inputField('test-state')
+                      .set(inputKeys.label, 'State')
+                      .set(inputKeys.placeholder, 'NY')
+                      .set(inputKeys.styleWidth, '140px')"
+      ></app-mat-form-field-input>
+      <app-mat-form-field-input
+        [value]="testCity()"
+        (valueChange)="testCity.set($event)"
+        [inputMap]="inputField('test-city')
+                      .set(inputKeys.label, 'City')
+                      .set(inputKeys.styleWidth, '180px')"
+      ></app-mat-form-field-input>
+      <app-mat-form-field-input
+        [value]="testPostalCode()"
+        (valueChange)="testPostalCode.set($event)"
+        [inputMap]="inputField('test-postal')
+                      .set(inputKeys.label, 'Postal code')
+                      .set(inputKeys.styleWidth, '160px')"
+      ></app-mat-form-field-input>
+    </div>
+    @if (testResult().checked) {
+      @if (testResult().rule; as winner) {
+        <p class="test-result match">
+          Matches <strong>{{ winner.name }}</strong> — rate
+          <strong>{{ winner.rate }}%</strong>
+          (specificity {{ specificity(winner) }}, priority {{ winner.priority }})
+        </p>
+      } @else {
+        <p class="test-result none">
+          No active rule matches — checkout would apply <strong>zero tax</strong>.
+        </p>
+      }
+    }
+  </li>
+</ul>

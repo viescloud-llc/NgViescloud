@@ -80,14 +80,10 @@ export class ProductMedia {
     @MatInputDisplayLabel('ID')
     id: string = '';
 
-    // Media attaches to EITHER a Product or a ProductVariant; the other side is null.
-    @MatInputHide()
-    @MatTableHide()
-    product?: Product;
-
-    @MatInputHide()
-    @MatTableHide()
-    productVariant?: ProductVariant;
+    // NOTE: no product/productVariant back-refs — the backend schema dropped
+    // them (see backend-openapi.json). Parent attachment is decided purely by
+    // NESTING: medias inside product.medias belong to the product, medias
+    // inside variants[i].medias belong to that variant.
 
     // url and objectStorageDataId are managed by the media picker/gallery UI
     // (from-URL / from-upload flow) rather than typed by the admin, so both are
@@ -131,10 +127,9 @@ export class ProductVariant extends TrackedTimeStamp {
     @MatInputDisplayLabel('ID')
     id: string = '';
 
-    // Back-ref to parent product — omit on PUT to avoid recursion.
-    @MatInputHide()
-    @MatTableHide()
-    product?: Product;
+    // NOTE: no `product` back-ref — the backend schema dropped it. A variant's
+    // parent is implicit from nesting inside product.variants; the variant
+    // editor tracks the parent id from the URL instead.
 
     @MatInputDisplayLabel('SKU (Stock Keeping Unit)')
     sku: string = '';

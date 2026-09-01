@@ -1,0 +1,104 @@
+<div class="shop-page">
+  <div class="page-header">
+    <h2>Order {{ order()?.orderNumber || '' }}</h2>
+    <button matButton (click)="backToOrders()" type="button">Back to my orders</button>
+  </div>
+
+  @if (order(); as o) {
+
+    <!-- Status + complete-payment -->
+    <div class="panel">
+      <div class="status-row">
+        <span>Status: <span class="status-badge">{{ o.status }}</span></span>
+        @if (canCompletePayment()) {
+          <button matButton="filled"
+                  (click)="completePayment()"
+                  [disabled]="completing()"
+                  type="button">
+            {{ completing() ? 'Completing…' : 'Complete payment' }}
+          </button>
+        }
+      </div>
+      @if (canCompletePayment()) {
+        <p class="hint">
+          Payment hasn't been captured yet. If you already approved on PayPal,
+          press <strong>Complete payment</strong>.
+        </p>
+      }
+    </div>
+
+    <!-- Items + totals -->
+    <div class="panel">
+      <h3 class="section-title">Items</h3>
+      <table class="detail-table">
+        <thead>
+          <tr><th>SKU</th><th class="num">Qty</th><th class="num">Unit</th><th class="num">Total</th></tr>
+        </thead>
+        <tbody>
+          @for (item of o.items; track $index) {
+            <tr>
+              <td class="mono">{{ item.lineItemSku || item.productVariant.sku || '—' }}</td>
+              <td class="num">{{ item.quantity }}</td>
+              <td class="num">{{ item.unitPrice }}</td>
+              <td class="num">{{ item.totalPrice }}</td>
+            </tr>
+          }
+          <tr><td colspan="3">Subtotal</td><td class="num">{{ o.subtotal }}</td></tr>
+          <tr><td colspan="3">Discount</td><td class="num">-{{ o.discountAmount }}</td></tr>
+          <tr><td colspan="3">Tax</td><td class="num">{{ o.tax }}</td></tr>
+          <tr><td colspan="3">Shipping</td><td class="num">{{ o.shippingCost }}</td></tr>
+          <tr class="totals"><td colspan="3">Total</td><td class="num">{{ o.totalAmount }} {{ o.currency }}</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Shipping -->
+    <div class="panel">
+      <h3 class="section-title">Shipping</h3>
+      <p class="address">{{ addressLine() }}</p>
+
+      @if (shipments().length === 0) {
+        <p class="hint">No shipments yet.</p>
+      } @else {
+        <table class="detail-table">
+          <thead>
+            <tr><th>Tracking #</th><th>Carrier</th><th>Status</th><th>ETA</th></tr>
+          </thead>
+          <tbody>
+            @for (s of shipments(); track s.id) {
+              <tr>
+                <td class="mono">
+                  @if (s.trackingUrl) {
+                    <a [href]="s.trackingUrl" target="_blank" rel="noopener">{{ s.trackingNumber }}</a>
+                  } @else {
+                    {{ s.trackingNumber }}
+                  }
+                </td>
+                <td>{{ s.carrier }}</td>
+                <td><span class="status-badge">{{ s.status }}</span></td>
+                <td>{{ deliveryEta(s) }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+
+    <!-- Payment -->
+    <div class="panel">
+      <h3 class="section-title">Payment</h3>
+      @if (payment(); as p) {
+        <table class="detail-table">
+          <tbody>
+            <tr><td>Payment status</td><td>{{ p.status || '—' }}</td></tr>
+            <tr><td>Amount total</td><td>{{ p.amountTotal || '—' }}</td></tr>
+            <tr><td>Amount refunded</td><td>{{ p.amountRefunded || '—' }}</td></tr>
+            <tr><td>Line items</td><td>{{ p.items?.length ?? 0 }}</td></tr>
+          </tbody>
+        </table>
+      } @else {
+        <p class="hint">No payment record loaded.</p>
+      }
+    </div>
+  }
+</div>

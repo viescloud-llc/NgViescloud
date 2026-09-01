@@ -1,0 +1,59 @@
+<div class="shop-page">
+  <div class="page-header">
+    <h2>{{ product()?.name || 'Product' }}</h2>
+    <button matButton (click)="backToProducts()" type="button">Back to products</button>
+  </div>
+
+  @if (product(); as p) {
+    <div class="product-layout">
+      <div class="image-pane">
+        @if (imageUrl()) {
+          <img [src]="imageUrl()" [alt]="p.name" />
+        } @else {
+          <div class="no-image">no image</div>
+        }
+      </div>
+
+      <div class="buy-pane">
+        <p class="description">{{ p.description }}</p>
+        <p class="price">{{ unitPrice() }} {{ p.currency }}</p>
+
+        @if (variants().length > 0) {
+          <mat-form-field appearance="outline" class="wide">
+            <mat-label>Variant</mat-label>
+            <mat-select
+              [value]="selectedVariant()"
+              (selectionChange)="selectedVariant.set($event.value)"
+            >
+              @for (v of variants(); track v.id) {
+                <mat-option [value]="v">{{ variantLabel(v) }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        } @else {
+          <p class="no-variants">
+            This product has no variants — nothing can be added to a cart.
+          </p>
+        }
+
+        <mat-form-field appearance="outline" class="qty">
+          <mat-label>Quantity</mat-label>
+          <input
+            matInput
+            type="number"
+            min="1"
+            [ngModel]="quantity()"
+            (ngModelChange)="quantity.set($event)"
+          />
+        </mat-form-field>
+
+        <button matButton="filled"
+                (click)="addToCart()"
+                [disabled]="!canAdd()"
+                type="button">
+          Add to cart
+        </button>
+      </div>
+    </div>
+  }
+</div>

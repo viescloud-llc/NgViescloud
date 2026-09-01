@@ -1,0 +1,62 @@
+<ul class="margin-center" appMatFormFieldGroup (onAllInputCheck)="validForm.set($event)">
+
+  <li class="return-banner">
+    <span>
+      @if (id()) {
+        Editing discount <strong>{{ value()?.code || '(no code)' }}</strong>
+      } @else {
+        Creating a new discount
+      }
+    </span>
+    <button matButton="filled" (click)="backToList()" type="button">
+      Back to discounts
+    </button>
+  </li>
+
+  <!-- Main fields. discountType is part of this form; the hint below adapts. -->
+  <li>
+    <app-mat-form-field-input-dynamic
+      [value]="value()"
+      (valueChange)="onMainFormChange($event)"
+      [blankObject]="blankValue"
+      [inputMap]="inputField('discount-main')
+                    .set(inputKeys.indent, false)
+                    .set(inputKeys.styleWidth, '100%')"
+    ></app-mat-form-field-input-dynamic>
+
+    @if (valueHint()) {
+      <p class="tab-hint">{{ valueHint() }}</p>
+    }
+  </li>
+
+  <!-- Validity window -->
+  <li class="dates-block">
+    <h3 class="section-title">Validity window</h3>
+    <div class="dates-row">
+      @if (value()?.validFrom) {
+        <app-mat-form-field-input-time
+          [value]="value()!.validFrom"
+          (valueChange)="onValidFromChange($event)"
+          type="DATE"
+          [inputMap]="inputField('discount-valid-from')
+                        .set(inputKeys.label, 'Valid from')"
+        ></app-mat-form-field-input-time>
+      }
+      @if (value()?.validTo) {
+        <app-mat-form-field-input-time
+          [value]="value()!.validTo"
+          (valueChange)="onValidToChange($event)"
+          type="DATE"
+          [inputMap]="inputField('discount-valid-to')
+                        .set(inputKeys.label, 'Valid to')"
+        ></app-mat-form-field-input-time>
+      }
+    </div>
+  </li>
+
+  <li class="flex-row-container-auto">
+    <button matButton="filled" (click)="save()" [disabled]="_value.isValueNotChange() || !validForm()">Save</button>
+    <button matButton="filled" class="warn" (click)="revert()" [disabled]="!_value.isValueChange()">Revert</button>
+    <button matButton="filled" class="warn" (click)="remove()" [disabled]="!id()">Delete</button>
+  </li>
+</ul>

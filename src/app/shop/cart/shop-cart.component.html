@@ -1,0 +1,54 @@
+<div class="shop-page">
+  <div class="page-header">
+    <h2>Cart</h2>
+    <button matButton (click)="keepShopping()" type="button">Keep shopping</button>
+  </div>
+
+  @if (!loading()) {
+    @if (isEmpty()) {
+      <p class="empty">Your cart is empty.</p>
+    } @else {
+      <table class="cart-table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th class="num">Unit price</th>
+            <th class="num">Qty</th>
+            <th class="num">Line total</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of items(); track $index) {
+            <tr>
+              <td>{{ itemLabel(item) }}</td>
+              <td class="num">{{ item.priceAtTime }}</td>
+              <td class="num">
+                <input
+                  class="qty-input"
+                  type="number"
+                  min="1"
+                  [ngModel]="item.quantity"
+                  (ngModelChange)="changeQuantity(item, $event)"
+                />
+              </td>
+              <td class="num">{{ lineTotal(item) }}</td>
+              <td class="actions">
+                <button matButton class="warn" (click)="removeItem(item)" type="button">Remove</button>
+              </td>
+            </tr>
+          }
+          <tr class="totals">
+            <td colspan="3">Total</td>
+            <td class="num">{{ total() }}</td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="checkout-row">
+        <button matButton="filled" (click)="checkout()" type="button">Checkout</button>
+      </div>
+    }
+  }
+</div>

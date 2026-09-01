@@ -1,0 +1,21 @@
+<ul class="margin-center">
+
+  <li>
+    <p class="tab-hint">
+      One shipping rule per currency. Orders in a currency without an active
+      rule fall back to <strong>zero shipping</strong> (warn-logged server-side).
+    </p>
+  </li>
+
+  <li>
+    <app-mat-table
+      [matRows]="rules()"
+      [blankObject]="blankRule"
+      (onEditRow)="selectRule($event)"
+    ></app-mat-table>
+  </li>
+  <br>
+  <li class="flex-row-container-auto">
+    <button matButton="filled" (click)="addRule()">Add shipping rule</button>
+  </li>
+</ul>

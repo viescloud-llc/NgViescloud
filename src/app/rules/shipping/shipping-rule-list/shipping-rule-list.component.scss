@@ -1,0 +1,12 @@
+.tab-hint {
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  border-left: 3px solid var(--mat-sys-tertiary, goldenrod);
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: var(--mat-sys-on-surface-variant, inherit);
+
+  strong {
+    color: var(--mat-sys-tertiary, goldenrod);
+  }
+}

@@ -66,12 +66,25 @@ export class Pageable<T> {
 // (e.g. the Venzora backend). Use this for any list endpoint that hands back
 // `{ content, page, size, totalElements, totalPages }` directly. `Pageable<T>` above is the
 // older nested shape; both coexist until consumers migrate.
+// Pagination metadata block as the backend actually serializes it (see
+// backend-openapi.json `Metadata` schema — note the singular `totalElement` /
+// `totalPage` field names; they're not typos here).
+export interface PageMetadata {
+    pageNumber?: number;    // 0-based current page
+    pageSize?: number;      // requested page size
+    totalElement?: number;
+    totalPage?: number;
+    sort?: string;
+    filters?: unknown;
+    matchBy?: string;
+    matchCase?: string;
+}
+
+// Paginated response wrapper: `{ content: T[], _metadata: {...} }` per the
+// backend OpenAPI (NOT a flat {content, page, size, totalElements} shape).
 export interface PageResponse<T> {
     content: T[];
-    page: number;          // 0-based current page
-    size: number;          // requested page size
-    totalElements: number;
-    totalPages: number;
+    _metadata?: PageMetadata;
 }
 
 

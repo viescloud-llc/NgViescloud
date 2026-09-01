@@ -115,14 +115,14 @@ Intent § 5.3. Multi-section editor implemented as a `<mat-tab-group>` with `pre
 
 Intent § 5.4. Now means `OrderFulfillment`, and payment status lives on `CheckoutOrder` in the library.
 
-- [ ] `OrderListComponent` — queue at `/commerce/orders` with `FulfillmentStatus` filters + `orderNumber` search
-- [ ] `OrderComponent` — detail with status transitions (`PENDING` → `PROCESSING` → `SHIPPED` → `DELIVERED`)
-- [ ] **Payment-side fetch** — resolve `OrderFulfillment.checkoutOrderId` against library `GET /api/v1/checkout/orders/{id}` for `CheckoutOrder.status`, `amountTotal`, `amountRefunded`, transaction audit log
-- [ ] **Order metadata viewer** (intent § 5.11):
-  - [ ] System keys (`checkout.*`, `tax.*`, `discount.*`, `shipping.*`) rendered as read-only audit panel
-  - [ ] `notes.*` keys editable list grouped by topic; "add note" UI to create new `notes.<topic>` entries
-- [ ] Trigger shipment creation from the order detail
-- [ ] Trigger return creation from the order detail
+- [x] `OrderListComponent` ([src/app/commerce/orders/order-list/](../src/app/commerce/orders/order-list/)) — queue at `/commerce/orders/list` with `FulfillmentStatus` filter + `orderNumber` search. No Add button — orders come from checkout.
+- [x] `OrderComponent` ([src/app/commerce/orders/order/](../src/app/commerce/orders/order/)) — four-tab detail (Basics / Items / Addresses / Metadata / Payment). Status transitions gated by a `STATUS_TRANSITIONS` graph (UI-enforced since backend doesn't); transition buttons stage locally, Save commits. Server-managed fields (`orderNumber`, `currency`, totals) render disabled via model decorators. Items are a read-only snapshot table; addresses render as disabled dynamic forms.
+- [x] **Payment-side fetch** — `CheckoutOrderService` ([src/app/shared/service/checkout-order/](../src/app/shared/service/checkout-order/)) resolves `checkoutOrderId` against library `GET /api/v1/checkout/orders/{id}`. Loose-typed `CheckoutOrderView` (index signature) since the checkout module's shape isn't mirrored here; the Payment tab renders scalar fields generically + a transaction audit list. Fetched on demand, not on init.
+- [x] **Order metadata viewer** (intent § 5.11):
+  - [x] System keys (`checkout.*`, `tax.*`, `discount.*`, `shipping.*`) rendered as read-only audit table; unknown prefixes fall into a read-only catch-all panel
+  - [x] `notes.*` keys editable list grouped by topic; "add note" form auto-namespaces new topics under `notes.`
+- [x] Trigger shipment creation from the order detail (→ `/commerce/shipments/new?orderId=`)
+- [x] Trigger return creation from the order detail (→ `/commerce/returns/new?orderId=`)
 - [!] Webhook → fulfillment status listener (no backend yet — admins manually flip status after PayPal-dashboard events; see § 11)
 
 ---
@@ -131,11 +131,11 @@ Intent § 5.4. Now means `OrderFulfillment`, and payment status lives on `Checko
 
 Intent § 5.5. Now means `ReturnRequest` referencing `OrderFulfillment` + `OrderFulfillmentItem`.
 
-- [ ] `ReturnListComponent` — RMA queue at `/commerce/returns`
-- [ ] `ReturnComponent` — review reason, approve/reject, mark shipped/received/refunded, write `adminNotes`, set `refundAmount`
-- [ ] On approve + refundable: call library `POST /api/v1/checkout/orders/paypal/{checkoutOrderId}/refund?amount=&reason=`
-- [ ] After refund, update `OrderFulfillment.status` to `REFUNDED` / `PARTIALLY_REFUNDED`
-- [ ] Lifecycle guard: status transitions not enforced server-side, so the UI must guard
+- [x] `ReturnListComponent` ([src/app/commerce/returns/return-list/](../src/app/commerce/returns/return-list/)) — RMA queue at `/commerce/returns/list` with `ReturnStatus` filter + `returnNumber` search
+- [x] `ReturnComponent` ([src/app/commerce/returns/return/](../src/app/commerce/returns/return/)) — order+item pickers on create (item options filtered to the linked order's lines), decorator form for reason/`adminNotes`/`returnQuantity`/`refundAmount`/tracking, workflow buttons per the transition graph
+- [x] On refundable status (`APPROVED`/`RECEIVED`/`INSPECTING`) + payment link: "Issue PayPal refund" calls library `POST /api/v1/checkout/orders/paypal/{checkoutOrderId}/refund?amount=&reason=` (confirm-first; empty `refundAmount` = full refund)
+- [x] After refund, PATCHes `OrderFulfillment.status` to `REFUNDED` / `PARTIALLY_REFUNDED` (partial = refundAmount < order total), then stamps the return `REFUNDED` and saves
+- [x] Lifecycle guard: `RETURN_TRANSITIONS` graph in the component — terminal states show no buttons
 
 ---
 
@@ -143,8 +143,8 @@ Intent § 5.5. Now means `ReturnRequest` referencing `OrderFulfillment` + `Order
 
 Intent § 5.4 (implicitly).
 
-- [ ] `ShipmentListComponent` — active shipments + tracking at `/commerce/shipments`
-- [ ] `ShipmentComponent` — `trackingNumber` (unique), `carrier` (free text), `ShipmentStatus`, both delivery dates (BOTH non-nullable — UI must supply both on create)
+- [x] `ShipmentListComponent` ([src/app/commerce/shipments/shipment-list/](../src/app/commerce/shipments/shipment-list/)) — queue at `/commerce/shipments/list` with `ShipmentStatus` filter + tracking/carrier search
+- [x] `ShipmentComponent` ([src/app/commerce/shipments/shipment/](../src/app/commerce/shipments/shipment/)) — `trackingNumber` (unique → 409 via error dialog), `carrier`, `ShipmentStatus`, both delivery dates via `<app-mat-form-field-input-time>` date pickers (BOTH non-nullable — blank object defaults them to now so create always sends values). Order link: autocomplete on create (or pre-linked via `?orderId=`), read-only chip + "Open order" once saved. Save reduces the order ref to a bare `{id}`.
 
 ---
 
@@ -152,11 +152,11 @@ Intent § 5.4 (implicitly).
 
 Intent § 5.7.
 
-- [ ] `DiscountListComponent` at `/commerce/discounts`
-- [ ] `DiscountComponent` — `discountType` selector switches the meaning of `discountValue`; form adapts (borrow the polymorphic pattern)
-- [ ] `validFrom` / `validTo` via `<datetime-picker>` (TBD — relies on `DateTimeUtil`)
-- [ ] `currentUses` shown read-only (server-bumped at checkout)
-- [ ] No client-side validation logic — orchestrator enforces at checkout
+- [x] `DiscountListComponent` ([src/app/commerce/discounts/discount-list/](../src/app/commerce/discounts/discount-list/)) at `/commerce/discounts/list` — code/description search
+- [x] `DiscountComponent` ([src/app/commerce/discounts/discount/](../src/app/commerce/discounts/discount/)) — `discountType` selector in the decorator form; a mode-adaptive hint under the form explains what `discountValue` means per type (percent / amount / ignored / promo-encoded)
+- [x] `validFrom` / `validTo` via `<app-mat-form-field-input-time>` date pickers (hidden from the dynamic form — ViesDateTime would explode into a dozen scalar inputs)
+- [x] `currentUses` shown read-only (`@MatInputDisable`, server-bumped at checkout)
+- [x] No client-side validation logic — orchestrator enforces at checkout
 
 ---
 
@@ -166,20 +166,20 @@ Intent § 5.7.
 
 Intent § 5.8.1.
 
-- [ ] `ShippingRuleListComponent` at `/rules/shipping` — one row per currency
-- [ ] Add-rule flow: currency picker excludes currencies that already have a rule (DB-unique constraint)
-- [ ] Edit `flatFee`, `freeAboveAmount` (nullable disables threshold), `description`, `active`
+- [x] `ShippingRuleListComponent` ([src/app/rules/shipping/shipping-rule-list/](../src/app/rules/shipping/shipping-rule-list/)) at `/rules/shipping/list` — one row per currency, zero-shipping-fallback hint
+- [x] Add-rule flow: custom currency picker EXCLUDES currencies that already have a rule (own currency stays available on edit) — `currency` is `@MatInputHide` on the model so the dynamic form doesn't render a conflicting enum select
+- [x] Edit `flatFee`, `freeAboveAmount` (empty disables threshold — hint under the form), `description`, `active`
 
 ### 8.2 Tax rules
 
 Intent § 5.8.2. The most flexible piece.
 
-- [ ] `TaxRuleListComponent` at `/rules/tax` sorted by `(specificity DESC, priority DESC)` — the eval order
-- [ ] `TaxRuleComponent` — `name`, `rate`, four matcher fields each with "match any" toggle that nulls the field
-- [ ] **Export button** → `GET /api/v1/tax/rules/export` → download JSON
-- [ ] **Import modal** — file picker → `append`/`replace` toggle → `POST /api/v1/tax/rules/import?mode=`
-  - [ ] On `replace`: confirmation showing the count of existing rules that will be deleted
-- [ ] **Test pad** (nice-to-have) — type a shipping address, see which rule matches and the resulting tax (client-side reproduction of the algorithm)
+- [x] `TaxRuleListComponent` ([src/app/rules/tax/tax-rule-list/](../src/app/rules/tax/tax-rule-list/)) at `/rules/tax/list` sorted by `(specificity DESC, priority DESC)` — the eval order, called out in the header hint
+- [x] `TaxRuleComponent` ([src/app/rules/tax/tax-rule/](../src/app/rules/tax/tax-rule/)) — `name`, `rate`, four matcher fields (empty = match any, per-field placeholders), live specificity readout ("2/4 — state-level") under the form
+- [x] **Export button** → `GET /api/v1/tax/rules/export` → downloads `tax-rules.json`
+- [x] **Import** — file picker → `append`/`replace` radio → `POST /api/v1/tax/rules/import?mode=`
+  - [x] On `replace`: confirmation shows the count of existing rules that will be deleted
+- [x] **Test pad** — type a shipping address on the list page, see which rule wins (client-side reproduction of the matching algorithm; informational only)
 
 ---
 
@@ -187,9 +187,9 @@ Intent § 5.8.2. The most flexible piece.
 
 Intent § 5.6.
 
-- [ ] `StockComponent` at `/inventory/stock` — per-variant stock view, filter by category/product, "low stock" sub-view
-- [ ] Adjustment flow inserts new `StockMovement` (type `ADJUSTMENT`) — **never PATCH `quantityAfter`** (denormalized)
-- [ ] `StockMovementListComponent` at `/inventory/movements` — audit log, filter by variant/date/type
+- [x] `StockComponent` ([src/app/inventory/stock/](../src/app/inventory/stock/)) at `/inventory/stock` — per-variant stock joined with product names, product/variant/SKU search, low-stock-only toggle with an adjustable threshold (low rows highlighted)
+- [x] Adjustment flow: inline per-row panel inserts a new `StockMovement` (type `ADJUSTMENT`, quantityChange ±, required reason, optional reference) then re-fetches — **never PATCHes `quantityAfter`**
+- [x] `StockMovementListComponent` ([src/app/inventory/stock-movement-list/](../src/app/inventory/stock-movement-list/)) at `/inventory/movements` — append-only audit log, movement-type filter + reason/reference search
 
 ---
 
@@ -199,25 +199,26 @@ Intent § 5.6.
 
 Intent § 5.9.
 
-- [ ] `ReviewListComponent` at `/reviews` — plain table, rating sort, status filter, delete control
+- [x] `ReviewListComponent` ([src/app/reviews/review-list/](../src/app/reviews/review-list/)) at `/reviews` — table with product-name resolution (best-effort against the catalog), rating sort toggle (lowest-first default — the moderation view), search, per-row delete with confirm. No status filter — the Review model has no moderation-status field today.
 - [!] Public review write needs backend change (Review should extend `TrackedTimeStampUserAccess` or use the new `/me/reviews` endpoint — see § 11)
 
 ### 10.2 Reports & analytics
 
-Intent § 5.10. Hits `/api/v1/reports/*` (10 endpoints).
+Intent § 5.10. Hits `/api/v1/reports/*` (10 endpoints). All in one `ReportsComponent` ([src/app/reports/](../src/app/reports/)) at `/reports`.
 
-- [ ] `<ReportPeriodPicker>` shared component — every report takes the same `from`/`to`
-- [ ] Service that fans out the request set per period
-- [ ] **Tax filing** *(highest value)* — `/reports/tax`, table grouped by jurisdiction, CSV download. Caption that `matchingRule` is informational only; historical record lives in `OrderFulfillment.metadata.tax.*`
-- [ ] **Sales dashboard** — KPI cards (`/sales/summary`), line/bar chart (`/sales/timeseries?bucket=day`), product/category leaderboards, geography map
-- [ ] **Order pipeline** donut from `/reports/orders/status`
-- [ ] **Refunds + customers** cards
-- [ ] **Raw export** — stitch paginated `/reports/orders` into a CSV
+- [x] Period picker — from/to date pickers + presets (7/30/90 days, this month, this year); from = start-of-day, to = end-of-day
+- [x] "Run reports" fans out all nine read endpoints in parallel per period
+- [x] **Tax filing** *(highest value)* — `/reports/tax` table grouped by jurisdiction with per-currency totals rows, CSV download. Caption notes `matchingRule` is informational only; historical record lives in `OrderFulfillment.metadata.tax.*`
+- [~] **Sales dashboard** — KPI cards (`/sales/summary`), timeseries + leaderboards + geography as dense tables per currency. Chart rendering (lines/bars/map) deferred — correct numbers first; revisit with a charting pass.
+- [~] **Order pipeline** — status/count/% table from `/reports/orders/status` (donut deferred with the charting pass)
+- [x] **Refunds + customers** panels
+- [x] **Raw export** — stitches paginated `/reports/orders` (1000/page) into one `orders-export.csv`
 
 ### 10.3 Polish
 
 - [ ] Density-optimized tables across the app
 - [ ] Keyboard shortcuts (navigate list rows, save form, esc to close detail panel)
+- [ ] Chart rendering for the reports dashboard (timeseries line/bar, status donut, geography map)
 - [ ] AI-assisted features (auto-tag, auto-categorize) — defer per intent § 12
 
 ---
@@ -227,7 +228,7 @@ Intent § 5.10. Hits `/api/v1/reports/*` (10 endpoints).
 These block specific Manager features. Track them so we don't accidentally try to build around them.
 
 - [!] **Variant generator** — `POST /api/v1/products/{id}/generate-variants` would replace the loop-and-POST approach in the product editor (blocks § 3 generator efficiency)
-- [!] **Media uploader** — `ProductMedia.url` is opaque; admins paste URLs today (blocks § 3 media UX)
+- [x] ~~**Media uploader**~~ — RESOLVED client-side: the media gallery + source dialog upload through `ObjectStorageService` (deferred until parent save), track `ProductMedia.objectStorageDataId`, and clean up orphaned storage files after successful saves
 - [!] **Webhook → fulfillment listener** — without it, admins manually flip `OrderFulfillment.status` after PayPal-dashboard refunds/chargebacks (blocks § 4 automation)
 - [!] **Login / refresh-token paths** — confirm with backend before wiring the auth shell (blocks § 0.1 final wiring)
 - [!] **Public review write** — `Review` doesn't extend `UserAccess`. Either model migration + user-scoped controller, or use the new `/me/reviews` endpoint (blocks § 10.1 if shoppers should self-write)

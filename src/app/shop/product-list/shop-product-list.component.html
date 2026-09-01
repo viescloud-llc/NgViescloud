@@ -1,0 +1,26 @@
+<div class="shop-page">
+  <div class="page-header">
+    <h2>Shop — Products</h2>
+    <button matButton="filled" (click)="goToCart()" type="button">Cart</button>
+  </div>
+
+  <div class="product-grid">
+    @for (p of products(); track p.id) {
+      <div class="product-card" (click)="view(p)">
+        <div class="card-image">
+          @if (imageUrl(p)) {
+            <img [src]="imageUrl(p)" [alt]="p.name" />
+          } @else {
+            <div class="no-image">no image</div>
+          }
+        </div>
+        <div class="card-body">
+          <span class="name">{{ p.name }}</span>
+          <span class="price">{{ p.basePrice }} {{ p.currency }}</span>
+        </div>
+      </div>
+    } @empty {
+      <p class="empty">No active products. Publish one from the catalog first.</p>
+    }
+  </div>
+</div>

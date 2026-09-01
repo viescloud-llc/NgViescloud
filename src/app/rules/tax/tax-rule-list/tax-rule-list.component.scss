@@ -1,0 +1,68 @@
+.tab-hint {
+  margin: 0 0 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-left: 3px solid var(--mat-sys-tertiary, goldenrod);
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: var(--mat-sys-on-surface-variant, inherit);
+
+  strong {
+    color: var(--mat-sys-tertiary, goldenrod);
+  }
+}
+
+.section-title {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--mat-sys-primary, #7c4dff);
+}
+
+.import-block,
+.test-pad {
+  padding: 1rem;
+  margin-top: 1rem;
+  border: 1px solid var(--mat-sys-outline-variant, rgba(255, 255, 255, 0.08));
+  border-radius: 6px;
+  background: var(--mat-sys-surface-container-low, rgba(255, 255, 255, 0.02));
+}
+
+.import-row {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.mode-radio {
+  display: flex;
+  gap: 1rem;
+}
+
+.file-picker-btn {
+  cursor: pointer;
+}
+
+.test-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.test-result {
+  margin: 0.5rem 0 0;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.95rem;
+
+  &.match {
+    border-left: 3px solid var(--mat-sys-primary, #7c4dff);
+    background: var(--mat-sys-surface-container-lowest, rgba(0, 0, 0, 0.1));
+  }
+
+  &.none {
+    border-left: 3px solid var(--mat-sys-error, tomato);
+    background: var(--mat-sys-surface-container-lowest, rgba(0, 0, 0, 0.1));
+    font-style: italic;
+  }
+}

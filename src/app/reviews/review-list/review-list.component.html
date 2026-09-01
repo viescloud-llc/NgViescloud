@@ -1,0 +1,51 @@
+<ul class="margin-center">
+
+  <li class="filter-row">
+    <app-mat-form-field-input
+      [value]="searchTerm()"
+      (valueChange)="searchTerm.set($event)"
+      [inputMap]="inputField('review-search')
+                    .set(inputKeys.label, 'Search reviews')
+                    .set(inputKeys.placeholder, 'By product, comment, or user…')
+                    .set(inputKeys.showClearIcon, true)
+                    .set(inputKeys.styleWidth, '100%')"
+    ></app-mat-form-field-input>
+
+    <button matButton="filled" (click)="toggleRatingSort()" type="button">
+      Rating: {{ ratingSort() === 'asc' ? 'lowest first' : 'highest first' }}
+    </button>
+  </li>
+
+  <li>
+    <table class="review-table">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th class="num">Rating</th>
+          <th>Comment</th>
+          <th>User</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (r of filteredReviews(); track r.id) {
+          <tr>
+            <td>{{ productName(r) }}</td>
+            <td class="num rating">{{ r.rating }} ★</td>
+            <td class="comment">{{ r.comment }}</td>
+            <td class="mono">{{ r.userId }}</td>
+            <td class="actions">
+              <button matButton class="warn" (click)="deleteReview(r)" type="button">
+                Delete
+              </button>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5" class="empty">No reviews match the current filters.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </li>
+</ul>

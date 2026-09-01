@@ -1,0 +1,110 @@
+<ul class="margin-center">
+
+  <li class="filter-row">
+    <app-mat-form-field-input
+      [value]="searchTerm()"
+      (valueChange)="searchTerm.set($event)"
+      [inputMap]="inputField('stock-search')
+                    .set(inputKeys.label, 'Search stock')
+                    .set(inputKeys.placeholder, 'By product, variant, or SKU…')
+                    .set(inputKeys.showClearIcon, true)
+                    .set(inputKeys.styleWidth, '100%')"
+    ></app-mat-form-field-input>
+
+    <app-mat-form-field-input
+      [value]="lowStockThreshold()"
+      (valueChange)="lowStockThreshold.set($event)"
+      [inputMap]="inputField('stock-threshold')
+                    .set(inputKeys.label, 'Low-stock threshold')
+                    .set(inputKeys.styleWidth, '180px')"
+    ></app-mat-form-field-input>
+
+    <mat-slide-toggle
+      [checked]="lowStockOnly()"
+      (change)="lowStockOnly.set($event.checked)"
+      class="low-toggle"
+    >
+      Low stock only
+    </mat-slide-toggle>
+  </li>
+
+  <li>
+    <table class="stock-table">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Variant</th>
+          <th>SKU</th>
+          <th class="num">Stock</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of rows(); track row.variant.id) {
+          <tr [class.low]="isLow(row)">
+            <td>{{ row.productName }}</td>
+            <td>{{ row.variant.variantName || '(unnamed)' }}</td>
+            <td class="mono">{{ row.variant.sku }}</td>
+            <td class="num" [class.low-qty]="isLow(row)">{{ row.variant.stockQuantity }}</td>
+            <td>{{ row.variant.status }}</td>
+            <td class="actions">
+              <button matButton (click)="openAdjust(row)" type="button">Adjust</button>
+            </td>
+          </tr>
+
+          <!-- Inline adjustment panel for the selected variant. -->
+          @if (adjustingVariant()?.id === row.variant.id) {
+            <tr class="adjust-row">
+              <td colspan="6">
+                <div class="adjust-panel">
+                  <p class="tab-hint">
+                    Creates a <strong>StockMovement (ADJUSTMENT)</strong> —
+                    positive adds stock, negative removes. The running total is
+                    recomputed server-side; the quantity is never edited directly.
+                  </p>
+                  <div class="adjust-fields">
+                    <app-mat-form-field-input
+                      [value]="adjustQuantity()"
+                      (valueChange)="adjustQuantity.set($event)"
+                      [inputMap]="inputField('adjust-qty')
+                                    .set(inputKeys.label, 'Quantity change')
+                                    .set(inputKeys.placeholder, 'e.g. 10 or -3')
+                                    .set(inputKeys.styleWidth, '170px')"
+                    ></app-mat-form-field-input>
+                    <app-mat-form-field-input
+                      [value]="adjustReason()"
+                      (valueChange)="adjustReason.set($event)"
+                      [inputMap]="inputField('adjust-reason')
+                                    .set(inputKeys.label, 'Reason')
+                                    .set(inputKeys.placeholder, 'e.g. cycle count correction')
+                                    .set(inputKeys.styleWidth, '280px')"
+                    ></app-mat-form-field-input>
+                    <app-mat-form-field-input
+                      [value]="adjustReference()"
+                      (valueChange)="adjustReference.set($event)"
+                      [inputMap]="inputField('adjust-ref')
+                                    .set(inputKeys.label, 'Reference (optional)')
+                                    .set(inputKeys.styleWidth, '220px')"
+                    ></app-mat-form-field-input>
+                    <button matButton="filled"
+                            (click)="applyAdjustment()"
+                            [disabled]="!canApplyAdjustment()"
+                            type="button">
+                      Apply
+                    </button>
+                    <button matButton (click)="closeAdjust()" type="button">Cancel</button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          }
+        } @empty {
+          <tr>
+            <td colspan="6" class="empty">No variants match the current filters.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </li>
+</ul>

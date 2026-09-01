@@ -78,6 +78,66 @@ export const APP_ROUTES = {
   schemaAttributeOptionNew: "schema/attribute-options/new",
   schemaAttributeOption(id: string) {
     return id ? `schema/attribute-options/${id}` : 'schema/attribute-options/new';
+  },
+
+  // ---- Commerce ---------------------------------------------------------
+  // Orders are NOT manually created — they come from checkout. So no /new
+  // route; just list + detail. The detail is edit-only (status, notes,
+  // notes.* metadata; everything else is read-only).
+  commerceOrderList: "commerce/orders/list",
+  commerceOrder(id: string) {
+    return `commerce/orders/${id}`;
+  },
+
+  commerceShipmentList: "commerce/shipments/list",
+  commerceShipmentNew: "commerce/shipments/new",
+  commerceShipment(id: string) {
+    return id ? `commerce/shipments/${id}` : 'commerce/shipments/new';
+  },
+
+  commerceReturnList: "commerce/returns/list",
+  commerceReturnNew: "commerce/returns/new",
+  commerceReturn(id: string) {
+    return id ? `commerce/returns/${id}` : 'commerce/returns/new';
+  },
+
+  commerceDiscountList: "commerce/discounts/list",
+  commerceDiscountNew: "commerce/discounts/new",
+  commerceDiscount(id: string) {
+    return id ? `commerce/discounts/${id}` : 'commerce/discounts/new';
+  },
+
+  // ---- Rules --------------------------------------------------------------
+  rulesShippingList: "rules/shipping/list",
+  rulesShippingNew: "rules/shipping/new",
+  rulesShipping(id: string) {
+    return id ? `rules/shipping/${id}` : 'rules/shipping/new';
+  },
+
+  rulesTaxList: "rules/tax/list",
+  rulesTaxNew: "rules/tax/new",
+  rulesTax(id: string) {
+    return id ? `rules/tax/${id}` : 'rules/tax/new';
+  },
+
+  // ---- Inventory ------------------------------------------------------------
+  inventoryStock: "inventory/stock",
+  inventoryMovements: "inventory/movements",
+
+  // ---- Reviews / Reports ------------------------------------------------------
+  reviews: "reviews",
+  reports: "reports",
+
+  // ---- Shop (test-only buyer flow) ---------------------------------------------
+  shopProducts: "shop/products",
+  shopProduct(id: string) {
+    return `shop/products/${id}`;
+  },
+  shopCart: "shop/cart",
+  shopCheckout: "shop/checkout",
+  shopOrders: "shop/orders",
+  shopOrder(id: string) {
+    return `shop/orders/${id}`;
   }
 };
 
@@ -203,6 +263,182 @@ export const routes: Routes = [
         ]
       }
     ]
+  },
+  {
+    path: "commerce",
+    canActivate: [async () => inject(AuthGuard).isLoginWithRole('ADMIN')],
+    children: [
+      { path: '', redirectTo: 'orders/list', pathMatch: 'full' },
+      {
+        path: "orders",
+        children: [
+          { path: '', redirectTo: 'list', pathMatch: 'full' },
+          {
+            path: "list",
+            loadComponent: () => import('./commerce/orders/order-list/order-list.component').then(m => m.OrderListComponent)
+          },
+          {
+            path: ":orderId",
+            loadComponent: () => import('./commerce/orders/order/order.component').then(m => m.OrderComponent)
+          }
+        ]
+      },
+      {
+        path: "shipments",
+        children: [
+          { path: '', redirectTo: 'list', pathMatch: 'full' },
+          {
+            path: "list",
+            loadComponent: () => import('./commerce/shipments/shipment-list/shipment-list.component').then(m => m.ShipmentListComponent)
+          },
+          {
+            path: "new",
+            loadComponent: () => import('./commerce/shipments/shipment/shipment.component').then(m => m.ShipmentComponent)
+          },
+          {
+            path: ":shipmentId",
+            loadComponent: () => import('./commerce/shipments/shipment/shipment.component').then(m => m.ShipmentComponent)
+          }
+        ]
+      },
+      {
+        path: "returns",
+        children: [
+          { path: '', redirectTo: 'list', pathMatch: 'full' },
+          {
+            path: "list",
+            loadComponent: () => import('./commerce/returns/return-list/return-list.component').then(m => m.ReturnListComponent)
+          },
+          {
+            path: "new",
+            loadComponent: () => import('./commerce/returns/return/return.component').then(m => m.ReturnComponent)
+          },
+          {
+            path: ":returnId",
+            loadComponent: () => import('./commerce/returns/return/return.component').then(m => m.ReturnComponent)
+          }
+        ]
+      },
+      {
+        path: "discounts",
+        children: [
+          { path: '', redirectTo: 'list', pathMatch: 'full' },
+          {
+            path: "list",
+            loadComponent: () => import('./commerce/discounts/discount-list/discount-list.component').then(m => m.DiscountListComponent)
+          },
+          {
+            path: "new",
+            loadComponent: () => import('./commerce/discounts/discount/discount.component').then(m => m.DiscountComponent)
+          },
+          {
+            path: ":discountId",
+            loadComponent: () => import('./commerce/discounts/discount/discount.component').then(m => m.DiscountComponent)
+          }
+        ]
+      }
+    ]
+  },
+  {
+    path: "rules",
+    canActivate: [async () => inject(AuthGuard).isLoginWithRole('ADMIN')],
+    children: [
+      { path: '', redirectTo: 'shipping/list', pathMatch: 'full' },
+      {
+        path: "shipping",
+        children: [
+          { path: '', redirectTo: 'list', pathMatch: 'full' },
+          {
+            path: "list",
+            loadComponent: () => import('./rules/shipping/shipping-rule-list/shipping-rule-list.component').then(m => m.ShippingRuleListComponent)
+          },
+          {
+            path: "new",
+            loadComponent: () => import('./rules/shipping/shipping-rule/shipping-rule.component').then(m => m.ShippingRuleComponent)
+          },
+          {
+            path: ":shippingRuleId",
+            loadComponent: () => import('./rules/shipping/shipping-rule/shipping-rule.component').then(m => m.ShippingRuleComponent)
+          }
+        ]
+      },
+      {
+        path: "tax",
+        children: [
+          { path: '', redirectTo: 'list', pathMatch: 'full' },
+          {
+            path: "list",
+            loadComponent: () => import('./rules/tax/tax-rule-list/tax-rule-list.component').then(m => m.TaxRuleListComponent)
+          },
+          {
+            path: "new",
+            loadComponent: () => import('./rules/tax/tax-rule/tax-rule.component').then(m => m.TaxRuleComponent)
+          },
+          {
+            path: ":taxRuleId",
+            loadComponent: () => import('./rules/tax/tax-rule/tax-rule.component').then(m => m.TaxRuleComponent)
+          }
+        ]
+      }
+    ]
+  },
+  {
+    path: "inventory",
+    canActivate: [async () => inject(AuthGuard).isLoginWithRole('ADMIN')],
+    children: [
+      { path: '', redirectTo: 'stock', pathMatch: 'full' },
+      {
+        path: "stock",
+        loadComponent: () => import('./inventory/stock/stock.component').then(m => m.StockComponent)
+      },
+      {
+        path: "movements",
+        loadComponent: () => import('./inventory/stock-movement-list/stock-movement-list.component').then(m => m.StockMovementListComponent)
+      }
+    ]
+  },
+  {
+    path: "reviews",
+    canActivate: [async () => inject(AuthGuard).isLoginWithRole('ADMIN')],
+    loadComponent: () => import('./reviews/review-list/review-list.component').then(m => m.ReviewListComponent)
+  },
+  {
+    // Test-only buyer-flow simulation. Login required (carts/orders are
+    // user-scoped) but NOT admin-gated — any authenticated test user works.
+    path: "shop",
+    canActivate: [async () => inject(AuthGuard).isLogin()],
+    children: [
+      { path: '', redirectTo: 'products', pathMatch: 'full' },
+      {
+        path: "products",
+        loadComponent: () => import('./shop/product-list/shop-product-list.component').then(m => m.ShopProductListComponent)
+      },
+      {
+        path: "products/:productId",
+        loadComponent: () => import('./shop/product/shop-product.component').then(m => m.ShopProductComponent)
+      },
+      {
+        path: "cart",
+        loadComponent: () => import('./shop/cart/shop-cart.component').then(m => m.ShopCartComponent)
+      },
+      {
+        path: "checkout",
+        loadComponent: () => import('./shop/checkout/shop-checkout.component').then(m => m.ShopCheckoutComponent)
+      },
+      {
+        path: "orders",
+        loadComponent: () => import('./shop/order-list/shop-order-list.component').then(m => m.ShopOrderListComponent)
+      },
+      {
+        path: "orders/:orderId",
+        loadComponent: () => import('./shop/order/shop-order.component').then(m => m.ShopOrderComponent)
+      }
+    ]
+  },
+  {
+    path: "reports",
+    canActivate: [async () => inject(AuthGuard).isLoginWithRole('ADMIN')],
+    loadComponent: () => import('./reports/reports.component').then(m => m.ReportsComponent)
   },
   {
     path: 'setting',

@@ -1,0 +1,71 @@
+<div class="shop-page">
+  <div class="page-header">
+    <h2>Checkout</h2>
+    <button matButton (click)="backToCart()" type="button">Back to cart</button>
+  </div>
+
+  @if (!checkoutResult()) {
+    <!-- ============ FORM MODE ============ -->
+    @if (!canPlaceOrder()) {
+      <p class="empty">No active cart with items — add something first.</p>
+    } @else {
+      <p class="summary">
+        Cart total: <strong>{{ cartTotal() }}</strong> ({{ cart()?.items?.length }} line item(s))
+      </p>
+
+      <ul class="address-form" appMatFormFieldGroup (onAllInputCheck)="validForm.set($event)">
+        <li>
+          <h3 class="section-title">Shipping / billing address</h3>
+          <app-mat-form-field-input-dynamic
+            [value]="address()"
+            (valueChange)="onAddressChange($event)"
+            [blankObject]="blankAddress"
+            [inputMap]="inputField('checkout-address')
+                          .set(inputKeys.indent, false)
+                          .set(inputKeys.styleWidth, '100%')"
+          ></app-mat-form-field-input-dynamic>
+        </li>
+        <li>
+          <app-mat-form-field-input
+            [value]="discountCode()"
+            (valueChange)="discountCode.set($event)"
+            [inputMap]="inputField('checkout-discount')
+                          .set(inputKeys.label, 'Discount code (optional)')
+                          .set(inputKeys.styleWidth, '280px')"
+          ></app-mat-form-field-input>
+        </li>
+        <li>
+          <button matButton="filled" (click)="placeOrder()" type="button">
+            Place order (PayPal)
+          </button>
+        </li>
+      </ul>
+    }
+  } @else {
+    <!-- ============ APPROVE / COMPLETE MODE ============ -->
+    <div class="post-checkout">
+      <h3 class="section-title">
+        Order {{ checkoutResult()?.orderFulfillment?.orderNumber }} created
+      </h3>
+      <p class="hint">
+        1. Approve the payment on PayPal (opens in a new tab).<br />
+        2. Come back and press <strong>Complete order</strong> to capture the
+        payment, decrement stock, and move the order to <em>Processing</em>.
+      </p>
+      <div class="action-row">
+        <button matButton="filled" (click)="openApproveUrl()" type="button">
+          Approve on PayPal
+        </button>
+        <button matButton="filled"
+                (click)="completeOrder()"
+                [disabled]="completing()"
+                type="button">
+          {{ completing() ? 'Completing…' : 'Complete order' }}
+        </button>
+        <button matButton (click)="viewOrder()" type="button">
+          View order
+        </button>
+      </div>
+    </div>
+  }
+</div>

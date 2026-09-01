@@ -74,10 +74,8 @@ export class CartItem extends TrackedTimeStamp {
     @MatInputDisplayLabel('ID')
     id: string = '';
 
-    // Back-ref to Cart — omit on PUT to avoid recursion.
-    @MatInputHide()
-    @MatTableHide()
-    cart?: Cart;
+    // NOTE: no `cart` back-ref — dropped from the backend schema; parent is
+    // implicit from nesting inside cart.items.
 
     @MatInputHide()
     @MatTableHide()
@@ -123,9 +121,8 @@ export class OrderFulfillmentItem extends TrackedTimeStamp {
     @MatInputDisplayLabel('ID')
     id: string = '';
 
-    @MatInputHide()
-    @MatTableHide()
-    orderFulfillment?: OrderFulfillment;
+    // NOTE: no `orderFulfillment` back-ref — dropped from the backend schema;
+    // parent is implicit from nesting inside orderFulfillment.items.
 
     @MatInputHide()
     @MatTableHide()
@@ -155,6 +152,8 @@ export class OrderFulfillment extends TrackedTimeStampUserAccess {
     @MatInputDisplayLabel('ID')
     id: string = '';
 
+    // Server-managed at checkout; the order editor treats it as read-only.
+    @MatInputDisable()
     @MatInputDisplayLabel('Order Number')
     orderNumber: string = '';
 
@@ -168,7 +167,9 @@ export class OrderFulfillment extends TrackedTimeStampUserAccess {
     @MatInputDisplayLabel('Checkout Order ID')
     checkoutOrderId: string = '';
 
-    // Denormalized cart currency at checkout time.
+    // Denormalized cart currency at checkout time — read-only in the order
+    // editor. Changing currency after purchase would break the totals contract.
+    @MatInputDisable()
     @MatInputEnum(Currency)
     @MatInputDisplayLabel('Currency')
     currency: Currency = Currency.USD;
@@ -178,18 +179,26 @@ export class OrderFulfillment extends TrackedTimeStampUserAccess {
     @MatInputListSetting(false, true, true)
     items: OrderFulfillmentItem[] = [new OrderFulfillmentItem()];
 
+    // Money totals are locked at checkout. Admins who need to correct these
+    // create a Return or manual adjustment flow — not by editing the record
+    // in place. Kept visible so the numbers can be inspected in the editor.
+    @MatInputDisable()
     @MatInputDisplayLabel('Subtotal')
     subtotal: string = '0';
 
+    @MatInputDisable()
     @MatInputDisplayLabel('Tax')
     tax: string = '0';
 
+    @MatInputDisable()
     @MatInputDisplayLabel('Shipping Cost')
     shippingCost: string = '0';
 
+    @MatInputDisable()
     @MatInputDisplayLabel('Discount Amount')
     discountAmount: string = '0';
 
+    @MatInputDisable()
     @MatInputDisplayLabel('Total Amount')
     totalAmount: string = '0';
 
@@ -245,10 +254,15 @@ export class Discount extends TrackedTimeStamp {
     @MatInputDisplayLabel('Maximum Discount Amount')
     maximumDiscountAmount: string = '0';
 
-    @MatInputDisplayLabel('Valid From')
+    // Validity window — rendered with the dedicated <app-mat-form-field-input-time>
+    // date pickers in the discount editor (the dynamic form would explode the
+    // ViesDateTime object into a dozen scalar inputs), so hidden here.
+    @MatInputHide()
+    @MatTableHide()
     validFrom: ViesDateTime = new ViesDateTime();
 
-    @MatInputDisplayLabel('Valid To')
+    @MatInputHide()
+    @MatTableHide()
     validTo: ViesDateTime = new ViesDateTime();
 
     // null = unlimited.
@@ -284,10 +298,16 @@ export class Shipment extends TrackedTimeStamp {
     @MatInputDisplayLabel('Status')
     status: ShipmentStatus = ShipmentStatus.PENDING;
 
-    @MatInputDisplayLabel('Estimated Delivery Date')
+    // BOTH delivery dates are non-nullable server-side — the shipment editor
+    // must supply values at create time (defaults to "now" if the admin doesn't
+    // pick). Rendered via <app-mat-form-field-input-time> date pickers in the
+    // editor, so hidden from the dynamic form.
+    @MatInputHide()
+    @MatTableHide()
     estimatedDeliveryDate: ViesDateTime = new ViesDateTime();
 
-    @MatInputDisplayLabel('Actual Delivery Date')
+    @MatInputHide()
+    @MatTableHide()
     actualDeliveryDate: ViesDateTime = new ViesDateTime();
 
     @MatInputDisplayLabel('Notes')
@@ -305,6 +325,8 @@ export class ReturnRequest extends TrackedTimeStampUserAccess {
     @MatInputDisplayLabel('ID')
     id: string = '';
 
+    // Server-generated (unique) — read-only in the editor.
+    @MatInputDisable()
     @MatInputDisplayLabel('Return Number')
     returnNumber: string = '';
 
@@ -391,6 +413,11 @@ export class ShippingRule extends TrackedTimeStamp {
     @MatInputDisplayLabel('ID')
     id: string = '';
 
+    // One rule per currency (DB-unique). Hidden from the dynamic form — the
+    // editor renders a custom picker that EXCLUDES currencies already taken
+    // by another rule, so the 409 can't happen from the UI. Kept visible in
+    // tables (the list is one-row-per-currency).
+    @MatInputHide()
     @MatInputEnum(Currency)
     @MatInputDisplayLabel('Currency')
     currency: Currency = Currency.USD;
@@ -399,9 +426,11 @@ export class ShippingRule extends TrackedTimeStamp {
     @MatInputDisplayLabel('Flat Fee')
     flatFee: string = '0';
 
-    // BigDecimal — null/empty disables the free-shipping threshold.
+    // BigDecimal — null/undefined disables the free-shipping threshold.
+    // Optional so the editor can send it as ABSENT (Jackson rejects "" for
+    // BigDecimal); the '' default only exists for the form's blank object.
     @MatInputDisplayLabel('Free Above Amount')
-    freeAboveAmount: string = '';
+    freeAboveAmount?: string = '';
 
     @MatInputDisplayLabel('Description')
     @MatInputItemSetting(MatItemSettingType.TEXT_AREA, true)

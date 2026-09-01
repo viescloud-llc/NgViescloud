@@ -1,0 +1,67 @@
+.filter-row {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+
+  app-mat-form-field-input {
+    flex: 1 1 auto;
+  }
+
+  button {
+    flex: 0 0 auto;
+  }
+}
+
+.review-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+
+  th, td {
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--mat-sys-outline-variant, rgba(255, 255, 255, 0.08));
+    vertical-align: top;
+  }
+
+  th {
+    font-weight: 600;
+    color: var(--mat-sys-on-surface-variant, inherit);
+  }
+
+  .num {
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .rating {
+    color: var(--mat-sys-tertiary, goldenrod);
+    font-weight: 600;
+  }
+
+  .comment {
+    max-width: 480px;
+    word-break: break-word;
+  }
+
+  .mono {
+    font-family: monospace;
+    font-size: 0.85rem;
+  }
+
+  .actions {
+    text-align: right;
+    white-space: nowrap;
+
+    .warn {
+      color: var(--mat-sys-error, tomato);
+    }
+  }
+
+  .empty {
+    text-align: center;
+    font-style: italic;
+    color: var(--mat-sys-on-surface-variant, inherit);
+    padding: 2rem;
+  }
+}

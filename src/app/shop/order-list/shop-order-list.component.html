@@ -1,0 +1,35 @@
+<div class="shop-page">
+  <div class="page-header">
+    <h2>My orders</h2>
+    <button matButton (click)="shop()" type="button">Shop</button>
+  </div>
+
+  <table class="order-table">
+    <thead>
+      <tr>
+        <th>Order #</th>
+        <th>Created</th>
+        <th>Status</th>
+        <th class="num">Total</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (o of orders(); track o.id) {
+        <tr>
+          <td class="mono">{{ o.orderNumber || '(pending)' }}</td>
+          <td>{{ createdDate(o) }}</td>
+          <td><span class="status-badge">{{ o.status }}</span></td>
+          <td class="num">{{ o.totalAmount }} {{ o.currency }}</td>
+          <td class="actions">
+            <button matButton (click)="view(o)" type="button">View</button>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="5" class="empty">No orders yet — go buy something.</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

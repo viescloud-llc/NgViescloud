@@ -1,0 +1,122 @@
+<ul class="margin-center" appMatFormFieldGroup (onAllInputCheck)="validForm.set($event)">
+
+  <li class="return-banner">
+    <span>
+      @if (id()) {
+        Editing return <strong>{{ value()?.returnNumber || '(no number)' }}</strong>
+        — status <strong class="status-badge">{{ value()?.status }}</strong>
+      } @else {
+        Creating a new return request
+      }
+    </span>
+    <button matButton="filled" (click)="backToList()" type="button">
+      Back to returns
+    </button>
+  </li>
+
+  <!-- Order + item links -->
+  <li class="link-block">
+    <h3 class="section-title">Order & item</h3>
+    @if (value()?.orderFulfillment?.id) {
+      <div class="linked-order">
+        <span>
+          Order <strong>{{ linkedOrder()?.orderNumber || value()?.orderFulfillment?.id }}</strong>
+          @if (selectedItem()) {
+            — item <strong>{{ selectedItem()?.lineItemSku || selectedItem()?.id }}</strong>
+          }
+        </span>
+        <button matButton (click)="goToLinkedOrder()" type="button">Open order</button>
+      </div>
+    }
+    @if (!id()) {
+      <app-mat-form-field-input
+        [value]="linkedOrder()"
+        (valueChange)="onOrderChange($event)"
+        [options]="orderOptions()"
+        [inputMap]="inputField('return-order')
+                      .set(inputKeys.label, 'Order')
+                      .set(inputKeys.placeholder, 'Search by order number…')
+                      .set(inputKeys.optionsAutoActiveFirst, true)
+                      .set(inputKeys.optionsrequireSelection, true)
+                      .set(inputKeys.showClearIcon, true)
+                      .set(inputKeys.styleWidth, '100%')"
+      ></app-mat-form-field-input>
+
+      @if (value()?.orderFulfillment?.id) {
+        <app-mat-form-field-input
+          [value]="selectedItem()"
+          (valueChange)="onItemChange($event)"
+          [options]="itemOptions()"
+          [inputMap]="inputField('return-item')
+                        .set(inputKeys.label, 'Order item (optional)')
+                        .set(inputKeys.placeholder, 'Pick the line item being returned…')
+                        .set(inputKeys.optionsAutoActiveFirst, true)
+                        .set(inputKeys.optionsrequireSelection, true)
+                        .set(inputKeys.showClearIcon, true)
+                        .set(inputKeys.styleWidth, '100%')"
+        ></app-mat-form-field-input>
+      }
+    }
+  </li>
+
+  <!-- Main fields (status shown read-only via workflow; reason, adminNotes,
+       returnQuantity, refundAmount, trackingNumber, refundShipping). -->
+  <li>
+    <app-mat-form-field-input-dynamic
+      [value]="value()"
+      (valueChange)="onMainFormChange($event)"
+      [blankObject]="blankValue"
+      [inputMap]="inputField('return-main')
+                    .set(inputKeys.indent, false)
+                    .set(inputKeys.styleWidth, '100%')"
+    ></app-mat-form-field-input-dynamic>
+  </li>
+
+  <!-- Lifecycle transitions — UI-guarded since the backend doesn't enforce. -->
+  <li class="workflow-block">
+    <h3 class="section-title">Advance workflow</h3>
+    @if (availableTransitions().length === 0) {
+      <p class="empty-hint">
+        <strong>{{ value()?.status }}</strong> is a terminal state — no further transitions available.
+      </p>
+    } @else {
+      <p class="tab-hint">
+        Click a button to stage the transition; commit with <em>Save</em>.
+      </p>
+      <div class="transition-row">
+        @for (t of availableTransitions(); track t) {
+          <button matButton="filled" (click)="advanceStatus(t)" type="button">
+            → {{ transitionLabel(t) }}
+          </button>
+        }
+      </div>
+    }
+  </li>
+
+  <!-- Refund — enabled on refundable statuses with a payment link present. -->
+  <li class="refund-block">
+    <h3 class="section-title">Refund</h3>
+    @if (canRefund()) {
+      <p class="tab-hint">
+        Issues a PayPal refund of <strong>{{ value()?.refundAmount || 'the full order amount' }}</strong>
+        through the checkout service, marks the order
+        <em>refunded / partially refunded</em>, and closes this return as <em>Refunded</em>.
+      </p>
+      <button matButton="filled" class="warn" (click)="issueRefund()" type="button">
+        Issue PayPal refund
+      </button>
+    } @else {
+      <p class="empty-hint">
+        Refund is available when the return is <strong>Approved</strong>,
+        <strong>Received</strong>, or <strong>Inspecting</strong> and the linked
+        order has a payment record.
+      </p>
+    }
+  </li>
+
+  <li class="flex-row-container-auto">
+    <button matButton="filled" (click)="save()" [disabled]="_value.isValueNotChange() || !validForm()">Save</button>
+    <button matButton="filled" class="warn" (click)="revert()" [disabled]="!_value.isValueChange()">Revert</button>
+    <button matButton="filled" class="warn" (click)="remove()" [disabled]="!id()">Delete</button>
+  </li>
+</ul>

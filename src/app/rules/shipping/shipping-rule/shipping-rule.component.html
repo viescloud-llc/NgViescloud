@@ -1,0 +1,51 @@
+<ul class="margin-center" appMatFormFieldGroup (onAllInputCheck)="validForm.set($event)">
+
+  <li class="return-banner">
+    <span>
+      @if (id()) {
+        Editing shipping rule for <strong>{{ value()?.currency }}</strong>
+      } @else {
+        Creating a new shipping rule
+      }
+    </span>
+    <button matButton="filled" (click)="backToList()" type="button">
+      Back to shipping rules
+    </button>
+  </li>
+
+  <!-- Currency — custom picker excluding currencies already claimed by
+       another rule (DB unique). -->
+  <li>
+    <app-mat-form-field-input-option
+      [value]="value()?.currency"
+      (valueChange)="onCurrencyChange($event)"
+      [options]="currencyOptions()"
+      [inputMap]="inputField('shipping-rule-currency')
+                    .set(inputKeys.label, 'Currency')
+                    .set(inputKeys.styleWidth, '240px')"
+    ></app-mat-form-field-input-option>
+  </li>
+
+  <li>
+    <app-mat-form-field-input-dynamic
+      [value]="value()"
+      (valueChange)="onMainFormChange($event)"
+      [blankObject]="blankValue"
+      [inputMap]="inputField('shipping-rule-main')
+                    .set(inputKeys.indent, false)
+                    .set(inputKeys.styleWidth, '100%')"
+    ></app-mat-form-field-input-dynamic>
+
+    <p class="tab-hint">
+      <strong>Flat Fee</strong> applies when the order subtotal is below
+      <strong>Free Above Amount</strong>. Leave <em>Free Above Amount</em> empty
+      to disable the free-shipping threshold (flat fee always applies).
+    </p>
+  </li>
+
+  <li class="flex-row-container-auto">
+    <button matButton="filled" (click)="save()" [disabled]="_value.isValueNotChange() || !validForm()">Save</button>
+    <button matButton="filled" class="warn" (click)="revert()" [disabled]="!_value.isValueChange()">Revert</button>
+    <button matButton="filled" class="warn" (click)="remove()" [disabled]="!id()">Delete</button>
+  </li>
+</ul>

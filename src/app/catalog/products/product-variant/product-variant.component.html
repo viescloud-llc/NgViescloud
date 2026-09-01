@@ -4,7 +4,7 @@
        back to the parent product editor. Sits above the tabs so it stays put
        regardless of which section they're on. -->
   <li class="return-banner">
-    <span>Editing a variant of <strong>{{ value()?.product?.name || 'this product' }}</strong>.</span>
+    <span>Editing a variant of <strong>{{ parentProduct()?.name || 'this product' }}</strong>.</span>
     <button matButton="filled" (click)="backToProduct()" type="button">
       Back to product
     </button>
