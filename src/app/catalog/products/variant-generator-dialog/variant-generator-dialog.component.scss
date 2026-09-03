@@ -1,0 +1,35 @@
+.hint {
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.empty-hint {
+  opacity: 0.7;
+  font-style: italic;
+}
+
+.preview {
+  margin-top: 0.5rem;
+
+  &.over-cap {
+    color: var(--mat-sys-error, #f28b82);
+  }
+
+  .sku-preview {
+    font-family: monospace;
+    font-size: 0.85rem;
+    opacity: 0.75;
+  }
+}
+
+mat-dialog-content {
+  min-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.full-width {
+  width: 100%;
+}

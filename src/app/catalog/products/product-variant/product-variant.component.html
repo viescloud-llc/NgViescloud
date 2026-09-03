@@ -1,4 +1,4 @@
-<ul class="margin-center" appMatFormFieldGroup (onAllInputCheck)="validForm.set($event)">
+<ul class="margin-center" appMatFormFieldGroup [formSummitButton]="viesSaveBtn" (onAllInputCheck)="validForm.set($event)">
 
   <!-- Return-to-product banner, always visible so the admin has an obvious exit
        back to the parent product editor. Sits above the tabs so it stays put
@@ -159,7 +159,7 @@
        stamped via the save() override). Clone only shows for saved variants
        and is disabled if there are pending edits (would clone a stale copy). -->
   <li class="flex-row-container-auto">
-    <button matButton="filled" (click)="save()" [disabled]="_value.isValueNotChange() || !validForm()">Save</button>
+    <button #viesSaveBtn matButton="filled" (click)="save()" [disabled]="_value.isValueNotChange() || !validForm()">Save</button>
     <button matButton="filled" class="warn" (click)="revert()" [disabled]="!_value.isValueChange()">Revert</button>
     @if (id()) {
       <button matButton="filled" (click)="clone()" [disabled]="_value.isValueChange()">Clone</button>

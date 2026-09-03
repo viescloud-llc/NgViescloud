@@ -99,6 +99,84 @@ export class CategoryListComponent extends ViesMatFormFieldMap implements OnInit
     this.router.navigate([APP_ROUTES.catalogCategory(cat.id)]);
   }
 
+  // ---- Drag-to-reparent (intent § 5.2 nice-to-have) -------------------------
+  //
+  // Native HTML5 drag events rather than CDK drop lists: reparenting is
+  // "drop ONTO a node", not list reordering, so per-node dragover/drop targets
+  // map directly. Dropping onto a node makes the dragged category its child;
+  // the "(make root)" zone clears the parent. Cycle guard client-side (the
+  // backend has no FK, so it would happily persist a loop).
+
+  draggedCategory = signal<Category | null>(null);
+  dropTargetId = signal<string | null>(null);
+
+  onDragStart(event: DragEvent, cat: Category) {
+    if (cat.id === '__orphans__') { event.preventDefault(); return; }
+    this.draggedCategory.set(cat);
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData('text/plain', cat.id);
+    }
+  }
+
+  onDragEnd() {
+    this.draggedCategory.set(null);
+    this.dropTargetId.set(null);
+  }
+
+  // '' = the root drop zone.
+  isValidDropTarget(targetId: string): boolean {
+    const dragged = this.draggedCategory();
+    if (!dragged) return false;
+    if (targetId === '') return !!dragged.parentCategoryId; // already root → no-op
+    if (targetId === '__orphans__' || targetId === dragged.id) return false;
+    if (targetId === (dragged.parentCategoryId || '')) return false;       // same parent → no-op
+    return !this.isDescendantOf(targetId, dragged.id);                     // cycle guard
+  }
+
+  onDragOver(event: DragEvent, targetId: string) {
+    if (!this.isValidDropTarget(targetId)) return;
+    event.preventDefault(); // preventDefault = "drop allowed"
+    if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
+    this.dropTargetId.set(targetId);
+  }
+
+  onDragLeave(targetId: string) {
+    if (this.dropTargetId() === targetId) this.dropTargetId.set(null);
+  }
+
+  onDrop(event: DragEvent, targetId: string) {
+    event.preventDefault();
+    const dragged = this.draggedCategory();
+    const valid = this.isValidDropTarget(targetId); // before onDragEnd clears the signal
+    this.onDragEnd();
+    if (!dragged || !valid) return;
+
+    // Full-object PUT (safer than PATCH merge semantics for clearing a field).
+    const updated = { ...dragged, parentCategoryId: targetId };
+    this.categoryService.put(dragged.id, updated).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+      next: () => this.refresh(),
+      error: err => this.dialogUtils.openErrorMessageFromError(err)
+    });
+  }
+
+  /** true when `candidateId` sits anywhere under `rootId` in the current flat list. */
+  private isDescendantOf(candidateId: string, rootId: string): boolean {
+    const byParent = new Map<string, string[]>();
+    for (const cat of this.categories()) {
+      const parentKey = cat.parentCategoryId || '';
+      if (!byParent.has(parentKey)) byParent.set(parentKey, []);
+      byParent.get(parentKey)!.push(cat.id);
+    }
+    const stack = [...(byParent.get(rootId) ?? [])];
+    while (stack.length) {
+      const id = stack.pop()!;
+      if (id === candidateId) return true;
+      stack.push(...(byParent.get(id) ?? []));
+    }
+    return false;
+  }
+
   private buildTree(categories: Category[]): CategoryNode[] {
     const idSet = new Set(categories.map(c => c.id));
     const byParent = new Map<string, Category[]>();

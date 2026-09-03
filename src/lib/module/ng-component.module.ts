@@ -8,6 +8,7 @@ import { CopyToClipboardDirective } from '../directive/copy-to-clipboard.directi
 import { FilterNamePipe } from '../pipes/filter-name.pipe';
 import { FilterNameReversePipe } from '../pipes/filter-name-reverse.pipe';
 import { MatTableComponent } from '../util-component/mat-table/mat-table.component';
+import { ChartComponent } from '../util-component/chart/chart.component';
 import { MatFormFieldGroupDirective } from '../directive/mat-form-field-group.directive';
 import { MatFormFieldInputTextAreaComponent } from '../util-component/mat-form-field-input-text-area/mat-form-field-input-text-area.component';
 import { MatFormFieldComponent } from '../util-component/mat-form-field/mat-form-field.component';
@@ -44,6 +45,7 @@ import { MatFormFieldFormComponent } from '../util-component/mat-form-field-form
 import { MoneyComponent } from '../util-component/money/money.component';
 
 const UTILS = [
+  ChartComponent,
   CopyToClipboardUtilComponent,
   InputTypeSwitchComponent,
   MatFormFieldInputComponent,

@@ -1,0 +1,56 @@
+<h2 mat-dialog-title>Generate variants</h2>
+
+<mat-dialog-content>
+  <p class="hint">
+    Pick the attribute definitions to combine — one variant is created per
+    combination (e.g. Size × Color). Existing SKUs are skipped, so re-running
+    after adding options only creates the new combinations.
+  </p>
+
+  @if (selectableDefinitions.length === 0) {
+    <p class="empty-hint">
+      No SELECT-type attribute definitions with options exist yet — create one
+      in the Schema section first.
+    </p>
+  } @else {
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Axes (attribute definitions)</mat-label>
+      <mat-select multiple
+                  [value]="axes()"
+                  (selectionChange)="onAxesChange($event.value)">
+        @for (def of selectableDefinitions; track def.id) {
+          <mat-option [value]="def">{{ defLabel(def) }} ({{ def.options!.length }} options)</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    @for (def of axes(); track def.id) {
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ defLabel(def) }} options</mat-label>
+        <mat-select multiple
+                    [value]="pickedFor(def)"
+                    (selectionChange)="onAxisOptionsChange(def, $event.value)">
+          @for (opt of def.options; track opt.id) {
+            <mat-option [value]="opt">{{ optionLabel(opt) }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    }
+
+    @if (axes().length > 0) {
+      <p class="preview" [class.over-cap]="comboCount() > 500">
+        <strong>{{ comboCount() }}</strong> variant(s) will be generated
+        @if (comboCount() > 500) { — over the 500 cap; narrow the option lists }
+        <br />
+        <span class="sku-preview">SKU pattern: {{ previewSku() }}</span>
+      </p>
+    }
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button matButton (click)="cancel()" type="button">Cancel</button>
+  <button matButton="filled" (click)="generate()" [disabled]="!canGenerate()" type="button">
+    Generate
+  </button>
+</mat-dialog-actions>

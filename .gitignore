@@ -43,3 +43,7 @@ Thumbs.db
 .lh
 temp
 .claude
+# Claude session secrets (PayPal sandbox creds etc.)
+.claude/.env
+document/backend-fix-checklist.md
+document/frontend-fix-checklist.md

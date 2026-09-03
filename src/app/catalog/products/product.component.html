@@ -1,4 +1,4 @@
-<ul class="margin-center" appMatFormFieldGroup (onAllInputCheck)="validForm.set($event)">
+<ul class="margin-center" appMatFormFieldGroup [formSummitButton]="viesSaveBtn" (onAllInputCheck)="validForm.set($event)">
   <li>
     <mat-tab-group [preserveContent]="true" class="product-tabs">
 
@@ -219,6 +219,15 @@
                     type="button">
               Add variant
             </button>
+            <!-- Server-side cartesian generator (POST /products/{id}/generate-variants):
+                 pick SELECT definitions as axes, the server mints one variant per
+                 combination and returns the updated product graph. -->
+            <button matButton="filled"
+                    (click)="openVariantGeneratorDialog()"
+                    [disabled]="_value.isValueChange()"
+                    type="button">
+              Generate variants…
+            </button>
           </div>
 
           <!-- Variants table. Click a row to open the standalone editor. -->
@@ -249,7 +258,7 @@
     <li class="missing-category-hint">Category is required — pick one in the Basics tab before saving.</li>
   }
   <li class="flex-row-container-auto">
-    <button matButton="filled" (click)="save()" [disabled]="_value.isValueNotChange() || !validForm() || !hasCategory()">Save</button>
+    <button #viesSaveBtn matButton="filled" (click)="save()" [disabled]="_value.isValueNotChange() || !validForm() || !hasCategory()">Save</button>
     <button matButton="filled" class="warn" (click)="revert()" [disabled]="!_value.isValueChange()">Revert</button>
     <button matButton="filled" class="warn" (click)="remove()" [disabled]="!id()">Delete</button>
   </li>

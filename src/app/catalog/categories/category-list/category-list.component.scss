@@ -21,3 +21,34 @@
   color: var(--mat-sys-on-surface-variant, inherit);
   font-style: italic;
 }
+
+// Drag-to-reparent affordances.
+.drag-handle {
+  opacity: 0.35;
+  cursor: grab;
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  margin-right: 2px;
+}
+
+mat-tree-node[draggable="true"] {
+  cursor: grab;
+}
+
+.drop-target {
+  outline: 2px dashed var(--mat-sys-primary, #7aa7ff);
+  outline-offset: -2px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--mat-sys-primary, #7aa7ff) 12%, transparent);
+}
+
+.root-drop-zone {
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  border: 2px dashed var(--mat-sys-outline-variant, rgba(128, 128, 128, 0.4));
+  border-radius: 6px;
+  text-align: center;
+  font-size: 0.9rem;
+  opacity: 0.85;
+}

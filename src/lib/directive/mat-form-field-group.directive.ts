@@ -1,4 +1,4 @@
-import { AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit, ChangeDetectorRef, ContentChild, ContentChildren, Directive, DoCheck, EventEmitter, Input, OnDestroy, Output, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
+import { AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit, ChangeDetectorRef, ContentChild, ContentChildren, Directive, DoCheck, EventEmitter, HostListener, Input, OnDestroy, Output, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { MatFormFieldComponent } from '../util-component/mat-form-field/mat-form-field.component';
 import { MatButton } from '@angular/material/button';
@@ -54,6 +54,24 @@ export class MatFormFieldGroupDirective implements AfterContentInit, AfterConten
         )
       )
     })
+  }
+
+  /**
+   * Ctrl+S / Cmd+S saves the form when a `formSummitButton` is bound — the
+   * keyboard twin of the enter-to-submit behavior above. preventDefault always
+   * fires (even when the button is disabled) so the browser's save-page dialog
+   * never appears while an editor group is on screen.
+   */
+  @HostListener('document:keydown', ['$event'])
+  onDocumentKeydown(event: KeyboardEvent): void {
+    if (!this.formSummitButton) return;
+    if (!(event.ctrlKey || event.metaKey) || (event.key !== 's' && event.key !== 'S')) return;
+    event.preventDefault();
+    if (this.formSummitButton.disabled) return;
+    if (this.formSummitButton instanceof HTMLButtonElement)
+      this.formSummitButton.click();
+    else
+      this.formSummitButton._elementRef.nativeElement.click();
   }
 
   validateAllInput(): boolean {

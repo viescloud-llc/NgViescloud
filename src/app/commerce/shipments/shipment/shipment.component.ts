@@ -71,6 +71,36 @@ export class ShipmentComponent extends ViesRestApi<Shipment, ShipmentService> im
         this.value.set({ ...v });
       }
     }
+
+    // The blank Shipment's dates are all-zero ViesDateTimes — truthy, so the
+    // `??` defaults in onMainFormChange never fire and an untouched form would
+    // persist a 0-0-0 window (same dead-?? bug as the Discount editor, FE-2).
+    // Seed real dates for the create case: estimated = now + 5 days, actual =
+    // now (both are non-nullable server-side; the form hint documents the
+    // "actual = placeholder until delivered" convention). _value.set so the
+    // seeded dates are the tracking baseline and Save stays disabled.
+    if (!this.getRouteId()) {
+      const v = this.value();
+      if (v) {
+        if (!v.estimatedDeliveryDate?.year) {
+          const inFiveDays = new Date();
+          inFiveDays.setDate(inFiveDays.getDate() + 5);
+          v.estimatedDeliveryDate = ViesDateTime.fromJsDate(inFiveDays);
+        }
+        if (!v.actualDeliveryDate?.year) {
+          v.actualDeliveryDate = ViesDateTime.now();
+        }
+        this._value.set({ ...v });
+      }
+    }
+  }
+
+  // After a create, leave /new for the entity's real edit URL so
+  // refresh/bookmark/back work (FE-12).
+  protected override afterSave(res: Shipment, wasCreate: boolean): void {
+    if (wasCreate && res.id) {
+      this.router.navigate([APP_ROUTES.commerceShipment(res.id)]);
+    }
   }
 
   private refreshOrders() {

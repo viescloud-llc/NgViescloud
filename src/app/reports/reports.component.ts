@@ -94,6 +94,55 @@ export class ReportsComponent extends ViesMatFormFieldMap implements OnInit {
 
   timeseriesBucket = signal<SalesTimeseriesBucket>('day');
 
+  // ---- Chart-ready projections (computed = memoized: fresh array refs only
+  // when the underlying report changes, so <app-chart> doesn't rebuild every
+  // CD cycle). Tables stay as the data of record; charts sit above them.
+
+  // Revenue line per currency (one measure, one axis — order counts stay in the table).
+  timeseriesCharts = computed(() =>
+    (this.salesTimeseries()?.byCurrency ?? []).map(cur => ({
+      currency: cur.currency,
+      labels: cur.points.map(pt => pt.bucket),
+      datasets: [{ label: `Revenue (${cur.currency})`, data: cur.points.map(pt => Number(pt.revenue) || 0) }]
+    }))
+  );
+
+  // Order pipeline share-of-whole. Slices are the workflow statuses in
+  // count-descending order (mirrors the table rows).
+  statusChart = computed(() => {
+    const rows = this.orderStatusRows();
+    return {
+      labels: rows.map(r => r.status),
+      datasets: [{ label: 'Orders', data: rows.map(r => r.count) }]
+    };
+  });
+
+  // Revenue magnitude by location — horizontal single-hue bars, top 12.
+  geographyCharts = computed(() =>
+    (this.geography()?.byCurrency ?? []).map(cur => {
+      const top = [...cur.locations]
+        .sort((a, b) => (Number(b.revenue) || 0) - (Number(a.revenue) || 0))
+        .slice(0, 12);
+      return {
+        currency: cur.currency,
+        labels: top.map(l => [l.country, l.state, l.city].filter(x => !!x).join(' / ') || '(unknown)'),
+        datasets: [{ label: `Revenue (${cur.currency})`, data: top.map(l => Number(l.revenue) || 0) }]
+      };
+    })
+  );
+
+  // Top products by revenue — horizontal single-hue bars, top 10.
+  topProductCharts = computed(() =>
+    (this.topProducts()?.byCurrency ?? []).map(cur => {
+      const top = cur.products.slice(0, 10);
+      return {
+        currency: cur.currency,
+        labels: top.map(prod => prod.name),
+        datasets: [{ label: `Revenue (${cur.currency})`, data: top.map(prod => Number(prod.revenue) || 0) }]
+      };
+    })
+  );
+
   // Order-status table rows out of the counts record.
   orderStatusRows = computed<{ status: string; count: number; percent: string }[]>(() => {
     const report = this.orderStatus();
@@ -107,6 +156,11 @@ export class ReportsComponent extends ViesMatFormFieldMap implements OnInit {
       }))
       .sort((a, b) => b.count - a.count);
   });
+
+  // Height for horizontal bar charts: one 32px band per row, min 160.
+  barChartHeight(rows: number): number {
+    return Math.max(160, rows * 32);
+  }
 
   async runReports() {
     const period = this.periodParams();

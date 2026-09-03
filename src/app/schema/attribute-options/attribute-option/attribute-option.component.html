@@ -1,4 +1,4 @@
-<ul class="margin-center" appMatFormFieldGroup (onAllInputCheck)="validForm.set($event)">
+<ul class="margin-center" appMatFormFieldGroup [formSummitButton]="viesSaveBtn" (onAllInputCheck)="validForm.set($event)">
   <li>
     <app-mat-form-field-input-dynamic
       [(value)]="value"
@@ -9,7 +9,7 @@
     ></app-mat-form-field-input-dynamic>
   </li>
   <li class="flex-row-container-auto">
-    <button matButton="filled" (click)="save()" [disabled]="_value.isValueNotChange() || !validForm()">Save</button>
+    <button #viesSaveBtn matButton="filled" (click)="save()" [disabled]="_value.isValueNotChange() || !validForm()">Save</button>
     <button matButton="filled" class="warn" (click)="revert()" [disabled]="!_value.isValueChange()">Revert</button>
     <button matButton="filled" class="warn" (click)="remove()" [disabled]="!id()">Delete</button>
   </li>

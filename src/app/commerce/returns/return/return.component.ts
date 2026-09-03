@@ -115,6 +115,14 @@ export class ReturnComponent extends ViesRestApi<ReturnRequest, ReturnRequestSer
     return id === 'new' ? null : id;
   }
 
+  // After a create, leave /new for the entity's real edit URL so
+  // refresh/bookmark/back work (FE-12).
+  protected override afterSave(res: ReturnRequest, wasCreate: boolean): void {
+    if (wasCreate && res.id) {
+      this.router.navigate([APP_ROUTES.commerceReturn(res.id)]);
+    }
+  }
+
   override ngOnInit(): void {
     super.ngOnInit();
     this.refreshOrders();
@@ -249,10 +257,17 @@ export class ReturnComponent extends ViesRestApi<ReturnRequest, ReturnRequestSer
       );
       return;
     }
-    v.orderFulfillment = { id: v.orderFulfillment.id } as OrderFulfillment;
-    if (v.orderFulfillmentItem?.id) {
-      v.orderFulfillmentItem = { id: v.orderFulfillmentItem.id } as OrderFulfillmentItem;
+    // Contract § 7.8: the line item is a REQUIRED FK — a return is always
+    // against a specific order item.
+    if (!v.orderFulfillmentItem?.id) {
+      this.dialogUtils.openErrorMessage(
+        'Order item required',
+        'Pick which line item is being returned before saving.'
+      );
+      return;
     }
+    v.orderFulfillment = { id: v.orderFulfillment.id } as OrderFulfillment;
+    v.orderFulfillmentItem = { id: v.orderFulfillmentItem.id } as OrderFulfillmentItem;
     super.save();
   }
 

@@ -234,3 +234,23 @@ export class Product extends TrackedTimeStamp {
     @MatTableHide()
     medias: ProductMedia[] = [new ProductMedia()];
 }
+
+// ---- Variant generator (POST /api/v1/products/{id}/generate-variants) ------
+// Server-side cartesian generation: each axis names a SELECT/MULTI_SELECT
+// AttributeDefinition and optionally a subset of its option ids (omitted = all).
+// Plain wire DTOs — not entities, so no decorators.
+
+export interface GenerateVariantsAxis {
+    attributeDefinitionId: string;
+    optionIds?: string[];
+}
+
+export interface GenerateVariantsRequest {
+    axes: GenerateVariantsAxis[];
+}
+
+export interface GenerateVariantsResponse {
+    created: number;
+    skipped: number;
+    product: Product;
+}

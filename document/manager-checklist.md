@@ -80,7 +80,7 @@ Intent § 5.2 and § 5.5 of [api.md].
 - [x] `CategoryListComponent` ([src/app/catalog/categories/category-list/](../src/app/catalog/categories/category-list/)) — `<mat-tree>` rendered from a `CategoryNode` tree built client-side from `parentCategoryId`. Surfaces orphans (categories whose parent id points at a deleted row) under a "⚠ Orphaned" pseudo-root so they're visible for cleanup. Modern `[childrenAccessor]` API; expand/collapse via toggle button.
 - [x] `CategoryComponent` ([src/app/catalog/categories/category/](../src/app/catalog/categories/category/)) — decorator-driven main form for name/description, dedicated `<app-mat-form-field-input-option>` parent picker (single-select with `(root)` blank option), dedicated `<app-mat-form-field-input-list-option>` for the M2M `attributeDefinitions`, child-count hint, cascade-delete confirm showing orphan-child count
 - [x] Client-side cycle detection — parent picker's `parentOptions` excludes `self + all descendants`, so the admin can't pick a bad parent in the first place
-- [ ] Drag-to-reparent (nice-to-have, deferred per intent § 5.2)
+- [x] Drag-to-reparent — native HTML5 drag on the category tree nodes: drop onto a node to become its child, or onto the "make root" zone to clear the parent. Client-side cycle guard (self/descendants excluded — backend has no FK to catch loops), full-object PUT, refresh after. ([category-list.component.ts](../src/app/catalog/categories/category-list/category-list.component.ts))
 - [x] Cascade-delete confirmation with child count — child count exposed via `childCount` computed; passed to `openCascadeDeleteConfirm` as a `{label, count}` dep
 - [x] `TagListComponent` ([src/app/catalog/tags/tag-list/](../src/app/catalog/tags/tag-list/)) — plain `<app-mat-table>` over the registry, add button routes to `/catalog/tags/new`
 - [x] `TagComponent` ([src/app/catalog/tags/tag/](../src/app/catalog/tags/tag/)) — decorator-driven form, cascade-delete (no deps), navigates to tag list after delete
@@ -102,10 +102,10 @@ Intent § 5.3. Multi-section editor implemented as a `<mat-tab-group>` with `pre
   - "Generate variants" computes cartesian product client-side, builds a `ProductVariant` per combination with derived SKU (`{baseSku}-{OPT1}-{OPT2}`), base price, stock 0, ACTIVE status, and matching `ProductVariantAttribute` per slot. Idempotent — skips SKUs already present locally.
   - Backend has no `POST /products/{id}/generate-variants` endpoint (intent § 11 gap), so variants are cascade-saved via the parent Product PUT — no per-variant POST needed.
 - [x] **Variants table**: dynamic-form row per variant for inline editing of SKU, name, price, stock, weight, status. Delete button per row.
-- [~] **Variant detail panel**: DEFERRED — the current variants table only exposes scalar fields (attributeValues + medias are `@MatInputHide` on `ProductVariant`, so they don't render inline). Per-variant attribute overrides and per-variant media aren't editable after generation. Follow-up: build a `VariantDetailDialog` that renders `<app-attribute-value-field>` per variant-level attribute + media rows.
+- [x] **Variant detail**: SUPERSEDED by the standalone `ProductVariantComponent` at `/catalog/products/:pid/variants/:id` ([product-variant.component.ts](../src/app/catalog/products/product-variant/product-variant.component.ts)) — per-variant attribute rows via `<app-attribute-value-field>`, per-variant media via the gallery, pricing modes with effective-price preview, clone. The planned `VariantDetailDialog` was never needed; the Variants tab is list-only and navigates here.
 - [x] **Media section**: per-product gallery via dynamic-form rows per `ProductMedia`. `isPrimary` toggle handler clears the flag on all other rows on activation (server doesn't enforce uniqueness).
 - [x] Save issues a PUT (or POST for new) with the full product graph via the inherited `ViesRestApi.save()`. Delete uses `openCascadeDeleteConfirm` with three dep counts (variants, attributes, media).
-- [~] Spinner: `RxJSUtils.waitLoadingDialog()` wraps the fetch/save calls via the base class. Optimistic UI for cheap toggles isn't wired yet — deferred to a polish pass.
+- [~] Spinner: `RxJSUtils.waitLoadingDialog()` wraps the fetch/save calls via the base class. Optimistic UI for cheap toggles remains deliberately unwired: every editor routes through explicit Save + `ValueTracking` (no independent cheap toggles exist), so there's nothing to apply `OptimisticUpdate` to today. Revisit only if standalone toggles appear.
 
 **Model change made along the way**: added `@MatInputHide()` + `@MatTableHide()` to `Product.tags` (was rendering as inline sub-form, but the product editor uses a dedicated multi-select from the Tag pool — cleaner UX).
 
@@ -123,7 +123,7 @@ Intent § 5.4. Now means `OrderFulfillment`, and payment status lives on `Checko
   - [x] `notes.*` keys editable list grouped by topic; "add note" form auto-namespaces new topics under `notes.`
 - [x] Trigger shipment creation from the order detail (→ `/commerce/shipments/new?orderId=`)
 - [x] Trigger return creation from the order detail (→ `/commerce/returns/new?orderId=`)
-- [!] Webhook → fulfillment status listener (no backend yet — admins manually flip status after PayPal-dashboard events; see § 11)
+- [x] Webhook → fulfillment status listener — IMPLEMENTED backend-side 2026-09-01: `CheckoutFulfillmentListener` (Venzora) consumes the library's `CheckoutOrderStatusChangedEvent` and maps CAPTURED→PROCESSING (+stock decrement, deduped with `complete()` via a `checkout.stockDecremented` metadata flag), REFUNDED/PARTIALLY_REFUNDED→same, CANCELLED/FAILED→same (only from PENDING). `complete()` is now idempotent when the webhook lands first. No frontend change needed.
 
 ---
 
@@ -200,7 +200,7 @@ Intent § 5.6.
 Intent § 5.9.
 
 - [x] `ReviewListComponent` ([src/app/reviews/review-list/](../src/app/reviews/review-list/)) at `/reviews` — table with product-name resolution (best-effort against the catalog), rating sort toggle (lowest-first default — the moderation view), search, per-row delete with confirm. No status filter — the Review model has no moderation-status field today.
-- [!] Public review write needs backend change (Review should extend `TrackedTimeStampUserAccess` or use the new `/me/reviews` endpoint — see § 11)
+- [x] Public review write — RESOLVED: the backend ships `/api/v1/me/reviews` (GET/POST/PUT/DELETE, ownership enforced from the `user_id` header). The Manager only moderates; a storefront writes through `/me/reviews`.
 
 ### 10.2 Reports & analytics
 
@@ -209,16 +209,16 @@ Intent § 5.10. Hits `/api/v1/reports/*` (10 endpoints). All in one `ReportsComp
 - [x] Period picker — from/to date pickers + presets (7/30/90 days, this month, this year); from = start-of-day, to = end-of-day
 - [x] "Run reports" fans out all nine read endpoints in parallel per period
 - [x] **Tax filing** *(highest value)* — `/reports/tax` table grouped by jurisdiction with per-currency totals rows, CSV download. Caption notes `matchingRule` is informational only; historical record lives in `OrderFulfillment.metadata.tax.*`
-- [~] **Sales dashboard** — KPI cards (`/sales/summary`), timeseries + leaderboards + geography as dense tables per currency. Chart rendering (lines/bars/map) deferred — correct numbers first; revisit with a charting pass.
-- [~] **Order pipeline** — status/count/% table from `/reports/orders/status` (donut deferred with the charting pass)
+- [x] **Sales dashboard** — KPI cards (`/sales/summary`); timeseries now renders as a revenue LINE chart per currency, top products and geography as horizontal BAR charts (top 10/12 by revenue), all above their tables (tables stay as the data of record). Charts via the new reusable `<app-chart>` (src/lib, Chart.js 4, fixed-order validated palette, dark/light aware, SSR-guarded). Done 2026-09-01.
+- [x] **Order pipeline** — status DONUT (legend right, 2px surface gaps) above the status/count/% table. Done 2026-09-01.
 - [x] **Refunds + customers** panels
 - [x] **Raw export** — stitches paginated `/reports/orders` (1000/page) into one `orders-export.csv`
 
 ### 10.3 Polish
 
-- [ ] Density-optimized tables across the app
-- [ ] Keyboard shortcuts (navigate list rows, save form, esc to close detail panel)
-- [ ] Chart rendering for the reports dashboard (timeseries line/bar, status donut, geography map)
+- [x] Density-optimized tables across the app — global compact styles in `styles.scss` (36px mat-table rows, tighter cell padding, 13px, compact paginator + .report-table). Done 2026-09-01.
+- [~] Keyboard shortcuts — **Ctrl+S / Cmd+S saves** on all 12 entity editors (new handler in the lib's `appMatFormFieldGroup` directive, `[formSummitButton]` bound to each Save button; also activates the directive's existing enter-to-submit). Esc already closes dialogs (Material default). Row navigation on lists not done — deferred. 2026-09-01
+- [x] Chart rendering for the reports dashboard — timeseries line, status donut, geography + top-products horizontal bars. A true geographic MAP was consciously skipped (needs topojson + projection for marginal value at this data volume); horizontal bars by location instead. 2026-09-01
 - [ ] AI-assisted features (auto-tag, auto-categorize) — defer per intent § 12
 
 ---
@@ -227,11 +227,11 @@ Intent § 5.10. Hits `/api/v1/reports/*` (10 endpoints). All in one `ReportsComp
 
 These block specific Manager features. Track them so we don't accidentally try to build around them.
 
-- [!] **Variant generator** — `POST /api/v1/products/{id}/generate-variants` would replace the loop-and-POST approach in the product editor (blocks § 3 generator efficiency)
+- [x] **Variant generator** — IMPLEMENTED 2026-09-01: backend `POST /api/v1/products/{id}/generate-variants` (admin-gated; SELECT-definition axes with optional option subsets; cartesian product capped at 500; SKU `{baseSku}-{OPT1}-{OPT2}`, skips existing SKUs locally AND globally; one cascading product save; returns `{created, skipped, product}`) + frontend `VariantGeneratorDialog` behind a "Generate variants…" button on the Variants tab (axis + option pickers, live combo count, swaps in the returned product graph).
 - [x] ~~**Media uploader**~~ — RESOLVED client-side: the media gallery + source dialog upload through `ObjectStorageService` (deferred until parent save), track `ProductMedia.objectStorageDataId`, and clean up orphaned storage files after successful saves
-- [!] **Webhook → fulfillment listener** — without it, admins manually flip `OrderFulfillment.status` after PayPal-dashboard refunds/chargebacks (blocks § 4 automation)
-- [!] **Login / refresh-token paths** — confirm with backend before wiring the auth shell (blocks § 0.1 final wiring)
-- [!] **Public review write** — `Review` doesn't extend `UserAccess`. Either model migration + user-scoped controller, or use the new `/me/reviews` endpoint (blocks § 10.1 if shoppers should self-write)
+- [x] **Webhook → fulfillment listener** — implemented; see § 4.
+- [x] **Login / refresh-token paths** — CONFIRMED: all 10 `/api/v1/authenticators/*` endpoints exist and are wired (login verified live repeatedly).
+- [x] **Public review write** — resolved via `/api/v1/me/reviews`; see § 10.1.
 
 ---
 

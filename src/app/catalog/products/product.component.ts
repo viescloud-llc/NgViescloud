@@ -16,6 +16,9 @@ import { CategoryQuickAddDialog } from '../categories/category/category-quick-ad
 import { TagQuickAddDialog } from '../tags/tag/tag-quick-add-dialog/tag-quick-add-dialog.component';
 import { AttributeValueFieldComponent } from '../../shared/component/attribute-value-field/attribute-value-field.component';
 import { ProductMediaGalleryComponent } from '../../shared/component/product-media/media-gallery/media-gallery.component';
+import { VariantGeneratorDialog, VariantGeneratorDialogData } from './variant-generator-dialog/variant-generator-dialog.component';
+import { GenerateVariantsResponse } from '../../shared/model/product.model';
+import { SnackBarUtils } from '../../../lib/util/SnackBar.utils';
 
 @Component({
   selector: 'app-product',
@@ -304,6 +307,36 @@ export class ProductComponent extends ViesRestApi<Product, ProductService> imple
     this.router.navigate([APP_ROUTES.catalogProductVariantNew(pid)]);
   }
 
+  // Cartesian generator — server-side (POST /products/{id}/generate-variants).
+  // Guarded on unsaved changes like the other variant actions: the endpoint
+  // saves through the product graph, so pending local edits would be lost.
+  openVariantGeneratorDialog() {
+    if (!this.guardUnsavedChanges()) return;
+    const pid = this.id();
+    if (!pid) return;
+    this.dialogUtils.matDialog
+      .open(VariantGeneratorDialog, {
+        width: '560px',
+        data: {
+          productId: pid,
+          baseSku: this.value()?.baseSku ?? '',
+          definitions: this.allAttributeDefinitions()
+        } satisfies VariantGeneratorDialogData
+      })
+      .afterClosed()
+      .subscribe((res: GenerateVariantsResponse | undefined) => {
+        if (!res) return;
+        // The response carries the authoritative updated product graph —
+        // swap it in as the new tracking baseline (same as a save would).
+        this._value.set(res.product);
+        SnackBarUtils.openSnackBar(
+          this.rxjsUtils.snackBar,
+          `Generated ${res.created} variant(s)` + (res.skipped ? `, skipped ${res.skipped} existing` : ''),
+          'Dismiss', 8000
+        );
+      });
+  }
+
   navigateToEditVariant(variant: ProductVariant) {
     if (!this.guardUnsavedChanges()) return;
     const pid = this.id();
@@ -376,7 +409,8 @@ export class ProductComponent extends ViesRestApi<Product, ProductService> imple
     }
 
     try {
-      const saved = this.id()
+      const wasCreate = !this.id();
+      const saved = !wasCreate
         ? await firstValueFrom(
             this.service.put(this.id(), draft).pipe(this.rxjsUtils.waitLoadingDialog())
           )
@@ -388,6 +422,13 @@ export class ProductComponent extends ViesRestApi<Product, ProductService> imple
       // Step 3
       if (gallery && gallery.hasPendingStorageDeletes()) {
         await gallery.flushPendingStorageDeletes();
+      }
+
+      // Step 4 — after a create, leave /new for the real edit URL so
+      // refresh/bookmark/back work (FE-10) and the variant/media tabs unlock
+      // against the persisted id.
+      if (wasCreate && saved?.id) {
+        this.router.navigate([APP_ROUTES.catalogProduct(saved.id)]);
       }
     } catch (err) {
       this.dialogUtils.openErrorMessageFromError(err);

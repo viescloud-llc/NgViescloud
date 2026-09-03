@@ -137,6 +137,12 @@
          ===================================================================== -->
     <li class="report-block">
       <h3 class="section-title">Sales over time ({{ salesTimeseries()?.bucket }})</h3>
+      @for (chart of timeseriesCharts(); track chart.currency) {
+        <app-chart type="line"
+                   [labels]="chart.labels"
+                   [datasets]="chart.datasets"
+                   [height]="240"></app-chart>
+      }
       @for (cur of salesTimeseries()?.byCurrency ?? []; track cur.currency) {
         <h4 class="currency-heading">{{ cur.currency }}</h4>
         <table class="report-table">
@@ -167,6 +173,13 @@
       <div class="leaderboards">
         <div class="leaderboard">
           <h4 class="currency-heading">Top products</h4>
+          @for (chart of topProductCharts(); track chart.currency) {
+            <app-chart type="bar"
+                       [horizontal]="true"
+                       [labels]="chart.labels"
+                       [datasets]="chart.datasets"
+                       [height]="barChartHeight(chart.labels.length)"></app-chart>
+          }
           @for (cur of topProducts()?.byCurrency ?? []; track cur.currency) {
             <table class="report-table">
               <thead>
@@ -207,6 +220,13 @@
          ===================================================================== -->
     <li class="report-block">
       <h3 class="section-title">Geography ({{ geography()?.groupBy }})</h3>
+      @for (chart of geographyCharts(); track chart.currency) {
+        <app-chart type="bar"
+                   [horizontal]="true"
+                   [labels]="chart.labels"
+                   [datasets]="chart.datasets"
+                   [height]="barChartHeight(chart.labels.length)"></app-chart>
+      }
       @for (cur of geography()?.byCurrency ?? []; track cur.currency) {
         <h4 class="currency-heading">{{ cur.currency }}</h4>
         <table class="report-table">
@@ -235,6 +255,12 @@
       <div class="panels">
         <div class="panel">
           <h4 class="currency-heading">Order pipeline ({{ orderStatus()?.totalOrders }} total)</h4>
+          @if (statusChart().labels.length > 0) {
+            <app-chart type="doughnut"
+                       [labels]="statusChart().labels"
+                       [datasets]="statusChart().datasets"
+                       [height]="220"></app-chart>
+          }
           <table class="report-table">
             <thead><tr><th>Status</th><th class="num">Count</th><th class="num">%</th></tr></thead>
             <tbody>

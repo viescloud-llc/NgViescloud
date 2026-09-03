@@ -208,3 +208,41 @@ a {
 .multiline {
     white-space: pre-wrap;
 }
+// ---------------------------------------------------------------------------
+// Density pass (manager-checklist § 10.3): the admin panel is a data-dense
+// back-office tool used by repeat operators — compact rows beat airy defaults.
+// Applies to Material tables (the lib's <app-mat-table> renders mat-table) and
+// the reports' plain .report-table.
+// ---------------------------------------------------------------------------
+
+.mat-mdc-table {
+    .mat-mdc-header-row {
+        height: 40px;
+    }
+
+    .mat-mdc-row {
+        height: 36px;
+    }
+
+    .mat-mdc-cell,
+    .mat-mdc-header-cell {
+        padding: 0 10px;
+        font-size: 13px;
+    }
+}
+
+.report-table {
+    th,
+    td {
+        padding: 3px 10px;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+}
+
+// Compact paginator to match the denser tables.
+.mat-mdc-paginator {
+    .mat-mdc-paginator-container {
+        min-height: 44px;
+    }
+}

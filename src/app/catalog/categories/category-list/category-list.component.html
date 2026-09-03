@@ -17,11 +17,21 @@
   <li>
     <mat-tree #treeView [dataSource]="tree()" [childrenAccessor]="getChildren" class="category-tree">
 
-      <!-- Leaf node (no children). Indented via matTreeNodePadding for visual alignment with branches. -->
-      <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
+      <!-- Leaf node (no children). Indented via matTreeNodePadding for visual alignment with branches.
+           Nodes are draggable — drop one ONTO another to reparent (cycle-guarded);
+           the "(make root)" zone below the tree clears the parent. -->
+      <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding
+                     [draggable]="node.category.id !== '__orphans__'"
+                     (dragstart)="onDragStart($event, node.category)"
+                     (dragend)="onDragEnd()"
+                     (dragover)="onDragOver($event, node.category.id)"
+                     (dragleave)="onDragLeave(node.category.id)"
+                     (drop)="onDrop($event, node.category.id)"
+                     [class.drop-target]="dropTargetId() === node.category.id">
         <button mat-icon-button disabled aria-label="Leaf node">
           <mat-icon>chevron_right</mat-icon>
         </button>
+        <mat-icon class="drag-handle" aria-hidden="true">drag_indicator</mat-icon>
         <span class="cat-name">{{ node.category.name }}</span>
         @if (node.category.id !== '__orphans__') {
           <button matButton (click)="selectCategory(node.category)">Edit</button>
@@ -30,10 +40,18 @@
       </mat-tree-node>
 
       <!-- Branch node (has children). Toggle button expands/collapses. -->
-      <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding>
+      <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding
+                     [draggable]="node.category.id !== '__orphans__'"
+                     (dragstart)="onDragStart($event, node.category)"
+                     (dragend)="onDragEnd()"
+                     (dragover)="onDragOver($event, node.category.id)"
+                     (dragleave)="onDragLeave(node.category.id)"
+                     (drop)="onDrop($event, node.category.id)"
+                     [class.drop-target]="dropTargetId() === node.category.id">
         <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.category.name">
           <mat-icon>{{ treeView.isExpanded(node) ? 'expand_more' : 'chevron_right' }}</mat-icon>
         </button>
+        <mat-icon class="drag-handle" aria-hidden="true">drag_indicator</mat-icon>
         <span class="cat-name">{{ node.category.name }}</span>
         @if (node.category.id !== '__orphans__') {
           <button matButton (click)="selectCategory(node.category)">Edit</button>
@@ -42,6 +60,17 @@
       </mat-tree-node>
 
     </mat-tree>
+
+    <!-- Root drop zone — only interesting mid-drag for a non-root category. -->
+    @if (draggedCategory() && draggedCategory()!.parentCategoryId) {
+      <div class="root-drop-zone"
+           [class.drop-target]="dropTargetId() === ''"
+           (dragover)="onDragOver($event, '')"
+           (dragleave)="onDragLeave('')"
+           (drop)="onDrop($event, '')">
+        Drop here to make "{{ draggedCategory()!.name }}" a root category
+      </div>
+    }
 
     @if (searchTerm() && filteredCategories().length === 0) {
       <p class="empty-hint">No categories match "{{ searchTerm() }}".</p>
