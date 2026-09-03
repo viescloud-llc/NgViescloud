@@ -53,6 +53,38 @@ export class DiscountComponent extends ViesRestApi<Discount, DiscountService> {
     return id === 'new' ? null : id;
   }
 
+  // The blank Discount's validFrom/validTo are `new ViesDateTime()` — all-zero
+  // but truthy, so the `??` defaults in onMainFormChange never fire and an
+  // untouched form would persist a year-0 window no checkout can ever satisfy.
+  // Seed a real window (now → now + 1 year) for the create case.
+  override ngOnInit(): void {
+    super.ngOnInit();
+    if (!this.getRouteId()) {
+      const v = this.value();
+      if (v) {
+        if (!v.validFrom?.year) {
+          v.validFrom = ViesDateTime.now();
+        }
+        if (!v.validTo?.year) {
+          const inOneYear = new Date();
+          inOneYear.setFullYear(inOneYear.getFullYear() + 1);
+          v.validTo = ViesDateTime.fromJsDate(inOneYear);
+        }
+        // _value.set (not value.set) so the seeded dates become the tracking
+        // baseline — Save stays disabled until the admin actually edits.
+        this._value.set({ ...v });
+      }
+    }
+  }
+
+  // After a create, leave /new for the entity's real edit URL so
+  // refresh/bookmark/back work.
+  protected override afterSave(res: Discount, wasCreate: boolean): void {
+    if (wasCreate && res.id) {
+      this.router.navigate([APP_ROUTES.commerceDiscount(res.id)]);
+    }
+  }
+
   // Preserve the hidden validity-window fields the dynamic form doesn't render.
   onMainFormChange(v: Discount) {
     const current = this.value();

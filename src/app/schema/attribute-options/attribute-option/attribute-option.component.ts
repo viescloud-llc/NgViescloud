@@ -23,6 +23,14 @@ export class AttributeOptionComponent extends ViesRestApi<AttributeOption, Attri
     return id === 'new' ? null : id;
   }
 
+  // After a create, leave /new for the entity's real edit URL so
+  // refresh/bookmark/back work.
+  protected override afterSave(res: AttributeOption, wasCreate: boolean): void {
+    if (wasCreate && res.id) {
+      this.router.navigate([APP_ROUTES.schemaAttributeOption(res.id)]);
+    }
+  }
+
   // AttributeOption has no owned children, so no dep counts to surface. We still
   // route through the cascade helper for the consistent "Delete X?" prompt and
   // navigate back to the options list rather than the default `/home`.

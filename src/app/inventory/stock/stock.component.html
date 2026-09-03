@@ -66,7 +66,7 @@
                   <div class="adjust-fields">
                     <app-mat-form-field-input
                       [value]="adjustQuantity()"
-                      (valueChange)="adjustQuantity.set($event)"
+                      (valueChange)="onAdjustQuantityChange($event)"
                       [inputMap]="inputField('adjust-qty')
                                     .set(inputKeys.label, 'Quantity change')
                                     .set(inputKeys.placeholder, 'e.g. 10 or -3')

@@ -23,6 +23,14 @@ export class TagComponent extends ViesRestApi<Tag, TagService> {
     return id === 'new' ? null : id;
   }
 
+  // After a create, leave /new for the entity's real edit URL so
+  // refresh/bookmark/back work.
+  protected override afterSave(res: Tag, wasCreate: boolean): void {
+    if (wasCreate && res.id) {
+      this.router.navigate([APP_ROUTES.catalogTag(res.id)]);
+    }
+  }
+
   // Tags have no owned children, so no dep counts to surface. Route through the
   // cascade-confirm helper anyway for the consistent prompt, then navigate back
   // to the tag list rather than the default `/home`.

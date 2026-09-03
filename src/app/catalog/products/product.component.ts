@@ -63,6 +63,10 @@ export class ProductComponent extends ViesRestApi<Product, ProductService> imple
     }))
   );
 
+  // Backend requires an embedded category with a real id — POSTing {id:""}
+  // 500s. Save is gated on this alongside validForm().
+  hasCategory = computed<boolean>(() => !!this.value()?.category?.id);
+
   selectedCategory = computed<Category | null>(() => {
     const catId = this.value()?.category?.id;
     if (!catId) return null;
@@ -130,7 +134,14 @@ export class ProductComponent extends ViesRestApi<Product, ProductService> imple
     this.value.set({ ...v });
   }
 
-  onCategoryChange(cat: Category | null | undefined) {
+  onCategoryChange(cat: Category | string | null | undefined) {
+    // Without manuallyEmitValue the autocomplete emits the raw text on every
+    // keystroke. Partial text is not a selection — ignore it; an emitted empty
+    // string (clear icon / requireSelection reset) means "clear the category".
+    if (typeof cat === 'string') {
+      if (cat !== '') return;
+      cat = null;
+    }
     const p = this.value();
     if (!p) return;
     p.category = cat ?? DataUtils.purgeValue(new Category());

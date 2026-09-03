@@ -78,6 +78,14 @@ export class CategoryComponent extends ViesRestApi<Category, CategoryService> im
     return id === 'new' ? null : id;
   }
 
+  // After a create, leave /new for the entity's real edit URL so
+  // refresh/bookmark/back work.
+  protected override afterSave(res: Category, wasCreate: boolean): void {
+    if (wasCreate && res.id) {
+      this.router.navigate([APP_ROUTES.catalogCategory(res.id)]);
+    }
+  }
+
   override ngOnInit(): void {
     super.ngOnInit();
 
@@ -117,7 +125,14 @@ export class CategoryComponent extends ViesRestApi<Category, CategoryService> im
     this.value.set({ ...v });
   }
 
-  onParentChange(parent: Category | null | undefined) {
+  onParentChange(parent: Category | string | null | undefined) {
+    // Without manuallyEmitValue the autocomplete emits the raw text on every
+    // keystroke. Partial text is not a selection — ignore it; an emitted empty
+    // string (clear icon / requireSelection reset) means "no parent" (root).
+    if (typeof parent === 'string') {
+      if (parent !== '') return;
+      parent = null;
+    }
     const cat = this.value();
     if (!cat) return;
     cat.parentCategoryId = parent?.id ?? '';

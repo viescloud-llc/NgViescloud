@@ -18,7 +18,10 @@
        parent's name in the input rather than its UUID. Excludes self and
        descendants passively (via `parentOptions`), so the admin can't create a
        cycle from the picker. `optionsrequireSelection` prevents partial text
-       from persisting as an unresolved parent. -->
+       from persisting as an unresolved parent. NOT using `manuallyEmitValue` —
+       clicking an option must commit immediately (with it, the input showed the
+       pick but the model kept the old parent until Enter); onParentChange
+       ignores the partial-text emissions that come with keystrokes. -->
   <li class="option-add-row">
     <app-mat-form-field-input
       [value]="selectedParent()"
@@ -27,8 +30,6 @@
       [inputMap]="inputField('parent-search')
                     .set(inputKeys.label, 'Parent Category')
                     .set(inputKeys.placeholder, 'Search existing categories… ( leave blank for root )')
-                    .set(inputKeys.manuallyEmitValue, true)
-                    .set(inputKeys.manuallyEmitValueHint, 'Press enter to set as parent')
                     .set(inputKeys.optionsAutoActiveFirst, true)
                     .set(inputKeys.optionsrequireSelection, true)
                     .set(inputKeys.showClearIcon, true)

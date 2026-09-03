@@ -22,7 +22,12 @@
 
           <!-- Category picker: searchable autocomplete over all categories with
                ancestry path in the label. Quick-add button reuses the same
-               CategoryQuickAddDialog from the Category editor. -->
+               CategoryQuickAddDialog from the Category editor.
+               NOT using `manuallyEmitValue` — clicking an option must commit the
+               value immediately (with it, the input showed the pick but the model
+               kept category {id:""} until Enter). Same pattern as the
+               Attributes-tab definition picker below; onCategoryChange ignores
+               the partial-text emissions that come with keystrokes. -->
           <div class="picker-row">
             <app-mat-form-field-input
               [value]="selectedCategory()"
@@ -31,8 +36,6 @@
               [inputMap]="inputField('prod-cat')
                             .set(inputKeys.label, 'Category')
                             .set(inputKeys.placeholder, 'Search categories…')
-                            .set(inputKeys.manuallyEmitValue, true)
-                            .set(inputKeys.manuallyEmitValueHint, 'Press enter to set')
                             .set(inputKeys.optionsAutoActiveFirst, true)
                             .set(inputKeys.optionsrequireSelection, true)
                             .set(inputKeys.showClearIcon, true)
@@ -239,8 +242,14 @@
   <!-- Save / Revert / Delete — outside the tabs so the actions are always in view.
        Save issues a PUT with the full product graph (variants, attributes, media)
        — the backend cascade-saves them per intent § 5.1. -->
+  <!-- Category is required by the backend contract (embedded, non-null) and an
+       empty {id:""} POST 500s server-side — so Save is also gated on a
+       committed category. -->
+  @if (!hasCategory()) {
+    <li class="missing-category-hint">Category is required — pick one in the Basics tab before saving.</li>
+  }
   <li class="flex-row-container-auto">
-    <button matButton="filled" (click)="save()" [disabled]="_value.isValueNotChange() || !validForm()">Save</button>
+    <button matButton="filled" (click)="save()" [disabled]="_value.isValueNotChange() || !validForm() || !hasCategory()">Save</button>
     <button matButton="filled" class="warn" (click)="revert()" [disabled]="!_value.isValueChange()">Revert</button>
     <button matButton="filled" class="warn" (click)="remove()" [disabled]="!id()">Delete</button>
   </li>

@@ -115,3 +115,12 @@
   gap: 0.75rem;
   flex-wrap: wrap;
 }
+
+// Inline warning shown above the action bar when no category is committed —
+// pairs with the Save gate (backend rejects products without a category).
+.missing-category-hint {
+  color: var(--mat-sys-error, #f28b82);
+  font-size: 0.85rem;
+  padding: 0.25rem 0;
+  list-style: none;
+}

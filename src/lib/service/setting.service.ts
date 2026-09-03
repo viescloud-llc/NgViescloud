@@ -7,7 +7,6 @@ import { AuthenticatorService } from './authenticator.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConfirmDialog } from '../dialog/confirm-dialog/confirm-dialog.component';
 import { PopupArgs, PopupType } from '../model/popup.model';
-import { RxJSUtils } from '../util/RxJS.utils';
 import { DataUtils } from '../util/Data.utils';
 import { FileUtils } from '../util/File.utils';
 import { StringUtils } from '../util/String.utils';
@@ -262,14 +261,10 @@ export class SettingService implements OnDestroy {
     const filePath = `${prefix}/${this.GENERAL_SETTING_KEY}`;
     this.log('Syncing settings from server:', filePath);
 
+    // No loading snackbar here — this is a background sync that runs on every
+    // login/page-load; flashing "Loading …" (and surfacing the expected 404
+    // when no settings have been saved yet) is just noise.
     this.objectStorageService.getFileByFileName(filePath)
-      .pipe(RxJSUtils.waitLoadingDynamicStringSnackBar(
-        this.snackBar,
-        `Loading ${filePath}`,
-        40,
-        'Dismiss',
-        10
-      ))
       .subscribe({
         next: (blob) => {
           StringUtils.readBlobAsText(blob).then((jsonString) => {
@@ -301,7 +296,13 @@ export class SettingService implements OnDestroy {
           });
         },
         error: (error) => {
-          this.logWarn('Failed to load settings from server:', error);
+          // 404 just means no settings file has been saved yet — expected on a
+          // fresh account/app, not worth a console warning.
+          if (error?.status === 404) {
+            this.log('No settings file on server yet:', filePath);
+          } else {
+            this.logWarn('Failed to load settings from server:', error);
+          }
 
           // Check if we have local settings to fall back on
           const localSettings = FileUtils.localStorageGetRawString(this.GENERAL_SETTING_KEY);

@@ -77,6 +77,7 @@ export abstract class ViesRestApi<T extends Object | object, S extends ViesRestS
             this.service.put(this.id(), this._value.value()!).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
                 next: res => {
                     this._value.set(res);
+                    this.afterSave(res, false);
                 },
                 error: err => {
                     this.dialogUtils.openErrorMessageFromError(err);
@@ -87,13 +88,22 @@ export abstract class ViesRestApi<T extends Object | object, S extends ViesRestS
             this.service.post(this._value.value()!).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
                 next: res => {
                     this._value.set(res);
+                    this.afterSave(res, true);
                 },
                 error: err => {
                     this.dialogUtils.openErrorMessageFromError(err);
                 }
             });
         }
-    }   
+    }
+
+    /**
+     * Called after a successful save. wasCreate is true when the save was a POST (new entity).
+     * Default is a no-op; override e.g. to navigate to the created entity's edit URL.
+     */
+    protected afterSave(res: T, wasCreate: boolean): void {
+
+    }
 
     revert() {
         this._value.revert();

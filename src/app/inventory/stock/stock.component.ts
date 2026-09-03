@@ -82,6 +82,12 @@ export class StockComponent extends ViesMatFormFieldMap implements OnInit {
     && this.adjustReason().trim().length > 0
   );
 
+  // The lib text input emits the raw string ("7"); StockMovement.quantityChange
+  // is integer(int64) on the wire, so coerce before it ever hits the signal.
+  onAdjustQuantityChange(v: number | string) {
+    this.adjustQuantity.set(Number(v) || 0);
+  }
+
   openAdjust(row: StockRow) {
     this.adjustingVariant.set(row.variant);
     this.adjustQuantity.set(0);

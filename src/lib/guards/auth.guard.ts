@@ -71,12 +71,37 @@ export class AuthGuard /*, CanActivateChild, CanDeactivate<unknown>, CanLoad */
     return this.isLogin();
   }
 
+  private checkAuthenticationWithRole(role: string): Observable<boolean> {
+    return this.authenticatorService.isAuthenticatedWithUserGroup$(role).pipe(
+      take(1),
+      tap(authorized => {
+        if (!authorized) {
+          this.router.navigate([environment.endpoint_login]);
+        }
+      })
+    );
+  }
+
   isLoginWithRole(role: string): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-    return this.authenticatorService.isAuthenticatedWithUserGroup$(role);
+    // Resolve to a Promise (not a cold Observable): call sites wrap this in an
+    // `async () =>` guard fn, and an Observable wrapped in a Promise is a truthy
+    // object the router never subscribes — the check would silently pass.
+    if(this.authenticatorService.isInitialized() || !this.authenticatorService.hasSessionRefreshToken()) {
+      return firstValueFrom(this.checkAuthenticationWithRole(role));
+    }
+    else {
+      return firstValueFrom(
+        this.delayUntilReadyOrTimeout(this.getAuthInitializationSignal(), 10000, () => {
+          this.router.navigate([environment.endpoint_login]);
+        }).pipe(
+          switchMap(() => this.checkAuthenticationWithRole(role))
+        )
+      );
+    }
   }
 
   isChildLoginWithRole(role: string): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-    return this.authenticatorService.isAuthenticatedWithUserGroup$(role);
+    return this.isLoginWithRole(role);
   }
 
   canActivate(

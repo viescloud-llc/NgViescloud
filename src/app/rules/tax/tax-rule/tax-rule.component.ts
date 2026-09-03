@@ -44,6 +44,14 @@ export class TaxRuleComponent extends ViesRestApi<TaxRule, TaxRuleService> {
     return id === 'new' ? null : id;
   }
 
+  // After a create, leave /new for the entity's real edit URL so
+  // refresh/bookmark/back work.
+  protected override afterSave(res: TaxRule, wasCreate: boolean): void {
+    if (wasCreate && res.id) {
+      this.router.navigate([APP_ROUTES.rulesTax(res.id)]);
+    }
+  }
+
   onMainFormChange(v: TaxRule) {
     this.value.set({ ...v });
   }
