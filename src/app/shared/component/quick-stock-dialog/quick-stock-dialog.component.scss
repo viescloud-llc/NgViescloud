@@ -1,0 +1,11 @@
+mat-dialog-content {
+  min-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.hint { margin: 0 0 0.75rem; font-size: 0.9rem; opacity: 0.85; }
+.full-width { width: 100%; }
+.projection { margin-top: 0.5rem; }
+.projection.negative { color: var(--mat-sys-error, #f28b82); }

@@ -9,6 +9,7 @@ import { FilterNamePipe } from '../pipes/filter-name.pipe';
 import { FilterNameReversePipe } from '../pipes/filter-name-reverse.pipe';
 import { MatTableComponent } from '../util-component/mat-table/mat-table.component';
 import { ChartComponent } from '../util-component/chart/chart.component';
+import { MaintenancePageComponent } from '../share-component/maintenance-page/maintenance-page.component';
 import { MatFormFieldGroupDirective } from '../directive/mat-form-field-group.directive';
 import { MatFormFieldInputTextAreaComponent } from '../util-component/mat-form-field-input-text-area/mat-form-field-input-text-area.component';
 import { MatFormFieldComponent } from '../util-component/mat-form-field/mat-form-field.component';
@@ -17,6 +18,7 @@ import { MatFormFieldInputOptionComponent } from '../util-component/mat-form-fie
 import { MatFormFieldInputListComponent } from '../util-component/mat-form-field-input-list/mat-form-field-input-list.component';
 import { MatFormFieldInputDynamicComponent } from '../util-component/mat-form-field-input-dynamic/mat-form-field-input-dynamic.component';
 import { MatFormFieldInputListOptionComponent } from '../util-component/mat-form-field-input-list-option/mat-form-field-input-list-option.component';
+import { MatFormFieldInputPermissionComponent } from '../util-component/mat-form-field-input-permission/mat-form-field-input-permission.component';
 import { HeaderComponent } from '../share-component/header/header.component';
 import { LoginComponent } from '../share-component/login/login.component';
 import { SideDrawerMenuComponent } from '../share-component/side-drawer-menu/side-drawer-menu.component';
@@ -36,6 +38,7 @@ import { MatTableLazyComponent } from '../util-component/mat-table-lazy/mat-tabl
 import { OpenIdProviderComponent } from '../share-component/open-id-provider/open-id-provider.component';
 import { UserGroupListComponent } from '../share-component/user-group-list/user-group-list.component';
 import { UserListComponent } from '../share-component/user-list/user-list.component';
+import { RoleListComponent } from '../share-component/role-list/role-list.component';
 import { UserSettingComponent } from '../share-component/user-setting/user-setting.component';
 import { UserAccessComponent } from '../share-component/user-access/user-access.component';
 import { MatTableDynamicViesServiceComponent } from '../util-component/mat-table-dynamic-vies-service/mat-table-dynamic-vies-service.component';
@@ -65,6 +68,7 @@ const UTILS = [
   MatFormFieldInputDynamicComponent,
   MatFormFieldInputDynamicFormComponent,
   MatFormFieldInputListOptionComponent,
+  MatFormFieldInputPermissionComponent,
   MatFormFieldInputRgbColorPickerComponent,
   MatFormFieldInputRecordComponent,
   MatFormFieldInputUserAccessComponent,
@@ -81,6 +85,7 @@ const UTILS = [
 ]
 
 const COMPONENTS = [
+  MaintenancePageComponent,
   HeaderComponent,
   LoginComponent,
   OpenIdProviderComponent,
@@ -88,6 +93,7 @@ const COMPONENTS = [
   QuickSideDrawerMenuComponent,
   UserGroupListComponent,
   UserListComponent,
+  RoleListComponent,
   UserSettingComponent,
   UserAccessComponent
 ]

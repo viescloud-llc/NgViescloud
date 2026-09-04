@@ -1,0 +1,49 @@
+<h2 mat-dialog-title>Effective permissions — {{ data.user.username || data.user.email }}</h2>
+
+<mat-dialog-content>
+  @if (hasStar()) {
+    <p class="star-note">This user holds <code>*</code> — everything is permitted.</p>
+  }
+
+  <!-- Persisted truth -->
+  <h3>As saved on the server</h3>
+  @if (serverError()) {
+    <p class="error">{{ serverError() }}</p>
+  } @else if (!serverRows()) {
+    <p class="dim">Loading…</p>
+  } @else if (serverRows()!.length === 0) {
+    <p class="dim">No grants — this user holds no roles (directly or via groups).</p>
+  } @else {
+    <p class="dim">{{ serverDistinct().length }} distinct grant(s) via {{ serverRows()!.length }} role assignment(s).</p>
+    <table class="provenance">
+      <thead><tr><th>Permission</th><th>Role</th><th>Via</th></tr></thead>
+      <tbody>
+        @for (row of serverRows(); track $index) {
+          <tr><td><code>{{ row.permission }}</code></td><td>{{ row.roleName }}</td><td>{{ row.via }}</td></tr>
+        }
+      </tbody>
+    </table>
+  }
+
+  <!-- Unsaved preview -->
+  @if (data.unsaved) {
+    <h3>Preview with your unsaved changes</h3>
+    @if (previewRows().length === 0) {
+      <p class="dim">No grants with the roles/groups currently selected.</p>
+    } @else {
+      <p class="dim">{{ previewDistinct().length }} distinct grant(s).</p>
+      <table class="provenance">
+        <thead><tr><th>Permission</th><th>Role</th><th>Via</th></tr></thead>
+        <tbody>
+          @for (row of previewRows(); track $index) {
+            <tr><td><code>{{ row.permission }}</code></td><td>{{ row.roleName }}</td><td>{{ row.via }}</td></tr>
+          }
+        </tbody>
+      </table>
+    }
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button matButton="filled" (click)="close()" type="button">Close</button>
+</mat-dialog-actions>

@@ -54,6 +54,39 @@
     </div>
   </li>
 
+  <!-- Product matchers: empty = whole cart; set = only matching lines. -->
+  <li>
+    <h3 class="section-title">Product matchers (optional)</h3>
+    <p class="tab-hint">
+      Restrict the discount to lines whose product carries <em>any</em> of the picked tags,
+      categories (including sub-categories) or attribute definitions. The discount value
+      (percentage, fixed amount and cap) is then computed on those lines' subtotal only;
+      the minimum order amount still applies to the whole order.
+      @if (isScoped()) { <strong>This discount is product-scoped.</strong> }
+    </p>
+    <app-mat-form-field-input-list-option
+      [value]="value()?.tags || []"
+      (valueChange)="onTagsChange($event)"
+      [options]="tagOptions()"
+      [inputMap]="inputField('disc-tags').set(inputKeys.label, 'Tags').set(inputKeys.styleWidth, '100%')
+                    .set(inputKeys.showSizeInput, false).set(inputKeys.showSearchOption, true).set(inputKeys.uniqueValue, true)"
+    ></app-mat-form-field-input-list-option>
+    <app-mat-form-field-input-list-option
+      [value]="value()?.categories || []"
+      (valueChange)="onCategoriesChange($event)"
+      [options]="categoryOptions()"
+      [inputMap]="inputField('disc-categories').set(inputKeys.label, 'Categories (incl. sub-categories)').set(inputKeys.styleWidth, '100%')
+                    .set(inputKeys.showSizeInput, false).set(inputKeys.showSearchOption, true).set(inputKeys.uniqueValue, true)"
+    ></app-mat-form-field-input-list-option>
+    <app-mat-form-field-input-list-option
+      [value]="value()?.attributeDefinitions || []"
+      (valueChange)="onAttributeDefinitionsChange($event)"
+      [options]="attributeDefinitionOptions()"
+      [inputMap]="inputField('disc-attr-defs').set(inputKeys.label, 'Attribute definitions').set(inputKeys.styleWidth, '100%')
+                    .set(inputKeys.showSizeInput, false).set(inputKeys.showSearchOption, true).set(inputKeys.uniqueValue, true)"
+    ></app-mat-form-field-input-list-option>
+  </li>
+
   <li class="flex-row-container-auto">
     <button #viesSaveBtn matButton="filled" (click)="save()" [disabled]="_value.isValueNotChange() || !validForm()">Save</button>
     <button matButton="filled" class="warn" (click)="revert()" [disabled]="!_value.isValueChange()">Revert</button>

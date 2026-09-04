@@ -5,6 +5,7 @@ import { AuthenticatorService } from '../service/authenticator.service';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogUtils } from '../util/Dialog.utils';
 import { environment } from '../../environments/environment.prod';
+import { SnackBarUtils } from '../util/SnackBar.utils';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +17,8 @@ export class AuthGuard /*, CanActivateChild, CanDeactivate<unknown>, CanLoad */
   constructor(
     private authenticatorService: AuthenticatorService, 
     private router: Router,
-    private dialogUtils: DialogUtils
+    private dialogUtils: DialogUtils,
+    private snackBarUtils: SnackBarUtils
   ){}
 
   delayUntilReadyOrTimeout(
@@ -102,6 +104,42 @@ export class AuthGuard /*, CanActivateChild, CanDeactivate<unknown>, CanLoad */
 
   isChildLoginWithRole(role: string): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     return this.isLoginWithRole(role);
+  }
+
+  /**
+   * Authority-based route gate. Unauthenticated → /login; authenticated but
+   * lacking the authority → snackbar + redirect home (UrlTree). Members of the
+   * admin group pass (legacy fallback) unless adminFallback is false.
+   *
+   * Same Promise discipline as isLoginWithRole: call sites are
+   * `async () => inject(AuthGuard).isLoginWithAuthority('orders:read')`, so a
+   * cold Observable would be wrapped in the Promise as a truthy object and
+   * never subscribed — both branches must resolve via firstValueFrom.
+   */
+  isLoginWithAuthority(authority: string | readonly string[], mode: 'any' | 'all' = 'any', adminFallback: boolean = true): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+    const checks = typeof authority === 'string' ? [authority] : authority;
+    const decide = (): Observable<boolean | UrlTree> =>
+      this.authenticatorService.isAuthenticatedWithAuthority$(checks, mode, adminFallback ? 'ADMIN' : null).pipe(
+        take(1),
+        map(authorized => {
+          if (authorized) return true;
+          if (this.authenticatorService.isAuthenticatedSync()) {
+            this.snackBarUtils.openSnackBar('You do not have access to that section', 'OK', 4000);
+            return this.router.createUrlTree([environment.endpoint_home]);
+          }
+          this.router.navigate([environment.endpoint_login]);
+          return false;
+        })
+      );
+
+    if(this.authenticatorService.isInitialized() || !this.authenticatorService.hasSessionRefreshToken()) {
+      return firstValueFrom(decide());
+    }
+    return firstValueFrom(
+      this.delayUntilReadyOrTimeout(this.getAuthInitializationSignal(), 10000, () => {
+        this.router.navigate([environment.endpoint_login]);
+      }).pipe(switchMap(() => decide()))
+    );
   }
 
   canActivate(

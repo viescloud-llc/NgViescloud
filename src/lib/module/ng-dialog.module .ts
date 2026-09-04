@@ -9,13 +9,15 @@ import { LoadingDialog } from '../dialog/loading-dialog/loading-dialog.component
 import { StringSnackBar } from '../snack/string-snack-bar/string-snack-bar.component';
 import { MessagePopup } from '../popup/message-popup/message-popup.component';
 import { UserAccessDialog } from '../dialog/user-access-dialog/user-access-dialog.component';
+import { EffectivePermissionsDialog } from '../dialog/effective-permissions-dialog/effective-permissions-dialog.component';
 
 const DIALOG = [
+  EffectivePermissionsDialog,
   ConfirmDialog,
   InputDialog,
   ObjectDialog,
   LoadingDialog,
-  UserAccessDialog
+  UserAccessDialog,
 ]
 
 const SNACK = [

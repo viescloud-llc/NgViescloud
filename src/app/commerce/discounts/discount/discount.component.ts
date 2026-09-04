@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { NgComponentModule } from '../../../../lib/module/ng-component.module';
 import { ViesRestApi } from '../../../../lib/abtract/ViesRestApi';
 import { RouteUtils } from '../../../../lib/util/Route.utils';
@@ -6,6 +6,12 @@ import { ViesDateTime } from '../../../../lib/model/vies.model';
 import { APP_ROUTES } from '../../../app.routes';
 import { Discount, DiscountType } from '../../../shared/model/commerce.model';
 import { DiscountService } from '../../../shared/service/discount/discount.service';
+import { MatOption } from '../../../../lib/model/mat.model';
+import { Category, Tag } from '../../../shared/model/product.model';
+import { AttributeDefinition } from '../../../shared/model/attribute.model';
+import { TagService } from '../../../shared/service/tag/tag.service';
+import { CategoryService } from '../../../shared/service/category/category.service';
+import { AttributeDefinitionService } from '../../../shared/service/attribute-definition/attribute-definition.service';
 
 // Discount editor at /commerce/discounts/{new,:id}.
 //
@@ -26,9 +32,22 @@ import { DiscountService } from '../../../shared/service/discount/discount.servi
   styleUrls: ['./discount.component.scss'],
   imports: [NgComponentModule]
 })
-export class DiscountComponent extends ViesRestApi<Discount, DiscountService> {
+export class DiscountComponent extends ViesRestApi<Discount, DiscountService> implements OnInit {
 
   service = inject(DiscountService);
+  private tagService = inject(TagService);
+  private categoryService = inject(CategoryService);
+  private attributeDefinitionService = inject(AttributeDefinitionService);
+
+  tagOptions = signal<MatOption<Tag>[]>([]);
+  categoryOptions = signal<MatOption<Category>[]>([]);
+  attributeDefinitionOptions = signal<MatOption<AttributeDefinition>[]>([]);
+
+  // Product-scoped discounts apply only to matching lines (any overlap; categories incl. sub-categories).
+  isScoped = computed<boolean>(() => {
+    const v = this.value();
+    return !!v && ((v.tags?.length ?? 0) > 0 || (v.categories?.length ?? 0) > 0 || (v.attributeDefinitions?.length ?? 0) > 0);
+  });
 
   validForm = signal<boolean>(false);
 
@@ -59,6 +78,9 @@ export class DiscountComponent extends ViesRestApi<Discount, DiscountService> {
   // Seed a real window (now → now + 1 year) for the create case.
   override ngOnInit(): void {
     super.ngOnInit();
+    this.tagService.getAll().subscribe({ next: res => this.tagOptions.set((res ?? []).map(t => ({ value: t, valueLabel: t.name || '(unnamed)' }))), error: () => {} });
+    this.categoryService.getAll().subscribe({ next: res => this.categoryOptions.set((res ?? []).map(c => ({ value: c, valueLabel: c.name || '(unnamed)' }))), error: () => {} });
+    this.attributeDefinitionService.getAll().subscribe({ next: res => this.attributeDefinitionOptions.set((res ?? []).map(d => ({ value: d, valueLabel: d.displayName || d.name }))), error: () => {} });
     if (!this.getRouteId()) {
       const v = this.value();
       if (v) {
@@ -85,12 +107,25 @@ export class DiscountComponent extends ViesRestApi<Discount, DiscountService> {
     }
   }
 
-  // Preserve the hidden validity-window fields the dynamic form doesn't render.
+  // Preserve the hidden fields the dynamic form doesn't render (window + product matchers).
   onMainFormChange(v: Discount) {
     const current = this.value();
     v.validFrom = current?.validFrom ?? ViesDateTime.now();
     v.validTo = current?.validTo ?? ViesDateTime.now();
+    v.tags = current?.tags ?? [];
+    v.categories = current?.categories ?? [];
+    v.attributeDefinitions = current?.attributeDefinitions ?? [];
     this.value.set({ ...v });
+  }
+
+  onTagsChange(tags: Tag[]) { this.patch({ tags: tags ?? [] }); }
+  onCategoriesChange(categories: Category[]) { this.patch({ categories: categories ?? [] }); }
+  onAttributeDefinitionsChange(defs: AttributeDefinition[]) { this.patch({ attributeDefinitions: defs ?? [] }); }
+
+  private patch(partial: Partial<Discount>) {
+    const v = this.value();
+    if (!v) return;
+    this.value.set({ ...v, ...partial });
   }
 
   onValidFromChange(dt: ViesDateTime) {

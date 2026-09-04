@@ -20,6 +20,9 @@ import { ProductMediaService } from '../../../shared/service/product-media/produ
 import { AttributeDefinitionService } from '../../../shared/service/attribute-definition/attribute-definition.service';
 import { AttributeValueFieldComponent } from '../../../shared/component/attribute-value-field/attribute-value-field.component';
 import { ProductMediaGalleryComponent } from '../../../shared/component/product-media/media-gallery/media-gallery.component';
+import { QuickStockDialog, QuickStockDialogData } from '../../../shared/component/quick-stock-dialog/quick-stock-dialog.component';
+import { StockMovement } from '../../../shared/model/commerce.model';
+import { SnackBarUtils } from '../../../../lib/util/SnackBar.utils';
 
 // Standalone editor for a single ProductVariant. Reached ONLY via the Variants
 // tab on the ProductComponent (either "Add variant" or clicking a row) — this
@@ -329,6 +332,45 @@ export class ProductVariantComponent extends ViesRestApi<ProductVariant, Product
   // to the human name.
   attributeDefinitionValueFor(attr: ProductVariantAttribute): AttributeDefinition | null {
     return attr.attributeDefinition?.id ? attr.attributeDefinition : null;
+  }
+
+  // ---- Quick stock -----------------------------------------------------------
+  //
+  // "Add stock" posts a StockMovement through the QuickStockDialog; the server
+  // applies the delta. On success we mirror the new balance into the form. If
+  // the form is clean the tracking baseline moves too (the change is already
+  // persisted, nothing to save); if the admin has unsaved edits we only update
+  // the visible value so their draft isn't reset.
+  openQuickStockDialog() {
+    const v = this.value();
+    if (!v?.id) return;
+    this.dialogUtils.matDialog
+      .open(QuickStockDialog, {
+        width: '520px',
+        data: {
+          variantId: v.id,
+          sku: v.sku,
+          variantName: v.variantName,
+          currentStock: Number(v.stockQuantity ?? 0)
+        } satisfies QuickStockDialogData
+      })
+      .afterClosed()
+      .subscribe((movement: StockMovement | undefined) => {
+        if (!movement) return;
+        const current = this.value();
+        if (!current) return;
+        const updated = { ...current, stockQuantity: movement.quantityAfter };
+        if (this._value.isValueChange()) {
+          this.value.set(updated);
+        } else {
+          this._value.set(updated);
+        }
+        SnackBarUtils.openSnackBar(
+          this.rxjsUtils.snackBar,
+          `Stock ${movement.quantityChange > 0 ? '+' : ''}${movement.quantityChange} → ${movement.quantityAfter} (${movement.movementType})`,
+          'Dismiss', 6000
+        );
+      });
   }
 
   // ---- Media gallery -------------------------------------------------------

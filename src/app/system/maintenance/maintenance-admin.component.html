@@ -1,0 +1,125 @@
+<ul class="margin-center">
+
+  <!-- ===================== STATUS ===================== -->
+  <li class="status-card" [class.on]="maintenance.isActive()">
+    <h2>
+      Maintenance mode is
+      <strong>{{ maintenance.status() ? (maintenance.isActive() ? 'ON' : 'OFF') : 'unknown' }}</strong>
+    </h2>
+    @if (maintenance.isActive()) {
+      <p>Customers currently see: <em>"{{ maintenance.status()?.message || '(no message set)' }}"</em></p>
+      @if (maintenance.status()?.windowName) {
+        <p class="dim">Effective window: {{ maintenance.status()?.windowName }}
+          @if (maintenance.status()?.endAt?.dateTime) { · until {{ maintenance.status()?.endAt?.dateTime }} }
+        </p>
+      }
+    } @else if (maintenance.status()?.nextStartAt) {
+      <p class="dim">Next scheduled window starts {{ maintenance.status()?.nextStartAt?.dateTime }}
+        @if (maintenance.status()?.nextEndAt?.dateTime) { and ends {{ maintenance.status()?.nextEndAt?.dateTime }} }
+        — "{{ maintenance.status()?.nextMessage }}"</p>
+    } @else {
+      <p class="dim">No maintenance scheduled. Customers have normal access.</p>
+    }
+    <button matButton (click)="refresh()" type="button">Refresh</button>
+  </li>
+
+  <!-- ===================== MANUAL SWITCH ===================== -->
+  <li class="panel">
+    <h3 class="section-title">Switch now</h3>
+    <p class="tab-hint">
+      Immediate on/off, independent of any schedule. Staff with
+      <code>maintenance:bypass</code> (all admin roles) keep working; everyone else gets the maintenance page.
+    </p>
+    <app-mat-form-field-input-text-area
+      [value]="toggleMessage()"
+      (valueChange)="toggleMessage.set($event)"
+      [inputMap]="inputField('mt-msg')
+                    .set(inputKeys.label, 'Message shown to customers')
+                    .set(inputKeys.placeholder, manualWindow()?.message || 'e.g. We are upgrading our systems — back in about an hour.')
+                    .set(inputKeys.styleWidth, '100%')"
+    ></app-mat-form-field-input-text-area>
+    <div class="add-row">
+      <button matButton="filled" class="warn" (click)="setActive(true)" [disabled]="manualWindow()?.active === true" type="button">
+        Turn maintenance ON now
+      </button>
+      <button matButton="filled" (click)="setActive(false)" [disabled]="!manualWindow()?.active" type="button">
+        Turn OFF
+      </button>
+    </div>
+  </li>
+
+  <!-- ===================== SCHEDULED WINDOWS ===================== -->
+  <li class="panel">
+    <h3 class="section-title">Scheduled windows ({{ scheduledWindows().length }})</h3>
+    <p class="tab-hint">
+      A window is effective while <em>now</em> is between its start and end (end empty = open-ended
+      after start), or when its manual switch is on. Click a row to edit.
+    </p>
+    @if (scheduledWindows().length === 0) {
+      <p class="empty-hint">No scheduled windows.</p>
+    } @else {
+      <table class="report-table">
+        <thead><tr><th>Name</th><th>Starts</th><th>Ends</th><th>Manual</th><th>Message</th><th></th></tr></thead>
+        <tbody>
+          @for (w of scheduledWindows(); track w.id) {
+            <tr class="cursor-hover" (click)="edit(w)">
+              <td>{{ w.name }}</td>
+              <td>{{ w.startAt?.dateTime || '—' }}</td>
+              <td>{{ w.endAt?.dateTime || (w.startAt ? 'open-ended' : '—') }}</td>
+              <td>{{ w.active ? 'ON' : 'off' }}</td>
+              <td class="msg">{{ w.message }}</td>
+              <td><button matButton class="warn" (click)="deleteWindow(w); $event.stopPropagation()" type="button">Delete</button></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+    <div class="add-row">
+      <button matButton="filled" (click)="newWindow()" type="button">Schedule a window</button>
+    </div>
+  </li>
+
+  <!-- ===================== EDITOR ===================== -->
+  @if (editing(); as w) {
+    <li class="panel editor" appMatFormFieldGroup (onAllInputCheck)="editingValid.set($event)">
+      <h3 class="section-title">{{ w.id ? 'Edit window' : 'New window' }}</h3>
+      <app-mat-form-field-input-dynamic
+        [value]="w"
+        (valueChange)="onEditFormChange($event)"
+        [blankObject]="blankWindow"
+        [inputMap]="inputField('mt-win')
+                      .set(inputKeys.indent, false)
+                      .set(inputKeys.styleWidth, '100%')"
+      ></app-mat-form-field-input-dynamic>
+
+      <div class="dates-row">
+        @if (w.startAt) {
+          <app-mat-form-field-input-time
+            [value]="w.startAt"
+            (valueChange)="onStartChange($event)"
+            type="DATE_TIME"
+            [inputMap]="inputField('mt-start').set(inputKeys.label, 'Starts')"
+          ></app-mat-form-field-input-time>
+        }
+        @if (w.endAt) {
+          <app-mat-form-field-input-time
+            [value]="w.endAt"
+            (valueChange)="onEndChange($event)"
+            type="DATE_TIME"
+            [inputMap]="inputField('mt-end').set(inputKeys.label, 'Ends')"
+          ></app-mat-form-field-input-time>
+        }
+        @if (!w.startAt) {
+          <span class="dim">No schedule — this window only acts through its manual switch.</span>
+        } @else {
+          <button matButton (click)="clearSchedule()" type="button">Clear schedule</button>
+        }
+      </div>
+
+      <div class="add-row">
+        <button matButton="filled" (click)="saveEdit()" [disabled]="!editingValid()" type="button">Save</button>
+        <button matButton (click)="cancelEdit()" type="button">Cancel</button>
+      </div>
+    </li>
+  }
+</ul>

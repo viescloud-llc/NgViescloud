@@ -1,0 +1,55 @@
+@if (!selected()) {
+  <ul class="margin-center">
+    <li>
+      <p class="hint">
+        A role is a named bundle of permission grants. Assign roles to users directly or to user groups;
+        a user's effective permissions are the union of both. <strong>SUPER_ADMIN</strong> holds <code>*</code>.
+      </p>
+      <app-mat-table
+        [matRows]="roles()"
+        [blankObject]="blankRole"
+        [showMatTooltip]="true"
+        [showPagination]="true"
+        [showFilter]="true"
+        (onEditRow)="select($event)"
+      ></app-mat-table>
+    </li>
+    <li>
+      <br>
+      <button [style.width]="'100%'" matButton="filled" (click)="addRole()" type="button">Add role</button>
+    </li>
+  </ul>
+} @else {
+  <ul class="margin-center" appMatFormFieldGroup (onAllInputCheck)="validForm.set($event)">
+    <li class="flex-row-container">
+      <button matButton="filled" (click)="back()" type="button">Back</button>
+    </li>
+    <hr>
+    <li>
+      <app-mat-form-field-input-dynamic
+        [value]="selected()"
+        (valueChange)="onFormChange($event)"
+        [blankObject]="blankRole"
+        [inputMap]="inputField('role-main').set(inputKeys.styleWidth, '100%').set(inputKeys.indent, false)"
+      ></app-mat-form-field-input-dynamic>
+    </li>
+    <li>
+      <app-mat-form-field-input-permission
+        [value]="selected()!.permissions"
+        (valueChange)="onPermissionsChange($event)"
+        label="Permission grants"
+      ></app-mat-form-field-input-permission>
+      @if (superAdminLosingStar()) {
+        <p class="warn-text">You are removing <code>*</code> from SUPER_ADMIN — every legacy admin would lose full access.</p>
+      }
+      @if (isSuperAdmin()) {
+        <p class="hint">SUPER_ADMIN is the role the ADMIN group carries; it cannot be deleted here.</p>
+      }
+    </li>
+    <li class="flex-row-container-auto">
+      <button matButton="filled" (click)="save()" [disabled]="!canSave()" type="button">Save</button>
+      <button matButton="filled" class="warn" (click)="revert()" [disabled]="!isDirty()" type="button">Revert</button>
+      <button matButton="filled" class="warn" (click)="remove()" [disabled]="!selected()!.id || isSuperAdmin()" type="button">Delete</button>
+    </li>
+  </ul>
+}

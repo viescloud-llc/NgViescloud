@@ -1,0 +1,22 @@
+<div class="maintenance-page">
+  <mat-icon class="maintenance-icon">engineering</mat-icon>
+  <h1>We'll be right back</h1>
+
+  <p class="message">
+    {{ maintenance.status()?.message || 'The application is currently undergoing scheduled maintenance.' }}
+  </p>
+
+  @if (maintenance.status()?.endAt?.dateTime) {
+    <p class="until">Expected to finish around <strong>{{ maintenance.status()?.endAt?.dateTime }}</strong>.</p>
+  }
+
+  <div class="actions">
+    <button matButton="filled" (click)="check()" [disabled]="checking()" type="button">
+      {{ checking() ? 'Checking…' : 'Check again' }}
+    </button>
+  </div>
+
+  @if (stillDown()) {
+    <p class="still-down">Still in maintenance — please try again in a few minutes.</p>
+  }
+</div>

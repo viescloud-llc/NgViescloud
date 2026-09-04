@@ -11,12 +11,15 @@ import {
 } from '../../../shared/model/commerce.model';
 import { OrderFulfillmentService } from '../../../shared/service/order-fulfillment/order-fulfillment.service';
 import { CheckoutOrderService, CheckoutOrderView } from '../../../shared/service/checkout-order/checkout-order.service';
+import { OrderRestockService } from '../../../shared/service/order-restock/order-restock.service';
+import { SnackBarUtils } from '../../../../lib/util/SnackBar.utils';
+import { firstValueFrom } from 'rxjs';
 
 // Order metadata is a flat `Record<string,string>` bag. System keys are
 // server-written history — every prefix here is treated as read-only audit
 // data. Manager notes go under `notes.*` by convention (§ 5.11) and are the
 // only editable slice.
-const SYSTEM_METADATA_PREFIXES = ['checkout.', 'discount.', 'tax.', 'shipping.'];
+const SYSTEM_METADATA_PREFIXES = ['checkout.', 'discount.', 'tax.', 'shipping.', 'restock.'];
 const NOTES_METADATA_PREFIX = 'notes.';
 
 // Legal FulfillmentStatus transitions. Terminal states (CANCELLED, REFUNDED,
@@ -115,6 +118,87 @@ export class OrderComponent extends ViesRestApi<OrderFulfillment, OrderFulfillme
     const oid = this.id();
     if (!oid) return;
     this.router.navigate([APP_ROUTES.commerceShipmentNew], { queryParams: { orderId: oid } });
+  }
+
+  // ---- Restock after refund / return ---------------------------------------
+  //
+  // Puts refunded goods back on the shelf through the stock ledger
+  // (POST /orders/{id}/restock → one RETURN movement per item). The server
+  // tracks progress in metadata `restock.<itemId>` and refuses to exceed what
+  // was sold, so this panel only ever offers the outstanding remainder.
+  // Requires the refund status to be SAVED first (the server checks the
+  // persisted status) and stock to have actually left (checkout captured).
+
+  private readonly restockService = inject(OrderRestockService);
+  private static readonly RESTOCKABLE: FulfillmentStatus[] = [
+    FulfillmentStatus.REFUNDED, FulfillmentStatus.PARTIALLY_REFUNDED,
+    FulfillmentStatus.RETURNED, FulfillmentStatus.CANCELLED
+  ];
+
+  // Per-item quantity overrides (default = outstanding remainder).
+  restockOverrides = signal<Record<string, number>>({});
+  restocking = signal<boolean>(false);
+
+  isRestockableStatus = computed<boolean>(() => {
+    const s = this.value()?.status;
+    return !!s && OrderComponent.RESTOCKABLE.includes(s);
+  });
+
+  stockLeftForOrder = computed<boolean>(() =>
+    this.value()?.metadata?.['checkout.stockDecremented'] === 'true'
+  );
+
+  restockRows = computed(() => {
+    const v = this.value();
+    const meta = v?.metadata ?? {};
+    return (v?.items ?? []).map(item => {
+      const sold = Number(item.quantity ?? 0);
+      const restocked = Number(meta[`restock.${item.id}`] ?? 0);
+      const remaining = Math.max(0, sold - restocked);
+      const override = this.restockOverrides()[item.id];
+      const qty = override === undefined ? remaining : Math.min(Math.max(0, override), remaining);
+      return { item, sold, restocked, remaining, qty };
+    });
+  });
+
+  restockTotal = computed<number>(() => this.restockRows().reduce((sum, r) => sum + r.qty, 0));
+
+  canRestock = computed<boolean>(() =>
+    this.isRestockableStatus() && this.stockLeftForOrder()
+    && !this._value.isValueChange() && !this.restocking() && this.restockTotal() > 0
+  );
+
+  onRestockQtyChange(itemId: string, v: number | string) {
+    this.restockOverrides.set({ ...this.restockOverrides(), [itemId]: Number(v) || 0 });
+  }
+
+  async restock() {
+    const v = this.value();
+    if (!v?.id || !this.canRestock()) return;
+    const items = this.restockRows().filter(r => r.qty > 0)
+      .map(r => ({ orderFulfillmentItemId: r.item.id, quantity: r.qty }));
+    const confirmed = await this.dialogUtils.openConfirmDialog(
+      'Restock items?',
+      `Add ${this.restockTotal()} unit(s) across ${items.length} item(s) back into stock for order ${v.orderNumber}. This writes RETURN stock movements and cannot be undone here.`,
+      'Restock', 'Cancel'
+    ).catch(() => false);
+    if (!confirmed) return;
+
+    this.restocking.set(true);
+    try {
+      const updated = await firstValueFrom(
+        this.restockService.restock(v.id, { items, reason: `Restock after ${v.status}` })
+          .pipe(this.rxjsUtils.waitLoadingDialog())
+      );
+      this._value.set(updated);
+      this.restockOverrides.set({});
+      SnackBarUtils.openSnackBar(this.rxjsUtils.snackBar,
+        `Restocked ${items.reduce((s, i) => s + i.quantity, 0)} unit(s) for ${v.orderNumber}`, 'Dismiss', 6000);
+    } catch (err) {
+      this.dialogUtils.openErrorMessageFromError(err);
+    } finally {
+      this.restocking.set(false);
+    }
   }
 
   createReturn() {

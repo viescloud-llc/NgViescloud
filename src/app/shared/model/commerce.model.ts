@@ -1,5 +1,7 @@
+import { AttributeDefinition } from './attribute.model';
+import { Tag, Category } from './product.model';
 import { Currency } from "../../../lib/model/currency.model";
-import { MatInputDisable, MatInputDisplayLabel, MatInputEnum, MatInputHide, MatInputItemSetting, MatInputListSetting, MatItemSettingType, MatTableHide } from "../../../lib/model/mat.model";
+import { MatInputDisable, MatInputDisplayLabel, MatInputEnum, MatInputHide, MatInputItemSetting, MatInputListSetting, MatItemSettingType, MatTableHide, MatTableDisplayLabel } from '../../../lib/model/mat.model';
 import { ViesDateTime } from "../../../lib/model/vies.model";
 import { Address } from "./address.model";
 import { ProductVariant } from "./product.model";
@@ -265,16 +267,31 @@ export class Discount extends TrackedTimeStamp {
     @MatTableHide()
     validTo: ViesDateTime = new ViesDateTime();
 
-    // null = unlimited.
-    @MatInputDisplayLabel('Max Uses')
+    // 0 (or empty) = unlimited — the backend treats null / <= 0 as no cap.
+    @MatInputDisplayLabel('Max Uses', '0 = unlimited')
     maxUses: number = 0;
 
+    // Server-owned: bumped once per checkout start.
     @MatInputDisable()
     @MatInputDisplayLabel('Current Uses')
     currentUses: number = 0;
 
     @MatInputDisplayLabel('Active')
     active: boolean = true;
+
+    // Product matchers — empty = whole cart; set = only lines whose product has ANY of them
+    // (categories include sub-categories). The discount amount is computed on those lines' subtotal.
+    @MatInputHide()
+    @MatTableDisplayLabel('Tags', (d: Discount) => (d.tags ?? []).map(t => t.name).join(', '))
+    tags: Tag[] = [] as Tag[];
+
+    @MatInputHide()
+    @MatTableDisplayLabel('Categories', (d: Discount) => (d.categories ?? []).map(c => c.name).join(', '))
+    categories: Category[] = [] as Category[];
+
+    @MatInputHide()
+    @MatTableDisplayLabel('Attribute definitions', (d: Discount) => (d.attributeDefinitions ?? []).map(a => a.displayName || a.name).join(', '))
+    attributeDefinitions: AttributeDefinition[] = [] as AttributeDefinition[];
 }
 
 // ---- Shipment -----------------------------------------------------------
@@ -469,6 +486,32 @@ export class TaxRule extends TrackedTimeStamp {
 
     @MatInputDisplayLabel('Postal Code', 'Empty = match any.')
     postalCode: string = '';
+
+    @MatInputDisplayLabel('District', 'Sub-city / administrative district. Empty = match any.')
+    district: string = '';
+
+    // Alternative spellings that also match country/state (e.g. "United States", "USA").
+    // Edited via dedicated comma-separated inputs, not the dynamic form.
+    @MatInputHide()
+    @MatTableDisplayLabel('Country aliases', (r: TaxRule) => (r.countryAliases ?? []).join(', '))
+    countryAliases: string[] = [] as string[];
+
+    @MatInputHide()
+    @MatTableDisplayLabel('State aliases', (r: TaxRule) => (r.stateAliases ?? []).join(', '))
+    stateAliases: string[] = [] as string[];
+
+    // Product matchers — empty = any product; non-empty = product must have ANY of them.
+    @MatInputHide()
+    @MatTableDisplayLabel('Tags', (r: TaxRule) => (r.tags ?? []).map(t => t.name).join(', '))
+    tags: Tag[] = [] as Tag[];
+
+    @MatInputHide()
+    @MatTableDisplayLabel('Categories', (r: TaxRule) => (r.categories ?? []).map(c => c.name).join(', '))
+    categories: Category[] = [] as Category[];
+
+    @MatInputHide()
+    @MatTableDisplayLabel('Attribute definitions', (r: TaxRule) => (r.attributeDefinitions ?? []).map(d => d.displayName || d.name).join(', '))
+    attributeDefinitions: AttributeDefinition[] = [] as AttributeDefinition[];
 
     // Tiebreaker when matcher specificity is equal — higher wins.
     @MatInputDisplayLabel('Priority')

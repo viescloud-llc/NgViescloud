@@ -1,6 +1,9 @@
 import { inject } from '@angular/core';
 import { Routes } from '@angular/router';
 import { AuthGuard } from '../lib/guards/auth.guard';
+import { MaintenancePageComponent } from '../lib/share-component/maintenance-page/maintenance-page.component';
+import { RoleListComponent } from '../lib/share-component/role-list/role-list.component';
+import { maintenanceGuard } from './shop/maintenance.guard';
 import { ApplicationSettingComponent } from '../lib/share-component/application-setting/application-setting.component';
 import { LoginComponent } from '../lib/share-component/login/login.component';
 import { OpenIdProviderComponent } from '../lib/share-component/open-id-provider/open-id-provider.component';
@@ -114,6 +117,11 @@ export const APP_ROUTES = {
     return id ? `rules/shipping/${id}` : 'rules/shipping/new';
   },
 
+  // ---- System -------------------------------------------------------------
+  systemMaintenance: "system/maintenance",
+  rolesSetting: "setting/roles",
+  maintenancePage: "maintenance",
+
   rulesTaxList: "rules/tax/list",
   rulesTaxNew: "rules/tax/new",
   rulesTax(id: string) {
@@ -152,7 +160,7 @@ export const routes: Routes = [
   },
   {
     path: "catalog",
-    canActivate: [async () => inject(AuthGuard).isLoginWithRole('ADMIN')],
+    canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('catalog:read')],
     children: [
       { path: '', redirectTo: 'products/list', pathMatch: 'full' },
       {
@@ -223,7 +231,7 @@ export const routes: Routes = [
   },
   {
     path: "schema",
-    canActivate: [async () => inject(AuthGuard).isLoginWithRole('ADMIN')],
+    canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('schema:read')],
     children: [
       { path: '', redirectTo: 'attribute-definitions/list', pathMatch: 'full' },
       {
@@ -266,7 +274,7 @@ export const routes: Routes = [
   },
   {
     path: "commerce",
-    canActivate: [async () => inject(AuthGuard).isLoginWithRole('ADMIN')],
+    canActivate: [async () => inject(AuthGuard).isLoginWithAuthority(['orders:read', 'shipments:read', 'returns:read', 'discounts:read'])],
     children: [
       { path: '', redirectTo: 'orders/list', pathMatch: 'full' },
       {
@@ -341,7 +349,7 @@ export const routes: Routes = [
   },
   {
     path: "rules",
-    canActivate: [async () => inject(AuthGuard).isLoginWithRole('ADMIN')],
+    canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('rules:read')],
     children: [
       { path: '', redirectTo: 'shipping/list', pathMatch: 'full' },
       {
@@ -384,7 +392,7 @@ export const routes: Routes = [
   },
   {
     path: "inventory",
-    canActivate: [async () => inject(AuthGuard).isLoginWithRole('ADMIN')],
+    canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('inventory:read')],
     children: [
       { path: '', redirectTo: 'stock', pathMatch: 'full' },
       {
@@ -399,14 +407,14 @@ export const routes: Routes = [
   },
   {
     path: "reviews",
-    canActivate: [async () => inject(AuthGuard).isLoginWithRole('ADMIN')],
+    canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('reviews:read')],
     loadComponent: () => import('./reviews/review-list/review-list.component').then(m => m.ReviewListComponent)
   },
   {
     // Test-only buyer-flow simulation. Login required (carts/orders are
     // user-scoped) but NOT admin-gated — any authenticated test user works.
     path: "shop",
-    canActivate: [async () => inject(AuthGuard).isLogin()],
+    canActivate: [async () => inject(AuthGuard).isLogin(), maintenanceGuard],
     children: [
       { path: '', redirectTo: 'products', pathMatch: 'full' },
       {
@@ -437,8 +445,18 @@ export const routes: Routes = [
   },
   {
     path: "reports",
-    canActivate: [async () => inject(AuthGuard).isLoginWithRole('ADMIN')],
+    canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('reports:read')],
     loadComponent: () => import('./reports/reports.component').then(m => m.ReportsComponent)
+  },
+  {
+    path: "system/maintenance",
+    canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('maintenance:read')],
+    loadComponent: () => import('./system/maintenance/maintenance-admin.component').then(m => m.MaintenanceAdminComponent)
+  },
+  {
+    // Where customers land while the backend is in maintenance (lib page; public).
+    path: "maintenance",
+    component: MaintenancePageComponent
   },
   {
     path: 'setting',
@@ -455,17 +473,23 @@ export const routes: Routes = [
       {
         path: 'users',
         component: UserListComponent,
-        canActivate: [async () => inject(AuthGuard).isLogin()]
+        canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('iam:read')]
       },
       {
         path: 'user/groups',
         component: UserGroupListComponent,
-        canActivate: [async () => inject(AuthGuard).isLogin()]
+        canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('iam:read')]
+      },
+      {
+        // Roles + permission grants (lib component; resource `iam`).
+        path: 'roles',
+        component: RoleListComponent,
+        canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('iam:read')]
       },
       {
         path: 'openid-provider',
         component: OpenIdProviderComponent,
-        canActivate: [async () => inject(AuthGuard).isLogin()]
+        canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('iam:read')]
       }
     ]
   },

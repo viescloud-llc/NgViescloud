@@ -24,6 +24,9 @@ export class Address {
     @MatInputDisplayLabel('Country', 'e.g "US"')
     country: string = '';
 
+    @MatInputDisplayLabel('District (optional)', 'Sub-city / administrative district, if your country uses one')
+    district: string = '';
+
     @MatInputEnum(AddressType)
     @MatInputDisplayLabel('Address Type')
     type: AddressType = AddressType.SHIPPING;

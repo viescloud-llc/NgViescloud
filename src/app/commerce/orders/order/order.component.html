@@ -166,6 +166,63 @@
               [blankObject]="blankOrderItem"
             ></app-mat-table>
           }
+
+          <!-- Restock after refund/return: server-side RETURN movements per item,
+               capped at what was sold minus what's already back. -->
+          @if (isRestockableStatus()) {
+            <div class="restock-panel">
+              <h3 class="section-title">Restock</h3>
+              @if (!stockLeftForOrder()) {
+                <p class="tab-hint">
+                  Stock never left for this order (payment was not captured), so there is nothing to put back.
+                </p>
+              } @else {
+                <p class="tab-hint">
+                  Put refunded / returned goods back on the shelf. Each line becomes a
+                  <strong>RETURN</strong> stock movement; you can restock at most what was sold.
+                </p>
+                @if (_value.isValueChange()) {
+                  <p class="save-first-hint"><strong>Save the status change first</strong> — restock works against the saved order.</p>
+                }
+                <table class="report-table restock-table">
+                  <thead>
+                    <tr><th>SKU</th><th class="num">Sold</th><th class="num">Restocked</th><th class="num">Remaining</th><th class="num">Restock now</th></tr>
+                  </thead>
+                  <tbody>
+                    @for (row of restockRows(); track row.item.id) {
+                      <tr>
+                        <td>{{ row.item.lineItemSku || row.item.id }}</td>
+                        <td class="num">{{ row.sold }}</td>
+                        <td class="num">{{ row.restocked }}</td>
+                        <td class="num">{{ row.remaining }}</td>
+                        <td class="num">
+                          @if (row.remaining > 0) {
+                            <app-mat-form-field-input
+                              [value]="row.qty"
+                              (valueChange)="onRestockQtyChange(row.item.id, $event)"
+                              [inputMap]="inputField('restock-' + row.item.id)
+                                            .set(inputKeys.defaultType, 'number')
+                                            .set(inputKeys.showMinMaxHint, true)
+                                            .set(inputKeys.min, 0)
+                                            .set(inputKeys.max, row.remaining)
+                                            .set(inputKeys.styleWidth, '110px')"
+                            ></app-mat-form-field-input>
+                          } @else {
+                            <span class="done">all back</span>
+                          }
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+                <div class="add-row">
+                  <button matButton="filled" (click)="restock()" [disabled]="!canRestock()" type="button">
+                    Restock {{ restockTotal() }} unit(s)
+                  </button>
+                </div>
+              }
+            </div>
+          }
         </div>
       </mat-tab>
 

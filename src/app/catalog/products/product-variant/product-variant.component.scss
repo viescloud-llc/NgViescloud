@@ -147,3 +147,11 @@
     margin-left: auto;
   }
 }
+
+// Quick-stock affordance under the basics form.
+.quick-stock-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0.5rem 0 1rem;
+}

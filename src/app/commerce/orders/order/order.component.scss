@@ -178,3 +178,14 @@
     margin-top: 0.25rem;
   }
 }
+
+// Restock panel (Items tab) — shown for refund/return family statuses.
+.restock-panel {
+  margin-top: 1.25rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--mat-sys-outline-variant, rgba(128, 128, 128, 0.3));
+
+  .restock-table td.num, .restock-table th.num { text-align: right; }
+  .done { opacity: 0.7; font-style: italic; }
+  .add-row { margin-top: 0.5rem; }
+}

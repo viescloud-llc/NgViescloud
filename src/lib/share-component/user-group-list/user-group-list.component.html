@@ -1,10 +1,58 @@
-<br>
-<app-mat-table-dynamic
-[getAllFn]="userGroupService.getAll()"
-[addOrSaveFn]="postOrPut"
-[blankObject]="blankUserGroup"
-[service]="userGroupService"
-[showFilter]="true"
-[showPagination]="true"
-[pageSizeOptions]="[30, 50, 100, 500]"
-></app-mat-table-dynamic>
+@if (!selected()) {
+  <ul class="margin-center">
+    <li>
+      <p class="hint">
+        A group is organizational — "who are you with". Roles attached to a group are inherited by
+        every member, on top of any roles assigned to them directly.
+      </p>
+      <app-mat-table
+        [matRows]="groups()"
+        [blankObject]="blankUserGroup"
+        [showMatTooltip]="true"
+        [showPagination]="true"
+        [showFilter]="true"
+        (onEditRow)="select($event)"
+      ></app-mat-table>
+    </li>
+    <li>
+      <br>
+      <button [style.width]="'100%'" matButton="filled" (click)="addGroup()" type="button">Add user group</button>
+    </li>
+  </ul>
+} @else {
+  <ul class="margin-center" appMatFormFieldGroup (onAllInputCheck)="validForm.set($event)">
+    <li class="flex-row-container">
+      <button matButton="filled" (click)="back()" type="button">Back</button>
+    </li>
+    <hr>
+    <li>
+      <app-mat-form-field-input-dynamic
+        [value]="selected()"
+        (valueChange)="onFormChange($event)"
+        [blankObject]="blankUserGroup"
+        [inputMap]="inputField('group-main').set(inputKeys.styleWidth, '100%').set(inputKeys.indent, false)"
+      ></app-mat-form-field-input-dynamic>
+    </li>
+    <li>
+      <app-mat-form-field-input-list-option
+        [value]="selected()!.roles"
+        (valueChange)="onRolesChange($event)"
+        [options]="roleOptions()"
+        [inputMap]="inputField('group-roles').set(inputKeys.label, 'Roles every member inherits')
+                                              .set(inputKeys.styleWidth, '100%')
+                                              .set(inputKeys.showSizeInput, false)
+                                              .set(inputKeys.showSearchOption, true)
+                                              .set(inputKeys.expanded, true)
+                                              .set(inputKeys.uniqueValue, true)"
+      ></app-mat-form-field-input-list-option>
+      @if (isProtected()) {
+        <p class="hint">"{{ selected()!.name }}" is a seeded default group — it can be edited but not deleted.</p>
+      }
+    </li>
+    <li class="flex-row-container-auto">
+      <button matButton="filled" (click)="save()" [disabled]="!canSave()" type="button">Save</button>
+      <button matButton="filled" class="warn" (click)="revert()" [disabled]="!isDirty()" type="button">Revert</button>
+      <button matButton="filled" class="warn" (click)="remove()" [disabled]="!selected()!.id || isProtected()" type="button">Delete</button>
+    </li>
+  </ul>
+}

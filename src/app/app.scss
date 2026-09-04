@@ -6,3 +6,21 @@
   top: 0;
   z-index: 10;
 }
+
+// Maintenance-mode strip under the header (staff bypass the gate, so keep it loud).
+.maintenance-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 1rem;
+  background: color-mix(in srgb, var(--mat-sys-error, #e34948) 18%, transparent);
+  border-bottom: 2px solid var(--mat-sys-error, #e34948);
+  font-size: 0.95rem;
+
+  &.scheduled {
+    background: color-mix(in srgb, var(--mat-sys-primary, #2a78d6) 12%, transparent);
+    border-bottom-color: var(--mat-sys-primary, #2a78d6);
+  }
+
+  a { margin-left: auto; font-weight: 600; }
+}

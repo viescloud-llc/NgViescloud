@@ -50,6 +50,29 @@ export class UserAccess {
   }
 }
 
+/**
+ * A named bundle of permission grants — the ONLY place grants live
+ * (vies-spring-utils 6.4.0+). Assigned to users directly (User.roles) and/or
+ * through groups (UserGroup.roles); effective permissions = the union.
+ * `permissions` is a Set server-side, so wire order is arbitrary.
+ */
+export class Role {
+    @MatInputDisable()
+    @MatTableHide()
+    id: string = '';
+
+    @MatInputRequire()
+    name: string = '';
+
+    @MatInputItemSetting(MatItemSettingType.TEXT_AREA)
+    description: string = '';
+
+    // Edited by the dedicated permission editor, not the dynamic form.
+    @MatInputHide()
+    @MatTableDisplayLabel('Permissions', (r: Role) => (r.permissions ?? []).join(', '))
+    permissions: string[] = [] as string[];
+}
+
 export class UserGroup {
     @MatInputDisable()
     id: string = '';
@@ -59,6 +82,11 @@ export class UserGroup {
 
     @MatInputItemSetting(MatItemSettingType.TEXT_AREA)
     description: string = '';
+
+    // Roles every member inherits. Picked with a dedicated multi-select.
+    @MatInputHide()
+    @MatTableDisplayLabel('Roles', (g: UserGroup) => (g.roles ?? []).map(r => r.name).join(', '))
+    roles: Role[] = [] as Role[];
 }
 
 export class User {
@@ -80,10 +108,15 @@ export class User {
     @MatInputHide()
     password: string = '';
 
-    @MatTableDisplayLabel('Groups', (user: User) => user.userGroups.reduce((a, c) => (a ? a + ', ' : a) + c.name, ''))
+    @MatTableDisplayLabel('Groups', (user: User) => (user.userGroups ?? []).map(g => g.name).join(', '))
     @MatInputHide()
     userGroups: UserGroup[] = [
         new UserGroup(),
     ] as UserGroup[];
+
+    // Directly-assigned roles (exception grants). Optional — [] default.
+    @MatInputHide()
+    @MatTableDisplayLabel('Roles', (user: User) => (user.roles ?? []).map(r => r.name).join(', '))
+    roles: Role[] = [] as Role[];
 }
 

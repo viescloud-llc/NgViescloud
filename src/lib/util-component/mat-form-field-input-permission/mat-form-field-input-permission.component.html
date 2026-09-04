@@ -1,0 +1,31 @@
+<mat-form-field appearance="outline" class="permission-editor">
+  <mat-label>{{ label }}</mat-label>
+  <mat-chip-grid #chipGrid [disabled]="readonly" aria-label="Permission grants">
+    @for (chip of chips(); track chip) {
+      <mat-chip-row [removable]="!readonly" (removed)="remove(chip)" [class.wildcard]="chip === '*' || chip.endsWith(':*')">
+        {{ chip }}
+        @if (!readonly) {
+          <button matChipRemove type="button" [attr.aria-label]="'remove ' + chip"><mat-icon>cancel</mat-icon></button>
+        }
+      </mat-chip-row>
+    }
+  </mat-chip-grid>
+  <input #permInput
+         [placeholder]="placeholder"
+         [matChipInputFor]="chipGrid"
+         [matChipInputSeparatorKeyCodes]="separatorKeys"
+         [matChipInputAddOnBlur]="false"
+         [matAutocomplete]="auto"
+         [disabled]="readonly"
+         (input)="onInput($event)"
+         (matChipInputTokenEnd)="onTokenEnd($event)" />
+  <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onSuggestionPicked($event, permInput)">
+    @for (s of filteredSuggestions(); track s) {
+      <mat-option [value]="s">{{ s }}</mat-option>
+    }
+  </mat-autocomplete>
+  <mat-hint>resource:action · <code>resource:*</code> = every action on a resource · <code>*</code> = everything. Enter or comma to add.</mat-hint>
+</mat-form-field>
+@if (error()) {
+  <p class="permission-error" role="alert">{{ error() }}</p>
+}

@@ -1,0 +1,58 @@
+<h2 mat-dialog-title>Adjust stock — {{ data.sku }}</h2>
+
+<mat-dialog-content>
+  <p class="hint">
+    <strong>{{ data.variantName || data.sku }}</strong> · current stock
+    <strong>{{ data.currentStock }}</strong>. This records a stock movement; the
+    server applies it and keeps the ledger.
+  </p>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Movement type</mat-label>
+    <mat-select [value]="movementType()" (selectionChange)="movementType.set($event.value)">
+      @for (t of typeOptions; track t.value) {
+        <mat-option [value]="t.value">{{ t.label }}</mat-option>
+      }
+    </mat-select>
+    <mat-hint>{{ typeHint() }}</mat-hint>
+  </mat-form-field>
+
+  <app-mat-form-field-input
+    [value]="quantity()"
+    (valueChange)="onQuantityChange($event)"
+    [inputMap]="inputField('qs-qty')
+                  .set(inputKeys.label, 'Quantity')
+                  .set(inputKeys.placeholder, 'e.g. 25')
+                  .set(inputKeys.defaultType, 'number')
+                  .set(inputKeys.styleWidth, '100%')"
+  ></app-mat-form-field-input>
+
+  <app-mat-form-field-input
+    [value]="reason()"
+    (valueChange)="reason.set($event)"
+    [inputMap]="inputField('qs-reason')
+                  .set(inputKeys.label, 'Reason')
+                  .set(inputKeys.placeholder, 'e.g. supplier delivery PO-1234')
+                  .set(inputKeys.required, true)
+                  .set(inputKeys.styleWidth, '100%')"
+  ></app-mat-form-field-input>
+
+  <app-mat-form-field-input
+    [value]="reference()"
+    (valueChange)="reference.set($event)"
+    [inputMap]="inputField('qs-ref')
+                  .set(inputKeys.label, 'Reference (optional)')
+                  .set(inputKeys.styleWidth, '100%')"
+  ></app-mat-form-field-input>
+
+  <p class="projection" [class.negative]="projectedStock() < 0">
+    Change <strong>{{ signedChange() > 0 ? '+' : '' }}{{ signedChange() }}</strong>
+    → new stock <strong>{{ projectedStock() }}</strong>
+    @if (projectedStock() < 0) { — cannot go below zero }
+  </p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button matButton (click)="cancel()" type="button">Cancel</button>
+  <button matButton="filled" (click)="apply()" [disabled]="!canApply()" type="button">Apply</button>
+</mat-dialog-actions>

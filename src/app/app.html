@@ -14,6 +14,20 @@
     @if (isLazyChunkLoading()) {
       <mat-progress-bar mode="indeterminate" class="app-nav-progress"></mat-progress-bar>
     }
+    @if (maintenance.isActive()) {
+      <div class="maintenance-banner" role="status">
+        <mat-icon>engineering</mat-icon>
+        <span><strong>Maintenance mode is ON</strong> — customers are being held.
+          {{ maintenance.status()?.message }}</span>
+        <a [routerLink]="'/' + systemMaintenanceRoute">Manage</a>
+      </div>
+    } @else if (maintenance.nextWindowMessage()) {
+      <div class="maintenance-banner scheduled" role="status">
+        <mat-icon>schedule</mat-icon>
+        <span>Maintenance scheduled for {{ maintenance.status()?.nextStartAt?.dateTime }}.</span>
+        <a [routerLink]="'/' + systemMaintenanceRoute">Manage</a>
+      </div>
+    }
     <router-outlet></router-outlet>
   </mat-drawer-content>
 </mat-drawer-container>

@@ -29,6 +29,16 @@
                           .set(inputKeys.styleWidth, '100%')"
           ></app-mat-form-field-input-dynamic>
 
+          <!-- Quick stock: records a StockMovement (server applies it) without
+               editing stockQuantity by hand — keeps the ledger honest. Needs a
+               saved variant (movements reference the variant's id). -->
+          @if (id()) {
+            <div class="quick-stock-row">
+              <span>Stock on hand: <strong>{{ value()?.stockQuantity ?? 0 }}</strong></span>
+              <button matButton="filled" (click)="openQuickStockDialog()" type="button">Add / adjust stock…</button>
+            </div>
+          }
+
           <!-- =================================================================
                PRICING (custom section — price/priceMode/effectivePrice are
                hidden from the dynamic form because their labels and semantics

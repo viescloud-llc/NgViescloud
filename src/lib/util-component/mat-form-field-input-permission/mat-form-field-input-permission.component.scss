@@ -1,0 +1,17 @@
+.permission-editor {
+  width: 100%;
+
+  mat-chip-row.wildcard {
+    font-weight: 600;
+  }
+
+  code {
+    font-size: 0.85em;
+  }
+}
+
+.permission-error {
+  color: var(--mat-sys-error, #f28b82);
+  font-size: 0.8rem;
+  margin: -0.5rem 0 0.75rem 0.25rem;
+}

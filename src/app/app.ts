@@ -1,19 +1,42 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { RouterLink, RouterOutlet } from '@angular/router';
 import { ViescloudUtilsModule } from '../lib/viescloud-utils.module';
 import { QuickSideDrawerMenu } from '../lib/share-component/quick-side-drawer-menu/quick-side-drawer-menu.component';
 import { environment } from '../environments/environment.prod';
 import { ViescloudApplication } from '../lib/abtract/ViescloudApplication.directive';
 import { APP_ROUTES } from './app.routes';
+import { MaintenanceService } from '../lib/service/maintenance.service';
+import { ViesService } from '../lib/service/rest.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, ViescloudUtilsModule],
+  imports: [RouterOutlet, RouterLink, ViescloudUtilsModule],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
 export class App extends ViescloudApplication {
   readonly ADMIN_GROUP = 'ADMIN';
+
+  // Maintenance banner: staff bypass the gate, so the shell polls the public
+  // status probe (every 60 s) to keep a "maintenance is ON" strip visible —
+  // nobody should forget the switch is on.
+  readonly maintenance = inject(MaintenanceService);
+  readonly systemMaintenanceRoute = APP_ROUTES.systemMaintenance;
+
+  // Nav gate: ANY of the authorities, with the legacy-ADMIN fallback so a
+  // pre-6.4 backend (no roles yet) keeps admin navigation intact. UX only —
+  // every endpoint is enforced server-side.
+  can(authorities: string[]): boolean {
+    return this.authenticatorService.isAuthenticatedSync()
+      && this.authenticatorService.hasAnyAuthorityOrAdmin(authorities, this.ADMIN_GROUP);
+  }
+
+  override ngOnInit(): void {
+    super.ngOnInit();
+    if (ViesService.isNotCSR()) return;
+    this.maintenance.refreshStatus().subscribe({ error: () => { /* offline / no backend */ } });
+    setInterval(() => this.maintenance.refreshStatus().subscribe({ error: () => {} }), 60_000);
+  }
 
   menu: QuickSideDrawerMenu[] = [
     {
@@ -39,7 +62,7 @@ export class App extends ViescloudApplication {
     {
       title: 'Catalog',
       hideChildren: true,
-      hideConditional: () => !this.authenticatorService.isAuthenticatedSync() || !this.authenticatorService.hasUserGroup(this.ADMIN_GROUP),
+      hideConditional: () => !this.can(['catalog:read']),
       children: [
         {
           title: 'Products',
@@ -70,30 +93,34 @@ export class App extends ViescloudApplication {
     {
       title: 'Commerce',
       hideChildren: true,
-      hideConditional: () => !this.authenticatorService.isAuthenticatedSync() || !this.authenticatorService.hasUserGroup(this.ADMIN_GROUP),
+      hideConditional: () => !this.can(['orders:read', 'shipments:read', 'returns:read', 'discounts:read']),
       children: [
         {
           title: 'Orders',
-          routerLink: APP_ROUTES.commerceOrderList
+          routerLink: APP_ROUTES.commerceOrderList,
+          hideConditional: () => !this.can(['orders:read'])
         },
         {
           title: 'Shipments',
-          routerLink: APP_ROUTES.commerceShipmentList
+          routerLink: APP_ROUTES.commerceShipmentList,
+          hideConditional: () => !this.can(['shipments:read'])
         },
         {
           title: 'Returns',
-          routerLink: APP_ROUTES.commerceReturnList
+          routerLink: APP_ROUTES.commerceReturnList,
+          hideConditional: () => !this.can(['returns:read'])
         },
         {
           title: 'Discounts',
-          routerLink: APP_ROUTES.commerceDiscountList
+          routerLink: APP_ROUTES.commerceDiscountList,
+          hideConditional: () => !this.can(['discounts:read'])
         }
       ]
     },
     {
       title: 'Rules',
       hideChildren: true,
-      hideConditional: () => !this.authenticatorService.isAuthenticatedSync() || !this.authenticatorService.hasUserGroup(this.ADMIN_GROUP),
+      hideConditional: () => !this.can(['rules:read']),
       children: [
         {
           title: 'Shipping Rules',
@@ -108,7 +135,7 @@ export class App extends ViescloudApplication {
     {
       title: 'Inventory',
       hideChildren: true,
-      hideConditional: () => !this.authenticatorService.isAuthenticatedSync() || !this.authenticatorService.hasUserGroup(this.ADMIN_GROUP),
+      hideConditional: () => !this.can(['inventory:read']),
       children: [
         {
           title: 'Stock',
@@ -140,24 +167,37 @@ export class App extends ViescloudApplication {
       ]
     },
     {
+      title: 'System',
+      hideChildren: true,
+      hideConditional: () => !this.can(['maintenance:read']),
+      children: [
+        {
+          title: 'Maintenance mode',
+          routerLink: APP_ROUTES.systemMaintenance
+        }
+      ]
+    },
+    {
       title: 'Insights',
       hideChildren: true,
-      hideConditional: () => !this.authenticatorService.isAuthenticatedSync() || !this.authenticatorService.hasUserGroup(this.ADMIN_GROUP),
+      hideConditional: () => !this.can(['reports:read', 'reviews:read']),
       children: [
         {
           title: 'Reports',
-          routerLink: APP_ROUTES.reports
+          routerLink: APP_ROUTES.reports,
+          hideConditional: () => !this.can(['reports:read'])
         },
         {
           title: 'Reviews',
-          routerLink: APP_ROUTES.reviews
+          routerLink: APP_ROUTES.reviews,
+          hideConditional: () => !this.can(['reviews:read'])
         }
       ]
     },
     {
       title: 'Schema',
       hideChildren: true,
-      hideConditional: () => !this.authenticatorService.isAuthenticatedSync() || !this.authenticatorService.hasUserGroup(this.ADMIN_GROUP),
+      hideConditional: () => !this.can(['schema:read']),
       children: [
         {
           title: 'Attribute Definitions',
@@ -193,17 +233,22 @@ export class App extends ViescloudApplication {
         {
           title: 'Users',
           routerLink: APP_ROUTES.usersSetting,
-          hideConditional: () => !this.authenticatorService.hasUserGroup(this.ADMIN_GROUP)
+          hideConditional: () => !this.can(['iam:read'])
         },
         {
           title: 'User groups',
           routerLink: APP_ROUTES.userGroupsSetting,
-          hideConditional: () => !this.authenticatorService.hasUserGroup(this.ADMIN_GROUP)
+          hideConditional: () => !this.can(['iam:read'])
+        },
+        {
+          title: 'Roles & permissions',
+          routerLink: APP_ROUTES.rolesSetting,
+          hideConditional: () => !this.can(['iam:read'])
         },
         {
           title: 'OpenId Provider',
           routerLink: APP_ROUTES.openidProviderSetting,
-          hideConditional: () => !this.authenticatorService.hasUserGroup(this.ADMIN_GROUP)
+          hideConditional: () => !this.can(['iam:read'])
         }
       ]
     },

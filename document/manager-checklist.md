@@ -241,3 +241,143 @@ These block specific Manager features. Track them so we don't accidentally try t
 - **Source of truth** for intent: `frontend-manager.md` (in the backend repo). Memory pointer: [project_venzora_manager_intent].
 - **Library-first preference**: when introducing new primitives (the three reusables, error mapper, cascade-delete helper), put them in `src/lib/` if they'd benefit other Angular projects, not in `src/app/`.
 - **No NgRx unless really needed** (intent § 2). Service + signals is the default.
+
+---
+
+## 12. Dynamic permission system (RBAC) — added 2026-09-03
+
+Design: `vies-spring-utils/document/permission-system.md` (grammar is FROZEN there).
+Model: users → roles → permissions AND users → groups → roles → permissions; permission
+strings (`resource:action`, `*` wildcards) live only on the new `Role` entity.
+
+- [x] **Library 6.4.0** (411 tests green, deployed): `Role` entity + CRUD (`/api/v1/roles`,
+  gated on `iam:*`), `User.roles` + `UserGroup.roles` M2M, `PermissionStrings` grammar +
+  matcher, `ViesPermission` manual-check API (`hasAuthority/hasAnyAuthority/hasAllAuthorities`,
+  `hasRole/hasAnyRole/hasAllRoles`, `hasGroup/...`, `getEffectivePermissions[WithProvenance]`),
+  `@RequiresUser/@RequiresAuthority/@RequiresRole/@RequiresGroup` (ANY/ALL modes, class-level,
+  meta-annotation shortcuts) enforced by a HandlerInterceptor, `@CurrentUserId` argument
+  resolver, `@PublicEndpoint` + `SecurityArchitecture.assertAllEndpointsGated(...)`,
+  `resourceName()` verb→authority mapping on admin CRUD controllers (null = legacy admin
+  check), `adminBypassAuthority()` row-bypass refinement, idempotent SUPER_ADMIN (`*`) seed
+  attached to the ADMIN group. Debug: `GET /api/v1/roles/effective/{userId}` (provenance).
+- [x] **Venzora adoption**: every admin CRUD controller declares its resource (catalog /
+  schema / orders / shipments / discounts / inventory / rules / reviews / customers);
+  hand-written endpoints annotated (reports:read — previously UNGATED; rules:read/update on
+  tax export/import — previously UNGATED; catalog:update on the variant generator;
+  @RequiresUser on orchestrator + discount-validate + /me/*; @PublicEndpoint on the two
+  public controllers); orders/returns row-bypass now keys on orders:manage / returns:manage;
+  section roles seeded create-if-absent (SHIPPING_ADMIN, INVENTORY_ADMIN, CATALOG_ADMIN,
+  FINANCE_ADMIN); `SecurityArchitectureTest` enforces default-deny at build time.
+- [x] **Manager frontend** (2026-09-04, hand-built step by step): all in `src/lib` (vocabulary-free)
+  except the wiring —
+  `util/Permission.utils.ts` (`PermissionStrings` grammar port with right-aligned matching +
+  `PermissionUtils` client-side resolution/provenance; verified against the Java test vectors),
+  `Role` model + `roles` on `User`/`UserGroup`, `model/permission.model.ts` (`KNOWN_PERMISSIONS`
+  InjectionToken — the app supplies the words), `service/role.service.ts` (CRUD + `/roles/effective`),
+  `AuthenticatorService.hasAuthority/hasAnyAuthority/hasAllAuthorities/hasRole` (+`$`, +
+  `hasAuthorityOrAdmin` legacy fallback, `refreshCurrentUser`), `AuthGuard.isLoginWithAuthority`
+  (Promise-resolving; lacking → snackbar + home), `app-mat-form-field-input-permission` (chips editor:
+  grammar validation with a grammar-teaching inline error, suggestions from the catalog, `resource:*`
+  and `*` offered), `app-role-list` (list → editor; SUPER_ADMIN delete-protected, `*` removal warned),
+  `EffectivePermissionsDialog` (server provenance + unsaved preview), user editor roles picker +
+  "Effective permissions…" button, user-group editor rewritten list→editor with a roles picker
+  (seeded groups delete-protected). App: `setting/roles` route + "Roles & permissions" nav,
+  `VENZORA_PERMISSIONS` catalog provider, every admin route/nav section gated on authorities
+  (catalog/schema/orders|shipments|returns|discounts/rules/inventory/reviews|reports/maintenance/iam)
+  with per-child gating in Commerce/Insights and the legacy-ADMIN fallback. Zero-warning build.
+- [ ] **Testing round**: log in as a seeded section admin (create a user in only e.g.
+  SHIPPING_ADMIN) and verify: shipments CRUD 200, catalog write 403, refund 403, reports 403;
+  admin/admin (SUPER_ADMIN via ADMIN group) unchanged; `GET /api/v1/roles/effective/{id}`
+  explains every grant.
+
+---
+
+## 13. Quick stock + order restock, and Maintenance mode — added 2026-09-04
+
+### 13.1 Quick stock (variant) + restock from an order
+- [x] **Backend** (Venzora): `StockMovementService.recordOrderMovement/recordRestock` generalize the
+  ledger writer; new `POST /api/v1/orders/{id}/restock` (`OrderRestockController` +
+  `OrderRestockService`, gated `orders:restock` OR `inventory:update`) writes one RETURN movement
+  per item, tracks progress in `metadata.restock.<itemId>`, refuses more than sold, requires a
+  REFUNDED / PARTIALLY_REFUNDED / RETURNED / CANCELLED order whose stock actually left
+  (`checkout.stockDecremented`). FINANCE_ADMIN seeded with `orders:restock`.
+- [x] **Variant editor**: "Add / adjust stock…" button under Basics (saved variants only) opens the new
+  shared `QuickStockDialog` (type PURCHASE/RETURN/ADJUSTMENT/DAMAGE/TRANSFER, signed projection,
+  can't go below zero) → posts a StockMovement; the form mirrors `quantityAfter`
+  ([quick-stock-dialog](../src/app/shared/component/quick-stock-dialog/)).
+- [x] **Order editor → Items tab**: a *Restock* panel appears for refund/return statuses — per-item
+  sold / restocked / remaining with editable "restock now" (capped at remaining), disabled until the
+  status change is saved; confirm → `OrderRestockService.restock` → order graph refreshed.
+  `restock.*` metadata keys render in the system audit list.
+
+### 13.2 Maintenance mode
+- [x] **Library 6.5.0** (433 tests, deployed; doc `vies-spring-utils/document/maintenance-mode.md`):
+  `MaintenanceWindow` (name, message, manual `active`, `startAt`/`endAt` schedule), effective =
+  ANY window on; `GET /api/v1/maintenance/status` (public), `POST /toggle` (`maintenance:update`),
+  CRUD (resource `maintenance`); `MaintenanceInterceptor` answers **503 + `{maintenance:true,…}`**
+  to everyone except OPTIONS, the login/refresh/user/health/status allowlist, and holders of
+  `maintenance:bypass` / legacy ADMIN. Status cached 3 s, invalidated on writes. Flags
+  `enabledMaintenanceController` / `enabledMaintenanceGate`.
+- [x] **Venzora**: seeder now ADDITIVE — `maintenance:bypass` unioned into every section-admin role
+  (existing roles get it on next start).
+- [x] **Frontend lib** (`src/lib`): `MaintenanceService` (status signal, `refreshStatus`, `toggle`) +
+  `MaintenanceWindowService` (CRUD), `MaintenanceInterceptor` (503 maintenance → `/maintenance`),
+  `MaintenancePageComponent` (`viescloud-maintenance-page`, "Check again" re-probes and returns home).
+- [x] **Manager**: `/system/maintenance` control room (status card, switch-now with message,
+  scheduled windows table + editor with DATE_TIME pickers), nav *System → Maintenance mode*, red
+  banner under the header while ON (blue "scheduled" banner when a window is upcoming; polled every
+  60 s), `maintenanceGuard` on the test shop (non-admins → `/maintenance`), interceptor registered.
+- [ ] **Testing round**: restart backend (VS Code Java reload first — lib bumped to 6.5.0); as admin
+  turn maintenance ON → banner shows, admin screens keep working; as a NORMAL user any API call →
+  503 with `maintenance:true` and the shop routes to `/maintenance`; turn OFF → "Check again" returns
+  home. Restock: capture an order, refund it, save REFUNDED, Items tab → Restock → stock + a RETURN
+  movement per item; a second restock is capped at the remainder. Variant editor → Add stock →
+  balance + PURCHASE movement.
+
+---
+
+## 14. Tax rules v2 — aliases, district, product matchers (2026-09-04)
+
+- [x] **Backend** (Venzora, built; `TaxCalculatorTest` unit-tests the matching + per-line math without a DB):
+  `Address.district` (+ `shipping_district`/`billing_district` on orders, user addresses via the element
+  collection); `TaxRule.countryAliases[]`, `stateAliases[]` (TEXT via StringListConverter), `district`,
+  and M2M `tags` / `categories` / `attributeDefinitions` (join tables `tax_rule_*`). Matching moved INTO
+  `TaxRule` (`matchesLocation` alias-aware, `matchesProduct` any-overlap with category ANCESTORS,
+  `specificity` = location + product matchers) so checkout and the tax report share one definition.
+  `TaxCalculator.calculateForCart` computes tax **per line item** with discount proration (exact remainder),
+  returns `TaxCalculation.lines`, and the orchestrator stores `tax.line.<sku>` + `tax.mixed`/`tax.rules`
+  metadata; the amount-only `calculate` path skips product-matcher rules. Reports' jurisdiction "matching
+  rule" uses the alias-aware matcher and skips product-level rules.
+- [x] **Manager**: `Address` form gains "District (optional)" everywhere it's rendered (checkout, order
+  addresses); tax-rule editor adds District, comma-separated Country/State alias inputs, and Tag / Category /
+  Attribute-definition pickers with an 8-point specificity readout; the list's evaluation order and the
+  **test pad** mirror the new algorithm (aliases, district, optional product picker with ancestor-aware
+  category matching). Zero-warning build.
+- [ ] **Testing round** (needs backend restart — new columns/join tables are created by ddl-auto): rule
+  `US` + alias "United States" → checkout with country "United States" taxes; a category rule on "Apparel"
+  taxes a T-Shirt line while a food line takes the general rule (`tax.mixed=true`, per-line metadata);
+  district-only rule; test pad agrees with what checkout stored.
+
+---
+
+## 15. Discounts v2 — product matchers + usage-cap fix (2026-09-04)
+
+- [x] **Backend**: `Discount.tags` / `categories` / `attributeDefinitions` (M2M, join tables `discount_*`),
+  matching through the new shared `ProductMatching` helper (also adopted by `TaxRule`/`TaxCalculator`,
+  so tax rules and discounts agree on "product has ANY of…", categories incl. ancestors). A scoped
+  discount is computed on the ELIGIBLE lines' subtotal (percentage, fixed amount and cap alike); the
+  minimum-order check stays order-level; a cart with no qualifying line is rejected with
+  "No items in the cart qualify for discount X" (checkout 400 / validate preview `valid=false`).
+  Tax proration now spreads the discount only over eligible lines
+  (`TaxCalculator.calculateForCart(..., eligibleVariantIds)`). `/discounts/validate` returns
+  `eligibleSubtotal`; order metadata gains `discount.scoped`.
+- [x] **Usage cap bug fixed**: the Manager sends `maxUses = 0` for "unlimited", but the backend only
+  treated `null` as unlimited → a fresh discount hit "usage limit reached" (0 ≥ 0) on first use.
+  Now `null` OR `<= 0` = unlimited (`Discount.isUnlimited()`), `currentUses` bump is null-safe and
+  still increments on every checkout start regardless of cap. Manager label: "Max Uses — 0 = unlimited".
+- [x] **Manager**: discount editor gains the same Tag / Category / Attribute-definition pickers as tax
+  rules with a "product-scoped" readout; model + validation DTO updated. Zero-warning build.
+- [ ] **Testing round** (restart backend — new join tables): discount with maxUses 0 applies repeatedly
+  and `currentUses` climbs; a category-scoped 10% discount on "Apparel" reduces only the shirt line
+  (order shows `discount.scoped=true`; tax on the food line unchanged); validate preview returns
+  `eligibleSubtotal`; cart with no qualifying item → clear rejection.

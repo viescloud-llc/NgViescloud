@@ -8,6 +8,10 @@ import { RxJSUtils } from '../../../../lib/util/RxJS.utils';
 import { DialogUtils } from '../../../../lib/util/Dialog.utils';
 import { APP_ROUTES } from '../../../app.routes';
 import { TaxRule } from '../../../shared/model/commerce.model';
+import { Category, Product } from '../../../shared/model/product.model';
+import { MatOption } from '../../../../lib/model/mat.model';
+import { ProductService } from '../../../shared/service/product/product.service';
+import { CategoryService } from '../../../shared/service/category/category.service';
 import { TaxRuleService } from '../../../shared/service/tax-rule/tax-rule.service';
 import { TaxRuleImportExportService, TaxRuleImportMode } from '../../../shared/service/tax-rule-import-export/tax-rule-import-export.service';
 
@@ -37,6 +41,8 @@ export class TaxRuleListComponent extends ViesMatFormFieldMap implements OnInit 
   protected readonly taxRuleService = inject(TaxRuleService);
   protected readonly importExportService = inject(TaxRuleImportExportService);
   protected readonly router = inject(Router);
+  private readonly productService = inject(ProductService);
+  private readonly categoryService = inject(CategoryService);
 
   rules = signal<TaxRule[]>([]);
   blankRule = new TaxRule();
@@ -55,26 +61,77 @@ export class TaxRuleListComponent extends ViesMatFormFieldMap implements OnInit 
   testState = signal<string>('');
   testCity = signal<string>('');
   testPostalCode = signal<string>('');
+  testDistrict = signal<string>('');
+  testProduct = signal<Product | null>(null);
+
+  // Pools for the product-aware test pad (product picker + category ancestry).
+  products = signal<Product[]>([]);
+  categories = signal<Category[]>([]);
+  productOptions = computed<MatOption<Product>[]>(() =>
+    this.products().map(p => ({ value: p, valueLabel: `${p.name || '(unnamed)'}${p.baseSku ? ' — ' + p.baseSku : ''}` }))
+  );
 
   testResult = computed<{ rule: TaxRule | null; checked: boolean }>(() => {
-    const country = this.testCountry().trim();
-    const state = this.testState().trim();
-    const city = this.testCity().trim();
-    const postal = this.testPostalCode().trim();
-    // Only evaluate once the admin has typed something.
-    if (!country && !state && !city && !postal) return { rule: null, checked: false };
-
-    const candidates = this.sortedRules().filter(r => {
-      if (!r.active) return false;
-      // A non-empty matcher must equal the address field (case-insensitive);
-      // an empty matcher matches anything.
-      const eq = (matcher: string, actual: string) =>
-        !matcher || matcher.toLowerCase() === actual.toLowerCase();
-      return eq(r.country, country) && eq(r.state, state) && eq(r.city, city) && eq(r.postalCode, postal);
-    });
+    const addr = {
+      country: this.testCountry().trim(), state: this.testState().trim(), city: this.testCity().trim(),
+      postalCode: this.testPostalCode().trim(), district: this.testDistrict().trim()
+    };
+    const product = this.testProduct();
+    if (!addr.country && !addr.state && !addr.city && !addr.postalCode && !addr.district && !product) {
+      return { rule: null, checked: false };
+    }
+    const candidates = this.sortedRules().filter(r => r.active && this.matchesLocation(r, addr) && this.matchesProduct(r, product));
     // sortedRules is already in eval order → first candidate wins.
     return { rule: candidates[0] ?? null, checked: true };
   });
+
+  onTestProductChange(p: Product | string | null | undefined) {
+    if (typeof p === 'string') { if (p !== '') return; p = null; } // partial typing vs clear
+    this.testProduct.set(p ?? null);
+  }
+
+  // Mirror of TaxRule.matchesLocation on the backend: set matchers must equal
+  // the address field (case-insensitive); country/state also accept aliases.
+  private matchesLocation(r: TaxRule, a: { country: string; state: string; city: string; postalCode: string; district: string }): boolean {
+    const eq = (m: string | undefined, actual: string) => !!m && !!actual && m.trim().toLowerCase() === actual.trim().toLowerCase();
+    const withAliases = (m: string | undefined, aliases: string[] | undefined, actual: string) =>
+      eq(m, actual) || (aliases ?? []).some(al => eq(al, actual));
+    const set = (m: string | undefined) => !!m && m.trim() !== '';
+    if (set(r.country) && !withAliases(r.country, r.countryAliases, a.country)) return false;
+    if (set(r.state) && !withAliases(r.state, r.stateAliases, a.state)) return false;
+    if (set(r.city) && !eq(r.city, a.city)) return false;
+    if (set(r.postalCode) && !eq(r.postalCode, a.postalCode)) return false;
+    if (set(r.district) && !eq(r.district, a.district)) return false;
+    return true;
+  }
+
+  // Mirror of TaxRule.matchesProduct: empty matcher = any; set matcher needs ANY overlap.
+  // Categories include the product's ancestors (built from the category pool).
+  private matchesProduct(r: TaxRule, product: Product | null): boolean {
+    const hasTags = (r.tags?.length ?? 0) > 0, hasCats = (r.categories?.length ?? 0) > 0, hasDefs = (r.attributeDefinitions?.length ?? 0) > 0;
+    if (!hasTags && !hasCats && !hasDefs) return true;
+    if (!product) return false; // product-level rules need a product to evaluate
+    const tagIds = new Set((product.tags ?? []).map(t => t.id));
+    const catIds = this.categoryChain(product.category?.id);
+    const defIds = new Set<string>();
+    (product.attributes ?? []).forEach(a => { if (a.attributeDefinition?.id) defIds.add(a.attributeDefinition.id); });
+    (product.variants ?? []).forEach(v => (v.attributeValues ?? []).forEach(a => { if (a.attributeDefinition?.id) defIds.add(a.attributeDefinition.id); }));
+    if (hasTags && !r.tags.some(t => tagIds.has(t.id))) return false;
+    if (hasCats && !r.categories.some(c => catIds.has(c.id))) return false;
+    if (hasDefs && !r.attributeDefinitions.some(d => defIds.has(d.id))) return false;
+    return true;
+  }
+
+  private categoryChain(categoryId: string | undefined): Set<string> {
+    const chain = new Set<string>();
+    const byId = new Map(this.categories().map(c => [c.id, c]));
+    let current = categoryId ? byId.get(categoryId) : undefined;
+    while (current?.id && !chain.has(current.id)) {
+      chain.add(current.id);
+      current = current.parentCategoryId ? byId.get(current.parentCategoryId) : undefined;
+    }
+    return chain;
+  }
 
   ngOnInit(): void {
     this.refresh();
@@ -85,11 +142,16 @@ export class TaxRuleListComponent extends ViesMatFormFieldMap implements OnInit 
       next: res => this.rules.set(res),
       error: err => this.dialogUtils.openErrorMessageFromError(err)
     });
+    this.productService.getAll().subscribe({ next: res => this.products.set(res ?? []), error: () => this.products.set([]) });
+    this.categoryService.getAll().subscribe({ next: res => this.categories.set(res ?? []), error: () => this.categories.set([]) });
   }
 
+  // Backend TaxRule.specificity(): set location matchers + set product matchers (aliases don't count).
   specificity(rule: TaxRule): number {
-    return [rule.country, rule.state, rule.city, rule.postalCode]
+    const location = [rule.country, rule.state, rule.city, rule.postalCode, rule.district]
       .filter(f => !!f && f.trim() !== '').length;
+    const product = [rule.tags, rule.categories, rule.attributeDefinitions].filter(a => (a?.length ?? 0) > 0).length;
+    return location + product;
   }
 
   addRule() {

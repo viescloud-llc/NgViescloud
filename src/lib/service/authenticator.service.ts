@@ -1,7 +1,8 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable, OnDestroy, signal, computed } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { User, UserGroup } from '../model/authenticator.model';
+import { Role, User, UserGroup } from '../model/authenticator.model';
+import { PermissionStrings, PermissionUtils } from '../util/Permission.utils';
 import { Observable, Subscription, catchError, filter, finalize, first, interval, map, switchMap, tap, throwError } from 'rxjs';
 import { ViesService } from './rest.service';
 import { AliasChangeRequest, AuthEvent, AuthResponse, LoginRequest, Oauth2LoginRequest, PasswordChangeRequest, RefreshTokenRequest, RegisterRequest } from '../model/vies.model';
@@ -67,6 +68,14 @@ export class AuthenticatorService implements OnDestroy {
   readonly userGroups = computed(() => {
     return this._currentUser()?.userGroups ?? [];
   });
+
+  /** Every role the signed-in user holds (direct + via groups), deduplicated by name. */
+  readonly roles = computed<Role[]>(() => this._isAuthenticated() ? PermissionUtils.rolesOf(this._currentUser()) : []);
+
+  /** Deduplicated grant strings of the signed-in user (roles ∪ userGroups[*].roles). [] until authenticated. */
+  readonly effectivePermissions = computed<string[]>(() =>
+    this._isAuthenticated() ? PermissionUtils.effectivePermissions(this._currentUser()) : []
+  );
 
   // Observable conversions for backward compatibility
   readonly user$ = toObservable(this._currentUser);
@@ -480,6 +489,73 @@ export class AuthenticatorService implements OnDestroy {
     }
 
     return userGroups.some(group => group.id === userGroupNameOrId || group.name === userGroupNameOrId);
+  }
+
+  // ========================================
+  // Authority / role checks (client-side — UX only)
+  // ========================================
+  //
+  // These shape the UI (nav visibility, route bouncing, disabled buttons).
+  // Every endpoint is re-checked server-side; never treat a client result as
+  // a security decision. Everything degrades to false when unauthenticated or
+  // when the backend predates roles (missing arrays).
+
+  /** True when the user holds a grant covering the CONCRETE check, e.g. hasAuthority('orders:read'). */
+  hasAuthority(check: string): boolean {
+    return PermissionStrings.anyMatches(this.effectivePermissions(), check);
+  }
+
+  hasAnyAuthority(checks: readonly string[]): boolean {
+    return checks.some(c => this.hasAuthority(c));
+  }
+
+  hasAllAuthorities(checks: readonly string[]): boolean {
+    return checks.length > 0 && checks.every(c => this.hasAuthority(c));
+  }
+
+  /**
+   * Authority check with the legacy fallback: members of the admin group pass
+   * even when the backend hasn't attached the SUPER_ADMIN role yet (pre-6.4
+   * servers). Use this for nav/route gating; use hasAuthority for exact checks.
+   */
+  hasAuthorityOrAdmin(check: string, adminGroupName: string = 'ADMIN'): boolean {
+    return this.hasAuthority(check) || this.hasUserGroup(adminGroupName);
+  }
+
+  hasAnyAuthorityOrAdmin(checks: readonly string[], adminGroupName: string = 'ADMIN'): boolean {
+    return this.hasAnyAuthority(checks) || this.hasUserGroup(adminGroupName);
+  }
+
+  /** Exact role NAME, direct or via a group (ids are not accepted — server parity). */
+  hasRole(roleName: string): boolean {
+    return this.roles().some(r => r.name === roleName);
+  }
+
+  hasAnyRole(roleNames: readonly string[]): boolean {
+    return roleNames.some(n => this.hasRole(n));
+  }
+
+  /** Observable form, derived from user$ (emits on every user change). */
+  hasAuthority$(check: string): Observable<boolean> {
+    return this.user$.pipe(map(user => this._isAuthenticated() && PermissionStrings.anyMatches(PermissionUtils.effectivePermissions(user), check)));
+  }
+
+  /** What AuthGuard.isLoginWithAuthority consumes: ANY (default) or ALL of the checks, with the admin fallback. */
+  isAuthenticatedWithAuthority$(checks: readonly string[], mode: 'any' | 'all' = 'any', adminFallbackGroup: string | null = 'ADMIN'): Observable<boolean> {
+    return this.user$.pipe(map(user => {
+      if (!this._isAuthenticated() || !user) return false;
+      if (adminFallbackGroup && this.matchUserGroup(user.userGroups ?? [], adminFallbackGroup)) return true;
+      const grants = PermissionUtils.effectivePermissions(user);
+      return mode === 'all'
+        ? checks.length > 0 && checks.every(c => PermissionStrings.anyMatches(grants, c))
+        : checks.some(c => PermissionStrings.anyMatches(grants, c));
+    }));
+  }
+
+  /** Re-fetch the current user (e.g. after roles were edited in the admin UI). */
+  refreshCurrentUser(): void {
+    if (!this.isAuthenticatedSync()) return;
+    this.getCurrentUser().subscribe({ error: () => { /* keep the cached user */ } });
   }
 
   // ========================================

@@ -3,8 +3,10 @@
   <li>
     <p class="tab-hint">
       Rules are listed in <strong>evaluation order</strong> — most specific
-      first (count of non-empty matchers), then priority. The first active rule
-      whose every non-empty matcher equals the shipping address wins.
+      first (count of set location <em>and</em> product matchers), then priority.
+      Country/state also match their aliases; tax is computed per line item, so
+      a product-specific rule can apply to one line while another line uses a
+      different rule.
     </p>
   </li>
 
@@ -46,8 +48,9 @@
   <li class="test-pad">
     <h3 class="section-title">Test pad</h3>
     <p class="tab-hint">
-      Type a shipping address to see which rule would match. Client-side echo of
-      the backend algorithm — informational only.
+      Type a shipping address (and optionally pick a product) to see which rule
+      would match that line. Client-side echo of the backend algorithm, aliases
+      and product matchers included — informational only.
     </p>
     <div class="test-row">
       <app-mat-form-field-input
@@ -80,6 +83,28 @@
                       .set(inputKeys.label, 'Postal code')
                       .set(inputKeys.styleWidth, '160px')"
       ></app-mat-form-field-input>
+      <app-mat-form-field-input
+        [value]="testDistrict()"
+        (valueChange)="testDistrict.set($event)"
+        [inputMap]="inputField('test-district')
+                      .set(inputKeys.label, 'District')
+                      .set(inputKeys.styleWidth, '160px')"
+      ></app-mat-form-field-input>
+    </div>
+    <div class="test-row">
+      <!-- Product picker: needed to evaluate rules with product matchers. -->
+      <app-mat-form-field-input
+        [value]="testProduct()"
+        (valueChange)="onTestProductChange($event)"
+        [options]="productOptions()"
+        [inputMap]="inputField('test-product')
+                      .set(inputKeys.label, 'Product (optional)')
+                      .set(inputKeys.placeholder, 'Search products…')
+                      .set(inputKeys.optionsAutoActiveFirst, true)
+                      .set(inputKeys.optionsrequireSelection, true)
+                      .set(inputKeys.showClearIcon, true)
+                      .set(inputKeys.styleWidth, '360px')"
+      ></app-mat-form-field-input>
     </div>
     @if (testResult().checked) {
       @if (testResult().rule; as winner) {
@@ -90,7 +115,8 @@
         </p>
       } @else {
         <p class="test-result none">
-          No active rule matches — checkout would apply <strong>zero tax</strong>.
+          No active rule matches — that line would get <strong>zero tax</strong>
+          @if (!testProduct()) { (rules with product matchers need a product to be picked) }.
         </p>
       }
     }

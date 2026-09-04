@@ -22,11 +22,80 @@
                     .set(inputKeys.indent, false)
                     .set(inputKeys.styleWidth, '100%')"
     ></app-mat-form-field-input-dynamic>
+  </li>
+
+  <!-- Aliases: addresses are free text ("United States" vs "US"); any alias matches. -->
+  <li>
+    <h3 class="section-title">Aliases</h3>
+    <p class="tab-hint">
+      Alternative spellings that should also match. Comma-separated, case-insensitive
+      — e.g. <em>United States, USA, U.S.</em> for country <em>US</em>. Aliases don't
+      change specificity.
+    </p>
+    <app-mat-form-field-input
+      [value]="countryAliasText()"
+      (valueChange)="onCountryAliasesChange($event)"
+      [inputMap]="inputField('tax-country-aliases')
+                    .set(inputKeys.label, 'Country aliases')
+                    .set(inputKeys.placeholder, 'United States, USA, U.S.')
+                    .set(inputKeys.styleWidth, '100%')"
+    ></app-mat-form-field-input>
+    <app-mat-form-field-input
+      [value]="stateAliasText()"
+      (valueChange)="onStateAliasesChange($event)"
+      [inputMap]="inputField('tax-state-aliases')
+                    .set(inputKeys.label, 'State aliases')
+                    .set(inputKeys.placeholder, 'New York')
+                    .set(inputKeys.styleWidth, '100%')"
+    ></app-mat-form-field-input>
+  </li>
+
+  <!-- Product matchers: empty = any product; non-empty = product has ANY of them. -->
+  <li>
+    <h3 class="section-title">Product matchers (optional)</h3>
+    <p class="tab-hint">
+      Restrict the rule to products carrying <em>any</em> of the picked tags, categories
+      (including sub-categories) or attribute definitions. Leave all empty to match every
+      product. Each non-empty matcher adds one point of specificity; tax is then computed
+      per line item.
+    </p>
+    <app-mat-form-field-input-list-option
+      [value]="value()?.tags || []"
+      (valueChange)="onTagsChange($event)"
+      [options]="tagOptions()"
+      [inputMap]="inputField('tax-tags')
+                    .set(inputKeys.label, 'Tags')
+                    .set(inputKeys.styleWidth, '100%')
+                    .set(inputKeys.showSizeInput, false)
+                    .set(inputKeys.showSearchOption, true)
+                    .set(inputKeys.uniqueValue, true)"
+    ></app-mat-form-field-input-list-option>
+    <app-mat-form-field-input-list-option
+      [value]="value()?.categories || []"
+      (valueChange)="onCategoriesChange($event)"
+      [options]="categoryOptions()"
+      [inputMap]="inputField('tax-categories')
+                    .set(inputKeys.label, 'Categories (incl. sub-categories)')
+                    .set(inputKeys.styleWidth, '100%')
+                    .set(inputKeys.showSizeInput, false)
+                    .set(inputKeys.showSearchOption, true)
+                    .set(inputKeys.uniqueValue, true)"
+    ></app-mat-form-field-input-list-option>
+    <app-mat-form-field-input-list-option
+      [value]="value()?.attributeDefinitions || []"
+      (valueChange)="onAttributeDefinitionsChange($event)"
+      [options]="attributeDefinitionOptions()"
+      [inputMap]="inputField('tax-attr-defs')
+                    .set(inputKeys.label, 'Attribute definitions')
+                    .set(inputKeys.styleWidth, '100%')
+                    .set(inputKeys.showSizeInput, false)
+                    .set(inputKeys.showSearchOption, true)
+                    .set(inputKeys.uniqueValue, true)"
+    ></app-mat-form-field-input-list-option>
 
     <p class="tab-hint">
-      Every non-empty location field must equal the shipping address for this
-      rule to match; empty fields match anything. Current specificity:
-      <strong>{{ specificity() }}/4 — {{ specificityLabel() }}</strong>.
+      Every set matcher must fit for this rule to apply; empty matchers match anything.
+      Specificity: <strong>{{ specificity() }}/8 — {{ specificityLabel() }}</strong>.
       Between equally-specific matches, higher <em>Priority</em> wins.
     </p>
   </li>
