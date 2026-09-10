@@ -5,10 +5,14 @@ import { RouteUtils } from '../../../../lib/util/Route.utils';
 import { APP_ROUTES } from '../../../app.routes';
 import { Address } from '../../../shared/model/address.model';
 import {
+  DigitalDownloadView,
   FulfillmentStatus,
   OrderFulfillment,
   OrderFulfillmentItem
 } from '../../../shared/model/commerce.model';
+import { DigitalDownloadService } from '../../../shared/service/digital-download/digital-download.service';
+import { VariantFulfillmentType } from '../../../shared/model/product.model';
+import { FileUtils } from '../../../../lib/util/File.utils';
 import { OrderFulfillmentService } from '../../../shared/service/order-fulfillment/order-fulfillment.service';
 import { CheckoutOrderService, CheckoutOrderView } from '../../../shared/service/checkout-order/checkout-order.service';
 import { OrderRestockService } from '../../../shared/service/order-restock/order-restock.service';
@@ -19,7 +23,7 @@ import { firstValueFrom } from 'rxjs';
 // server-written history — every prefix here is treated as read-only audit
 // data. Manager notes go under `notes.*` by convention (§ 5.11) and are the
 // only editable slice.
-const SYSTEM_METADATA_PREFIXES = ['checkout.', 'discount.', 'tax.', 'shipping.', 'restock.'];
+const SYSTEM_METADATA_PREFIXES = ['checkout.', 'discount.', 'tax.', 'shipping.', 'restock.', 'digital.'];
 const NOTES_METADATA_PREFIX = 'notes.';
 
 // Legal FulfillmentStatus transitions. Terminal states (CANCELLED, REFUNDED,
@@ -110,6 +114,92 @@ export class OrderComponent extends ViesRestApi<OrderFulfillment, OrderFulfillme
     return Object.entries(item)
       .filter(([, v]) => v !== null && v !== undefined && typeof v !== 'object')
       .map(([key, v]) => ({ key, value: String(v) }));
+  }
+
+  // ---- Digital downloads ------------------------------------------------------
+  //
+  // Entitlements minted on payment capture for DIGITAL lines. Loaded on init
+  // (by route id — the order itself may still be in flight); staff can grant
+  // missing ones (file attached after the sale), revoke/restore, and pull a
+  // file for support.
+  private readonly digitalDownloadService = inject(DigitalDownloadService);
+  downloads = signal<DigitalDownloadView[]>([]);
+  downloadsLoaded = signal<boolean>(false);
+  hasDigitalItems = computed<boolean>(() =>
+    (this.value()?.items ?? []).some(i => i.productVariant?.fulfillmentType === VariantFulfillmentType.DIGITAL)
+  );
+  canGrantDownloads = computed<boolean>(() => {
+    const s = this.value()?.status;
+    return this.hasDigitalItems() && !!s
+      && s !== FulfillmentStatus.PENDING && s !== FulfillmentStatus.CANCELLED
+      && s !== FulfillmentStatus.FAILED && s !== FulfillmentStatus.REFUNDED;
+  });
+
+  override ngOnInit(): void {
+    super.ngOnInit();
+    this.loadDownloads();
+  }
+
+  loadDownloads() {
+    const oid = this.getRouteId();
+    if (!oid) return;
+    this.digitalDownloadService.list(oid).subscribe({
+      next: res => { this.downloads.set(res ?? []); this.downloadsLoaded.set(true); },
+      error: () => { this.downloads.set([]); this.downloadsLoaded.set(true); }
+    });
+  }
+
+  grantDownloads(notify: boolean) {
+    const oid = this.getRouteId();
+    if (!oid) return;
+    this.digitalDownloadService.grant(oid, notify).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+      next: res => {
+        this.downloads.set(res ?? []);
+        SnackBarUtils.openSnackBar(this.rxjsUtils.snackBar, notify ? 'Downloads granted and buyer notified' : 'Downloads granted', 'Dismiss', 5000);
+        this.refreshOrderSilently();
+      },
+      error: err => this.dialogUtils.openErrorMessageFromError(err)
+    });
+  }
+
+  async revokeDownload(d: DigitalDownloadView) {
+    const oid = this.getRouteId();
+    if (!oid) return;
+    const ok = await this.dialogUtils.openConfirmDialog(
+      'Revoke download access?',
+      `The buyer will no longer be able to download ${d.variantName || d.variantSku || 'this item'}.`,
+      'Revoke', 'Cancel').catch(() => false);
+    if (!ok) return;
+    this.digitalDownloadService.revoke(oid, d.entitlementId, 'Revoked by staff').subscribe({
+      next: updated => this.downloads.set(this.downloads().map(x => x.entitlementId === updated.entitlementId ? updated : x)),
+      error: err => this.dialogUtils.openErrorMessageFromError(err)
+    });
+  }
+
+  restoreDownload(d: DigitalDownloadView) {
+    const oid = this.getRouteId();
+    if (!oid) return;
+    this.digitalDownloadService.restore(oid, d.entitlementId).subscribe({
+      next: updated => this.downloads.set(this.downloads().map(x => x.entitlementId === updated.entitlementId ? updated : x)),
+      error: err => this.dialogUtils.openErrorMessageFromError(err)
+    });
+  }
+
+  downloadAssetAsStaff(d: DigitalDownloadView, assetId: string, fileName: string) {
+    const oid = this.getRouteId();
+    if (!oid) return;
+    this.digitalDownloadService.download(oid, d.entitlementId, assetId).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+      next: blob => FileUtils.saveBlobAsFile(fileName || 'download', blob),
+      error: err => this.dialogUtils.openErrorMessageFromError(err)
+    });
+  }
+
+  // Grant may flip a digital-only order to DELIVERED server-side — re-read the
+  // order without disturbing an unsaved draft.
+  private refreshOrderSilently() {
+    const oid = this.getRouteId();
+    if (!oid || this._value.isValueChange()) return;
+    this.service.get(oid).subscribe({ next: o => this._value.set(o), error: () => {} });
   }
 
   // ---- Shipment / return triggers -------------------------------------------

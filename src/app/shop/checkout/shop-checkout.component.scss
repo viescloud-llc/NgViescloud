@@ -69,3 +69,6 @@
   flex-wrap: wrap;
   margin-top: 0.75rem;
 }
+
+.shipping-options { display: flex; flex-direction: column; gap: 0.5rem; margin: 0.5rem 0; small { opacity: 0.75; } }
+.hint.warn { color: var(--mat-sys-error, #f28b82); }

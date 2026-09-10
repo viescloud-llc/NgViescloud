@@ -4,6 +4,7 @@ import { Currency } from "../../../lib/model/currency.model";
 import { MatInputDisable, MatInputDisplayLabel, MatInputEnum, MatInputHide, MatInputItemSetting, MatInputListSetting, MatItemSettingType, MatTableHide, MatTableDisplayLabel } from '../../../lib/model/mat.model';
 import { ViesDateTime } from "../../../lib/model/vies.model";
 import { Address } from "./address.model";
+import { Warehouse } from "./inventory.model";
 import { ProductVariant } from "./product.model";
 import { TrackedTimeStamp, TrackedTimeStampUserAccess } from "./tracked.model";
 
@@ -147,6 +148,11 @@ export class OrderFulfillmentItem extends TrackedTimeStamp {
     @MatInputHide()
     @MatTableHide()
     productSnapshot: string = '';
+
+    // Warehouse the line was allocated to (and sold out of) at payment capture.
+    @MatInputHide()
+    @MatTableHide()
+    warehouseId?: string | null;
 }
 
 export class OrderFulfillment extends TrackedTimeStampUserAccess {
@@ -333,6 +339,19 @@ export class Shipment extends TrackedTimeStamp {
 
     @MatInputDisplayLabel('Tracking URL')
     trackingUrl: string = '';
+
+    // Pickers in the editor: origin warehouse and carrier record + service level.
+    @MatInputHide()
+    @MatTableHide()
+    warehouseId?: string | null;
+
+    @MatInputHide()
+    @MatTableHide()
+    carrierId?: string | null;
+
+    @MatInputHide()
+    @MatTableHide()
+    carrierServiceCode?: string | null;
 }
 
 // ---- ReturnRequest ------------------------------------------------------
@@ -397,6 +416,11 @@ export class StockMovement extends TrackedTimeStamp {
     @MatTableHide()
     productVariant: ProductVariant = new ProductVariant();
 
+    // Which warehouse the units moved in/out of. Absent on input = the default warehouse.
+    @MatInputHide()
+    @MatTableDisplayLabel('Warehouse', (m: StockMovement) => m.warehouse?.name ?? '')
+    warehouse?: Warehouse | null;
+
     @MatInputEnum(StockMovementType)
     @MatInputDisplayLabel('Movement Type')
     movementType: StockMovementType = StockMovementType.ADJUSTMENT;
@@ -405,10 +429,14 @@ export class StockMovement extends TrackedTimeStamp {
     @MatInputDisplayLabel('Quantity Change')
     quantityChange: number = 0;
 
-    // Denormalized running total after this movement.
+    // Variant total across warehouses after this movement.
     @MatInputDisable()
-    @MatInputDisplayLabel('Quantity After')
+    @MatInputDisplayLabel('Quantity After (all warehouses)')
     quantityAfter: number = 0;
+
+    @MatInputDisable()
+    @MatInputDisplayLabel('Quantity After (warehouse)')
+    warehouseQuantityAfter?: number | null;
 
     @MatInputDisplayLabel('Reason')
     reason: string = '';
@@ -425,36 +453,203 @@ export class StockMovement extends TrackedTimeStamp {
 // One rule per currency (DB-level unique). Drives OrderFulfillment.shippingCost.
 // Missing or inactive rule → orchestrator falls back to zero shipping (warn-logged).
 
+// How a shipping rule prices a shipment (mirrors ShippingStrategy on the backend).
+export enum ShippingStrategy {
+    FLAT = "FLAT",                    // flatFee
+    WEIGHT_TIERED = "WEIGHT_TIERED",  // tiers by packaged grams
+    PRICE_TIERED = "PRICE_TIERED",    // tiers by physical subtotal
+    ITEM_TIERED = "ITEM_TIERED",      // tiers by unit count
+    PER_ITEM = "PER_ITEM",            // flatFee + perItemFee × units
+    CARRIER_API = "CARRIER_API"       // live carrier rate (needs a registered provider)
+}
+
+export const SHIPPING_STRATEGY_LABELS: Record<ShippingStrategy, string> = {
+    [ShippingStrategy.FLAT]: 'Flat fee',
+    [ShippingStrategy.WEIGHT_TIERED]: 'Tiers by weight (g)',
+    [ShippingStrategy.PRICE_TIERED]: 'Tiers by order subtotal',
+    [ShippingStrategy.ITEM_TIERED]: 'Tiers by item count',
+    [ShippingStrategy.PER_ITEM]: 'Base fee + per item',
+    [ShippingStrategy.CARRIER_API]: 'Live carrier rate (future)'
+};
+
+// One step of a tiered rule: "up to `upTo` costs `price`". BigDecimals as strings/numbers.
+export interface ShippingTier {
+    upTo: number | string;
+    price: string;
+}
+
+// A shipping METHOD: where it applies (location matchers + aliases, same
+// grammar as tax rules), what it applies to (optional product matchers — every
+// physical line must match), how it is priced (strategy + its fields), and the
+// modifiers every strategy honours. Several rules may cover the same zone —
+// they are simply the methods offered there. Table: shipping_rule.
 export class ShippingRule extends TrackedTimeStamp {
     @MatInputDisable()
     @MatInputDisplayLabel('ID')
+    @MatTableHide()
     id: string = '';
 
-    // One rule per currency (DB-unique). Hidden from the dynamic form — the
-    // editor renders a custom picker that EXCLUDES currencies already taken
-    // by another rule, so the 409 can't happen from the UI. Kept visible in
-    // tables (the list is one-row-per-currency).
-    @MatInputHide()
+    @MatInputDisplayLabel('Name', 'shown to buyers, e.g "Standard", "Express"')
+    name: string = '';
+
+    @MatInputDisplayLabel('Description')
+    @MatInputItemSetting(MatItemSettingType.TEXT_AREA, true)
+    @MatTableHide()
+    description: string = '';
+
     @MatInputEnum(Currency)
     @MatInputDisplayLabel('Currency')
     currency: Currency = Currency.USD;
 
-    // BigDecimal — shipping fee when below the free-above threshold.
-    @MatInputDisplayLabel('Flat Fee')
-    flatFee: string = '0';
-
-    // BigDecimal — null/undefined disables the free-shipping threshold.
-    // Optional so the editor can send it as ABSENT (Jackson rejects "" for
-    // BigDecimal); the '' default only exists for the form's blank object.
-    @MatInputDisplayLabel('Free Above Amount')
-    freeAboveAmount?: string = '';
-
-    @MatInputDisplayLabel('Description')
-    @MatInputItemSetting(MatItemSettingType.TEXT_AREA, true)
-    description: string = '';
-
     @MatInputDisplayLabel('Active')
     active: boolean = true;
+
+    @MatInputDisplayLabel('Priority', 'tie-breaker between equally specific rules; higher wins')
+    priority: number = 0;
+
+    // ---- Location matchers (empty = anywhere) ----
+    @MatInputDisplayLabel('Country', 'e.g "US" — empty = any')
+    country: string = '';
+
+    @MatInputHide()
+    @MatTableHide()
+    countryAliases: string[] = [] as string[];
+
+    @MatInputDisplayLabel('State / Province', 'empty = any')
+    state: string = '';
+
+    @MatInputHide()
+    @MatTableHide()
+    stateAliases: string[] = [] as string[];
+
+    @MatInputDisplayLabel('City', 'empty = any')
+    @MatTableHide()
+    city: string = '';
+
+    @MatInputDisplayLabel('Postal Code', 'empty = any')
+    @MatTableHide()
+    postalCode: string = '';
+
+    @MatInputDisplayLabel('District', 'empty = any')
+    @MatTableHide()
+    district: string = '';
+
+    // ---- Product matchers (custom pickers) ----
+    @MatInputHide()
+    @MatTableHide()
+    tags: Tag[] = [] as Tag[];
+
+    @MatInputHide()
+    @MatTableHide()
+    categories: Category[] = [] as Category[];
+
+    @MatInputHide()
+    @MatTableHide()
+    attributeDefinitions: AttributeDefinition[] = [] as AttributeDefinition[];
+
+    // Warehouse hook (future): null = any origin.
+    @MatInputHide()
+    @MatTableHide()
+    originWarehouseId?: string | null;
+
+    // ---- Pricing (custom section in the editor) ----
+    @MatInputHide()
+    @MatTableDisplayLabel('Pricing', (r: ShippingRule) => SHIPPING_STRATEGY_LABELS[r.strategy] ?? r.strategy)
+    strategy: ShippingStrategy = ShippingStrategy.FLAT;
+
+    @MatInputHide()
+    @MatTableHide()
+    flatFee?: string = '';
+
+    @MatInputHide()
+    @MatTableHide()
+    perItemFee?: string = '';
+
+    @MatInputHide()
+    @MatTableHide()
+    tiers: ShippingTier[] = [] as ShippingTier[];
+
+    @MatInputHide()
+    @MatTableHide()
+    overageStep?: string = '';
+
+    @MatInputHide()
+    @MatTableHide()
+    overagePrice?: string = '';
+
+    // Carrier record a CARRIER_API rule is priced through (picker in the editor).
+    @MatInputHide()
+    @MatTableHide()
+    carrierId?: string | null;
+
+    @MatInputHide()
+    @MatTableHide()
+    carrierServiceCode?: string = '';
+
+    // ---- Modifiers (every strategy). BigDecimals; '' = unset (sent as absent). ----
+    @MatInputDisplayLabel('Free above amount', 'physical subtotal at/above which this method is free; empty = never')
+    @MatTableHide()
+    freeAboveAmount?: string = '';
+
+    @MatInputDisplayLabel('Handling fee', 'added on top of the rate')
+    @MatTableHide()
+    handlingFee?: string = '';
+
+    @MatInputDisplayLabel('Minimum charge')
+    @MatTableHide()
+    minCharge?: string = '';
+
+    @MatInputDisplayLabel('Maximum charge')
+    @MatTableHide()
+    maxCharge?: string = '';
+
+    @MatInputDisplayLabel('Estimated days (min)', '0 = not shown')
+    @MatTableHide()
+    estimatedDaysMin: number = 0;
+
+    @MatInputDisplayLabel('Estimated days (max)', '0 = not shown')
+    @MatTableHide()
+    estimatedDaysMax: number = 0;
+}
+
+// ---- Shipping quotes (POST /orders/shipping-quote, POST /shipping/rules/quote) ----
+
+export interface ShippingOption {
+    ruleId: string;
+    name: string;
+    description?: string | null;
+    strategy: ShippingStrategy;
+    carrierCode?: string | null;
+    amount?: string | number | null;
+    free: boolean;
+    breakdown?: string | null;
+    estimatedDaysMin?: number | null;
+    estimatedDaysMax?: number | null;
+    specificity: number;
+    priority: number;
+    recommended: boolean;
+    available: boolean;
+    unavailableReason?: string | null;
+}
+
+export interface ShippingQuote {
+    currency?: Currency | null;
+    digitalOnly: boolean;
+    bootstrapFree: boolean;
+    physicalItems: number;
+    totalWeightGrams: number;
+    weightMissing: boolean;
+    physicalSubtotal?: string | number | null;
+    recommendedRuleId?: string | null;
+    options: ShippingOption[];
+    message?: string | null;
+}
+
+// Admin test pad body: a synthetic cart.
+export interface ShippingTestRequest {
+    currency: Currency;
+    shippingAddress: Address;
+    lines: { productVariantId: string; quantity: number }[];
 }
 
 // ---- TaxRule ------------------------------------------------------------
@@ -523,4 +718,37 @@ export class TaxRule extends TrackedTimeStamp {
     @MatInputDisplayLabel('Description')
     @MatInputItemSetting(MatItemSettingType.TEXT_AREA, true)
     description: string = '';
+}
+
+// ---- Digital downloads (GET /api/v1/orders/{id}/downloads) -------------------
+//
+// One row per digital order line. `available` folds every server rule
+// (payment captured, not revoked/expired/capped) so the UI greys a row out for
+// the same reason the download endpoint would refuse it. Instants are ISO
+// strings (not ViesDateTime).
+
+export interface DigitalDownloadAsset {
+    id: string;
+    fileName: string;
+    contentType?: string | null;
+    size?: number | null;
+    label?: string | null;
+}
+
+export interface DigitalDownloadView {
+    entitlementId: string;
+    orderItemId: string;
+    productVariantId: string;
+    variantSku?: string | null;
+    variantName?: string | null;
+    grantedAt?: string | null;
+    revoked: boolean;
+    revokedReason?: string | null;
+    downloadCount: number;
+    maxDownloads?: number | null;
+    expiresAt?: string | null;
+    lastDownloadAt?: string | null;
+    available: boolean;
+    unavailableReason?: string | null;
+    assets: DigitalDownloadAsset[];
 }

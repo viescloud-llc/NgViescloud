@@ -12,7 +12,7 @@ import { MatOption } from '../../../../lib/model/mat.model';
 import { ViesRestApi } from '../../../../lib/abtract/ViesRestApi';
 import { DataUtils } from '../../../../lib/util/Data.utils';
 import { APP_ROUTES } from '../../../app.routes';
-import { Product, ProductMedia, ProductVariant, VariantPriceMode } from '../../../shared/model/product.model';
+import { DigitalAsset, Product, ProductMedia, ProductVariant, VariantFulfillmentType, VariantPriceMode } from '../../../shared/model/product.model';
 import { AttributeDefinition, AttributeValue, ProductVariantAttribute } from '../../../shared/model/attribute.model';
 import { ProductService } from '../../../shared/service/product/product.service';
 import { ProductVariantService } from '../../../shared/service/product-variant/product-variant.service';
@@ -22,7 +22,15 @@ import { AttributeValueFieldComponent } from '../../../shared/component/attribut
 import { ProductMediaGalleryComponent } from '../../../shared/component/product-media/media-gallery/media-gallery.component';
 import { QuickStockDialog, QuickStockDialogData } from '../../../shared/component/quick-stock-dialog/quick-stock-dialog.component';
 import { StockMovement } from '../../../shared/model/commerce.model';
+import { ProductVariantScanCode, SCAN_CODE_SYMBOLOGY_LABELS, ScanCodeSymbology } from '../../../shared/model/scan-code.model';
+import { ScanCodeService } from '../../../shared/service/scan-code/scan-code.service';
+import { LabelFormat, ScanLabelUtil } from '../../../shared/util/scan-label.util';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { ViesService } from '../../../../lib/service/rest.service';
 import { SnackBarUtils } from '../../../../lib/util/SnackBar.utils';
+import { DigitalAssetService } from '../../../shared/service/digital-asset/digital-asset.service';
+import { UtilsService } from '../../../../lib/service/utils.service';
+import { FileUtils } from '../../../../lib/util/File.utils';
 
 // Standalone editor for a single ProductVariant. Reached ONLY via the Variants
 // tab on the ProductComponent (either "Add variant" or clicking a row) — this
@@ -71,8 +79,193 @@ export class ProductVariantComponent extends ViesRestApi<ProductVariant, Product
   // definition can be attached as a variant attribute.
   allAttributeDefinitions = signal<AttributeDefinition[]>([]);
 
-  // Expose the enum to the template.
+  // Expose the enums to the template.
   readonly VariantPriceMode = VariantPriceMode;
+  readonly VariantFulfillmentType = VariantFulfillmentType;
+
+  // ---- Scan codes (barcode / QR) --------------------------------------------
+  //
+  // MAIN code = the variant id (UUIDv7: unique, immutable, generated on create),
+  // rendered as a QR by default or a (long) Code 128 stripe. ALIASES are any
+  // outside codes (supplier UPC, legacy labels…) managed through their own
+  // endpoint; they may repeat across variants but not on one variant.
+  private scanCodeService = inject(ScanCodeService);
+  private sanitizer = inject(DomSanitizer);
+  readonly symbologyOptions = (Object.values(ScanCodeSymbology) as ScanCodeSymbology[]).map(s => ({ value: s, label: SCAN_CODE_SYMBOLOGY_LABELS[s] }));
+  readonly symbologyLabels = SCAN_CODE_SYMBOLOGY_LABELS;
+  mainCodeFormat = signal<LabelFormat>('QR');
+  mainQrDataUrl = signal<string>('');
+  mainCode128Svg = signal<SafeHtml | null>(null);
+  labelCopies = signal<number>(1);
+  scanCodes = signal<ProductVariantScanCode[]>([]);
+  newAliasValue = signal<string>('');
+  newAliasSymbology = signal<ScanCodeSymbology>(ScanCodeSymbology.OTHER);
+  newAliasLabel = signal<string>('');
+  canAddAlias = computed<boolean>(() => !!this.id() && this.newAliasValue().trim().length > 0);
+
+  private renderMainCode() {
+    const id = this.id();
+    if (!id || ViesService.isNotCSR()) { this.mainQrDataUrl.set(''); this.mainCode128Svg.set(null); return; }
+    ScanLabelUtil.qrDataUrl(id, 180).then(url => this.mainQrDataUrl.set(url)).catch(() => this.mainQrDataUrl.set(''));
+    try {
+      this.mainCode128Svg.set(this.sanitizer.bypassSecurityTrustHtml(ScanLabelUtil.code128Svg(id, { height: 40, width: 1 })));
+    } catch { this.mainCode128Svg.set(null); }
+  }
+
+  loadScanCodes() {
+    const id = this.id();
+    if (!id) { this.scanCodes.set([]); return; }
+    this.scanCodeService.list(id).subscribe({ next: res => this.scanCodes.set(res ?? []), error: () => this.scanCodes.set([]) });
+  }
+
+  copyMainCode() {
+    const id = this.id();
+    if (!id) return;
+    navigator.clipboard?.writeText(id).then(() => SnackBarUtils.openSnackBar(this.rxjsUtils.snackBar, 'Variant id copied', 'Dismiss', 3000)).catch(() => {});
+  }
+
+  async printMainLabel() {
+    const v = this.value();
+    if (!v?.id) return;
+    try {
+      await ScanLabelUtil.printLabels([{
+        value: v.id, format: this.mainCodeFormat(), copies: this.labelCopies(),
+        title: v.sku, subtitle: [this.parentProduct()?.name, v.variantName].filter(Boolean).join(' — ')
+      }]);
+    } catch (err) {
+      this.dialogUtils.openErrorMessageFromError(err);
+    }
+  }
+
+  async printAliasLabel(code: ProductVariantScanCode) {
+    const v = this.value();
+    if (!v) return;
+    const format: LabelFormat = code.symbology === ScanCodeSymbology.QR || code.symbology === ScanCodeSymbology.DATA_MATRIX ? 'QR' : 'CODE_128';
+    try {
+      await ScanLabelUtil.printLabels([{ value: code.codeValue, format, copies: this.labelCopies(), title: v.sku, subtitle: code.label || undefined }]);
+    } catch (err) {
+      this.dialogUtils.openErrorMessageFromError(err);
+    }
+  }
+
+  addAlias() {
+    const id = this.id();
+    if (!id || !this.canAddAlias()) return;
+    this.scanCodeService.add(id, { codeValue: this.newAliasValue().trim(), symbology: this.newAliasSymbology(), label: this.newAliasLabel().trim() || null, active: true })
+      .pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+        next: () => { this.newAliasValue.set(''); this.newAliasLabel.set(''); this.loadScanCodes(); },
+        error: err => this.dialogUtils.openErrorMessageFromError(err)
+      });
+  }
+
+  toggleAliasActive(code: ProductVariantScanCode) {
+    const id = this.id();
+    if (!id || !code.id) return;
+    this.scanCodeService.patch(id, code.id, { active: !code.active }).subscribe({
+      next: saved => this.scanCodes.set(this.scanCodes().map(c => c.id === saved.id ? saved : c)),
+      error: err => this.dialogUtils.openErrorMessageFromError(err)
+    });
+  }
+
+  async removeAlias(code: ProductVariantScanCode) {
+    const id = this.id();
+    if (!id || !code.id) return;
+    const ok = await this.dialogUtils.openConfirmDialog('Remove alias?', `"${code.codeValue}" will no longer resolve to this variant when scanned.`, 'Remove', 'Cancel').catch(() => false);
+    if (!ok) return;
+    this.scanCodeService.delete(id, code.id).subscribe({ next: () => this.loadScanCodes(), error: err => this.dialogUtils.openErrorMessageFromError(err) });
+  }
+
+  // ---- Digital files -------------------------------------------------------
+  //
+  // Files attached to a DIGITAL variant. Managed through their own endpoint
+  // (multipart upload → object storage), NOT through the variant JSON, so the
+  // list is loaded separately and refreshed after every change. Needs a saved
+  // variant (the id names the storage path).
+  private digitalAssetService = inject(DigitalAssetService);
+  digitalAssets = signal<DigitalAsset[]>([]);
+  digitalAssetsLoaded = signal<boolean>(false);
+  uploadingAsset = signal<boolean>(false);
+  isDigital = computed<boolean>(() => this.value()?.fulfillmentType === VariantFulfillmentType.DIGITAL);
+  activeDigitalAssetCount = computed<number>(() => this.digitalAssets().filter(a => a.active).length);
+
+  loadDigitalAssets() {
+    const id = this.id();
+    if (!id) { this.digitalAssets.set([]); this.digitalAssetsLoaded.set(true); return; }
+    this.digitalAssetService.list(id).subscribe({
+      next: res => { this.digitalAssets.set(res ?? []); this.digitalAssetsLoaded.set(true); },
+      error: () => { this.digitalAssets.set([]); this.digitalAssetsLoaded.set(true); }
+    });
+  }
+
+  async uploadDigitalAsset() {
+    const id = this.id();
+    if (!id || this.uploadingAsset()) return;
+    let vFile;
+    try {
+      vFile = await UtilsService.uploadFileAsVFile('*/*');
+    } catch {
+      return;
+    }
+    if (!vFile?.rawFile) return;
+    this.uploadingAsset.set(true);
+    this.digitalAssetService.upload(id, vFile.rawFile, vFile.name).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+      next: () => {
+        this.uploadingAsset.set(false);
+        this.loadDigitalAssets();
+        SnackBarUtils.openSnackBar(this.rxjsUtils.snackBar, `Uploaded ${vFile.name}`, 'Dismiss', 4000);
+      },
+      error: err => { this.uploadingAsset.set(false); this.dialogUtils.openErrorMessageFromError(err); }
+    });
+  }
+
+  onDigitalAssetLabelChange(asset: DigitalAsset, label: string) {
+    const id = this.id();
+    if (!id || !asset.id || (label ?? '') === (asset.label ?? '')) return;
+    this.digitalAssetService.patch(id, asset.id, { label }).subscribe({
+      next: saved => this.digitalAssets.set(this.digitalAssets().map(a => a.id === saved.id ? saved : a)),
+      error: err => this.dialogUtils.openErrorMessageFromError(err)
+    });
+  }
+
+  toggleDigitalAssetActive(asset: DigitalAsset) {
+    const id = this.id();
+    if (!id || !asset.id) return;
+    this.digitalAssetService.patch(id, asset.id, { active: !asset.active }).subscribe({
+      next: saved => this.digitalAssets.set(this.digitalAssets().map(a => a.id === saved.id ? saved : a)),
+      error: err => this.dialogUtils.openErrorMessageFromError(err)
+    });
+  }
+
+  downloadDigitalAsset(asset: DigitalAsset) {
+    const id = this.id();
+    if (!id || !asset.id) return;
+    this.digitalAssetService.download(id, asset.id).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+      next: blob => FileUtils.saveBlobAsFile(asset.fileName || 'download', blob),
+      error: err => this.dialogUtils.openErrorMessageFromError(err)
+    });
+  }
+
+  async deleteDigitalAsset(asset: DigitalAsset) {
+    const id = this.id();
+    if (!id || !asset.id) return;
+    const ok = await this.dialogUtils.openConfirmDialog(
+      'Delete file?',
+      `Delete "${asset.fileName}"? Buyers who purchased this variant will no longer be able to download it.`,
+      'Delete', 'Cancel').catch(() => false);
+    if (!ok) return;
+    this.digitalAssetService.delete(id, asset.id).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+      next: () => this.loadDigitalAssets(),
+      error: err => this.dialogUtils.openErrorMessageFromError(err)
+    });
+  }
+
+  formatBytes(size?: number | null): string {
+    const n = Number(size ?? 0);
+    if (n < 1024) return `${n} B`;
+    if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
+    if (n < 1024 * 1024 * 1024) return `${(n / (1024 * 1024)).toFixed(1)} MB`;
+    return `${(n / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+  }
   readonly priceModeOptions: { value: VariantPriceMode; label: string }[] = [
     { value: VariantPriceMode.NORMAL,             label: 'Fixed price' },
     { value: VariantPriceMode.FLAT_ADJUSTMENT,    label: 'Adjust base by amount' },
@@ -136,6 +329,9 @@ export class ProductVariantComponent extends ViesRestApi<ProductVariant, Product
 
   override ngOnInit(): void {
     super.ngOnInit();
+    this.loadDigitalAssets();
+    this.loadScanCodes();
+    this.renderMainCode();
 
     // Capture the parent product id from the URL. Try the ActivatedRoute
     // param map first (proper Angular API); fall back to URL string parsing
@@ -341,7 +537,7 @@ export class ProductVariantComponent extends ViesRestApi<ProductVariant, Product
   // the form is clean the tracking baseline moves too (the change is already
   // persisted, nothing to save); if the admin has unsaved edits we only update
   // the visible value so their draft isn't reset.
-  openQuickStockDialog() {
+  openQuickStockDialog(warehouseId?: string) {
     const v = this.value();
     if (!v?.id) return;
     this.dialogUtils.matDialog
@@ -351,7 +547,9 @@ export class ProductVariantComponent extends ViesRestApi<ProductVariant, Product
           variantId: v.id,
           sku: v.sku,
           variantName: v.variantName,
-          currentStock: Number(v.stockQuantity ?? 0)
+          currentStock: Number(v.stockQuantity ?? 0),
+          levels: v.inventoryLevels ?? [],
+          warehouseId
         } satisfies QuickStockDialogData
       })
       .afterClosed()
@@ -359,7 +557,16 @@ export class ProductVariantComponent extends ViesRestApi<ProductVariant, Product
         if (!movement) return;
         const current = this.value();
         if (!current) return;
-        const updated = { ...current, stockQuantity: movement.quantityAfter };
+        // Mirror the new balances: total from the movement, the warehouse row from
+        // its per-warehouse figure (new warehouses get a row).
+        const wid = movement.warehouse?.id;
+        const levels = [...(current.inventoryLevels ?? [])];
+        const idx = levels.findIndex(l => l.warehouse?.id === wid);
+        if (wid && movement.warehouseQuantityAfter !== null && movement.warehouseQuantityAfter !== undefined) {
+          if (idx >= 0) levels[idx] = { ...levels[idx], quantity: Number(movement.warehouseQuantityAfter) };
+          else levels.push({ id: wid + ':' + current.id, productVariantId: current.id, warehouse: movement.warehouse!, quantity: Number(movement.warehouseQuantityAfter) });
+        }
+        const updated = { ...current, stockQuantity: movement.quantityAfter, inventoryLevels: levels };
         if (this._value.isValueChange()) {
           this.value.set(updated);
         } else {
@@ -411,6 +618,13 @@ export class ProductVariantComponent extends ViesRestApi<ProductVariant, Product
   // scope was saving only, and the direct DELETE endpoint is fine (backend
   // cascades cleanly). See remove() below.
   override async save() {
+    // (0) packaged spec: 0 in the form means "use the product default" → send null
+    const packaged = this._value.value();
+    if (packaged) {
+      for (const k of ['weightGrams', 'lengthMm', 'widthMm', 'heightMm'] as const) {
+        if (!Number(packaged[k])) (packaged as any)[k] = null;
+      }
+    }
     // (1) flush pending media uploads
     const gallery = this.gallery();
     if (gallery && gallery.hasPendingUploads()) {

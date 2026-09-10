@@ -36,6 +36,10 @@
           </p>
         }
 
+        @if (selectedIsDigital()) {
+          <p class="digital-note">Digital product — delivered as a download after payment. No shipping.</p>
+        }
+
         <mat-form-field appearance="outline" class="qty">
           <mat-label>Quantity</mat-label>
           <input

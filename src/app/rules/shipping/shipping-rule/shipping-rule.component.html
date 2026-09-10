@@ -3,27 +3,14 @@
   <li class="return-banner">
     <span>
       @if (id()) {
-        Editing shipping rule for <strong>{{ value()?.currency }}</strong>
+        Editing shipping method <strong>{{ value()?.name || '(unnamed)' }}</strong>
       } @else {
-        Creating a new shipping rule
+        Creating a new shipping method
       }
     </span>
     <button matButton="filled" (click)="backToList()" type="button">
       Back to shipping rules
     </button>
-  </li>
-
-  <!-- Currency — custom picker excluding currencies already claimed by
-       another rule (DB unique). -->
-  <li>
-    <app-mat-form-field-input-option
-      [value]="value()?.currency"
-      (valueChange)="onCurrencyChange($event)"
-      [options]="currencyOptions()"
-      [inputMap]="inputField('shipping-rule-currency')
-                    .set(inputKeys.label, 'Currency')
-                    .set(inputKeys.styleWidth, '240px')"
-    ></app-mat-form-field-input-option>
   </li>
 
   <li>
@@ -35,11 +22,199 @@
                     .set(inputKeys.indent, false)
                     .set(inputKeys.styleWidth, '100%')"
     ></app-mat-form-field-input-dynamic>
-
     <p class="tab-hint">
-      <strong>Flat Fee</strong> applies when the order subtotal is below
-      <strong>Free Above Amount</strong>. Leave <em>Free Above Amount</em> empty
-      to disable the free-shipping threshold (flat fee always applies).
+      Location fields are <em>matchers</em>: empty = anywhere. Several methods may cover the same
+      place — at checkout every match is offered, the most specific one (ties → priority) is
+      recommended. <strong>Free above</strong>, <strong>handling</strong>, <strong>min / max</strong>
+      apply to every pricing strategy.
+    </p>
+  </li>
+
+  <!-- ===================== PRICING (strategy-specific) ===================== -->
+  <li>
+    <h3 class="section-title">Pricing</h3>
+    <div class="pricing-row">
+      <mat-form-field appearance="outline" class="mode-select">
+        <mat-label>Strategy</mat-label>
+        <mat-select [value]="strategy()" (selectionChange)="onStrategyChange($event.value)">
+          @for (opt of strategyOptions; track opt.value) {
+            <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    @switch (strategy()) {
+      @case (ShippingStrategy.FLAT) {
+        <app-mat-form-field-input
+          [value]="value()?.flatFee || ''"
+          (valueChange)="onFlatFeeChange($event)"
+          [blankObject]="''"
+          [inputMap]="inputField('sr-flat-fee').set(inputKeys.label, 'Flat fee').set(inputKeys.placeholder, '5.00').set(inputKeys.styleWidth, '240px').set(inputKeys.required, true)"
+        ></app-mat-form-field-input>
+      }
+      @case (ShippingStrategy.PER_ITEM) {
+        <div class="pricing-row">
+          <app-mat-form-field-input
+            [value]="value()?.flatFee || ''"
+            (valueChange)="onFlatFeeChange($event)"
+            [blankObject]="''"
+            [inputMap]="inputField('sr-base-fee').set(inputKeys.label, 'Base fee').set(inputKeys.placeholder, '5.00').set(inputKeys.styleWidth, '240px')"
+          ></app-mat-form-field-input>
+          <app-mat-form-field-input
+            [value]="value()?.perItemFee || ''"
+            (valueChange)="onPerItemFeeChange($event)"
+            [blankObject]="''"
+            [inputMap]="inputField('sr-per-item').set(inputKeys.label, 'Per item').set(inputKeys.placeholder, '1.50').set(inputKeys.styleWidth, '240px').set(inputKeys.required, true)"
+          ></app-mat-form-field-input>
+        </div>
+      }
+      @case (ShippingStrategy.CARRIER_API) {
+        <p class="tab-hint">
+          Live carrier rates are not integrated yet. This method is saved but reported as
+          <em>unavailable</em> at checkout until a provider for the carrier code is registered —
+          you can prepare it now.
+        </p>
+        <div class="pricing-row">
+          <mat-form-field appearance="outline" class="mode-select">
+            <mat-label>Carrier</mat-label>
+            <mat-select [value]="value()?.carrierId || ''" (selectionChange)="onCarrierChange($event.value)">
+              @for (c of carriers(); track c.id) {
+                <mat-option [value]="c.id">{{ c.name }} ({{ c.code }}, {{ c.integrationType }})</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="mode-select">
+            <mat-label>Service level</mat-label>
+            <mat-select [value]="value()?.carrierServiceCode || ''" (selectionChange)="onCarrierServiceCodeChange($event.value)">
+              <mat-option value="">(any / carrier default)</mat-option>
+              @for (s of selectedCarrier()?.services ?? []; track s.code) {
+                <mat-option [value]="s.code">{{ s.name || s.code }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+        @if (carriers().length === 0) { <p class="tab-hint">No carriers yet — add one under Rules → Carriers.</p> }
+      }
+      @default {
+        <p class="tab-hint">
+          Ascending steps: the first tier the shipment fits under wins.
+          @switch (strategy()) {
+            @case (ShippingStrategy.WEIGHT_TIERED) { Measured by total <strong>packaged weight in grams</strong> (variant weight, or the product default). }
+            @case (ShippingStrategy.PRICE_TIERED) { Measured by the <strong>physical subtotal</strong> in the rule currency. }
+            @case (ShippingStrategy.ITEM_TIERED) { Measured by the <strong>number of physical units</strong>. }
+          }
+          Above the last tier: the last price, or last price + <em>overage price</em> per started <em>overage step</em>.
+        </p>
+        <table class="tier-table">
+          <thead>
+            <tr><th>Up to ({{ tierUnit() }})</th><th>Price</th><th></th></tr>
+          </thead>
+          <tbody>
+            @for (t of tiers(); track $index; let i = $index) {
+              <tr>
+                <td>
+                  <mat-form-field appearance="outline" class="tier-input">
+                    <input matInput type="number" min="0" [ngModel]="t.upTo" (ngModelChange)="onTierUpToChange(i, $event)" />
+                  </mat-form-field>
+                </td>
+                <td>
+                  <mat-form-field appearance="outline" class="tier-input">
+                    <input matInput type="text" inputmode="decimal" [ngModel]="t.price" (ngModelChange)="onTierPriceChange(i, $event)" />
+                  </mat-form-field>
+                </td>
+                <td>
+                  <button mat-icon-button (click)="removeTier(i)" [matTooltip]="'Remove tier'" type="button"><mat-icon>close</mat-icon></button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+        <div class="pricing-row">
+          <button matButton="filled" (click)="addTier()" type="button">Add tier</button>
+          <app-mat-form-field-input
+            [value]="value()?.overageStep || ''"
+            (valueChange)="onOverageStepChange($event)"
+            [blankObject]="''"
+            [inputMap]="inputField('sr-overage-step').set(inputKeys.label, 'Overage step (' + tierUnit() + ')').set(inputKeys.placeholder, '1000').set(inputKeys.styleWidth, '200px')"
+          ></app-mat-form-field-input>
+          <app-mat-form-field-input
+            [value]="value()?.overagePrice || ''"
+            (valueChange)="onOveragePriceChange($event)"
+            [blankObject]="''"
+            [inputMap]="inputField('sr-overage-price').set(inputKeys.label, 'Overage price per step').set(inputKeys.placeholder, '2.00').set(inputKeys.styleWidth, '200px')"
+          ></app-mat-form-field-input>
+        </div>
+      }
+    }
+  </li>
+
+  <!-- ===================== ORIGIN ===================== -->
+  <li>
+    <h3 class="section-title">Origin warehouse (optional)</h3>
+    <p class="tab-hint">
+      Offer this method only when the order would ship from the chosen warehouse (checkout allocates
+      stock to a warehouse first, preferring the destination country). Empty = any origin.
+    </p>
+    <mat-form-field appearance="outline" class="mode-select">
+      <mat-label>Ships from</mat-label>
+      <mat-select [value]="value()?.originWarehouseId || ''" (selectionChange)="onOriginWarehouseChange($event.value)">
+        <mat-option value="">(any warehouse)</mat-option>
+        @for (w of warehouses(); track w.id) {
+          <mat-option [value]="w.id">{{ w.name }}{{ w.address.country ? ' — ' + w.address.country : '' }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </li>
+
+  <!-- ===================== ALIASES ===================== -->
+  <li>
+    <h3 class="section-title">Aliases</h3>
+    <p class="tab-hint">
+      Alternative spellings that should also match, comma-separated, case-insensitive —
+      e.g. <em>United States, USA</em> for country <em>US</em>.
+    </p>
+    <app-mat-form-field-input
+      [value]="countryAliasText()"
+      (valueChange)="onCountryAliasesChange($event)"
+      [inputMap]="inputField('sr-country-aliases').set(inputKeys.label, 'Country aliases').set(inputKeys.placeholder, 'United States, USA, U.S.').set(inputKeys.styleWidth, '100%')"
+    ></app-mat-form-field-input>
+    <app-mat-form-field-input
+      [value]="stateAliasText()"
+      (valueChange)="onStateAliasesChange($event)"
+      [inputMap]="inputField('sr-state-aliases').set(inputKeys.label, 'State aliases').set(inputKeys.placeholder, 'New York').set(inputKeys.styleWidth, '100%')"
+    ></app-mat-form-field-input>
+  </li>
+
+  <!-- ===================== PRODUCT MATCHERS ===================== -->
+  <li>
+    <h3 class="section-title">Product matchers (optional)</h3>
+    <p class="tab-hint">
+      Offer this method only when <em>every physical item</em> in the cart carries any of the picked
+      tags, categories (incl. sub-categories) or attribute definitions — e.g. an "oversized"
+      method for furniture. Leave empty for any cart.
+    </p>
+    <app-mat-form-field-input-list-option
+      [value]="value()?.tags || []"
+      (valueChange)="onTagsChange($event)"
+      [options]="tagOptions()"
+      [inputMap]="inputField('sr-tags').set(inputKeys.label, 'Tags').set(inputKeys.styleWidth, '100%').set(inputKeys.showSizeInput, false).set(inputKeys.showSearchOption, true).set(inputKeys.uniqueValue, true)"
+    ></app-mat-form-field-input-list-option>
+    <app-mat-form-field-input-list-option
+      [value]="value()?.categories || []"
+      (valueChange)="onCategoriesChange($event)"
+      [options]="categoryOptions()"
+      [inputMap]="inputField('sr-categories').set(inputKeys.label, 'Categories (incl. sub-categories)').set(inputKeys.styleWidth, '100%').set(inputKeys.showSizeInput, false).set(inputKeys.showSearchOption, true).set(inputKeys.uniqueValue, true)"
+    ></app-mat-form-field-input-list-option>
+    <app-mat-form-field-input-list-option
+      [value]="value()?.attributeDefinitions || []"
+      (valueChange)="onAttributeDefinitionsChange($event)"
+      [options]="attributeDefinitionOptions()"
+      [inputMap]="inputField('sr-attr-defs').set(inputKeys.label, 'Attribute definitions').set(inputKeys.styleWidth, '100%').set(inputKeys.showSizeInput, false).set(inputKeys.showSearchOption, true).set(inputKeys.uniqueValue, true)"
+    ></app-mat-form-field-input-list-option>
+    <p class="tab-hint">
+      Specificity <strong>{{ specificity() }}</strong> ({{ locationSpecificity() }} location, {{ productSpecificity() }} product).
+      Between equally specific matches, higher <em>Priority</em> is recommended first.
     </p>
   </li>
 

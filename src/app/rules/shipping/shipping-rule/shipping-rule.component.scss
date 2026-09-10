@@ -32,3 +32,13 @@
     font-weight: 600;
   }
 }
+
+.section-title { margin: 1rem 0 0.25rem; }
+.pricing-row { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; margin: 0.5rem 0; }
+.mode-select { min-width: 280px; }
+.tier-table {
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+  th, td { padding: 0.25rem 0.5rem; text-align: left; vertical-align: middle; }
+  .tier-input { width: 180px; }
+}

@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -11,12 +11,18 @@ import { DialogUtils } from '../../../../lib/util/Dialog.utils';
 import { StockMovement, StockMovementType } from '../../model/commerce.model';
 import { ProductVariant } from '../../model/product.model';
 import { StockMovementService } from '../../service/stock-movement/stock-movement.service';
+import { InventoryLevel, Warehouse } from '../../model/inventory.model';
+import { WarehouseService } from '../../service/warehouse/warehouse.service';
 
 export interface QuickStockDialogData {
   variantId: string;
   sku: string;
   variantName?: string;
   currentStock: number;
+  /** Per-warehouse balances, when known (variant.inventoryLevels). */
+  levels?: InventoryLevel[];
+  /** Preselect this warehouse. */
+  warehouseId?: string;
 }
 
 // One-shot "add stock" popup for a single variant. Posts a StockMovement — the
@@ -29,7 +35,7 @@ export interface QuickStockDialogData {
   styleUrls: ['./quick-stock-dialog.component.scss'],
   imports: [NgComponentModule, MatDialogModule, MatButtonModule, MatFormFieldModule, MatSelectModule]
 })
-export class QuickStockDialog extends ViesMatFormFieldMap {
+export class QuickStockDialog extends ViesMatFormFieldMap implements OnInit {
 
   private dialogRef = inject(MatDialogRef<QuickStockDialog, StockMovement | undefined>);
   readonly data = inject<QuickStockDialogData>(MAT_DIALOG_DATA);
@@ -44,6 +50,28 @@ export class QuickStockDialog extends ViesMatFormFieldMap {
     { value: StockMovementType.DAMAGE,     label: 'Damage / write-off', hint: 'Removes the quantity.' },
     { value: StockMovementType.TRANSFER,   label: 'Transfer out', hint: 'Removes the quantity.' }
   ];
+
+  // Stock moves in ONE warehouse; the default is preselected unless the caller names one.
+  private warehouseService = inject(WarehouseService);
+  warehouses = signal<Warehouse[]>([]);
+  warehouseId = signal<string>('');
+  warehouseStock = computed<number>(() => {
+    const id = this.warehouseId();
+    const lvl = (this.data.levels ?? []).find(l => l.warehouse?.id === id);
+    return Number(lvl?.quantity ?? 0);
+  });
+
+  ngOnInit(): void {
+    this.warehouseService.getAll().subscribe({
+      next: res => {
+        const ws = (res ?? []).filter(w => w.active);
+        this.warehouses.set(ws);
+        const preset = this.data.warehouseId && ws.some(w => w.id === this.data.warehouseId) ? this.data.warehouseId : (ws.find(w => w.defaultWarehouse)?.id ?? ws[0]?.id ?? '');
+        this.warehouseId.set(preset);
+      },
+      error: () => this.warehouses.set([])
+    });
+  }
 
   movementType = signal<StockMovementType>(StockMovementType.PURCHASE);
   quantity = signal<number>(0);
@@ -65,7 +93,8 @@ export class QuickStockDialog extends ViesMatFormFieldMap {
     }
   });
 
-  projectedStock = computed<number>(() => this.data.currentStock + this.signedChange());
+  // Projection is per warehouse when balances are known (a warehouse can't go below zero).
+  projectedStock = computed<number>(() => (this.data.levels ? this.warehouseStock() : this.data.currentStock) + this.signedChange());
   typeHint = computed<string>(() => this.typeOptions.find(t => t.value === this.movementType())?.hint ?? '');
 
   canApply = computed<boolean>(() =>
@@ -80,6 +109,7 @@ export class QuickStockDialog extends ViesMatFormFieldMap {
     if (!this.canApply()) return;
     const movement = DataUtils.purgeValue(new StockMovement());
     movement.productVariant = { id: this.data.variantId } as ProductVariant;
+    if (this.warehouseId()) movement.warehouse = { id: this.warehouseId() } as Warehouse;
     movement.movementType = this.movementType();
     movement.quantityChange = this.signedChange();
     movement.reason = this.reason().trim();

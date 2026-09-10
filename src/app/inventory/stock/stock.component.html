@@ -1,5 +1,23 @@
 <ul class="margin-center">
 
+  <!-- Scan box: a scanner types the code + Enter. Variant ids and aliases both resolve. -->
+  <li class="scan-row">
+    <input class="scan-input" type="text" placeholder="Scan or type a code (variant id or alias) and press Enter"
+           [value]="scanValue()" (input)="scanValue.set($any($event.target).value)" (keydown)="onScanKey($event)" autocomplete="off" />
+    <button matButton="filled" (click)="runScan()" [disabled]="!scanValue().trim() || scanning()" type="button">{{ scanning() ? 'Looking up…' : 'Find' }}</button>
+    @if (scanResult(); as r) {
+      @if (r.matchedBy === 'NONE') {
+        <span class="scan-hint warn">No variant carries "{{ r.code }}".</span>
+      } @else if (r.matches.length > 1) {
+        <span class="scan-hint">"{{ r.code }}" is an alias on {{ r.matches.length }} variants:
+          @for (m of r.matches; track m.variant.id) {
+            <button matButton (click)="openScanMatch(m.productId, m.variant.id)" type="button">{{ m.productName }} — {{ m.variant.sku }}</button>
+          }
+        </span>
+      }
+    }
+  </li>
+
   <li class="filter-row">
     <app-mat-form-field-input
       [value]="searchTerm()"
@@ -46,7 +64,14 @@
             <td>{{ row.productName }}</td>
             <td>{{ row.variant.variantName || '(unnamed)' }}</td>
             <td class="mono">{{ row.variant.sku }}</td>
-            <td class="num" [class.low-qty]="isLow(row)">{{ row.variant.stockQuantity }}</td>
+            <td class="num" [class.low-qty]="isLow(row)">
+              {{ row.variant.stockQuantity }}
+              @if ((row.variant.inventoryLevels ?? []).length > 1) {
+                <br><small>
+                  @for (l of row.variant.inventoryLevels; track l.id; let last = $last) {{{ l.warehouse?.code || l.warehouse?.name }} {{ l.quantity }}{{ last ? '' : ' · ' }}}
+                </small>
+              }
+            </td>
             <td>{{ row.variant.status }}</td>
             <td class="actions">
               <button matButton (click)="openAdjust(row)" type="button">Adjust</button>

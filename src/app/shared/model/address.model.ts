@@ -27,6 +27,15 @@ export class Address {
     @MatInputDisplayLabel('District (optional)', 'Sub-city / administrative district, if your country uses one')
     district: string = '';
 
+    @MatInputDisplayLabel('Phone (optional)', 'Carriers need it for international and express services')
+    phone: string = '';
+
+    @MatInputDisplayLabel('Company (optional)')
+    company: string = '';
+
+    @MatInputDisplayLabel('Residential address')
+    residential: boolean = true;
+
     @MatInputEnum(AddressType)
     @MatInputDisplayLabel('Address Type')
     type: AddressType = AddressType.SHIPPING;

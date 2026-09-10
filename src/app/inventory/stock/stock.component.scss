@@ -85,3 +85,7 @@
   align-items: center;
   flex-wrap: wrap;
 }
+
+.scan-row { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; margin-bottom: 0.75rem; }
+.scan-input { flex: 1 1 320px; min-width: 260px; padding: 0.6rem 0.75rem; font-size: 1rem; border: 1px solid var(--mat-sys-outline, #888); border-radius: 6px; background: transparent; color: inherit; }
+.scan-hint { font-size: 0.9rem; &.warn { color: var(--mat-sys-error, #f28b82); } }

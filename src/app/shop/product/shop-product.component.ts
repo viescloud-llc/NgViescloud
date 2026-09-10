@@ -7,7 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { RxJSUtils } from '../../../lib/util/RxJS.utils';
 import { DialogUtils } from '../../../lib/util/Dialog.utils';
-import { Product, ProductMediaType, ProductVariant } from '../../shared/model/product.model';
+import { Product, ProductMediaType, ProductVariant, VariantFulfillmentType } from '../../shared/model/product.model';
 import { PublicProductsService } from '../../shared/service/public-products/public-products.service';
 import { ShopSessionService } from '../shop-session.service';
 import { APP_ROUTES } from '../../app.routes';
@@ -44,6 +44,10 @@ export class ShopProductComponent implements OnInit {
     if (v) return v.effectivePrice || v.price || this.product()?.basePrice || '0';
     return this.product()?.basePrice || '0';
   });
+
+  selectedIsDigital = computed<boolean>(() =>
+    this.selectedVariant()?.fulfillmentType === VariantFulfillmentType.DIGITAL
+  );
 
   canAdd = computed<boolean>(() =>
     !!this.selectedVariant()?.id && this.quantity() > 0

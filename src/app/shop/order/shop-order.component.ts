@@ -4,7 +4,10 @@ import { firstValueFrom } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { RxJSUtils } from '../../../lib/util/RxJS.utils';
 import { DialogUtils } from '../../../lib/util/Dialog.utils';
-import { FulfillmentStatus, OrderFulfillment, Shipment } from '../../shared/model/commerce.model';
+import { DigitalDownloadView, FulfillmentStatus, OrderFulfillment, Shipment } from '../../shared/model/commerce.model';
+import { DigitalDownloadService } from '../../shared/service/digital-download/digital-download.service';
+import { VariantFulfillmentType } from '../../shared/model/product.model';
+import { FileUtils } from '../../../lib/util/File.utils';
 import { OrderFulfillmentService } from '../../shared/service/order-fulfillment/order-fulfillment.service';
 import { ShipmentService } from '../../shared/service/shipment/shipment.service';
 import { CheckoutOrchestratorService } from '../../shared/service/checkout-orchestrator/checkout-orchestrator.service';
@@ -39,8 +42,20 @@ export class ShopOrderComponent implements OnInit {
   private activatedRoute = inject(ActivatedRoute);
   private router = inject(Router);
 
+  private digitalDownloadService = inject(DigitalDownloadService);
+
   order = signal<OrderFulfillment | null>(null);
   shipments = signal<Shipment[]>([]);
+  downloads = signal<DigitalDownloadView[]>([]);
+  downloading = signal<string>('');
+
+  hasDigitalItems = computed<boolean>(() =>
+    (this.order()?.items ?? []).some(i => i.productVariant?.fulfillmentType === VariantFulfillmentType.DIGITAL)
+  );
+  isDigitalOnly = computed<boolean>(() => {
+    const items = this.order()?.items ?? [];
+    return items.length > 0 && items.every(i => i.productVariant?.fulfillmentType === VariantFulfillmentType.DIGITAL);
+  });
   payment = signal<CheckoutOrderView | null>(null);
   completing = signal<boolean>(false);
 
@@ -64,6 +79,7 @@ export class ShopOrderComponent implements OnInit {
         this.order.set(o);
         this.loadShipments(o);
         this.loadPayment(o);
+        this.loadDownloads(o);
       },
       error: err => this.dialogUtils.openErrorMessageFromError(err)
     });
@@ -75,6 +91,37 @@ export class ShopOrderComponent implements OnInit {
       next: all => this.shipments.set(all.filter(s => s.orderFulfillment?.id === order.id)),
       error: () => this.shipments.set([])
     });
+  }
+
+  // Download rights appear once payment is captured; the server tells us why a
+  // row is unavailable (pending payment, refunded, revoked, capped).
+  private loadDownloads(order: OrderFulfillment) {
+    if (!order.id) return;
+    this.digitalDownloadService.list(order.id).subscribe({
+      next: res => this.downloads.set(res ?? []),
+      error: () => this.downloads.set([])
+    });
+  }
+
+  downloadFile(d: DigitalDownloadView, assetId: string, fileName: string) {
+    const order = this.order();
+    if (!order?.id || this.downloading()) return;
+    this.downloading.set(assetId);
+    this.digitalDownloadService.download(order.id, d.entitlementId, assetId).subscribe({
+      next: blob => {
+        this.downloading.set('');
+        FileUtils.saveBlobAsFile(fileName || 'download', blob);
+        this.loadDownloads(order); // refresh the counter
+      },
+      error: err => { this.downloading.set(''); this.dialogUtils.openErrorMessageFromError(err); }
+    });
+  }
+
+  formatBytes(size?: number | null): string {
+    const n = Number(size ?? 0);
+    if (n < 1024) return `${n} B`;
+    if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
+    return `${(n / (1024 * 1024)).toFixed(1)} MB`;
   }
 
   private loadPayment(order: OrderFulfillment) {
@@ -101,6 +148,7 @@ export class ShopOrderComponent implements OnInit {
       );
       this.order.set(updated);
       this.loadPayment(updated);
+      this.loadDownloads(updated);
     } catch (err) {
       this.dialogUtils.openErrorMessageFromError(err);
     } finally {

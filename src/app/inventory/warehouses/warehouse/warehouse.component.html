@@ -1,0 +1,53 @@
+<ul class="margin-center" appMatFormFieldGroup [formSummitButton]="viesSaveBtn" (onAllInputCheck)="validForm.set($event)">
+  <li class="return-banner">
+    <span>
+      @if (id()) { Editing warehouse <strong>{{ value()?.name || '(unnamed)' }}</strong> }
+      @else { Creating a new warehouse }
+    </span>
+    <button matButton="filled" (click)="backToList()" type="button">Back to warehouses</button>
+  </li>
+
+  <li>
+    <app-mat-form-field-input-dynamic
+      [value]="value()"
+      (valueChange)="onMainFormChange($event)"
+      [blankObject]="blankValue"
+      [inputMap]="inputField('warehouse-main').set(inputKeys.indent, false).set(inputKeys.styleWidth, '100%')"
+    ></app-mat-form-field-input-dynamic>
+  </li>
+
+  <li>
+    <h3 class="section-title">Address (ship-from)</h3>
+    <p class="tab-hint">Country decides which warehouse is preferred for an order; the full address is what carrier rates and labels will use.</p>
+    <app-mat-form-field-input-dynamic
+      [value]="addressValue()"
+      (valueChange)="onAddressChange($event)"
+      [blankObject]="blankAddress"
+      [inputMap]="inputField('warehouse-address').set(inputKeys.indent, false).set(inputKeys.styleWidth, '100%')"
+    ></app-mat-form-field-input-dynamic>
+  </li>
+
+  @if (id()) {
+    <li>
+      <h3 class="section-title">Stock held here ({{ totalUnits() }} unit(s))</h3>
+      @if (levels().length === 0) {
+        <p class="tab-hint">Nothing yet. Stock arrives through stock movements that name this warehouse (variant editor → Adjust stock).</p>
+      } @else {
+        <table class="report-table levels-table">
+          <thead><tr><th>Variant</th><th class="num">Units</th></tr></thead>
+          <tbody>
+            @for (l of levels(); track l.id) {
+              <tr><td class="mono">{{ l.productVariantId }}</td><td class="num">{{ l.quantity }}</td></tr>
+            }
+          </tbody>
+        </table>
+      }
+    </li>
+  }
+
+  <li class="flex-row-container-auto">
+    <button #viesSaveBtn matButton="filled" (click)="save()" [disabled]="_value.isValueNotChange() || !validForm()">Save</button>
+    <button matButton="filled" class="warn" (click)="revert()" [disabled]="!_value.isValueChange()">Revert</button>
+    <button matButton="filled" class="warn" (click)="remove()" [disabled]="!id()">Delete</button>
+  </li>
+</ul>

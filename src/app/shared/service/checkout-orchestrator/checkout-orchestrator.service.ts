@@ -3,7 +3,8 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ViesService } from '../../../../lib/service/rest.service';
 import { OrderFulfillment } from '../../model/commerce.model';
-import { CheckoutRequest, CheckoutResponse } from '../../model/checkout.model';
+import { CheckoutRequest, CheckoutResponse, ShippingQuoteRequest } from '../../model/checkout.model';
+import { ShippingQuote } from '../../model/commerce.model';
 
 // Custom orchestration controller — NOT CRUD. Lives at the same `/api/v1/orders` base path
 // as `OrderFulfillmentController` (Spring routes by full URL + verb so they don't collide).
@@ -24,6 +25,12 @@ export class CheckoutOrchestratorService {
 
   checkout(request: CheckoutRequest): Observable<CheckoutResponse> {
     return this.http.post<CheckoutResponse>(`${this.baseUrl}/checkout`, request);
+  }
+
+  // Non-destructive: every shipping method available for the cart + address,
+  // priced, the recommended one flagged. Pass the chosen ruleId to checkout().
+  shippingQuote(request: ShippingQuoteRequest): Observable<ShippingQuote> {
+    return this.http.post<ShippingQuote>(`${this.baseUrl}/shipping-quote`, request);
   }
 
   complete(orderFulfillmentId: string): Observable<OrderFulfillment> {

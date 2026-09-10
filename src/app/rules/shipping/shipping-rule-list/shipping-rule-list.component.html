@@ -2,20 +2,98 @@
 
   <li>
     <p class="tab-hint">
-      One shipping rule per currency. Orders in a currency without an active
-      rule fall back to <strong>zero shipping</strong> (warn-logged server-side).
+      Shipping <strong>methods</strong>, listed in checkout order (most specific first, then priority).
+      Every active method whose location and product matchers fit the cart is offered to the buyer;
+      the first one is recommended. No rules at all = free shipping (fresh store); rules exist but
+      none match = checkout refuses the address.
     </p>
   </li>
 
   <li>
     <app-mat-table
-      [matRows]="rules()"
+      [matRows]="sortedRules()"
       [blankObject]="blankRule"
+      [showMatTooltip]="true"
+      [showFilter]="true"
       (onEditRow)="selectRule($event)"
     ></app-mat-table>
   </li>
   <br>
   <li class="flex-row-container-auto">
-    <button matButton="filled" (click)="addRule()">Add shipping rule</button>
+    <button matButton="filled" (click)="addRule()" type="button">Add shipping method</button>
+    <button matButton (click)="refresh()" type="button">Refresh</button>
+  </li>
+
+  <!-- Test pad — quotes through the server, exactly what checkout would offer. -->
+  <li class="test-pad">
+    <h3 class="section-title">Test pad</h3>
+    <p class="tab-hint">
+      Build a sample cart and address; the server prices every matching method the way checkout
+      does (weights from the variants, digital items skipped) and shows the breakdown.
+    </p>
+    <div class="test-row">
+      <app-mat-form-field-input [value]="testCountry()" (valueChange)="testCountry.set($event)"
+        [inputMap]="inputField('sq-country').set(inputKeys.label, 'Country').set(inputKeys.placeholder, 'US').set(inputKeys.styleWidth, '140px')"></app-mat-form-field-input>
+      <app-mat-form-field-input [value]="testState()" (valueChange)="testState.set($event)"
+        [inputMap]="inputField('sq-state').set(inputKeys.label, 'State').set(inputKeys.styleWidth, '140px')"></app-mat-form-field-input>
+      <app-mat-form-field-input [value]="testCity()" (valueChange)="testCity.set($event)"
+        [inputMap]="inputField('sq-city').set(inputKeys.label, 'City').set(inputKeys.styleWidth, '180px')"></app-mat-form-field-input>
+      <app-mat-form-field-input [value]="testPostalCode()" (valueChange)="testPostalCode.set($event)"
+        [inputMap]="inputField('sq-postal').set(inputKeys.label, 'Postal code').set(inputKeys.styleWidth, '160px')"></app-mat-form-field-input>
+      <app-mat-form-field-input [value]="testDistrict()" (valueChange)="testDistrict.set($event)"
+        [inputMap]="inputField('sq-district').set(inputKeys.label, 'District').set(inputKeys.styleWidth, '160px')"></app-mat-form-field-input>
+      <app-mat-form-field-input-option [value]="testCurrency()" (valueChange)="testCurrency.set($event)" [options]="currencyOptions"
+        [inputMap]="inputField('sq-currency').set(inputKeys.label, 'Currency').set(inputKeys.styleWidth, '140px')"></app-mat-form-field-input-option>
+    </div>
+
+    @for (line of testLines(); track $index; let i = $index) {
+      <div class="test-row">
+        <app-mat-form-field-input
+          [value]="line.variant"
+          (valueChange)="onTestVariantChange(i, $event)"
+          [options]="variantOptions()"
+          [inputMap]="inputField('sq-variant-' + i).set(inputKeys.label, 'Variant').set(inputKeys.placeholder, 'Search variants…')
+                        .set(inputKeys.optionsAutoActiveFirst, true).set(inputKeys.optionsrequireSelection, true).set(inputKeys.showClearIcon, true).set(inputKeys.styleWidth, '360px')"
+        ></app-mat-form-field-input>
+        <mat-form-field appearance="outline" class="qty">
+          <mat-label>Qty</mat-label>
+          <input matInput type="number" min="1" [ngModel]="line.quantity" (ngModelChange)="onTestQtyChange(i, $event)" />
+        </mat-form-field>
+        <button mat-icon-button (click)="removeTestLine(i)" [matTooltip]="'Remove line'" type="button"><mat-icon>close</mat-icon></button>
+      </div>
+    }
+    <div class="test-row">
+      <button matButton (click)="addTestLine()" type="button">Add line</button>
+      <button matButton="filled" (click)="runQuote()" [disabled]="!canQuote()" type="button">{{ quoting() ? 'Quoting…' : 'Quote' }}</button>
+    </div>
+
+    @if (quote(); as q) {
+      <p class="test-result" [class.match]="!!q.recommendedRuleId" [class.none]="!q.recommendedRuleId && !q.digitalOnly && !q.bootstrapFree">
+        @if (q.digitalOnly) { Nothing to ship — every line is digital. }
+        @else if (q.bootstrapFree) { {{ q.message }} }
+        @else {
+          {{ q.physicalItems }} unit(s), {{ q.totalWeightGrams }} g, subtotal {{ q.physicalSubtotal }} {{ q.currency }}.
+          @if (q.weightMissing) { <strong>Some items have no packaged weight.</strong> }
+          @if (!q.recommendedRuleId) { <strong>{{ q.message || 'No method available' }}</strong> }
+        }
+      </p>
+      @if (q.options.length > 0) {
+        <table class="report-table quote-table">
+          <thead><tr><th>Method</th><th>Strategy</th><th class="num">Amount</th><th>ETA</th><th>Breakdown</th><th></th></tr></thead>
+          <tbody>
+            @for (o of q.options; track o.ruleId) {
+              <tr [class.inactive]="!o.available">
+                <td>{{ o.name }}</td>
+                <td>{{ o.strategy }}</td>
+                <td class="num">{{ o.available ? (o.free ? 'FREE' : o.amount) : '—' }}</td>
+                <td>{{ eta(o.estimatedDaysMin, o.estimatedDaysMax) }}</td>
+                <td class="breakdown">{{ o.available ? o.breakdown : o.unavailableReason }}</td>
+                <td>@if (o.recommended) { <strong>recommended</strong> }</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    }
   </li>
 </ul>

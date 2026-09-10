@@ -377,6 +377,12 @@ export class ProductComponent extends ViesRestApi<Product, ProductService> imple
   override async save() {
     const gallery = this.gallery();
 
+    // Optional BigDecimal: '' must go out as absent (Jackson rejects "" for BigDecimal).
+    const productDraft = this._value.value();
+    if (productDraft && (productDraft.declaredValue === '' || productDraft.declaredValue === null)) {
+      productDraft.declaredValue = undefined;
+    }
+
     // Step 1
     if (gallery && gallery.hasPendingUploads()) {
       try {

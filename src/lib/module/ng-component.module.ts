@@ -39,6 +39,7 @@ import { OpenIdProviderComponent } from '../share-component/open-id-provider/ope
 import { UserGroupListComponent } from '../share-component/user-group-list/user-group-list.component';
 import { UserListComponent } from '../share-component/user-list/user-list.component';
 import { RoleListComponent } from '../share-component/role-list/role-list.component';
+import { SmtpProviderListComponent } from '../share-component/smtp-provider-list/smtp-provider-list.component';
 import { UserSettingComponent } from '../share-component/user-setting/user-setting.component';
 import { UserAccessComponent } from '../share-component/user-access/user-access.component';
 import { MatTableDynamicViesServiceComponent } from '../util-component/mat-table-dynamic-vies-service/mat-table-dynamic-vies-service.component';
@@ -94,6 +95,7 @@ const COMPONENTS = [
   UserGroupListComponent,
   UserListComponent,
   RoleListComponent,
+  SmtpProviderListComponent,
   UserSettingComponent,
   UserAccessComponent
 ]

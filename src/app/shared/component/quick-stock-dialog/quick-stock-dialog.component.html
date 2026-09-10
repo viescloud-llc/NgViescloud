@@ -8,6 +8,16 @@
   </p>
 
   <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Warehouse</mat-label>
+    <mat-select [value]="warehouseId()" (selectionChange)="warehouseId.set($event.value)">
+      @for (w of warehouses(); track w.id) {
+        <mat-option [value]="w.id">{{ w.name }}{{ w.defaultWarehouse ? ' (default)' : '' }}</mat-option>
+      }
+    </mat-select>
+    @if (data.levels) { <mat-hint>{{ warehouseStock() }} unit(s) here now</mat-hint> }
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
     <mat-label>Movement type</mat-label>
     <mat-select [value]="movementType()" (selectionChange)="movementType.set($event.value)">
       @for (t of typeOptions; track t.value) {
@@ -47,7 +57,7 @@
 
   <p class="projection" [class.negative]="projectedStock() < 0">
     Change <strong>{{ signedChange() > 0 ? '+' : '' }}{{ signedChange() }}</strong>
-    → new stock <strong>{{ projectedStock() }}</strong>
+    → new stock in warehouse <strong>{{ projectedStock() }}</strong>
     @if (projectedStock() < 0) { — cannot go below zero }
   </p>
 </mat-dialog-content>

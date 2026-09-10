@@ -20,13 +20,15 @@ export const VENZORA_PERMISSIONS: KnownPermission[] = [
   { resource: 'returns',     actions: [...CRUD, 'manage'],                     description: 'Return requests; manage = back-office access to every return' },
   { resource: 'discounts',   actions: CRUD,                                    description: 'Discount codes' },
   { resource: 'rules',       actions: CRUD,                                    description: 'Shipping and tax rules (rules:update = tax import)' },
-  { resource: 'inventory',   actions: CRUD,                                    description: 'Stock movements / adjustments' },
+  { resource: 'inventory',   actions: CRUD,                                    description: 'Stock movements / adjustments, warehouses, stock per warehouse' },
+  { resource: 'shipping',    actions: CRUD,                                    description: 'Carrier records (accounts, credentials, service levels)' },
   { resource: 'reviews',     actions: CRUD,                                    description: 'Review moderation' },
   { resource: 'reports',     actions: ['read'],                                description: 'Reports dashboard' },
   { resource: 'customers',   actions: CRUD,                                    description: 'Customer profiles and addresses' },
   { resource: 'checkout',    actions: ['read', 'capture', 'refund', 'cancel', 'sync'], description: 'MONEY — never implied by orders:*' },
   { resource: 'iam',         actions: CRUD,                                    description: 'Users, groups, roles — as sensitive as money' },
   { resource: 'maintenance', actions: [...CRUD, 'bypass'],                     description: 'Maintenance mode; bypass = keep working while customers are held' },
+  { resource: 'smtp',        actions: [...CRUD, 'send'],                       description: 'Outbound mail accounts (credentials round-trip → read is a real grant); send = mail through them' },
 ];
 
 export const appConfig: ApplicationConfig = {

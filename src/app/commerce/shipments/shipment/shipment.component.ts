@@ -1,4 +1,6 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { Component, computed, inject, OnInit, signal  } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NgComponentModule } from '../../../../lib/module/ng-component.module';
 import { ViesRestApi } from '../../../../lib/abtract/ViesRestApi';
@@ -7,6 +9,10 @@ import { MatOption } from '../../../../lib/model/mat.model';
 import { ViesDateTime } from '../../../../lib/model/vies.model';
 import { APP_ROUTES } from '../../../app.routes';
 import { OrderFulfillment, Shipment } from '../../../shared/model/commerce.model';
+import { Warehouse } from '../../../shared/model/inventory.model';
+import { Carrier } from '../../../shared/model/shipping.model';
+import { WarehouseService } from '../../../shared/service/warehouse/warehouse.service';
+import { CarrierService } from '../../../shared/service/carrier/carrier.service';
 import { ShipmentService } from '../../../shared/service/shipment/shipment.service';
 import { OrderFulfillmentService } from '../../../shared/service/order-fulfillment/order-fulfillment.service';
 
@@ -25,12 +31,27 @@ import { OrderFulfillmentService } from '../../../shared/service/order-fulfillme
   selector: 'app-shipment',
   templateUrl: './shipment.component.html',
   styleUrls: ['./shipment.component.scss'],
-  imports: [NgComponentModule]
+  imports: [NgComponentModule, MatSelectModule, MatFormFieldModule]
 })
 export class ShipmentComponent extends ViesRestApi<Shipment, ShipmentService> implements OnInit {
 
   service = inject(ShipmentService);
   orderService = inject(OrderFulfillmentService);
+  private warehouseService = inject(WarehouseService);
+  private carrierService = inject(CarrierService);
+  warehouses = signal<Warehouse[]>([]);
+  carriers = signal<Carrier[]>([]);
+  selectedCarrier = computed<Carrier | null>(() => this.carriers().find(c => c.id === this.value()?.carrierId) ?? null);
+
+  onWarehouseChange(id: string) { const v = this.value(); if (v) this.value.set({ ...v, warehouseId: id || null }); }
+  // Picking a carrier record also fills the display name and (when a tracking number is set) the tracking link.
+  onCarrierChange(id: string) {
+    const v = this.value(); if (!v) return;
+    const c = this.carriers().find(x => x.id === id) ?? null;
+    const url = c?.trackingUrlTemplate && v.trackingNumber ? c.trackingUrlTemplate.replace('{tracking}', v.trackingNumber) : v.trackingUrl;
+    this.value.set({ ...v, carrierId: id || null, carrier: c?.name ?? v.carrier, carrierServiceCode: '', trackingUrl: url });
+  }
+  onCarrierServiceChange(code: string) { const v = this.value(); if (v) this.value.set({ ...v, carrierServiceCode: code || null }); }
   activatedRoute = inject(ActivatedRoute);
 
   validForm = signal<boolean>(false);
@@ -60,6 +81,8 @@ export class ShipmentComponent extends ViesRestApi<Shipment, ShipmentService> im
 
   override ngOnInit(): void {
     super.ngOnInit();
+    this.warehouseService.getAll().subscribe({ next: res => this.warehouses.set(res ?? []), error: () => {} });
+    this.carrierService.getAll().subscribe({ next: res => this.carriers.set(res ?? []), error: () => {} });
     this.refreshOrders();
 
     // Pre-link when arriving from an order detail's "Create shipment" button.
@@ -115,6 +138,9 @@ export class ShipmentComponent extends ViesRestApi<Shipment, ShipmentService> im
   // Preserve fields the dynamic form doesn't render (order link + both dates).
   onMainFormChange(v: Shipment) {
     const current = this.value();
+    v.warehouseId = current?.warehouseId;
+    v.carrierId = current?.carrierId;
+    v.carrierServiceCode = current?.carrierServiceCode;
     v.orderFulfillment = current?.orderFulfillment ?? new OrderFulfillment();
     v.estimatedDeliveryDate = current?.estimatedDeliveryDate ?? ViesDateTime.now();
     v.actualDeliveryDate = current?.actualDeliveryDate ?? ViesDateTime.now();

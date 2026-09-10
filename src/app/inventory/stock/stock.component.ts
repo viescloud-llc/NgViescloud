@@ -1,4 +1,8 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Router } from '@angular/router';
+import { ScanCodeService } from '../../shared/service/scan-code/scan-code.service';
+import { ScanLookupResult } from '../../shared/model/scan-code.model';
+import { APP_ROUTES } from '../../app.routes';
 import { firstValueFrom } from 'rxjs';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { NgComponentModule } from '../../../lib/module/ng-component.module';
@@ -36,6 +40,7 @@ export class StockComponent extends ViesMatFormFieldMap implements OnInit {
   protected readonly dialogUtils = inject(DialogUtils);
   protected readonly productService = inject(ProductService);
   protected readonly stockMovementService = inject(StockMovementService);
+  private readonly router = inject(Router);
 
   products = signal<Product[]>([]);
 
@@ -43,6 +48,40 @@ export class StockComponent extends ViesMatFormFieldMap implements OnInit {
   lowStockOnly = signal<boolean>(false);
   // "Low" = at or below this. Editable so different shops can set their own bar.
   lowStockThreshold = signal<number>(5);
+
+  // ---- Scan lookup ---------------------------------------------------------
+  //
+  // A scanner types the code and presses Enter. Variant id → straight to the
+  // variant editor; alias → one match opens it, several are listed; none → hint.
+  private scanCodeService = inject(ScanCodeService);
+  scanValue = signal<string>('');
+  scanResult = signal<ScanLookupResult | null>(null);
+  scanning = signal<boolean>(false);
+
+  onScanKey(evt: KeyboardEvent) {
+    if (evt.key === 'Enter') { evt.preventDefault(); this.runScan(); }
+  }
+
+  runScan() {
+    const code = this.scanValue().trim();
+    if (!code || this.scanning()) return;
+    this.scanning.set(true);
+    this.scanCodeService.lookup(code).subscribe({
+      next: r => {
+        this.scanning.set(false);
+        this.scanResult.set(r);
+        if (r.matches.length === 1 && r.matches[0].productId && r.matches[0].variant?.id) {
+          this.router.navigate([APP_ROUTES.catalogProductVariant(r.matches[0].productId, r.matches[0].variant.id)]);
+        }
+      },
+      error: err => { this.scanning.set(false); this.dialogUtils.openErrorMessageFromError(err); }
+    });
+  }
+
+  openScanMatch(productId?: string | null, variantId?: string) {
+    if (!productId || !variantId) return;
+    this.router.navigate([APP_ROUTES.catalogProductVariant(productId, variantId)]);
+  }
 
   rows = computed<StockRow[]>(() => {
     const term = this.searchTerm().toLowerCase().trim();

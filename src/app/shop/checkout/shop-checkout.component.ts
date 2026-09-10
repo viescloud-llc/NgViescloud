@@ -2,13 +2,15 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
+import { MatRadioModule } from '@angular/material/radio';
 import { NgComponentModule } from '../../../lib/module/ng-component.module';
 import { ViesMatFormFieldMap } from '../../../lib/abtract/ViesMatFormFieldMap';
 import { RxJSUtils } from '../../../lib/util/RxJS.utils';
 import { DialogUtils } from '../../../lib/util/Dialog.utils';
 import { DataUtils } from '../../../lib/util/Data.utils';
 import { Address, AddressType } from '../../shared/model/address.model';
-import { Cart } from '../../shared/model/commerce.model';
+import { Cart, ShippingQuote } from '../../shared/model/commerce.model';
+import { VariantFulfillmentType } from '../../shared/model/product.model';
 import { CheckoutResponse } from '../../shared/model/checkout.model';
 import { CheckoutOrchestratorService } from '../../shared/service/checkout-orchestrator/checkout-orchestrator.service';
 import { ShopSessionService } from '../shop-session.service';
@@ -29,7 +31,7 @@ import { APP_ROUTES } from '../../app.routes';
   selector: 'app-shop-checkout',
   templateUrl: './shop-checkout.component.html',
   styleUrls: ['./shop-checkout.component.scss'],
-  imports: [NgComponentModule, MatButtonModule]
+  imports: [NgComponentModule, MatButtonModule, MatRadioModule]
 })
 export class ShopCheckoutComponent extends ViesMatFormFieldMap implements OnInit {
 
@@ -50,9 +52,62 @@ export class ShopCheckoutComponent extends ViesMatFormFieldMap implements OnInit
   checkoutResult = signal<CheckoutResponse | null>(null);
   completing = signal<boolean>(false);
 
-  canPlaceOrder = computed<boolean>(() =>
-    !!this.cart()?.id && (this.cart()?.items?.length ?? 0) > 0
-  );
+  // ---- Shipping options (POST /orders/shipping-quote) --------------------------
+  //
+  // Priced against the typed address; the recommended method is preselected,
+  // the buyer may pick another. Digital-only carts skip the step. Placing the
+  // order sends the chosen rule id; the server re-quotes and refuses a method
+  // that no longer applies.
+  shippingQuote = signal<ShippingQuote | null>(null);
+  selectedShippingRuleId = signal<string>('');
+  quoting = signal<boolean>(false);
+
+  isDigitalOnly = computed<boolean>(() => {
+    const items = this.cart()?.items ?? [];
+    return items.length > 0 && items.every(i => i.productVariant?.fulfillmentType === VariantFulfillmentType.DIGITAL);
+  });
+  availableShipping = computed(() => (this.shippingQuote()?.options ?? []).filter(o => o.available));
+  selectedShipping = computed(() => this.availableShipping().find(o => o.ruleId === this.selectedShippingRuleId()) ?? null);
+  shippingCostPreview = computed<string>(() => {
+    const q = this.shippingQuote();
+    if (this.isDigitalOnly() || q?.bootstrapFree) return '0.00';
+    const s = this.selectedShipping();
+    return s ? Number(s.amount ?? 0).toFixed(2) : '—';
+  });
+  canQuoteShipping = computed<boolean>(() => !!this.cart()?.id && !this.isDigitalOnly() && !!this.address().country.trim() && !this.quoting());
+
+  canPlaceOrder = computed<boolean>(() => {
+    if (!this.cart()?.id || (this.cart()?.items?.length ?? 0) === 0) return false;
+    if (this.isDigitalOnly()) return true;
+    const q = this.shippingQuote();
+    return !!q && (q.bootstrapFree || !!this.selectedShipping());
+  });
+
+  async fetchShippingOptions() {
+    const cart = this.cart();
+    if (!cart?.id || !this.canQuoteShipping()) return;
+    this.quoting.set(true);
+    try {
+      const q = await firstValueFrom(this.checkoutService.shippingQuote({
+        cartId: cart.id,
+        shippingAddress: { ...this.address(), type: AddressType.SHIPPING }
+      }));
+      this.shippingQuote.set(q);
+      const current = q.options.find(o => o.ruleId === this.selectedShippingRuleId() && o.available);
+      this.selectedShippingRuleId.set(current?.ruleId ?? q.recommendedRuleId ?? '');
+    } catch (err) {
+      this.shippingQuote.set(null);
+      this.dialogUtils.openErrorMessageFromError(err);
+    } finally {
+      this.quoting.set(false);
+    }
+  }
+
+  eta(min?: number | null, max?: number | null): string {
+    if (!min && !max) return '';
+    if (min && max) return `${min}–${max} days`;
+    return `${min ?? max} days`;
+  }
 
   ngOnInit(): void {
     this.shopSession.getActiveCart()
@@ -61,7 +116,10 @@ export class ShopCheckoutComponent extends ViesMatFormFieldMap implements OnInit
   }
 
   onAddressChange(a: Address) {
+    const countryChanged = (a.country ?? '') !== (this.address().country ?? '');
     this.address.set({ ...a });
+    // A stale quote must not be sent with a new country; the buyer re-quotes.
+    if (countryChanged) { this.shippingQuote.set(null); this.selectedShippingRuleId.set(''); }
   }
 
   cartTotal = computed<string>(() =>
@@ -85,6 +143,7 @@ export class ShopCheckoutComponent extends ViesMatFormFieldMap implements OnInit
           shippingAddress: shipping,
           billingAddress: billing,
           discountCode: this.discountCode().trim() || undefined,
+          shippingRuleId: this.isDigitalOnly() ? undefined : (this.selectedShippingRuleId() || undefined),
           provider: 'paypal',
           returnUrl: `${origin}/${APP_ROUTES.shopOrders}`,
           cancelUrl: `${origin}/${APP_ROUTES.shopCart}`

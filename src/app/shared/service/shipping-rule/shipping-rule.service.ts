@@ -1,14 +1,17 @@
-import { Injectable } from '@angular/core';
-import { ViesRestService } from '../../../../lib/service/rest.service';
-import { ShippingRule } from '../../model/commerce.model';
+import { HttpClient } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { ViesRestService, ViesService } from '../../../../lib/service/rest.service';
+import { ShippingQuote, ShippingRule, ShippingTestRequest } from '../../model/commerce.model';
 
-// Admin-gated. `currency` is DB-level unique (one rule per currency) → 409 on duplicate.
-// Drives OrderFulfillment.shippingCost at checkout. Missing/inactive rule → orchestrator
-// falls back to zero shipping with a warn-log.
+// Shipping METHODS (rules) — /api/v1/shipping/rules, authority resource `rules`.
+// Server validates per strategy on save (400 naming the problem). `quote`
+// prices a synthetic cart for the admin test pad (rules:read).
 @Injectable({
   providedIn: 'root'
 })
 export class ShippingRuleService extends ViesRestService<ShippingRule> {
+  private http = inject(HttpClient);
 
   protected override getPrefixes(): string[] {
     return ['api', 'v1', 'shipping', 'rules'];
@@ -22,5 +25,9 @@ export class ShippingRuleService extends ViesRestService<ShippingRule> {
   }
   override setIdFieldValue(object: ShippingRule, id: any): void {
     object.id = id;
+  }
+
+  quote(request: ShippingTestRequest): Observable<ShippingQuote> {
+    return this.http.post<ShippingQuote>(`${ViesService.getUri()}/api/v1/shipping/rules/quote`, request);
   }
 }

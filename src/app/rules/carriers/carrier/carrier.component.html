@@ -1,0 +1,58 @@
+<ul class="margin-center" appMatFormFieldGroup [formSummitButton]="viesSaveBtn" (onAllInputCheck)="validForm.set($event)">
+  <li class="return-banner">
+    <span>
+      @if (id()) { Editing carrier <strong>{{ value()?.name || '(unnamed)' }}</strong> }
+      @else { Creating a new carrier }
+    </span>
+    <button matButton="filled" (click)="backToList()" type="button">Back to carriers</button>
+  </li>
+
+  <li>
+    <app-mat-form-field-input-dynamic
+      [value]="value()"
+      (valueChange)="onMainFormChange($event)"
+      [blankObject]="blankValue"
+      [inputMap]="inputField('carrier-main').set(inputKeys.indent, false).set(inputKeys.styleWidth, '100%')"
+    ></app-mat-form-field-input-dynamic>
+  </li>
+
+  <li>
+    <h3 class="section-title">API credentials</h3>
+    <p class="tab-hint">Only used once an integration for this carrier exists. Stored as entered.</p>
+    <app-mat-form-field-input
+      [value]="value()?.apiKey || ''" (valueChange)="onApiKeyChange($event)" [blankObject]="''"
+      [inputMap]="inputField('carrier-api-key').set(inputKeys.label, 'API key').set(inputKeys.showVisibleSwitch, true).set(inputKeys.styleWidth, '100%')"
+    ></app-mat-form-field-input>
+    <app-mat-form-field-input
+      [value]="value()?.apiSecret || ''" (valueChange)="onApiSecretChange($event)" [blankObject]="''"
+      [inputMap]="inputField('carrier-api-secret').set(inputKeys.label, 'API secret').set(inputKeys.showVisibleSwitch, true).set(inputKeys.styleWidth, '100%')"
+    ></app-mat-form-field-input>
+  </li>
+
+  <li>
+    <h3 class="section-title">Service levels</h3>
+    <p class="tab-hint">Codes are referenced by live-rate shipping rules (<em>service code</em>) and shipments. Lower-cased on save.</p>
+    <table class="services-table">
+      <thead><tr><th>Code</th><th>Name</th><th>Days min</th><th>Days max</th><th>Enabled</th><th></th></tr></thead>
+      <tbody>
+        @for (s of services(); track $index; let i = $index) {
+          <tr>
+            <td><mat-form-field appearance="outline" class="cell"><input matInput [ngModel]="s.code" (ngModelChange)="onServiceChange(i, 'code', $event)" placeholder="ups_ground" /></mat-form-field></td>
+            <td><mat-form-field appearance="outline" class="cell wide"><input matInput [ngModel]="s.name" (ngModelChange)="onServiceChange(i, 'name', $event)" placeholder="Ground" /></mat-form-field></td>
+            <td><mat-form-field appearance="outline" class="cell narrow"><input matInput type="number" min="0" [ngModel]="s.estimatedDaysMin ?? ''" (ngModelChange)="onServiceChange(i, 'estimatedDaysMin', $event)" /></mat-form-field></td>
+            <td><mat-form-field appearance="outline" class="cell narrow"><input matInput type="number" min="0" [ngModel]="s.estimatedDaysMax ?? ''" (ngModelChange)="onServiceChange(i, 'estimatedDaysMax', $event)" /></mat-form-field></td>
+            <td><button matButton (click)="onServiceChange(i, 'enabled', !s.enabled)" type="button">{{ s.enabled ? 'Enabled' : 'Disabled' }}</button></td>
+            <td><button mat-icon-button (click)="removeService(i)" [matTooltip]="'Remove service'" type="button"><mat-icon>close</mat-icon></button></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    <button matButton="filled" (click)="addService()" type="button">Add service level</button>
+  </li>
+
+  <li class="flex-row-container-auto">
+    <button #viesSaveBtn matButton="filled" (click)="save()" [disabled]="_value.isValueNotChange() || !validForm()">Save</button>
+    <button matButton="filled" class="warn" (click)="revert()" [disabled]="!_value.isValueChange()">Revert</button>
+    <button matButton="filled" class="warn" (click)="remove()" [disabled]="!id()">Delete</button>
+  </li>
+</ul>

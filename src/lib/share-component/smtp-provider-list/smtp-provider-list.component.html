@@ -1,0 +1,100 @@
+@if (!selected()) {
+  <ul class="margin-center">
+    <li>
+      <p class="hint">
+        Outbound mail accounts. Password recovery and system notifications send through the
+        <strong>default</strong> provider
+        @if (currentDefault(); as d) { (currently <strong>{{ d.username || d.host }}</strong>) }
+        @else { (<em>none configured yet</em>) }.
+      </p>
+      <app-mat-table
+        [matRows]="providers()"
+        [blankObject]="blankProvider"
+        [showMatTooltip]="true"
+        [showPagination]="true"
+        [showFilter]="true"
+        (onEditRow)="select($event)"
+      ></app-mat-table>
+    </li>
+    <li>
+      <br>
+      <button [style.width]="'100%'" matButton="filled" (click)="addProvider()" type="button">Add SMTP provider</button>
+    </li>
+  </ul>
+} @else {
+  <ul class="margin-center" appMatFormFieldGroup (onAllInputCheck)="validForm.set($event)">
+    <li class="flex-row-container">
+      <button matButton="filled" (click)="back()" type="button">Back</button>
+    </li>
+    <hr>
+    <li>
+      <app-mat-form-field-input-dynamic
+        [value]="selected()"
+        (valueChange)="onFormChange($event)"
+        [blankObject]="blankProvider"
+        [inputMap]="inputField('smtp-main').set(inputKeys.styleWidth, '100%').set(inputKeys.indent, false)"
+      ></app-mat-form-field-input-dynamic>
+    </li>
+    <li>
+      <app-mat-form-field-input
+        [value]="selected()!.password"
+        (valueChange)="onPasswordChange($event)"
+        [blankObject]="''"
+        [inputMap]="inputField('smtp-password')
+                      .set(inputKeys.label, 'Password / app password')
+                      .set(inputKeys.showVisibleSwitch, true)
+                      .set(inputKeys.styleWidth, '100%')
+                      .set(inputKeys.required, true)"
+      ></app-mat-form-field-input>
+      @if (defaultWillMove()) {
+        <p class="warn-text">Saving makes this the default provider and clears the flag on <strong>{{ currentDefault()!.username || currentDefault()!.host }}</strong>.</p>
+      }
+    </li>
+    <li class="flex-row-container-auto">
+      <button matButton="filled" (click)="save()" [disabled]="!canSave()" type="button">Save</button>
+      <button matButton="filled" class="warn" (click)="revert()" [disabled]="!isDirty()" type="button">Revert</button>
+      <button matButton="filled" class="warn" (click)="remove()" [disabled]="!selected()!.id" type="button">Delete</button>
+    </li>
+
+    @if (canSendUpdates()) {
+      <hr>
+      <li>
+        <h3 class="section-title">Send a test email</h3>
+        <p class="hint">
+          Uses the settings above <em>as they are on screen</em> — unsaved edits included — and waits
+          for the mail server, so a wrong host, port or password shows up here as an error.
+        </p>
+        <app-mat-form-field-input
+          [value]="testFrom()"
+          (valueChange)="testFrom.set($event)"
+          [blankObject]="''"
+          [inputMap]="inputField('smtp-test-from').set(inputKeys.label, 'From').set(inputKeys.placeholder, 'noreply@example.com').set(inputKeys.styleWidth, '100%')"
+        ></app-mat-form-field-input>
+        <app-mat-form-field-input
+          [value]="testTo()"
+          (valueChange)="testTo.set($event)"
+          [blankObject]="''"
+          [inputMap]="inputField('smtp-test-to').set(inputKeys.label, 'To (comma-separated)').set(inputKeys.placeholder, 'you@example.com').set(inputKeys.styleWidth, '100%')"
+        ></app-mat-form-field-input>
+        <app-mat-form-field-input
+          [value]="testSubject()"
+          (valueChange)="testSubject.set($event)"
+          [blankObject]="''"
+          [inputMap]="inputField('smtp-test-subject').set(inputKeys.label, 'Subject').set(inputKeys.styleWidth, '100%')"
+        ></app-mat-form-field-input>
+        <app-mat-form-field-input-text-area
+          [value]="testBody()"
+          (valueChange)="testBody.set($event)"
+          [blankObject]="''"
+          [inputMap]="inputField('smtp-test-body').set(inputKeys.label, 'Body').set(inputKeys.styleWidth, '100%')"
+        ></app-mat-form-field-input-text-area>
+        <div class="flex-row-container-auto">
+          <button matButton="filled" (click)="sendTest()" [disabled]="!canSend()" type="button">Send test email</button>
+        </div>
+        @if (lastTest(); as t) {
+          <p [class.ok-text]="t.ok" [class.warn-text]="!t.ok">{{ t.ok ? '✓ ' : '✗ ' }}{{ t.message }}</p>
+        }
+      </li>
+    }
+  </ul>
+}

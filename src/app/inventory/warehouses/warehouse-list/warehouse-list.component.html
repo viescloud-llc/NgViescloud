@@ -1,0 +1,22 @@
+<ul class="margin-center">
+  <li>
+    <p class="tab-hint">
+      Where stock is held and shipped from. Each variant tracks its units per warehouse; the
+      <strong>default</strong> warehouse receives movements that name none and is the allocation
+      fallback. The address is the ship-from carriers will rate against.
+    </p>
+  </li>
+  <li>
+    <app-mat-table
+      [matRows]="warehouses()"
+      [blankObject]="blank"
+      [showMatTooltip]="true"
+      (onEditRow)="select($event)"
+    ></app-mat-table>
+  </li>
+  <br>
+  <li class="flex-row-container-auto">
+    <button matButton="filled" (click)="add()" type="button">Add warehouse</button>
+    <button matButton (click)="refresh()" type="button">Refresh</button>
+  </li>
+</ul>

@@ -55,6 +55,34 @@
     ></app-mat-form-field-input-dynamic>
   </li>
 
+  <!-- Origin warehouse + carrier record (the free-text carrier name above stays the display value). -->
+  <li>
+    <h3 class="section-title">Origin & carrier</h3>
+    <div class="picker-row">
+      <mat-form-field appearance="outline" class="picker">
+        <mat-label>Ships from warehouse</mat-label>
+        <mat-select [value]="value()?.warehouseId || ''" (selectionChange)="onWarehouseChange($event.value)">
+          <mat-option value="">(not set)</mat-option>
+          @for (w of warehouses(); track w.id) { <mat-option [value]="w.id">{{ w.name }}</mat-option> }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="picker">
+        <mat-label>Carrier record</mat-label>
+        <mat-select [value]="value()?.carrierId || ''" (selectionChange)="onCarrierChange($event.value)">
+          <mat-option value="">(not set)</mat-option>
+          @for (c of carriers(); track c.id) { <mat-option [value]="c.id">{{ c.name }}</mat-option> }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="picker">
+        <mat-label>Service level</mat-label>
+        <mat-select [value]="value()?.carrierServiceCode || ''" (selectionChange)="onCarrierServiceChange($event.value)">
+          <mat-option value="">(not set)</mat-option>
+          @for (s of selectedCarrier()?.services ?? []; track s.code) { <mat-option [value]="s.code">{{ s.name || s.code }}</mat-option> }
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </li>
+
   <!-- Delivery dates — both REQUIRED by the backend (non-nullable columns). -->
   <li class="dates-block">
     <h3 class="section-title">Delivery dates</h3>

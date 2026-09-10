@@ -29,14 +29,37 @@
                           .set(inputKeys.styleWidth, '100%')"
           ></app-mat-form-field-input-dynamic>
 
+          @if (isDigital()) {
+            <p class="tab-hint">
+              <strong>Digital variant:</strong> stock and weight are ignored at checkout, no shipping is
+              charged for digital-only carts, and buyers get download access once payment is captured.
+              Attach the files on the <strong>Digital files</strong> tab.
+            </p>
+          }
+
           <!-- Quick stock: records a StockMovement (server applies it) without
                editing stockQuantity by hand — keeps the ledger honest. Needs a
                saved variant (movements reference the variant's id). -->
-          @if (id()) {
+          @if (id() && !isDigital()) {
             <div class="quick-stock-row">
-              <span>Stock on hand: <strong>{{ value()?.stockQuantity ?? 0 }}</strong></span>
+              <span>Stock by warehouse — total <strong>{{ value()?.stockQuantity ?? 0 }}</strong> (the read-only field above)</span>
               <button matButton="filled" (click)="openQuickStockDialog()" type="button">Add / adjust stock…</button>
             </div>
+            <table class="report-table levels-table">
+              <thead><tr><th>Warehouse</th><th class="num">Units</th><th></th></tr></thead>
+              <tbody>
+                @for (l of value()?.inventoryLevels ?? []; track l.id) {
+                  <tr>
+                    <td>{{ l.warehouse?.name }} <small class="mono">{{ l.warehouse?.code }}</small></td>
+                    <td class="num">{{ l.quantity }}</td>
+                    <td class="actions"><button matButton (click)="openQuickStockDialog(l.warehouse?.id)" type="button">Adjust…</button></td>
+                  </tr>
+                }
+                @if ((value()?.inventoryLevels ?? []).length === 0) {
+                  <tr><td colspan="3"><em>No stock in any warehouse yet — use Add / adjust stock.</em></td></tr>
+                }
+              </tbody>
+            </table>
           }
 
           <!-- =================================================================
@@ -158,6 +181,167 @@
             [medias]="value()?.medias ?? []"
             (mediasChange)="onMediasChange($event)"
           ></app-product-media-gallery>
+        </div>
+      </mat-tab>
+
+      <!-- =====================================================================
+           CODES (barcode / QR)
+           Main code = the variant id, rendered client-side. Aliases = outside
+           codes managed through their own endpoint (never in the variant JSON).
+           ================================================================== -->
+      <mat-tab [label]="'Codes' + (scanCodes().length ? ' (' + scanCodes().length + ')' : '')">
+        <div class="tab-body">
+          @if (!id()) {
+            <p class="tab-hint"><strong>Save the variant first</strong> — its id becomes the main scan code.</p>
+          } @else {
+            <h3 class="section-title">Main code</h3>
+            <p class="tab-hint">
+              The variant's own id is its permanent scan code: unique, generated on create, never changes.
+              Print it as a <strong>QR</strong> (small, phone- and 2D-scanner friendly) or as a <strong>Code 128</strong>
+              stripe (long — for bin and shipping labels). Scanning either resolves to this variant.
+            </p>
+            <div class="code-row">
+              <div class="code-preview">
+                @if (mainCodeFormat() === 'QR') {
+                  @if (mainQrDataUrl()) { <img [src]="mainQrDataUrl()" alt="QR code" class="qr" /> }
+                } @else {
+                  @if (mainCode128Svg()) { <div class="c128" [innerHTML]="mainCode128Svg()"></div> }
+                }
+                <div class="mono small">{{ id() }}</div>
+              </div>
+              <div class="code-actions">
+                <mat-form-field appearance="outline" class="fmt">
+                  <mat-label>Print format</mat-label>
+                  <mat-select [value]="mainCodeFormat()" (selectionChange)="mainCodeFormat.set($event.value)">
+                    <mat-option value="QR">QR code</mat-option>
+                    <mat-option value="CODE_128">Code 128</mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="copies">
+                  <mat-label>Copies</mat-label>
+                  <input matInput type="number" min="1" max="200" [ngModel]="labelCopies()" (ngModelChange)="labelCopies.set(+$event || 1)" />
+                </mat-form-field>
+                <button matButton="filled" (click)="printMainLabel()" type="button">Print labels</button>
+                <button matButton (click)="copyMainCode()" type="button">Copy id</button>
+              </div>
+            </div>
+
+            <h3 class="section-title">Alias codes</h3>
+            <p class="tab-hint">
+              Codes from outside our system (a supplier's UPC, a legacy label, a marketplace code). Scanning
+              one resolves to this variant too. Aliases may repeat across variants — the lookup then returns
+              every match — but not twice on the same variant.
+            </p>
+            <div class="alias-add">
+              <app-mat-form-field-input
+                [value]="newAliasValue()" (valueChange)="newAliasValue.set($event)" [blankObject]="''"
+                [inputMap]="inputField('alias-value').set(inputKeys.label, 'Code value (scan or type)').set(inputKeys.placeholder, '012345678905').set(inputKeys.styleWidth, '300px')"
+              ></app-mat-form-field-input>
+              <mat-form-field appearance="outline" class="fmt">
+                <mat-label>Symbology</mat-label>
+                <mat-select [value]="newAliasSymbology()" (selectionChange)="newAliasSymbology.set($event.value)">
+                  @for (o of symbologyOptions; track o.value) { <mat-option [value]="o.value">{{ o.label }}</mat-option> }
+                </mat-select>
+              </mat-form-field>
+              <app-mat-form-field-input
+                [value]="newAliasLabel()" (valueChange)="newAliasLabel.set($event)" [blankObject]="''"
+                [inputMap]="inputField('alias-label').set(inputKeys.label, 'Label (optional)').set(inputKeys.placeholder, 'Supplier UPC').set(inputKeys.styleWidth, '220px')"
+              ></app-mat-form-field-input>
+              <button matButton="filled" (click)="addAlias()" [disabled]="!canAddAlias()" type="button">Add alias</button>
+            </div>
+            @if (scanCodes().length > 0) {
+              <table class="report-table alias-table">
+                <thead><tr><th>Code</th><th>Symbology</th><th>Label</th><th>Active</th><th></th></tr></thead>
+                <tbody>
+                  @for (c of scanCodes(); track c.id) {
+                    <tr [class.inactive]="!c.active">
+                      <td class="mono">{{ c.codeValue }}</td>
+                      <td>{{ symbologyLabels[c.symbology] || c.symbology }}</td>
+                      <td>{{ c.label || '' }}</td>
+                      <td><button matButton (click)="toggleAliasActive(c)" type="button">{{ c.active ? 'Active' : 'Inactive' }}</button></td>
+                      <td class="actions">
+                        <button mat-icon-button (click)="printAliasLabel(c)" [matTooltip]="'Print label'" type="button"><mat-icon>print</mat-icon></button>
+                        <button mat-icon-button (click)="removeAlias(c)" [matTooltip]="'Remove alias'" type="button"><mat-icon>delete</mat-icon></button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            } @else {
+              <p class="tab-hint">No aliases yet.</p>
+            }
+          }
+        </div>
+      </mat-tab>
+
+      <!-- =====================================================================
+           DIGITAL FILES
+           Downloadable files for a DIGITAL variant. Own endpoint (multipart →
+           object storage); never part of the variant JSON. Needs a saved id.
+           ================================================================== -->
+      <mat-tab [label]="'Digital files' + (digitalAssets().length ? ' (' + digitalAssets().length + ')' : '')">
+        <div class="tab-body">
+          @if (!isDigital()) {
+            <p class="tab-hint">
+              This variant is <strong>physical</strong>. Set <em>Fulfillment type</em> to DIGITAL on the Basics
+              tab (and save) to deliver it as downloadable files. Files attached here are only offered to
+              buyers of a digital variant.
+            </p>
+          } @else {
+            <p class="tab-hint">
+              Buyers can download every <strong>active</strong> file below after their payment is captured —
+              including files you add later. Uploads go straight to object storage; a file cannot be replaced,
+              upload a new one and deactivate the old.
+            </p>
+          }
+
+          @if (!id()) {
+            <p class="tab-hint"><strong>Save the variant first</strong> — files are stored against its id.</p>
+          } @else {
+            <div class="add-row">
+              <button matButton="filled" (click)="uploadDigitalAsset()" [disabled]="uploadingAsset()" type="button">
+                {{ uploadingAsset() ? 'Uploading…' : 'Upload file' }}
+              </button>
+            </div>
+
+            @if (digitalAssetsLoaded() && digitalAssets().length === 0) {
+              <p class="tab-hint">No files yet.</p>
+            } @else if (digitalAssets().length > 0) {
+              <table class="report-table digital-assets-table">
+                <thead>
+                  <tr><th>File</th><th>Label (shown to buyers)</th><th class="num">Size</th><th>Active</th><th></th></tr>
+                </thead>
+                <tbody>
+                  @for (asset of digitalAssets(); track asset.id) {
+                    <tr [class.inactive]="!asset.active">
+                      <td class="mono">{{ asset.fileName }}<br><small>{{ asset.contentType || '—' }}</small></td>
+                      <td>
+                        <app-mat-form-field-input
+                          [value]="asset.label || ''"
+                          (valueChange)="onDigitalAssetLabelChange(asset, $event)"
+                          [blankObject]="''"
+                          [inputMap]="inputField('asset-label-' + asset.id).set(inputKeys.label, 'Label').set(inputKeys.styleWidth, '100%')"
+                        ></app-mat-form-field-input>
+                      </td>
+                      <td class="num">{{ formatBytes(asset.size) }}</td>
+                      <td>
+                        <button matButton (click)="toggleDigitalAssetActive(asset)" type="button">
+                          {{ asset.active ? 'Active' : 'Inactive' }}
+                        </button>
+                      </td>
+                      <td class="actions">
+                        <button mat-icon-button (click)="downloadDigitalAsset(asset)" [matTooltip]="'Download (staff preview)'" type="button"><mat-icon>download</mat-icon></button>
+                        <button mat-icon-button (click)="deleteDigitalAsset(asset)" [matTooltip]="'Delete file'" type="button"><mat-icon>delete</mat-icon></button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+              @if (isDigital() && activeDigitalAssetCount() === 0) {
+                <p class="tab-hint warn-text">No active file — buyers of this variant would have nothing to download.</p>
+              }
+            }
+          }
         </div>
       </mat-tab>
 

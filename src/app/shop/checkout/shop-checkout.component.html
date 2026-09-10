@@ -25,6 +25,42 @@
                           .set(inputKeys.styleWidth, '100%')"
           ></app-mat-form-field-input-dynamic>
         </li>
+        <!-- Shipping method: quoted against the typed address. -->
+        @if (!isDigitalOnly()) {
+          <li>
+            <h3 class="section-title">Shipping method</h3>
+            <div class="action-row">
+              <button matButton="filled" (click)="fetchShippingOptions()" [disabled]="!canQuoteShipping()" type="button">
+                {{ quoting() ? 'Quoting…' : (shippingQuote() ? 'Refresh shipping options' : 'Get shipping options') }}
+              </button>
+              @if (!address().country.trim()) { <span class="hint">Enter the country first.</span> }
+            </div>
+            @if (shippingQuote(); as q) {
+              @if (q.bootstrapFree) {
+                <p class="hint">{{ q.message }}</p>
+              } @else if (availableShipping().length === 0) {
+                <p class="hint warn">{{ q.message || 'No shipping method is available for this address.' }}</p>
+              } @else {
+                <mat-radio-group class="shipping-options" [value]="selectedShippingRuleId()" (change)="selectedShippingRuleId.set($event.value)">
+                  @for (o of availableShipping(); track o.ruleId) {
+                    <mat-radio-button [value]="o.ruleId">
+                      <strong>{{ o.name }}</strong> — {{ o.free ? 'FREE' : o.amount }}
+                      @if (eta(o.estimatedDaysMin, o.estimatedDaysMax)) { · {{ eta(o.estimatedDaysMin, o.estimatedDaysMax) }} }
+                      @if (o.recommended) { <em>(recommended)</em> }
+                      @if (o.description) { <br><small>{{ o.description }}</small> }
+                    </mat-radio-button>
+                  }
+                </mat-radio-group>
+                @if (q.weightMissing) { <p class="hint">Some items have no packaged weight on file; weight-based rates treated them as 0 g.</p> }
+              }
+            }
+          </li>
+        } @else {
+          <li><p class="hint">Digital-only order — nothing ships, no shipping charge.</p></li>
+        }
+        <li>
+          <p class="summary">Shipping: <strong>{{ shippingCostPreview() }}</strong></p>
+        </li>
         <li>
           <app-mat-form-field-input
             [value]="discountCode()"
@@ -35,9 +71,10 @@
           ></app-mat-form-field-input>
         </li>
         <li>
-          <button matButton="filled" (click)="placeOrder()" type="button">
+          <button matButton="filled" (click)="placeOrder()" [disabled]="!canPlaceOrder()" type="button">
             Place order (PayPal)
           </button>
+          @if (!isDigitalOnly() && !shippingQuote()) { <span class="hint">Get shipping options before placing the order.</span> }
         </li>
       </ul>
     }

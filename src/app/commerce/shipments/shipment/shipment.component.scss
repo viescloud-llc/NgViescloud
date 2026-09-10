@@ -58,3 +58,5 @@
   gap: 1.5rem;
   flex-wrap: wrap;
 }
+
+.picker-row { display: flex; gap: 1rem; flex-wrap: wrap; .picker { min-width: 240px; } }

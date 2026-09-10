@@ -2,6 +2,7 @@ import { inject } from '@angular/core';
 import { Routes } from '@angular/router';
 import { AuthGuard } from '../lib/guards/auth.guard';
 import { MaintenancePageComponent } from '../lib/share-component/maintenance-page/maintenance-page.component';
+import { SmtpProviderListComponent } from '../lib/share-component/smtp-provider-list/smtp-provider-list.component';
 import { RoleListComponent } from '../lib/share-component/role-list/role-list.component';
 import { maintenanceGuard } from './shop/maintenance.guard';
 import { ApplicationSettingComponent } from '../lib/share-component/application-setting/application-setting.component';
@@ -40,6 +41,7 @@ export const APP_ROUTES = {
   usersSetting: "setting/users",
   userGroupsSetting: "setting/user/groups",
   openidProviderSetting: "setting/openid-provider",
+  smtpProviderSetting: "setting/smtp-providers",
   oauth2: "oauth2",
 
   // ---- Catalog ----------------------------------------------------------
@@ -131,6 +133,16 @@ export const APP_ROUTES = {
   // ---- Inventory ------------------------------------------------------------
   inventoryStock: "inventory/stock",
   inventoryMovements: "inventory/movements",
+  inventoryWarehouseList: "inventory/warehouses/list",
+  inventoryWarehouseNew: "inventory/warehouses/new",
+  inventoryWarehouse(id: string) {
+    return `inventory/warehouses/${id}`;
+  },
+  rulesCarrierList: "rules/carriers/list",
+  rulesCarrierNew: "rules/carriers/new",
+  rulesCarrier(id: string) {
+    return `rules/carriers/${id}`;
+  },
 
   // ---- Reviews / Reports ------------------------------------------------------
   reviews: "reviews",
@@ -402,7 +414,26 @@ export const routes: Routes = [
       {
         path: "movements",
         loadComponent: () => import('./inventory/stock-movement-list/stock-movement-list.component').then(m => m.StockMovementListComponent)
+      },
+      {
+        path: "warehouses",
+        children: [
+          { path: '', redirectTo: 'list', pathMatch: 'full' },
+          { path: "list", loadComponent: () => import('./inventory/warehouses/warehouse-list/warehouse-list.component').then(m => m.WarehouseListComponent) },
+          { path: "new", loadComponent: () => import('./inventory/warehouses/warehouse/warehouse.component').then(m => m.WarehouseComponent) },
+          { path: ":warehouseId", loadComponent: () => import('./inventory/warehouses/warehouse/warehouse.component').then(m => m.WarehouseComponent) }
+        ]
       }
+    ]
+  },
+  {
+    path: "rules/carriers",
+    canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('shipping:read')],
+    children: [
+      { path: '', redirectTo: 'list', pathMatch: 'full' },
+      { path: "list", loadComponent: () => import('./rules/carriers/carrier-list/carrier-list.component').then(m => m.CarrierListComponent) },
+      { path: "new", loadComponent: () => import('./rules/carriers/carrier/carrier.component').then(m => m.CarrierComponent) },
+      { path: ":carrierId", loadComponent: () => import('./rules/carriers/carrier/carrier.component').then(m => m.CarrierComponent) }
     ]
   },
   {
@@ -490,6 +521,12 @@ export const routes: Routes = [
         path: 'openid-provider',
         component: OpenIdProviderComponent,
         canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('iam:read')]
+      },
+      {
+        // Outbound-mail accounts (lib component; resource `smtp`).
+        path: 'smtp-providers',
+        component: SmtpProviderListComponent,
+        canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('smtp:read')]
       }
     ]
   },

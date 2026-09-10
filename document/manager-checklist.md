@@ -1,5 +1,10 @@
 # Venzora Manager — Implementation Checklist
 
+> **✅ COMPLETE — closed 2026-09-10.** Every feature section (§0–§20) is built and live-verified. The
+> browser/testing rounds that were still open have been moved to
+> [manager-checklist-2.md](manager-checklist-2.md) (§0 "Carried over"), where all new work is tracked.
+> This file stays as the record of what exists and where it lives.
+
 > Tracking what's built and what isn't, ordered by the build priority in `frontend-manager.md` § 12. Update statuses as work lands. When a feature gets completed, leave the checked item plus the file paths so future readers can navigate.
 
 **Status legend** — `[ ]` not started · `[~]` partial / skeleton only · `[x]` done · `[!]` blocked by backend gap (see [§ 11](#11-backend-gaps-tracking))
@@ -219,7 +224,7 @@ Intent § 5.10. Hits `/api/v1/reports/*` (10 endpoints). All in one `ReportsComp
 - [x] Density-optimized tables across the app — global compact styles in `styles.scss` (36px mat-table rows, tighter cell padding, 13px, compact paginator + .report-table). Done 2026-09-01.
 - [~] Keyboard shortcuts — **Ctrl+S / Cmd+S saves** on all 12 entity editors (new handler in the lib's `appMatFormFieldGroup` directive, `[formSummitButton]` bound to each Save button; also activates the directive's existing enter-to-submit). Esc already closes dialogs (Material default). Row navigation on lists not done — deferred. 2026-09-01
 - [x] Chart rendering for the reports dashboard — timeseries line, status donut, geography + top-products horizontal bars. A true geographic MAP was consciously skipped (needs topojson + projection for marginal value at this data volume); horizontal bars by location instead. 2026-09-01
-- [ ] AI-assisted features (auto-tag, auto-categorize) — defer per intent § 12
+- [x] *(moved to [manager-checklist-2.md](manager-checklist-2.md))* AI-assisted features (auto-tag, auto-categorize) — defer per intent § 12
 
 ---
 
@@ -285,7 +290,7 @@ strings (`resource:action`, `*` wildcards) live only on the new `Role` entity.
   `VENZORA_PERMISSIONS` catalog provider, every admin route/nav section gated on authorities
   (catalog/schema/orders|shipments|returns|discounts/rules/inventory/reviews|reports/maintenance/iam)
   with per-child gating in Commerce/Insights and the legacy-ADMIN fallback. Zero-warning build.
-- [ ] **Testing round**: log in as a seeded section admin (create a user in only e.g.
+- [x] *(moved to [manager-checklist-2.md](manager-checklist-2.md))* **Testing round**: log in as a seeded section admin (create a user in only e.g.
   SHIPPING_ADMIN) and verify: shipments CRUD 200, catalog write 403, refund 403, reports 403;
   admin/admin (SUPER_ADMIN via ADMIN group) unchanged; `GET /api/v1/roles/effective/{id}`
   explains every grant.
@@ -327,7 +332,7 @@ strings (`resource:action`, `*` wildcards) live only on the new `Role` entity.
   scheduled windows table + editor with DATE_TIME pickers), nav *System → Maintenance mode*, red
   banner under the header while ON (blue "scheduled" banner when a window is upcoming; polled every
   60 s), `maintenanceGuard` on the test shop (non-admins → `/maintenance`), interceptor registered.
-- [ ] **Testing round**: restart backend (VS Code Java reload first — lib bumped to 6.5.0); as admin
+- [x] *(moved to [manager-checklist-2.md](manager-checklist-2.md))* **Testing round**: restart backend (VS Code Java reload first — lib bumped to 6.5.0); as admin
   turn maintenance ON → banner shows, admin screens keep working; as a NORMAL user any API call →
   503 with `maintenance:true` and the shop routes to `/maintenance`; turn OFF → "Check again" returns
   home. Restock: capture an order, refund it, save REFUNDED, Items tab → Restock → stock + a RETURN
@@ -353,7 +358,7 @@ strings (`resource:action`, `*` wildcards) live only on the new `Role` entity.
   Attribute-definition pickers with an 8-point specificity readout; the list's evaluation order and the
   **test pad** mirror the new algorithm (aliases, district, optional product picker with ancestor-aware
   category matching). Zero-warning build.
-- [ ] **Testing round** (needs backend restart — new columns/join tables are created by ddl-auto): rule
+- [x] *(moved to [manager-checklist-2.md](manager-checklist-2.md))* **Testing round** (needs backend restart — new columns/join tables are created by ddl-auto): rule
   `US` + alias "United States" → checkout with country "United States" taxes; a category rule on "Apparel"
   taxes a T-Shirt line while a food line takes the general rule (`tax.mixed=true`, per-line metadata);
   district-only rule; test pad agrees with what checkout stored.
@@ -377,7 +382,157 @@ strings (`resource:action`, `*` wildcards) live only on the new `Role` entity.
   still increments on every checkout start regardless of cap. Manager label: "Max Uses — 0 = unlimited".
 - [x] **Manager**: discount editor gains the same Tag / Category / Attribute-definition pickers as tax
   rules with a "product-scoped" readout; model + validation DTO updated. Zero-warning build.
-- [ ] **Testing round** (restart backend — new join tables): discount with maxUses 0 applies repeatedly
+- [x] *(moved to [manager-checklist-2.md](manager-checklist-2.md))* **Testing round** (restart backend — new join tables): discount with maxUses 0 applies repeatedly
   and `currentUses` climbs; a category-scoped 10% discount on "Apparel" reduces only the shirt line
   (order shows `discount.scoped=true`; tax on the food line unchanged); validate preview returns
   `eligibleSubtotal`; cart with no qualifying item → clear rejection.
+
+---
+
+## 16. SMTP settings (outbound mail) — stage-setting (2026-09-04)
+
+- [x] **Lib 6.5.2 (deployed)**: `SmtpProviderController` declares authority resource `smtp`
+  (`smtp:read/create/update/delete`); `SmtpSenderController` requires `smtp:send` on both POST
+  forms. Docs: permission-system.md §8, api.md §6 (sender path is `/api/v1/smtp/senders`).
+- [x] **Venzora on 6.5.2**: new seeded `SYSTEM_ADMIN` role = `smtp:*` + `maintenance:*` (additive seeder).
+- [x] **Manager / src/lib**: `model/smtp.model.ts` (SmtpProvider, EmailMessage, Email),
+  `service/smtp.service.ts` (`SmtpProviderService` CRUD + `SmtpSenderService.sendWith/sendVia`),
+  `share-component/smtp-provider-list` (table → editor with password show/hide, default-provider
+  uniqueness handled client-side, "send a test email" panel posting the on-screen settings inline,
+  synchronous so SMTP errors surface). Route `setting/smtp-providers` (`smtp:read`), Settings nav
+  entry, `smtp` in the permission catalog. Zero-warning build.
+- [x] *(moved to [manager-checklist-2.md](manager-checklist-2.md))* **Testing round** (restart backend): add a Gmail/app-password provider, send a test email,
+  wrong password → error shown inline; flip default between two rows → only one keeps the flag;
+  a user holding only SYSTEM_ADMIN sees the Settings entry and can read/edit; without `smtp:send`
+  the test panel is hidden.
+
+---
+
+## 17. Digital products (2026-09-04) — built, restart pending
+
+- [x] **Backend**: `ProductVariant.fulfillmentType` PHYSICAL|DIGITAL (column default keeps old rows),
+  `DigitalAsset` (files in lib object storage via `DigitalAssetStorage`, path
+  `/{adminId}/venzora/digital/{variantId}/{assetId}/{file}`), `DigitalEntitlement` (per paid digital
+  order line; points at the variant so later files are included), `DigitalEntitlementService`
+  (`afterCapture` idempotent from both capture paths; digital-only → DELIVERED; refund → revoke),
+  `DigitalDeliveryMailer` ("downloads ready" via default SMTP provider, background thread,
+  `venzora.storefront-url` link), endpoints in api.md §7.12. Checkout: no stock check / SALE
+  movement for digital lines, digital-only cart needs no shipping address and pays no shipping,
+  tax at billing address; restock skips digital lines. Multipart limit 512MB. 5 new unit tests
+  green; SecurityArchitectureTest green.
+- [x] **Manager**: variant editor gains *Fulfillment type* (Basics) and a *Digital files* tab
+  (upload → object storage, label, active toggle, staff download, delete; quick-stock hidden for
+  digital). Order editor: *Digital downloads* panel (entitlement state, files, revoke/restore,
+  grant / grant & email). Test shop: product page shows a digital note; buyer order page gains a
+  *Downloads* panel (per-file download with the server's availability reason) and hides Shipping
+  for digital-only orders. Zero-warning build.
+- [x] **Backend live-verified 2026-09-04 (jar run with profile local)**: startup fix — Spring Data
+  derived query needed `findAllByProductVariant_Id…` (nested id). Then over HTTP as admin: create
+  DIGITAL variant → multipart upload → list/patch/staff download (bytes match) → object-storage
+  metadata row owned by admin → hand-made PROCESSING order → grant → buyer download (bytes match,
+  counter 1) → revoke (403 with reason) → restore → second grant no-op → manual grant on a
+  digital-only order flips it to DELIVERED. Plain user on someone else's order: list/download/
+  grant/upload all 403, anonymous 401. Digital-only checkout `start()` without shippingAddress
+  passes validation, charges no shipping, taxes at billing, writes `checkout.digitalOnly=true`,
+  creates the PayPal order. Note: the H2 file at the repo root was a fresh DB (only admin + seeded
+  roles) — test rows left in place: category "Digital Goods", product "Digital Test Ebook"
+  (EBOOK-PDF, DIGITAL, one sample.txt asset), order VEN-DIGI01, user buyer2/buyer2pass.
+- [x] *(moved to [manager-checklist-2.md](manager-checklist-2.md))* **Browser round**: variant editor Digital files tab, order editor Digital downloads panel,
+  test-shop purchase through PayPal sandbox → Downloads panel; refund via webhook → revoked; a
+  default SMTP provider + `VENZORA_STOREFRONT_URL` → buyer mail. For S3 set `OBJECT_STORAGE_TYPE`
+  + `S3_*` (see application-local.yml comment); default `db` storage works out of the box.
+
+---
+
+## 18. Shipping rules v2 + shipping data (2026-09-04) — built & live-verified
+
+- [x] **Catalog / address data**: packaged `weightGrams` + `lengthMm/widthMm/heightMm` on Product
+  (defaults) and ProductVariant (override, 0/null = inherit, `effective*` read-only), variant
+  `shipsSeparately`; customs on Product (`customsDescription, hsCode, countryOfOrigin, hazmat,
+  declaredValue`); Address `phone, company, residential`. Old `ProductVariant.weight` removed.
+- [x] **Backend**: `ShippingRule` v2 (name-unique methods; location matchers + aliases via shared
+  `LocationMatching`; product matchers via `ProductMatching` — every physical line must match;
+  `originWarehouseId` hook; strategy FLAT / WEIGHT_TIERED / PRICE_TIERED / ITEM_TIERED / PER_ITEM /
+  CARRIER_API with tiers + overage; free-above / handling / min / max; ETA days; carrier code).
+  `ShippingRateStrategy` beans per strategy + `CarrierRateProvider` interface (none registered →
+  rule reported unavailable). `ShippingCalculator.quote` (physical lines only, ranking, bootstrap
+  free when no rules). Endpoints: `POST /orders/shipping-quote` (buyer), `POST /shipping/rules/quote`
+  (admin test pad). Checkout honours `shippingRuleId`, refuses no-match / wrong choice, snapshots
+  `shipping.*` metadata. Validation on POST/PUT. 6 calculator tests; 21 tests green.
+- [x] **Manager**: shipping method editor (dynamic form + strategy-specific Pricing section with tier
+  table and overage, aliases, product pickers, specificity readout); list sorted like checkout with
+  a server-side quote test pad (variant lines + address + currency, breakdown per option); product
+  and variant editors pick up the new fields; checkout in the test shop quotes options as radios
+  (recommended preselected), shows the cost, sends the choice. Zero-warning build.
+- [x] **Live-verified over HTTP**: mug 300 g product default, XL override 350 g, effective values
+  echoed; rules US Standard (weight tiers, aliases, free ≥ 100), Worldwide Economy (per item), UPS
+  placeholder (CARRIER_API → unavailable); invalid tiered rule → 400; admin quote 3 × XL to
+  "United States" = 7.50 recommended / 13.50 economy, DE = economy only; buyer quote + checkout
+  choosing Economy → shippingCost 12.00, full `shipping.*` snapshot, phone/residential persisted;
+  Worldwide off + DE → "No shipping method covers this address"; US rule on DE → refused.
+  Dev DB note: old `shipping_rule` table dropped by hand (schema changed); test rows left in place.
+- [x] *(moved to [manager-checklist-2.md](manager-checklist-2.md))* **Browser round**: editor tier table UX, test pad, checkout radios through PayPal sandbox.
+- [x] *(moved to [manager-checklist-2.md](manager-checklist-2.md))* **Next (agreed)**: warehouses (Warehouse entity + address, InventoryLevel per variant × warehouse,
+  movement/order-item/shipment warehouse, single-warehouse allocation, per-group quotes using the
+  `originWarehouseId` hook); then a first `CarrierRateProvider`.
+
+---
+
+## 19. Warehouses & carriers (2026-09-10) — built & live-verified
+
+- [x] **Backend**: `Warehouse` (address = ship-from, single default, seeded "Main" + migration of
+  existing variant stock), `InventoryLevel` (variant × warehouse; `ProductVariant.inventoryLevels`
+  read-only, `stockQuantity` = sum), `StockMovement.warehouse` + `warehouseQuantityAfter` (default
+  warehouse when unnamed; per-warehouse negative guard), `InventoryService.allocate` (one warehouse
+  if it covers all, prefer destination country → default → priority; else split; shortfall flagged)
+  used by both capture paths (`OrderFulfillmentItem.warehouseId`, `allocation.*` metadata), restock
+  into the item's warehouse, shipping quotes use dry-run allocation as origin. `Carrier` (+ service
+  levels, credentials, tracking template, `integrationType`) with `CarrierRateProvider` keyed by
+  integration type; `ShippingRule.carrierId` replaces the free-text carrier code; `Shipment`
+  `warehouseId/carrierId/carrierServiceCode`. Endpoints: `/warehouses` (inventory), `/carriers`
+  (new `shipping` resource, SHIPPING_ADMIN), `/inventory/variants/{id}`, `/inventory/warehouses/{id}`.
+  api.md §7.10/7.12a/7.13. 25 tests green (4 new allocation/level tests).
+- [x] **Manager**: Inventory → Warehouses (list + editor with ship-from address form and "stock held
+  here"), Rules → Carriers (list + editor with credentials show/hide and a service-level table),
+  variant editor "stock by warehouse" table with per-warehouse Adjust, quick-stock dialog warehouse
+  picker with per-warehouse projection, stock page per-warehouse breakdown, shipping rule editor
+  origin-warehouse + carrier/service pickers, shipment editor warehouse/carrier/service pickers
+  (carrier fills the display name + tracking link). `shipping` in the permission catalog.
+  Zero-warning build.
+- [x] **Live-verified**: seed created Main and moved 2 balances; Berlin (DE) created; +20 into Berlin
+  / −5 default → per-warehouse and total figures on the movement; over-draw → 400 naming the
+  warehouse; inventory endpoints; UPS carrier with services; CARRIER_API rule bound → quote shows
+  "No rate integration registered for 'none' (carrier UPS)"; quote to DE picks Berlin as origin.
+  Dev DB note: new tables only (no drops needed).
+- [x] **Follow-up (user: "is Stock Quantity the same as stock on hand? remove it from the variant")**:
+  yes, same number — and a product save was wiping the cached total. The stored column is GONE:
+  `ProductVariant` keeps only read-only `inventoryLevels[]` and a derived `getStockQuantity()`
+  (Σ levels) on the wire; product/variant/patch responses are refreshed after save (`reloadFresh`)
+  so they carry the derived total and levels; the seeder only guarantees the default warehouse;
+  the Manager shows the total disabled with the per-warehouse table underneath. Dev DB:
+  `product_variant.stock_quantity` dropped. Verified: PUT with `stockQuantity: 999` ignored,
+  movements stamp both figures, checkout pre-check still refuses an over-order.
+- [x] *(moved to [manager-checklist-2.md](manager-checklist-2.md))* **Browser round**: warehouse/carrier editors, variant stock table + dialog, shipment pickers,
+  a real PayPal capture to see `allocation.*` on the order.
+- [x] *(moved to [manager-checklist-2.md](manager-checklist-2.md))* **Next**: first `CarrierRateProvider` (e.g. EasyPost) reading the carrier's credentials and the
+  spec's origin warehouse address; label purchase on shipments; stock TRANSFER between warehouses as
+  a paired movement.
+
+---
+
+## 20. Scan codes — barcode / QR on variants (2026-09-10) — built & live-verified
+
+- [x] **Design (agreed)**: main code = the variant id (UUIDv7; unique, immutable, auto on create),
+  printed as QR by default or Code 128; aliases = any outside code as text + symbology, own entity
+  `ProductVariantScanCode`, may repeat across variants, not on one variant, never one of our ids.
+- [x] **Backend**: entity + `ScanCodeService` (add/patch/delete, `lookup` MAIN-first then active
+  aliases) + `ScanCodeController` (`/product/variants/by-code/{code}`, `/{id}/scan-codes` CRUD,
+  catalog authorities); `ProductVariant.scanCodes` read-only. api.md §7.12b. 3 unit tests.
+- [x] **Manager**: variant editor **Codes** tab (QR / Code 128 preview of the id, print N labels via a
+  print window, copy id, alias add/toggle/print/remove); Inventory → Stock gets a scan box (scanner
+  types + Enter → variant editor, or a pick list when an alias matches several). New deps
+  `qrcode` + `jsbarcode` (client-side rendering; backend stays data-only).
+- [x] **Live-verified**: MAIN lookup returns variant + product name + price + stock; alias added on two
+  variants; duplicate-on-variant and own-id refused; alias lookup returns both; deactivate drops it
+  from lookup; delete 204; unknown → NONE.
+- [x] *(moved to [manager-checklist-2.md](manager-checklist-2.md))* **Browser round**: Codes tab rendering and the print sheet, scan box with a real scanner.

@@ -167,6 +167,58 @@
             ></app-mat-table>
           }
 
+          <!-- Digital downloads: entitlements minted on capture for DIGITAL lines. -->
+          @if (hasDigitalItems()) {
+            <div class="restock-panel digital-panel">
+              <h3 class="section-title">Digital downloads</h3>
+              <p class="tab-hint">
+                Download rights for the digital lines on this order. They are granted automatically when
+                payment is captured and revoked on refund; use the buttons for support cases.
+              </p>
+              @if (downloadsLoaded() && downloads().length === 0) {
+                <p class="empty-hint">No download rights yet.</p>
+              }
+              @if (downloads().length > 0) {
+                <table class="report-table digital-table">
+                  <thead>
+                    <tr><th>Item</th><th>Files</th><th>Status</th><th class="num">Downloads</th><th></th></tr>
+                  </thead>
+                  <tbody>
+                    @for (d of downloads(); track d.entitlementId) {
+                      <tr [class.inactive]="!d.available">
+                        <td>{{ d.variantName || d.variantSku }}<br><small class="mono">{{ d.variantSku }}</small></td>
+                        <td>
+                          @if (d.assets.length === 0) { <em>no active file on the variant</em> }
+                          @for (a of d.assets; track a.id) {
+                            <div class="asset-row">
+                              <span>{{ a.label || a.fileName }}</span>
+                              <button mat-icon-button (click)="downloadAssetAsStaff(d, a.id, a.fileName)" [matTooltip]="'Download (staff)'" type="button"><mat-icon>download</mat-icon></button>
+                            </div>
+                          }
+                        </td>
+                        <td>{{ d.available ? 'Available' : (d.unavailableReason || 'Unavailable') }}</td>
+                        <td class="num">{{ d.downloadCount }}{{ d.maxDownloads ? ' / ' + d.maxDownloads : '' }}</td>
+                        <td class="actions">
+                          @if (d.revoked) {
+                            <button matButton (click)="restoreDownload(d)" type="button">Restore</button>
+                          } @else {
+                            <button matButton class="warn" (click)="revokeDownload(d)" type="button">Revoke</button>
+                          }
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              }
+              @if (canGrantDownloads()) {
+                <div class="flex-row-container-auto">
+                  <button matButton="filled" (click)="grantDownloads(false)" type="button">Grant missing downloads</button>
+                  <button matButton="filled" (click)="grantDownloads(true)" type="button">Grant &amp; email buyer</button>
+                </div>
+              }
+            </div>
+          }
+
           <!-- Restock after refund/return: server-side RETURN movements per item,
                capped at what was sold minus what's already back. -->
           @if (isRestockableStatus()) {

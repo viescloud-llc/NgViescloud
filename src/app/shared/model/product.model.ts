@@ -2,6 +2,8 @@ import { Currency } from "../../../lib/model/currency.model";
 import { MatInputDisable, MatInputDisplayLabel, MatInputEnum, MatInputHide, MatInputItemSetting, MatInputListSetting, MatInputRequire, MatItemSettingType, MatTableHide } from "../../../lib/model/mat.model";
 import { AttributeDefinition, ProductAttribute, ProductVariantAttribute } from "./attribute.model";
 import { TrackedTimeStamp } from "./tracked.model";
+import { InventoryLevel } from "./inventory.model";
+import { ProductVariantScanCode } from "./scan-code.model";
 
 export enum ProductStatus {
     DRAFT = "DRAFT",
@@ -27,6 +29,59 @@ export enum VariantPriceMode {
 export enum ProductMediaType {
     IMAGE = "IMAGE",
     VIDEO = "VIDEO"
+}
+
+// How a variant reaches the buyer. DIGITAL = downloadable files attached to the
+// variant; checkout skips stock and shipping for it and mints download rights
+// on payment capture.
+export enum VariantFulfillmentType {
+    PHYSICAL = "PHYSICAL",
+    DIGITAL = "DIGITAL"
+}
+
+// One downloadable file on a DIGITAL variant (table: digital_assets). Bytes live
+// in the backend's object storage; this is the catalog-side handle. Managed via
+// /api/v1/product/variants/{id}/digital-assets (multipart upload), never through
+// the variant JSON.
+export class DigitalAsset extends TrackedTimeStamp {
+    @MatInputHide()
+    @MatTableHide()
+    id: string = '';
+
+    @MatInputHide()
+    @MatTableHide()
+    productVariantId: string = '';
+
+    @MatInputDisable()
+    @MatInputDisplayLabel('File')
+    fileName: string = '';
+
+    @MatInputDisable()
+    @MatInputDisplayLabel('Type')
+    @MatTableHide()
+    contentType: string = '';
+
+    @MatInputDisable()
+    @MatInputDisplayLabel('Size')
+    size: number = 0;
+
+    @MatInputDisplayLabel('Label', 'shown to buyers, e.g "Installer (Windows)"')
+    label: string = '';
+
+    @MatInputDisplayLabel('Sort order')
+    sortOrder: number = 0;
+
+    // Inactive files stay stored but disappear from buyers' download lists.
+    @MatInputDisplayLabel('Active')
+    active: boolean = true;
+
+    @MatInputHide()
+    @MatTableHide()
+    storageObjectId?: string;
+
+    @MatInputHide()
+    @MatTableHide()
+    uploadedByUserId?: string;
 }
 
 export class Tag {
@@ -162,16 +217,58 @@ export class ProductVariant extends TrackedTimeStamp {
     @MatInputDisplayLabel('Effective Price')
     effectivePrice?: string;
 
-    // Long on the backend, but always small enough for a JS number.
-    @MatInputDisplayLabel('Stock Quantity')
+    // Cached total across warehouses — READ-ONLY (the server ignores it on write
+    // and recomputes it from the per-warehouse levels after every movement).
+    // Change stock through "Add / adjust stock", which records a movement.
+    @MatInputDisable()
+    @MatInputDisplayLabel('Stock (all warehouses, read-only)', 'sum of the per-warehouse balances below; adjust via a stock movement')
     stockQuantity: number = 0;
 
-    @MatInputDisplayLabel('Weight')
-    weight: string = '0';
+    // ---- Packaged shipping spec. 0 = "use the product's default"; the editor
+    // sends 0 as null so the server-side fallback applies. Server echoes the
+    // resolved values as effective* (read-only).
+    @MatInputDisplayLabel('Packaged weight (g)', '0 = use the product default')
+    weightGrams: number = 0;
+
+    @MatInputDisplayLabel('Package length (mm)', '0 = product default')
+    lengthMm: number = 0;
+
+    @MatInputDisplayLabel('Package width (mm)', '0 = product default')
+    widthMm: number = 0;
+
+    @MatInputDisplayLabel('Package height (mm)', '0 = product default')
+    heightMm: number = 0;
+
+    @MatInputDisplayLabel('Ships in its own parcel', 'oversized / fragile — packing and carrier hint')
+    @MatTableHide()
+    shipsSeparately: boolean = false;
+
+    @MatInputHide()
+    @MatTableHide()
+    effectiveWeightGrams?: number | null;
+
+    @MatInputHide()
+    @MatTableHide()
+    effectiveLengthMm?: number | null;
+
+    @MatInputHide()
+    @MatTableHide()
+    effectiveWidthMm?: number | null;
+
+    @MatInputHide()
+    @MatTableHide()
+    effectiveHeightMm?: number | null;
 
     @MatInputEnum(ProductVariantStatus)
     @MatInputDisplayLabel('Status')
     status: ProductVariantStatus = ProductVariantStatus.ACTIVE;
+
+    // PHYSICAL ships and consumes stock; DIGITAL is delivered as the files on the
+    // variant's "Digital files" tab (no stock check, no shipping, entitlements on
+    // payment). Server default PHYSICAL.
+    @MatInputEnum(VariantFulfillmentType)
+    @MatInputDisplayLabel('Fulfillment type', 'DIGITAL = downloadable files; stock and shipping are ignored')
+    fulfillmentType: VariantFulfillmentType = VariantFulfillmentType.PHYSICAL;
 
     @MatInputHide()
     @MatTableHide()
@@ -182,6 +279,17 @@ export class ProductVariant extends TrackedTimeStamp {
     @MatTableHide()
     @MatInputListSetting(false, true, true)
     attributeValues: ProductVariantAttribute[] = [new ProductVariantAttribute()];
+
+    // Stock per warehouse — READ-ONLY (ignored on write). stockQuantity is the sum.
+    @MatInputHide()
+    @MatTableHide()
+    inventoryLevels?: InventoryLevel[];
+
+    // Alias scan codes — READ-ONLY here (managed via ScanCodeService). The MAIN
+    // scan code is the variant id itself.
+    @MatInputHide()
+    @MatTableHide()
+    scanCodes?: ProductVariantScanCode[];
 }
 
 export class Product extends TrackedTimeStamp {
@@ -214,6 +322,45 @@ export class Product extends TrackedTimeStamp {
     @MatInputEnum(ProductStatus)
     @MatInputDisplayLabel('Status')
     status: ProductStatus = ProductStatus.DRAFT;
+
+    // ---- Shipping defaults (packaged), inherited by variants that leave theirs at 0 ----
+    @MatInputDisplayLabel('Packaged weight (g)', 'default for every variant; the box, not the bare item')
+    @MatTableHide()
+    weightGrams: number = 0;
+
+    @MatInputDisplayLabel('Package length (mm)')
+    @MatTableHide()
+    lengthMm: number = 0;
+
+    @MatInputDisplayLabel('Package width (mm)')
+    @MatTableHide()
+    widthMm: number = 0;
+
+    @MatInputDisplayLabel('Package height (mm)')
+    @MatTableHide()
+    heightMm: number = 0;
+
+    // ---- Customs (cross-border parcels) ----
+    @MatInputDisplayLabel('Customs description', 'plain words, e.g "cotton t-shirt"')
+    @MatTableHide()
+    customsDescription: string = '';
+
+    @MatInputDisplayLabel('HS tariff code', 'e.g 6109.10')
+    @MatTableHide()
+    hsCode: string = '';
+
+    @MatInputDisplayLabel('Country of origin', 'ISO code, e.g VN')
+    @MatTableHide()
+    countryOfOrigin: string = '';
+
+    @MatInputDisplayLabel('Hazmat / restricted goods', 'lithium batteries, aerosols… limits carrier services')
+    @MatTableHide()
+    hazmat: boolean = false;
+
+    // BigDecimal; '' = not set (sent as absent).
+    @MatInputDisplayLabel('Declared value per unit (optional)', 'customs / insurance value when it differs from the price')
+    @MatTableHide()
+    declaredValue?: string = '';
 
     // Hidden from the dynamic form because the product editor renders tags via
     // a dedicated multi-select picker against the global Tag pool (better UX

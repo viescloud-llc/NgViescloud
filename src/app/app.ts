@@ -120,15 +120,22 @@ export class App extends ViescloudApplication {
     {
       title: 'Rules',
       hideChildren: true,
-      hideConditional: () => !this.can(['rules:read']),
+      hideConditional: () => !this.can(['rules:read', 'shipping:read']),
       children: [
         {
           title: 'Shipping Rules',
-          routerLink: APP_ROUTES.rulesShippingList
+          routerLink: APP_ROUTES.rulesShippingList,
+          hideConditional: () => !this.can(['rules:read'])
         },
         {
           title: 'Tax Rules',
-          routerLink: APP_ROUTES.rulesTaxList
+          routerLink: APP_ROUTES.rulesTaxList,
+          hideConditional: () => !this.can(['rules:read'])
+        },
+        {
+          title: 'Carriers',
+          routerLink: APP_ROUTES.rulesCarrierList,
+          hideConditional: () => !this.can(['shipping:read'])
         }
       ]
     },
@@ -144,6 +151,10 @@ export class App extends ViescloudApplication {
         {
           title: 'Stock Movements',
           routerLink: APP_ROUTES.inventoryMovements
+        },
+        {
+          title: 'Warehouses',
+          routerLink: APP_ROUTES.inventoryWarehouseList
         }
       ]
     },
@@ -249,6 +260,11 @@ export class App extends ViescloudApplication {
           title: 'OpenId Provider',
           routerLink: APP_ROUTES.openidProviderSetting,
           hideConditional: () => !this.can(['iam:read'])
+        },
+        {
+          title: 'SMTP / outbound mail',
+          routerLink: APP_ROUTES.smtpProviderSetting,
+          hideConditional: () => !this.can(['smtp:read'])
         }
       ]
     },

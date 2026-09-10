@@ -189,3 +189,15 @@
   .done { opacity: 0.7; font-style: italic; }
   .add-row { margin-top: 0.5rem; }
 }
+
+// Digital downloads panel
+.digital-table {
+  width: 100%;
+  border-collapse: collapse;
+  th, td { padding: 0.4rem 0.5rem; text-align: left; vertical-align: top; border-bottom: 1px solid var(--mat-sys-outline-variant, rgba(255,255,255,0.1)); }
+  .num { text-align: right; white-space: nowrap; }
+  .actions { white-space: nowrap; text-align: right; }
+  .mono { font-family: monospace; }
+  tr.inactive td { opacity: 0.6; }
+  .asset-row { display: flex; align-items: center; gap: 0.25rem; }
+}

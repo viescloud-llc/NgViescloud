@@ -52,7 +52,42 @@
       </table>
     </div>
 
-    <!-- Shipping -->
+    <!-- Digital downloads -->
+    @if (hasDigitalItems()) {
+      <div class="panel">
+        <h3 class="section-title">Downloads</h3>
+        @if (downloads().length === 0) {
+          <p class="hint">
+            @if (canCompletePayment()) { Your downloads unlock as soon as payment is captured. }
+            @else { No download rights on this order yet. }
+          </p>
+        }
+        @for (d of downloads(); track d.entitlementId) {
+          <div class="download-item" [class.unavailable]="!d.available">
+            <div class="download-head">
+              <strong>{{ d.variantName || d.variantSku }}</strong>
+              @if (!d.available) { <span class="status-badge">{{ d.unavailableReason || 'Unavailable' }}</span> }
+              @else if (d.maxDownloads) { <span class="hint">{{ d.downloadCount }} / {{ d.maxDownloads }} downloads used</span> }
+            </div>
+            @if (d.assets.length === 0) {
+              <p class="hint">The seller has not attached any file yet — check back soon.</p>
+            }
+            @for (a of d.assets; track a.id) {
+              <div class="download-row">
+                <span>{{ a.label || a.fileName }} <small>({{ formatBytes(a.size) }})</small></span>
+                <button matButton="filled" (click)="downloadFile(d, a.id, a.fileName)"
+                        [disabled]="!d.available || downloading() === a.id" type="button">
+                  {{ downloading() === a.id ? 'Downloading…' : 'Download' }}
+                </button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Shipping (nothing ships on a digital-only order) -->
+    @if (!isDigitalOnly()) {
     <div class="panel">
       <h3 class="section-title">Shipping</h3>
       <p class="address">{{ addressLine() }}</p>
@@ -83,6 +118,8 @@
         </table>
       }
     </div>
+
+    }
 
     <!-- Payment -->
     <div class="panel">

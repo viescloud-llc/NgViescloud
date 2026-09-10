@@ -1,0 +1,4 @@
+.return-banner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.75rem 1rem; margin-bottom: 1rem; border-left: 4px solid var(--mat-sys-primary, #7c4dff); background: var(--mat-sys-surface-container-low, rgba(255,255,255,0.03)); border-radius: 4px; }
+.section-title { margin: 1rem 0 0.25rem; }
+.tab-hint { margin: 0.25rem 0 0.5rem; padding: 0.5rem 0.75rem; border-left: 3px solid var(--mat-sys-tertiary, goldenrod); font-size: 0.9rem; line-height: 1.4; }
+.services-table { border-collapse: collapse; margin-bottom: 0.5rem; th, td { padding: 0.2rem 0.4rem; text-align: left; vertical-align: middle; } .cell { width: 160px; &.wide { width: 220px; } &.narrow { width: 110px; } } }

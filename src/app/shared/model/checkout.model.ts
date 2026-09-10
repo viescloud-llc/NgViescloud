@@ -9,6 +9,7 @@ export interface CheckoutRequest {
     shippingAddress: Address;
     billingAddress: Address;
     discountCode?: string;                // optional coupon code
+    shippingRuleId?: string;              // buyer's pick from the shipping quote; absent = recommended method
     provider: string;                     // payment provider, e.g. 'paypal'
     returnUrl: string;                    // where the buyer is redirected after success
     cancelUrl: string;                    // where the buyer is redirected on cancel
@@ -17,4 +18,10 @@ export interface CheckoutRequest {
 export interface CheckoutResponse {
     orderFulfillment: OrderFulfillment;
     approveUrl: string;                   // hand to window.location to redirect to PayPal etc.
+}
+
+// Body for POST /api/v1/orders/shipping-quote — non-destructive, mirrors the discount preview.
+export interface ShippingQuoteRequest {
+    cartId: string;
+    shippingAddress: Address;
 }

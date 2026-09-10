@@ -1,0 +1,17 @@
+<ul class="margin-center">
+  <li>
+    <p class="tab-hint">
+      Carriers the store ships with. Today they hold the tracking link template, the service levels
+      and the account slots; a <strong>live-rate shipping rule</strong> points at a carrier and is priced
+      by its integration once one is registered (until then such rules show as unavailable).
+    </p>
+  </li>
+  <li>
+    <app-mat-table [matRows]="carriers()" [blankObject]="blank" [showMatTooltip]="true" (onEditRow)="select($event)"></app-mat-table>
+  </li>
+  <br>
+  <li class="flex-row-container-auto">
+    <button matButton="filled" (click)="add()" type="button">Add carrier</button>
+    <button matButton (click)="refresh()" type="button">Refresh</button>
+  </li>
+</ul>
