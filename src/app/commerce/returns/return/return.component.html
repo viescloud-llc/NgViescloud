@@ -98,13 +98,16 @@
     <h3 class="section-title">Refund</h3>
     @if (canRefund()) {
       <p class="tab-hint">
-        Issues a PayPal refund of <strong>{{ value()?.refundAmount || 'the full order amount' }}</strong>
-        through the checkout service, marks the order
+        Refunds <strong>{{ value()?.refundAmount && +value()!.refundAmount > 0 ? value()?.refundAmount : 'everything still refundable' }}</strong>
+        @if (value()?.refundShipping) { plus the order's shipping }
+        through the payment provider in one server step, lets the order move to
         <em>refunded / partially refunded</em>, and closes this return as <em>Refunded</em>.
+        Needs <code>checkout:refund</code>.
       </p>
-      <button matButton="filled" class="warn" (click)="issueRefund()" type="button">
-        Issue PayPal refund
+      <button matButton="filled" class="warn" (click)="issueRefund()" [disabled]="_value.isValueChange()" type="button">
+        Issue refund
       </button>
+      @if (_value.isValueChange()) { <p class="empty-hint">Save your changes first — the server refunds the saved amount.</p> }
     } @else {
       <p class="empty-hint">
         Refund is available when the return is <strong>Approved</strong>,

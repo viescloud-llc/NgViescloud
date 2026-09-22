@@ -100,6 +100,10 @@
     </p>
   </li>
 
+  <li>
+    <app-history-panel entityType="TaxRule" [entityId]="id()"></app-history-panel>
+  </li>
+
   <li class="flex-row-container-auto">
     <button #viesSaveBtn matButton="filled" (click)="save()" [disabled]="_value.isValueNotChange() || !validForm()">Save</button>
     <button matButton="filled" class="warn" (click)="revert()" [disabled]="!_value.isValueChange()">Revert</button>

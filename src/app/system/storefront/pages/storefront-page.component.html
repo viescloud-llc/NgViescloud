@@ -1,0 +1,31 @@
+<ul class="margin-center" appMatFormFieldGroup [formSummitButton]="viesSaveBtn" (onAllInputCheck)="validForm.set($event)">
+  <li class="return-banner">
+    <span>@if (id()) { Page <strong>{{ value()?.title }}</strong> } @else { New page }</span>
+    <button matButton="filled" (click)="back()" type="button">Back to pages</button>
+  </li>
+  <li>
+    <app-mat-form-field-input-dynamic [value]="value()" (valueChange)="onMainFormChange($event)" [blankObject]="blankValue"
+      [inputMap]="inputField('pg-main').set(inputKeys.indent, false).set(inputKeys.styleWidth, '100%').set(inputKeys.disable, !canUpdate())"></app-mat-form-field-input-dynamic>
+    @if (value(); as p) {
+      <p class="status">
+        @if (p.publishedAt) { Published {{ p.publishedAt.slice(0, 16).replace('T', ' ') }} } @else { <strong>Never published</strong> — customers cannot see it yet }
+        @if (unpublishedChanges() && !_value.isValueChange()) { · <strong>draft differs from the published copy</strong> }
+      </p>
+    }
+  </li>
+  <li>
+    <h3 class="section-title">Sections (draft)</h3>
+    <app-sections-editor [sections]="value()?.draftSections ?? []" (sectionsChange)="onSections($event)" ownerType="PAGE" [ownerId]="id()" [disabled]="!canUpdate()"></app-sections-editor>
+  </li>
+  @if (id()) { <li><app-history-panel entityType="StorefrontPage" [entityId]="id()"></app-history-panel></li> }
+  <li class="flex-row-container-auto">
+    <button #viesSaveBtn matButton="filled" (click)="save()" [disabled]="!canUpdate() || _value.isValueNotChange() || !validForm()">Save draft</button>
+    <button matButton="filled" class="warn" (click)="revert()" [disabled]="!_value.isValueChange()">Revert</button>
+    @if (id()) {
+      <button matButton="filled" (click)="publish()" [disabled]="!canUpdate() || _value.isValueChange()">Publish</button>
+      <button matButton (click)="discard()" [disabled]="!canUpdate() || !value()?.publishedAt" type="button">Discard draft</button>
+      @if (isHome()) { <button matButton (click)="preview()" type="button">Preview draft</button> }
+      @if (!isHome()) { <button matButton="filled" class="warn" (click)="remove()" [disabled]="!canUpdate()">Delete</button> }
+    }
+  </li>
+</ul>

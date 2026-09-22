@@ -1,3 +1,6 @@
+import { HistoryPanelComponent } from '../../../shared/component/history-panel/history-panel.component';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { NgComponentModule } from '../../../../lib/module/ng-component.module';
 import { ViesRestApi } from '../../../../lib/abtract/ViesRestApi';
@@ -13,8 +16,14 @@ import {
 import { DigitalDownloadService } from '../../../shared/service/digital-download/digital-download.service';
 import { VariantFulfillmentType } from '../../../shared/model/product.model';
 import { FileUtils } from '../../../../lib/util/File.utils';
+import { AuthenticatorService } from '../../../../lib/service/authenticator.service';
 import { OrderFulfillmentService } from '../../../shared/service/order-fulfillment/order-fulfillment.service';
-import { CheckoutOrderService, CheckoutOrderView } from '../../../shared/service/checkout-order/checkout-order.service';
+import { CheckoutOrderService, CheckoutOrderView, CheckoutTransactionView } from '../../../shared/service/checkout-order/checkout-order.service';
+import { OrderPaymentService, PaymentView } from '../../../shared/service/order-payment/order-payment.service';
+import { ManualOrderService } from '../../../shared/service/manual-order/manual-order.service';
+import { OFFLINE_PAYMENT_METHODS, PaymentMethod } from '../../../shared/model/manual-order.model';
+import { ReceiptPrintUtil } from '../../../shared/util/receipt-print.util';
+import { StoreSettingsService } from '../../../shared/service/store-settings/store-settings.service';
 import { OrderRestockService } from '../../../shared/service/order-restock/order-restock.service';
 import { SnackBarUtils } from '../../../../lib/util/SnackBar.utils';
 import { firstValueFrom } from 'rxjs';
@@ -53,7 +62,7 @@ const STATUS_TRANSITIONS: Record<FulfillmentStatus, FulfillmentStatus[]> = {
   selector: 'app-order',
   templateUrl: './order.component.html',
   styleUrls: ['./order.component.scss'],
-  imports: [NgComponentModule]
+  imports: [NgComponentModule, HistoryPanelComponent, MatSelectModule, MatFormFieldModule]
 })
 export class OrderComponent extends ViesRestApi<OrderFulfillment, OrderFulfillmentService> implements OnInit {
 
@@ -75,20 +84,139 @@ export class OrderComponent extends ViesRestApi<OrderFulfillment, OrderFulfillme
   paymentInfo = signal<CheckoutOrderView | null>(null);
   paymentLoadState = signal<'idle' | 'loading' | 'loaded' | 'failed'>('idle');
 
+  // ---- Money actions (MONEY — each behind its own checkout:* authority) ----------
+  //
+  // The Payment tab loads the server-side PaymentView (lib checkout order +
+  // transactions + what is refundable) and offers Refund / Capture / Cancel /
+  // Sync. The server validates amounts, snapshots refund.* / cancel.* metadata,
+  // and the webhook listener moves the order status — we just re-read.
+  private readonly orderPaymentService = inject(OrderPaymentService);
+  payment = signal<PaymentView | null>(null);
+  transactions = computed<CheckoutTransactionView[]>(() => this.payment()?.transactions ?? []);
+  refundAmount = signal<string>('');
+  refundReason = signal<string>('');
+  cancelReason = signal<string>('');
+  moneyBusy = signal<boolean>(false);
+  canRefundMoney = computed<boolean>(() => this.authenticatorService.hasAuthorityOrAdmin('checkout:refund'));
+  canCaptureMoney = computed<boolean>(() => this.authenticatorService.hasAuthorityOrAdmin('checkout:capture'));
+  canCancelMoney = computed<boolean>(() => this.authenticatorService.hasAuthorityOrAdmin('checkout:cancel'));
+  canSyncMoney = computed<boolean>(() => this.authenticatorService.hasAuthorityOrAdmin('checkout:sync'));
+  refundable = computed<number>(() => Number(this.payment()?.amountRefundable ?? 0));
+  refundAmountValid = computed<boolean>(() => {
+    const raw = this.refundAmount().trim();
+    if (!raw) return this.refundable() > 0;               // empty = everything refundable
+    const n = Number(raw);
+    return Number.isFinite(n) && n > 0 && n <= this.refundable() + 1e-9;
+  });
+
   loadPaymentInfo() {
-    const checkoutOrderId = this.value()?.checkoutOrderId;
-    if (!checkoutOrderId) return;
+    const oid = this.getRouteId();
+    if (!oid || !this.value()?.checkoutOrderId) return;
     this.paymentLoadState.set('loading');
-    this.checkoutOrderService.get(checkoutOrderId).subscribe({
-      next: res => {
-        this.paymentInfo.set(res);
-        this.paymentLoadState.set('loaded');
-      },
+    this.orderPaymentService.view(oid).subscribe({
+      next: res => this.applyPayment(res, 'loaded'),
       error: err => {
         this.paymentLoadState.set('failed');
         this.dialogUtils.openErrorMessageFromError(err);
       }
     });
+  }
+
+  private applyPayment(res: PaymentView, state: 'loaded' = 'loaded') {
+    this.payment.set(res);
+    this.paymentInfo.set(res.checkoutOrder ?? null);
+    this.paymentLoadState.set(state);
+    // Money actions change the order (status, metadata) — reflect it unless a draft is open.
+    if (res.order && !this._value.isValueChange()) this._value.set(res.order);
+  }
+
+  async refundMoney() {
+    const oid = this.getRouteId();
+    const p = this.payment();
+    if (!oid || !p?.canRefund || !this.refundAmountValid()) return;
+    const raw = this.refundAmount().trim();
+    const amount = raw ? Number(raw).toFixed(2) : undefined;
+    const currency = p.checkoutOrder?.currency ?? this.value()?.currency ?? '';
+    const ok = await this.dialogUtils.openConfirmDialog(
+      'Refund payment?',
+      `Send ${amount ?? Number(p.amountRefundable).toFixed(2)} ${currency} back to the buyer through ${p.checkoutOrder?.provider ?? 'the payment provider'}. This moves real money and cannot be undone.`,
+      'Refund', 'Cancel').catch(() => false);
+    if (!ok) return;
+    this.moneyBusy.set(true);
+    this.orderPaymentService.refund(oid, amount, this.refundReason().trim()).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+      next: res => { this.moneyBusy.set(false); this.refundAmount.set(''); this.refundReason.set(''); this.applyPayment(res); this.loadDownloads(); SnackBarUtils.openSnackBar(this.rxjsUtils.snackBar, 'Refund issued', 'Dismiss', 5000); },
+      error: err => { this.moneyBusy.set(false); this.dialogUtils.openErrorMessageFromError(err); }
+    });
+  }
+
+  async captureMoney() {
+    const oid = this.getRouteId();
+    if (!oid || !this.payment()?.canCapture) return;
+    const ok = await this.dialogUtils.openConfirmDialog('Capture payment?',
+      'Charge the buyer\'s approved payment now, decrement stock and move the order to Processing.', 'Capture', 'Cancel').catch(() => false);
+    if (!ok) return;
+    this.moneyBusy.set(true);
+    this.orderPaymentService.capture(oid).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+      next: res => { this.moneyBusy.set(false); this.applyPayment(res); this.loadDownloads(); SnackBarUtils.openSnackBar(this.rxjsUtils.snackBar, 'Payment captured', 'Dismiss', 5000); },
+      error: err => { this.moneyBusy.set(false); this.dialogUtils.openErrorMessageFromError(err); }
+    });
+  }
+
+  async cancelMoney() {
+    const oid = this.getRouteId();
+    if (!oid || !this.payment()?.canCancel) return;
+    const ok = await this.dialogUtils.openConfirmDialog('Cancel this order?',
+      'The unpaid order is voided at the provider and moves to Cancelled. Nothing is charged.', 'Cancel order', 'Keep').catch(() => false);
+    if (!ok) return;
+    this.moneyBusy.set(true);
+    this.orderPaymentService.cancel(oid, this.cancelReason().trim()).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+      next: res => { this.moneyBusy.set(false); this.cancelReason.set(''); this.applyPayment(res); SnackBarUtils.openSnackBar(this.rxjsUtils.snackBar, 'Order cancelled', 'Dismiss', 5000); },
+      error: err => { this.moneyBusy.set(false); this.dialogUtils.openErrorMessageFromError(err); }
+    });
+  }
+
+  syncMoney() {
+    const oid = this.getRouteId();
+    if (!oid) return;
+    this.moneyBusy.set(true);
+    this.orderPaymentService.sync(oid).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+      next: res => { this.moneyBusy.set(false); this.applyPayment(res); },
+      error: err => { this.moneyBusy.set(false); this.dialogUtils.openErrorMessageFromError(err); }
+    });
+  }
+
+  // Manual (no checkout provider) orders: staff record the offline payment here.
+  private readonly manualOrderService = inject(ManualOrderService);
+  private readonly storeSettings = inject(StoreSettingsService);
+  readonly offlineMethods = OFFLINE_PAYMENT_METHODS.filter(m => m.value !== 'UNPAID');
+  recordMethod = signal<PaymentMethod>('CASH');
+  recordReference = signal<string>('');
+  recordTendered = signal<string>('');
+  recordHandedOver = signal<boolean>(false);
+  isManualOrder = computed<boolean>(() => !this.value()?.checkoutOrderId);
+
+  async recordOfflinePayment() {
+    const oid = this.getRouteId();
+    if (!oid || !this.payment()?.canRecordPayment) return;
+    const ok = await this.dialogUtils.openConfirmDialog('Record payment?',
+      `Mark this order as paid by ${this.recordMethod()}. Stock moves and the buyer is notified, exactly like an online capture.`, 'Record', 'Cancel').catch(() => false);
+    if (!ok) return;
+    this.moneyBusy.set(true);
+    this.manualOrderService.recordPayment(oid, { paymentMethod: this.recordMethod(), paymentReference: this.recordReference().trim() || undefined,
+      amountTendered: this.recordTendered().trim() || undefined, handedOver: this.recordHandedOver() }).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+      next: o => { this.moneyBusy.set(false); this._value.set(o); this.loadPaymentInfo(); this.loadDownloads(); SnackBarUtils.openSnackBar(this.rxjsUtils.snackBar, 'Payment recorded', 'Dismiss', 5000); },
+      error: err => { this.moneyBusy.set(false); this.dialogUtils.openErrorMessageFromError(err); }
+    });
+  }
+
+  printReceipt() {
+    const o = this.value();
+    if (!o) return;
+    try { ReceiptPrintUtil.print(o, this.storeSettings.current() ?? this.storeSettings.publicInfo()); } catch (err) { this.dialogUtils.openErrorMessageFromError(err); }
+  }
+
+  money(v?: string | number | null): string {
+    return v === null || v === undefined || v === '' ? '—' : Number(v).toFixed(2);
   }
 
   // Flatten the payment record's scalar fields for a generic key/value table —
@@ -114,6 +242,15 @@ export class OrderComponent extends ViesRestApi<OrderFulfillment, OrderFulfillme
     return Object.entries(item)
       .filter(([, v]) => v !== null && v !== undefined && typeof v !== 'object')
       .map(([key, v]) => ({ key, value: String(v) }));
+  }
+
+  // ---- Customer link ------------------------------------------------------------
+  private readonly authenticatorService = inject(AuthenticatorService);
+  canViewCustomer = computed<boolean>(() => this.authenticatorService.hasAuthorityOrAdmin('customers:read'));
+
+  openCustomer() {
+    const uid = this.value()?.userId;
+    if (uid) this.router.navigate([APP_ROUTES.commerceCustomer(uid)]);
   }
 
   // ---- Digital downloads ------------------------------------------------------

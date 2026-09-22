@@ -35,6 +35,8 @@ export interface ProductVariantScanCode {
     symbology: ScanCodeSymbology;
     label?: string | null;
     notes?: string | null;
+    // The supplier whose carton barcode this is (Inventory → Suppliers), when known.
+    supplierId?: string | null;
     active: boolean;
 }
 

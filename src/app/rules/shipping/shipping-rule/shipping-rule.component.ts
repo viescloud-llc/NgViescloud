@@ -1,3 +1,4 @@
+import { HistoryPanelComponent } from '../../../shared/component/history-panel/history-panel.component';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -35,7 +36,7 @@ import { CarrierService } from '../../../shared/service/carrier/carrier.service'
   selector: 'app-shipping-rule',
   templateUrl: './shipping-rule.component.html',
   styleUrls: ['./shipping-rule.component.scss'],
-  imports: [NgComponentModule, FormsModule, MatFormFieldModule, MatInputModule, MatSelectModule]
+  imports: [NgComponentModule, FormsModule, MatFormFieldModule, MatInputModule, MatSelectModule, HistoryPanelComponent]
 })
 export class ShippingRuleComponent extends ViesRestApi<ShippingRule, ShippingRuleService> implements OnInit {
 

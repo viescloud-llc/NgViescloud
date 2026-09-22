@@ -1,4 +1,7 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { emptyPage, ListPage } from '../../../shared/model/list-page.model';
+import { SearchService } from '../../../shared/service/search/search.service';
+import { ServerPagerComponent } from '../../../shared/component/server-pager/server-pager.component';
 import { Router } from '@angular/router';
 import { NgComponentModule } from '../../../../lib/module/ng-component.module';
 import { ViesMatFormFieldMap } from '../../../../lib/abtract/ViesMatFormFieldMap';
@@ -15,7 +18,7 @@ import { ReturnRequestService } from '../../../shared/service/return-request/ret
   selector: 'app-return-list',
   templateUrl: './return-list.component.html',
   styleUrls: ['./return-list.component.scss'],
-  imports: [NgComponentModule]
+  imports: [NgComponentModule, ServerPagerComponent]
 })
 export class ReturnListComponent extends ViesMatFormFieldMap implements OnInit {
 
@@ -24,40 +27,46 @@ export class ReturnListComponent extends ViesMatFormFieldMap implements OnInit {
   protected readonly returnService = inject(ReturnRequestService);
   protected readonly router = inject(Router);
 
-  returns = signal<ReturnRequest[]>([]);
+  // Server-side (GET /returns/search): status, free text (return / order number,
+  // reason), paged, newest first.
+  private readonly search = inject(SearchService);
+  result = signal<ListPage<ReturnRequest>>(emptyPage());
+  returns = computed<ReturnRequest[]>(() => this.result().content);
   blankReturn = new ReturnRequest();
+  loading = signal<boolean>(false);
 
   searchTerm = signal<string>('');
   statusFilter = signal<ReturnStatus | null>(null);
+  page = signal<number>(0);
+  size = signal<number>(25);
+  private debounce?: ReturnType<typeof setTimeout>;
 
   statusOptions: MatOption<ReturnStatus | null>[] = [
     { value: null, valueLabel: 'All statuses' },
-    ...Object.values(ReturnStatus).map(s => ({
-      value: s as ReturnStatus | null,
-      valueLabel: s.charAt(0) + s.slice(1).toLowerCase().replace(/_/g, ' ')
-    }))
+    ...Object.values(ReturnStatus).map(s => ({ value: s as ReturnStatus | null, valueLabel: s.charAt(0) + s.slice(1).toLowerCase() }))
   ];
-
-  filteredReturns = computed<ReturnRequest[]>(() => {
-    const term = this.searchTerm().toLowerCase().trim();
-    const status = this.statusFilter();
-    return this.returns().filter(r => {
-      if (status && r.status !== status) return false;
-      if (!term) return true;
-      return (r.returnNumber || '').toLowerCase().includes(term);
-    });
-  });
 
   ngOnInit(): void {
     this.refresh();
   }
 
   refresh() {
-    this.returnService.getAll().pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
-      next: res => this.returns.set(res),
-      error: err => this.dialogUtils.openErrorMessageFromError(err)
-    });
+    this.loading.set(true);
+    this.search.returns({ status: this.statusFilter() ?? undefined, q: this.searchTerm().trim() || undefined, page: this.page(), size: this.size() })
+      .subscribe({
+        next: r => { this.result.set(r); this.loading.set(false); },
+        error: err => { this.loading.set(false); this.dialogUtils.openErrorMessageFromError(err); }
+      });
   }
+
+  onSearchTerm(v: string) {
+    this.searchTerm.set(v);
+    clearTimeout(this.debounce);
+    this.debounce = setTimeout(() => { this.page.set(0); this.refresh(); }, 350);
+  }
+  onStatus(v: ReturnStatus | null) { this.statusFilter.set(v); this.page.set(0); this.refresh(); }
+  onPage(p: number) { this.page.set(Math.max(0, p)); this.refresh(); }
+  onSize(s: number) { this.size.set(s); this.page.set(0); this.refresh(); }
 
   addReturn() {
     this.router.navigate([APP_ROUTES.commerceReturnNew]);

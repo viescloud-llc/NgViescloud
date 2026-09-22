@@ -23,4 +23,11 @@
   <li class="flex-row-container-auto">
     <button matButton="filled" (click)="addDiscount()">Add discount</button>
   </li>
+
+  <li>
+    <app-csv-import-export fileName="discounts.csv" title="Discounts CSV" [canImport]="canUpdate()"
+      hint="Upsert by code. Dates as 2026-01-31 or 2026-01-31T23:59:00; tags/categories by name separated with |. Attribute-definition matches and usage counters are not covered."
+      columns="code, description, discountType, discountValue, minimumOrderAmount, maximumDiscountAmount, validFrom, validTo, maxUses, active, tags, categories"
+      [exportFn]="exportDiscounts" [importFn]="importDiscounts" (applied)="refresh()"></app-csv-import-export>
+  </li>
 </ul>

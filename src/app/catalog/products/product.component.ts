@@ -1,3 +1,4 @@
+import { HistoryPanelComponent } from '../../shared/component/history-panel/history-panel.component';
 import { Component, computed, inject, OnInit, signal, viewChild } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { RouteUtils } from '../../../lib/util/Route.utils';
@@ -5,6 +6,7 @@ import { NgComponentModule } from "../../../lib/module/ng-component.module";
 import { MatOption } from '../../../lib/model/mat.model';
 import { ViesRestApi } from '../../../lib/abtract/ViesRestApi';
 import { DataUtils } from '../../../lib/util/Data.utils';
+import { StoreSettingsService } from '../../shared/service/store-settings/store-settings.service';
 import { APP_ROUTES } from '../../app.routes';
 import { Category, Product, ProductMedia, ProductStatus, ProductVariant, Tag } from '../../shared/model/product.model';
 import { AttributeDefinition, AttributeValue, ProductAttribute } from '../../shared/model/attribute.model';
@@ -24,7 +26,7 @@ import { SnackBarUtils } from '../../../lib/util/SnackBar.utils';
   selector: 'app-product',
   templateUrl: './product.component.html',
   styleUrls: ['./product.component.scss'],
-  imports: [NgComponentModule, AttributeValueFieldComponent, ProductMediaGalleryComponent]
+  imports: [NgComponentModule, AttributeValueFieldComponent, ProductMediaGalleryComponent, HistoryPanelComponent]
 })
 export class ProductComponent extends ViesRestApi<Product, ProductService> implements OnInit {
 
@@ -97,6 +99,8 @@ export class ProductComponent extends ViesRestApi<Product, ProductService> imple
 
   // ---- Lifecycle -----------------------------------------------------------
 
+  private readonly storeSettings = inject(StoreSettingsService);
+
   override getRouteId() {
     const id = RouteUtils.getPathVariable('products');
     return id === 'new' ? null : id;
@@ -104,6 +108,12 @@ export class ProductComponent extends ViesRestApi<Product, ProductService> imple
 
   override ngOnInit(): void {
     super.ngOnInit();
+    // New product: preselect the store's default currency (Settings → Store) as the baseline.
+    if (!this.getRouteId()) {
+      const cur = this.storeSettings.current()?.defaultCurrency ?? this.storeSettings.publicInfo()?.defaultCurrency;
+      const v = this.value();
+      if (cur && v && v.currency !== cur) { v.currency = cur; this._value.set({ ...v }); }
+    }
     this.refreshCategories();
     this.refreshTags();
     this.refreshAttributeDefinitions();

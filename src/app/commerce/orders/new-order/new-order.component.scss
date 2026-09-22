@@ -1,0 +1,16 @@
+.return-banner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.75rem 1rem; margin-bottom: 1rem; border-left: 4px solid var(--mat-sys-primary, #7c4dff); background: var(--mat-sys-surface-container-low, rgba(255,255,255,0.03)); border-radius: 4px; }
+.panel { padding: 0.75rem 1rem; margin-bottom: 1rem; border: 1px solid var(--mat-sys-outline-variant, rgba(255,255,255,0.1)); border-radius: 6px; &.two { display: flex; gap: 2rem; flex-wrap: wrap; > div { flex: 1 1 320px; } } &.done { border-color: var(--mat-sys-primary, #7c4dff); } }
+.section-title { margin: 0 0 0.5rem; font-size: 1rem; }
+.row { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; margin: 0.25rem 0; }
+.text-input { flex: 1 1 280px; min-width: 240px; padding: 0.6rem 0.75rem; font-size: 1rem; border: 1px solid var(--mat-sys-outline, #888); border-radius: 6px; background: transparent; color: inherit; &.scan { border-color: var(--mat-sys-primary, #7c4dff); } }
+.results { display: flex; flex-direction: column; align-items: flex-start; gap: 0.15rem; margin: 0.25rem 0; small { opacity: 0.7; margin-left: 0.4rem; } }
+.picked { display: flex; gap: 0.5rem; align-items: center; small { opacity: 0.7; } }
+.hint { font-size: 0.85rem; opacity: 0.75; margin: 0.25rem 0; }
+.warn-text { color: var(--mat-sys-error, #f28b82); font-size: 0.9rem; margin: 0.25rem 0; }
+.lines { width: 100%; border-collapse: collapse; margin: 0.5rem 0; th, td { padding: 0.35rem 0.5rem; text-align: left; vertical-align: top; border-bottom: 1px solid var(--mat-sys-outline-variant, rgba(255,255,255,0.1)); } .num { text-align: right; white-space: nowrap; } .mono { font-family: monospace; opacity: 0.75; } tr.warn td { color: var(--mat-sys-error, #f28b82); } .qty { width: 64px; } .price { width: 90px; } input { padding: 0.3rem; border: 1px solid var(--mat-sys-outline, #888); border-radius: 4px; background: transparent; color: inherit; text-align: right; } small { display: block; opacity: 0.7; } }
+.badge { margin-left: 0.4rem; padding: 0 0.4rem; border-radius: 4px; font-size: 0.7rem; background: var(--mat-sys-tertiary-container, rgba(255,214,128,0.25)); }
+.sel { min-width: 240px; }
+.address { margin: 0.5rem 0; ul { padding: 0; margin: 0; list-style: none; } }
+.ship-options { display: flex; flex-direction: column; gap: 0.35rem; margin: 0.5rem 0; }
+.totals { border-collapse: collapse; margin-bottom: 0.75rem; td { padding: 0.2rem 0.75rem 0.2rem 0; } .num { text-align: right; } .grand td { font-weight: 700; font-size: 1.1rem; border-top: 1px solid var(--mat-sys-outline-variant, rgba(255,255,255,0.2)); } }
+.change { font-size: 1.05rem; }

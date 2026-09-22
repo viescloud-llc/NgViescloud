@@ -258,12 +258,15 @@ export class MatTableComponent<T extends object> extends ViesMatFormFieldMap imp
     }
   }
 
+  // (click) → edit; (mousedown) only serves the middle button (open in new tab).
+  // A left mousedown must NOT emit: it fired before the click, double-emitting
+  // on every row and navigating away when a selection checkbox was pressed.
   editRow(row: T, event?: MouseEvent) {
     if (event) {
       if (event.button === 1) {
         this.onMiddleClickRow.emit(row);
-        return;
       }
+      return;
     }
 
     this.onEditRow.emit(row);

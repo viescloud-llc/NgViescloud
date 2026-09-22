@@ -5,6 +5,7 @@ import { QuickSideDrawerMenu } from '../lib/share-component/quick-side-drawer-me
 import { environment } from '../environments/environment.prod';
 import { ViescloudApplication } from '../lib/abtract/ViescloudApplication.directive';
 import { APP_ROUTES } from './app.routes';
+import { StoreSettingsService } from './shared/service/store-settings/store-settings.service';
 import { MaintenanceService } from '../lib/service/maintenance.service';
 import { ViesService } from '../lib/service/rest.service';
 
@@ -21,6 +22,8 @@ export class App extends ViescloudApplication {
   // status probe (every 60 s) to keep a "maintenance is ON" strip visible —
   // nobody should forget the switch is on.
   readonly maintenance = inject(MaintenanceService);
+  // Store name / currency / units for receipts and defaults (public info; full row when allowed).
+  private readonly storeSettings = inject(StoreSettingsService);
   readonly systemMaintenanceRoute = APP_ROUTES.systemMaintenance;
 
   // Nav gate: ANY of the authorities, with the legacy-ADMIN fallback so a
@@ -35,6 +38,8 @@ export class App extends ViescloudApplication {
     super.ngOnInit();
     if (ViesService.isNotCSR()) return;
     this.maintenance.refreshStatus().subscribe({ error: () => { /* offline / no backend */ } });
+    this.storeSettings.loadPublic().subscribe({ error: () => {} });
+    if (this.authenticatorService.hasAuthorityOrAdmin('settings:read')) this.storeSettings.get().subscribe({ error: () => {} });
     setInterval(() => this.maintenance.refreshStatus().subscribe({ error: () => {} }), 60_000);
   }
 
@@ -93,12 +98,22 @@ export class App extends ViescloudApplication {
     {
       title: 'Commerce',
       hideChildren: true,
-      hideConditional: () => !this.can(['orders:read', 'shipments:read', 'returns:read', 'discounts:read']),
+      hideConditional: () => !this.can(['orders:read', 'shipments:read', 'returns:read', 'discounts:read', 'customers:read']),
       children: [
         {
           title: 'Orders',
           routerLink: APP_ROUTES.commerceOrderList,
           hideConditional: () => !this.can(['orders:read'])
+        },
+        {
+          title: 'New order',
+          routerLink: APP_ROUTES.commerceOrderNew,
+          hideConditional: () => !this.can(['orders:create'])
+        },
+        {
+          title: 'Customers',
+          routerLink: APP_ROUTES.commerceCustomerList,
+          hideConditional: () => !this.can(['customers:read'])
         },
         {
           title: 'Shipments',
@@ -155,6 +170,23 @@ export class App extends ViescloudApplication {
         {
           title: 'Warehouses',
           routerLink: APP_ROUTES.inventoryWarehouseList
+        },
+        {
+          title: 'Transfers',
+          routerLink: APP_ROUTES.inventoryTransfers,
+          hideConditional: () => !this.can(['inventory:update'])
+        },
+        {
+          title: 'Low Stock',
+          routerLink: APP_ROUTES.inventoryLowStock
+        },
+        {
+          title: 'Suppliers',
+          routerLink: APP_ROUTES.inventorySupplierList
+        },
+        {
+          title: 'Purchase Orders',
+          routerLink: APP_ROUTES.inventoryPurchaseOrderList
         }
       ]
     },
@@ -163,6 +195,10 @@ export class App extends ViescloudApplication {
       hideChildren: true,
       hideConditional: () => !this.authenticatorService.isAuthenticatedSync(),
       children: [
+        {
+          title: 'Home',
+          routerLink: APP_ROUTES.shopHome
+        },
         {
           title: 'Products',
           routerLink: APP_ROUTES.shopProducts
@@ -180,11 +216,37 @@ export class App extends ViescloudApplication {
     {
       title: 'System',
       hideChildren: true,
-      hideConditional: () => !this.can(['maintenance:read']),
+      hideConditional: () => !this.can(['maintenance:read', 'audit:read', 'settings:read', 'storefront:read']),
       children: [
         {
+          title: 'Store',
+          routerLink: APP_ROUTES.systemStore,
+          hideConditional: () => !this.can(['settings:read'])
+        },
+        {
+          title: 'Storefront',
+          routerLink: APP_ROUTES.systemStorefront,
+          hideConditional: () => !this.can(['storefront:read'])
+        },
+        {
+          title: 'Storefront pages',
+          routerLink: APP_ROUTES.systemStorefrontPages,
+          hideConditional: () => !this.can(['storefront:read'])
+        },
+        {
+          title: 'Templates & schedule',
+          routerLink: APP_ROUTES.systemStorefrontTemplates,
+          hideConditional: () => !this.can(['storefront:read'])
+        },
+        {
+          title: 'Audit log',
+          routerLink: APP_ROUTES.systemAudit,
+          hideConditional: () => !this.can(['audit:read'])
+        },
+        {
           title: 'Maintenance mode',
-          routerLink: APP_ROUTES.systemMaintenance
+          routerLink: APP_ROUTES.systemMaintenance,
+          hideConditional: () => !this.can(['maintenance:read'])
         }
       ]
     },
@@ -264,6 +326,11 @@ export class App extends ViescloudApplication {
         {
           title: 'SMTP / outbound mail',
           routerLink: APP_ROUTES.smtpProviderSetting,
+          hideConditional: () => !this.can(['smtp:read'])
+        },
+        {
+          title: 'Email notifications',
+          routerLink: APP_ROUTES.systemMail,
           hideConditional: () => !this.can(['smtp:read'])
         }
       ]

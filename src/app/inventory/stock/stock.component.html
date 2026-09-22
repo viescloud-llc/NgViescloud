@@ -44,6 +44,7 @@
     >
       Low stock only
     </mat-slide-toggle>
+    <button matButton (click)="openLowStock()" type="button">Low stock (per-variant lines)</button>
   </li>
 
   <li>
@@ -131,5 +132,12 @@
         }
       </tbody>
     </table>
+  </li>
+
+  <li>
+    <app-csv-import-export fileName="stock-levels.csv" title="Stock levels CSV" [canImport]="canUpdate()" [modes]="stockModes"
+      hint="Every physical variant × active warehouse. Import writes ADJUSTMENT movements (reason 'CSV stock import'); rows that already match are skipped. All-or-nothing: an unknown SKU or warehouse code rejects the whole file."
+      columns="sku, warehouseCode, quantity (productName, variantName ignored)"
+      [exportFn]="exportStock" [importFn]="importStock" (applied)="refresh()"></app-csv-import-export>
   </li>
 </ul>

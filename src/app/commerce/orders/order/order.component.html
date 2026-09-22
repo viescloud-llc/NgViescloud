@@ -7,9 +7,14 @@
       — status
       <strong class="status-badge">{{ value()?.status }}</strong>
     </span>
-    <button matButton="filled" (click)="backToList()" type="button">
-      Back to orders
-    </button>
+    <span class="banner-actions">
+      @if (value()?.userId && canViewCustomer()) {
+        <button matButton (click)="openCustomer()" type="button">View customer</button>
+      }
+      <button matButton="filled" (click)="backToList()" type="button">
+        Back to orders
+      </button>
+    </span>
   </li>
 
   <li>
@@ -84,14 +89,40 @@
       <mat-tab label="Payment">
         <div class="tab-body">
           @if (!value()?.checkoutOrderId) {
-            <p class="empty-hint">
-              This order has no linked payment record (missing checkout order id).
+            <p class="tab-hint">
+              Staff-created order — paid offline, no checkout-provider record.
+              @if (value()?.paymentMethod) { Payment: <strong>{{ value()?.paymentMethod }}</strong> }
             </p>
+            <div class="money-panel">
+              @if (value()?.status === 'PENDING' && canCaptureMoney()) {
+                <div class="money-action">
+                  <h4>Record payment</h4>
+                  <div class="money-row">
+                    <mat-form-field appearance="outline" class="mode-select"><mat-label>Method</mat-label>
+                      <mat-select [value]="recordMethod()" (selectionChange)="recordMethod.set($event.value)">
+                        @for (m of offlineMethods; track m.value) { <mat-option [value]="m.value">{{ m.label }}</mat-option> }
+                      </mat-select>
+                    </mat-form-field>
+                    <app-mat-form-field-input [value]="recordReference()" (valueChange)="recordReference.set($event)" [blankObject]="''"
+                      [inputMap]="inputField('rec-ref').set(inputKeys.label, 'Reference').set(inputKeys.styleWidth, '220px')"></app-mat-form-field-input>
+                    @if (recordMethod() === 'CASH') {
+                      <app-mat-form-field-input [value]="recordTendered()" (valueChange)="recordTendered.set($event)" [blankObject]="''"
+                        [inputMap]="inputField('rec-tendered').set(inputKeys.label, 'Cash tendered').set(inputKeys.styleWidth, '160px')"></app-mat-form-field-input>
+                    }
+                    <button matButton="filled" (click)="recordOfflinePayment()" [disabled]="moneyBusy()" type="button">Record payment</button>
+                  </div>
+                </div>
+              }
+              <div class="money-action inline">
+                <button matButton (click)="printReceipt()" type="button">Print receipt</button>
+                @if (value()?.metadata?.['payment.recordedAt']) { <span class="hint">Recorded {{ value()?.metadata?.['payment.recordedAt'] }} · {{ value()?.metadata?.['payment.reference'] || '' }}</span> }
+              </div>
+            </div>
           } @else {
             <p class="tab-hint">
-              Payment state lives in the checkout service — this panel is
-              read-only. Refunds are issued from the linked
-              <em>Return</em> (Fulfillment actions → Create return).
+              Payment state lives in the checkout service. The actions below <strong>move real money</strong>;
+              each needs its own <code>checkout:*</code> grant. Returns can also refund themselves from the
+              return editor.
             </p>
 
             <div class="transition-row">
@@ -107,7 +138,79 @@
               <p class="empty-hint">Failed to load the payment record. Try again.</p>
             }
 
-            @if (paymentLoadState() === 'loaded') {
+            @if (paymentLoadState() === 'loaded' && payment(); as pay) {
+              <!-- Money figures + actions -->
+              <div class="money-panel">
+                <div class="money-kpis">
+                  <div class="kpi"><span class="label">Charged</span><span class="value">{{ money(pay.amountTotal) }} {{ pay.checkoutOrder?.currency }}</span></div>
+                  <div class="kpi"><span class="label">Refunded</span><span class="value">{{ money(pay.amountRefunded) }}</span></div>
+                  <div class="kpi"><span class="label">Refundable</span><span class="value">{{ money(pay.amountRefundable) }}</span></div>
+                  <div class="kpi"><span class="label">Payment status</span><span class="value small">{{ pay.checkoutOrder?.status || '—' }}</span></div>
+                </div>
+
+                @if (pay.canRefund && canRefundMoney()) {
+                  <div class="money-action">
+                    <h4>Refund</h4>
+                    <div class="money-row">
+                      <app-mat-form-field-input
+                        [value]="refundAmount()" (valueChange)="refundAmount.set($event)" [blankObject]="''"
+                        [inputMap]="inputField('refund-amount').set(inputKeys.label, 'Amount (empty = all refundable)').set(inputKeys.placeholder, money(pay.amountRefundable)).set(inputKeys.styleWidth, '240px')"
+                      ></app-mat-form-field-input>
+                      <app-mat-form-field-input
+                        [value]="refundReason()" (valueChange)="refundReason.set($event)" [blankObject]="''"
+                        [inputMap]="inputField('refund-reason').set(inputKeys.label, 'Reason').set(inputKeys.placeholder, 'damaged item, goodwill…').set(inputKeys.styleWidth, '320px')"
+                      ></app-mat-form-field-input>
+                      <button matButton="filled" class="warn" (click)="refundMoney()" [disabled]="moneyBusy() || !refundAmountValid()" type="button">Refund</button>
+                    </div>
+                    @if (!refundAmountValid() && refundAmount().trim()) { <p class="warn-text">Amount must be between 0 and {{ money(pay.amountRefundable) }}.</p> }
+                  </div>
+                }
+                @if (pay.canCapture && canCaptureMoney()) {
+                  <div class="money-action">
+                    <h4>Capture</h4>
+                    <p class="tab-hint">The buyer approved but the payment was never captured (browser closed after PayPal). Capture charges it now and moves the order to Processing.</p>
+                    <button matButton="filled" (click)="captureMoney()" [disabled]="moneyBusy()" type="button">Capture payment</button>
+                  </div>
+                }
+                @if (pay.canCancel && canCancelMoney()) {
+                  <div class="money-action">
+                    <h4>Cancel</h4>
+                    <div class="money-row">
+                      <app-mat-form-field-input
+                        [value]="cancelReason()" (valueChange)="cancelReason.set($event)" [blankObject]="''"
+                        [inputMap]="inputField('cancel-reason').set(inputKeys.label, 'Reason (optional)').set(inputKeys.styleWidth, '320px')"
+                      ></app-mat-form-field-input>
+                      <button matButton="filled" class="warn" (click)="cancelMoney()" [disabled]="moneyBusy()" type="button">Cancel order</button>
+                    </div>
+                  </div>
+                }
+                @if (canSyncMoney()) {
+                  <div class="money-action inline">
+                    <button matButton (click)="syncMoney()" [disabled]="moneyBusy()" type="button">Sync with provider</button>
+                    <span class="hint">Pulls the provider's current status and refunded amount (e.g. after a dashboard refund).</span>
+                  </div>
+                }
+              </div>
+
+              <div class="metadata-panel">
+                <h3 class="section-title">Transactions ({{ transactions().length }})</h3>
+                @if (transactions().length === 0) { <p class="empty-hint">No transactions recorded yet.</p> }
+                @else {
+                  <table class="metadata-table tx-table">
+                    <thead><tr><th>Kind</th><th>Status</th><th class="num">Amount</th><th>Reason</th><th>Provider ref</th></tr></thead>
+                    <tbody>
+                      @for (t of transactions(); track t.id) {
+                        <tr>
+                          <td>{{ t.kind }}</td><td>{{ t.status }}</td>
+                          <td class="num">{{ money(t.amount) }} {{ t.currency }}</td>
+                          <td>{{ t.reason || '' }}</td><td class="mono">{{ t.providerTransactionId || '' }}</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                }
+              </div>
+
               <div class="metadata-panel">
                 <h3 class="section-title">Checkout order</h3>
                 <table class="metadata-table">
@@ -453,6 +556,10 @@
   </li>
 
   <!-- Save / Revert / Delete — always in view below the tabs. -->
+  <li>
+    <app-history-panel entityType="OrderFulfillment" [entityId]="id()"></app-history-panel>
+  </li>
+
   <li class="flex-row-container-auto">
     <button #viesSaveBtn matButton="filled" (click)="save()" [disabled]="_value.isValueNotChange() || !validForm()">Save</button>
     <button matButton="filled" class="warn" (click)="revert()" [disabled]="!_value.isValueChange()">Revert</button>

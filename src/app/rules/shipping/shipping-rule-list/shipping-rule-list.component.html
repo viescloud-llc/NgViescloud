@@ -22,6 +22,14 @@
   <li class="flex-row-container-auto">
     <button matButton="filled" (click)="addRule()" type="button">Add shipping method</button>
     <button matButton (click)="refresh()" type="button">Refresh</button>
+    <button matButton (click)="exportRules()" type="button">Export JSON</button>
+    @if (canUpdate()) {
+      <mat-radio-group [value]="importMode()" (change)="importMode.set($event.value)" class="mode-radio">
+        <mat-radio-button value="append">Append</mat-radio-button>
+        <mat-radio-button value="replace">Replace all</mat-radio-button>
+      </mat-radio-group>
+      <label matButton class="file-picker-btn">Import JSON…<input type="file" accept="application/json,.json" (change)="onImportFilePicked($event)" hidden /></label>
+    }
   </li>
 
   <!-- Test pad — quotes through the server, exactly what checkout would offer. -->

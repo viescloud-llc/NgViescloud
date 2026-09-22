@@ -1,0 +1,62 @@
+<div class="sf" [ngStyle]="themeStyle()" [class.dark]="dark()">
+  @if (data().announcement; as an) {
+    <div class="announce" [style.background]="an.color || 'var(--sf-primary)'" (click)="go(an.link)" [class.link]="!!an.link">{{ an.text }}</div>
+  }
+  <header class="sf-header">
+    <div class="brand" (click)="go('/shop/home')">
+      @if (data().store.hasLogo) { <img class="logo" [src]="logoUrl()" alt="" /> }
+      <span>{{ data().store.storeName }}</span>
+    </div>
+    <nav>@for (n of data().navigation; track $index) { <a (click)="go(n.url)">{{ n.label }}</a> }</nav>
+    <div class="tools">
+      @if (data().appearance.header.showSearch) { <span>🔍</span> }
+      @if (data().appearance.header.showAccount) { <span>👤</span> }
+      @if (data().appearance.header.showCart) { <span (click)="go('/shop/cart')">🛒</span> }
+    </div>
+  </header>
+
+  @for (s of data().home; track s.id) {
+    @switch (s.type) {
+      @case ('HERO') {
+        <section class="hero" [style.background-image]="s.settings['imageAssetId'] ? 'url(' + asset(s.settings['imageAssetId']) + ')' : ''">
+          <div class="hero-inner">
+            <h1>{{ s.settings['headline'] }}</h1>
+            @if (s.settings['subtext']) { <p>{{ s.settings['subtext'] }}</p> }
+            @if (s.settings['buttonLabel']) { <button class="btn" (click)="go(s.settings['buttonUrl'])" type="button">{{ s.settings['buttonLabel'] }}</button> }
+          </div>
+        </section>
+      }
+      @case ('FEATURED_PRODUCTS') {
+        <section class="products"><h2>{{ s.settings['title'] }}</h2>
+          <div class="grid">@for (p of s.products || []; track p.id) { <div class="card" (click)="openProduct(p)"><div class="img">@if (imageUrl(p)) { <img [src]="imageUrl(p)" [alt]="p.name" /> } @else { <span>no image</span> }</div><div class="name">{{ p.name }}</div><div class="price">{{ p.basePrice }} {{ p.currency }}</div></div> } @empty { <p class="empty">No products match yet.</p> }</div>
+        </section>
+      }
+      @case ('NEW_ARRIVALS') {
+        <section class="products"><h2>{{ s.settings['title'] || 'New arrivals' }}</h2>
+          <div class="grid">@for (p of s.products || []; track p.id) { <div class="card" (click)="openProduct(p)"><div class="img">@if (imageUrl(p)) { <img [src]="imageUrl(p)" [alt]="p.name" /> } @else { <span>no image</span> }</div><div class="name">{{ p.name }}</div><div class="price">{{ p.basePrice }} {{ p.currency }}</div></div> } @empty { <p class="empty">Nothing yet.</p> }</div>
+        </section>
+      }
+      @case ('CATEGORY_GRID') {
+        <section class="cats"><h2>{{ s.settings['title'] || 'Shop by category' }}</h2>
+          <div class="grid">@for (c of categories(); track c.categoryId) { <div class="cat" (click)="go(c.url)">{{ c.label }}</div> } @empty { <p class="empty">No categories.</p> }</div>
+        </section>
+      }
+      @case ('PROMO_TILES') {
+        <section class="tiles">@for (t of s.settings['tiles'] || []; track $index) { <div class="tile" (click)="go(t.url)" [style.background-image]="t.imageAssetId ? 'url(' + asset(t.imageAssetId) + ')' : ''"><span>{{ t.title }}</span></div> }</section>
+      }
+      @case ('RICH_TEXT') { <section class="rich" [innerHTML]="html(s)"></section> }
+      @case ('REVIEWS') { <section class="reviews"><h2>{{ s.settings['title'] || 'What customers say' }}</h2><p class="empty">Recent reviews appear here.</p></section> }
+      @case ('NEWSLETTER') { <section class="newsletter"><h2>{{ s.settings['title'] }}</h2><p>{{ s.settings['text'] }}</p><div class="form"><input type="email" placeholder="you@example.com" [disabled]="inert()" /><button class="btn" type="button">Subscribe</button></div></section> }
+    }
+  }
+
+  <footer class="sf-footer">
+    <div class="cols">
+      @for (c of data().appearance.footer.columns; track $index) { <div class="col"><strong>{{ c.title }}</strong>@for (l of c.links; track $index) { <a (click)="go(l.url)">{{ l.label }}</a> }</div> }
+      @if (data().pages.length > 0) { <div class="col"><strong>Info</strong>@for (p of data().pages; track p.slug) { <a (click)="go('/shop/pages/' + p.slug)">{{ p.title }}</a> }</div> }
+      @if (data().appearance.footer.showSupportContact && (data().store.supportEmail || data().store.supportPhone)) { <div class="col"><strong>Contact</strong><span>{{ data().store.supportEmail }}</span><span>{{ data().store.supportPhone }}</span></div> }
+    </div>
+    <div class="social">@for (s of data().appearance.footer.socialLinks; track $index) { <a (click)="go(s.url)">{{ s.network }}</a> }</div>
+    <div class="copy">{{ data().appearance.footer.copyright || ('© ' + data().store.storeName) }}</div>
+  </footer>
+</div>

@@ -1,0 +1,25 @@
+@if (show('theme')) {
+  <app-mat-form-field-input-dynamic [value]="value().theme" (valueChange)="set('theme', $event)" [blankObject]="blankTheme" [inputMap]="fields('sf-theme')"></app-mat-form-field-input-dynamic>
+}
+@if (show('brand')) {
+  <app-asset-picker label="Favicon" [ownerType]="ownerType()" [ownerId]="ownerId()" [value]="value().brand.faviconAssetId" (valueChange)="setBrand('faviconAssetId', $event)" [disabled]="disabled()"></app-asset-picker>
+  <app-asset-picker label="Social share image" [ownerType]="ownerType()" [ownerId]="ownerId()" [value]="value().brand.shareImageAssetId" (valueChange)="setBrand('shareImageAssetId', $event)" [disabled]="disabled()"></app-asset-picker>
+}
+@if (show('header')) {
+  <app-mat-form-field-input-dynamic [value]="value().header" (valueChange)="set('header', $event)" [blankObject]="blankHeader" [inputMap]="fields('sf-header')"></app-mat-form-field-input-dynamic>
+}
+@if (show('footer')) {
+  <app-mat-form-field-input-dynamic [value]="value().footer" (valueChange)="set('footer', $event)" [blankObject]="blankFooter" [inputMap]="fields('sf-footer')"></app-mat-form-field-input-dynamic>
+}
+@if (show('announcement')) {
+  <app-mat-form-field-input-dynamic [value]="value().announcement" (valueChange)="set('announcement', $event)" [blankObject]="blankAnnouncement" [inputMap]="fields('sf-announcement')"></app-mat-form-field-input-dynamic>
+  <div class="window">
+    <app-mat-form-field-input-time [value]="value().announcement.startsAt!" (valueChange)="setAnnouncementWindow('startsAt', $event)" type="DATE_TIME" [inputMap]="inputField('sf-an-start').set(inputKeys.label, 'Show from').set(inputKeys.disable, disabled())"></app-mat-form-field-input-time>
+    <app-mat-form-field-input-time [value]="value().announcement.endsAt!" (valueChange)="setAnnouncementWindow('endsAt', $event)" type="DATE_TIME" [inputMap]="inputField('sf-an-end').set(inputKeys.label, 'Until').set(inputKeys.disable, disabled())"></app-mat-form-field-input-time>
+    <button matButton (click)="setAnnouncementWindow('startsAt', undefined); setAnnouncementWindow('endsAt', undefined)" [disabled]="disabled()" type="button">Clear window</button>
+    <small class="tab-hint">No window = always (while enabled). Outside the window the bar is hidden.</small>
+  </div>
+}
+@if (show('seo')) {
+  <app-mat-form-field-input-dynamic [value]="value().seo" (valueChange)="set('seo', $event)" [blankObject]="blankSeo" [inputMap]="fields('sf-seo')"></app-mat-form-field-input-dynamic>
+}

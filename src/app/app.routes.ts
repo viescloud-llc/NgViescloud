@@ -90,6 +90,7 @@ export const APP_ROUTES = {
   // route; just list + detail. The detail is edit-only (status, notes,
   // notes.* metadata; everything else is read-only).
   commerceOrderList: "commerce/orders/list",
+  commerceOrderNew: "commerce/orders/new",
   commerceOrder(id: string) {
     return `commerce/orders/${id}`;
   },
@@ -100,6 +101,10 @@ export const APP_ROUTES = {
     return id ? `commerce/shipments/${id}` : 'commerce/shipments/new';
   },
 
+  commerceCustomerList: "commerce/customers/list",
+  commerceCustomer(userId: string) {
+    return `commerce/customers/${userId}`;
+  },
   commerceReturnList: "commerce/returns/list",
   commerceReturnNew: "commerce/returns/new",
   commerceReturn(id: string) {
@@ -121,6 +126,16 @@ export const APP_ROUTES = {
 
   // ---- System -------------------------------------------------------------
   systemMaintenance: "system/maintenance",
+  systemStore: "system/store",
+  systemStorefront: "system/storefront",
+  systemStorefrontPreview: "system/storefront/preview",
+  systemStorefrontPages: "system/storefront/pages",
+  systemStorefrontPage(id: string) { return `system/storefront/pages/${id}`; },
+  systemStorefrontTemplates: "system/storefront/templates",
+  systemStorefrontTemplate(id: string) { return `system/storefront/templates/${id}`; },
+  shopHome: "shop/home",
+  systemMail: "system/mail",
+  systemAudit: "system/audit",
   rolesSetting: "setting/roles",
   maintenancePage: "maintenance",
 
@@ -137,6 +152,18 @@ export const APP_ROUTES = {
   inventoryWarehouseNew: "inventory/warehouses/new",
   inventoryWarehouse(id: string) {
     return `inventory/warehouses/${id}`;
+  },
+  inventoryTransfers: "inventory/transfers",
+  inventoryLowStock: "inventory/low-stock",
+  inventorySupplierList: "inventory/suppliers/list",
+  inventorySupplierNew: "inventory/suppliers/new",
+  inventorySupplier(id: string) {
+    return `inventory/suppliers/${id}`;
+  },
+  inventoryPurchaseOrderList: "inventory/purchase-orders/list",
+  inventoryPurchaseOrderNew: "inventory/purchase-orders/new",
+  inventoryPurchaseOrder(id: string) {
+    return `inventory/purchase-orders/${id}`;
   },
   rulesCarrierList: "rules/carriers/list",
   rulesCarrierNew: "rules/carriers/new",
@@ -286,9 +313,18 @@ export const routes: Routes = [
   },
   {
     path: "commerce",
-    canActivate: [async () => inject(AuthGuard).isLoginWithAuthority(['orders:read', 'shipments:read', 'returns:read', 'discounts:read'])],
+    canActivate: [async () => inject(AuthGuard).isLoginWithAuthority(['orders:read', 'shipments:read', 'returns:read', 'discounts:read', 'customers:read'])],
     children: [
       { path: '', redirectTo: 'orders/list', pathMatch: 'full' },
+      {
+        path: "customers",
+        canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('customers:read')],
+        children: [
+          { path: '', redirectTo: 'list', pathMatch: 'full' },
+          { path: "list", loadComponent: () => import('./commerce/customers/customer-list/customer-list.component').then(m => m.CustomerListComponent) },
+          { path: ":userId", loadComponent: () => import('./commerce/customers/customer/customer.component').then(m => m.CustomerComponent) }
+        ]
+      },
       {
         path: "orders",
         children: [
@@ -296,6 +332,12 @@ export const routes: Routes = [
           {
             path: "list",
             loadComponent: () => import('./commerce/orders/order-list/order-list.component').then(m => m.OrderListComponent)
+          },
+          {
+            // Staff-created orders (phone / counter). Must precede :orderId.
+            path: "new",
+            canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('orders:create')],
+            loadComponent: () => import('./commerce/orders/new-order/new-order.component').then(m => m.NewOrderComponent)
           },
           {
             path: ":orderId",
@@ -423,6 +465,33 @@ export const routes: Routes = [
           { path: "new", loadComponent: () => import('./inventory/warehouses/warehouse/warehouse.component').then(m => m.WarehouseComponent) },
           { path: ":warehouseId", loadComponent: () => import('./inventory/warehouses/warehouse/warehouse.component').then(m => m.WarehouseComponent) }
         ]
+      },
+      {
+        path: "transfers",
+        canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('inventory:update')],
+        loadComponent: () => import('./inventory/transfers/transfer.component').then(m => m.TransferComponent)
+      },
+      {
+        path: "low-stock",
+        loadComponent: () => import('./inventory/low-stock/low-stock.component').then(m => m.LowStockComponent)
+      },
+      {
+        path: "suppliers",
+        children: [
+          { path: '', redirectTo: 'list', pathMatch: 'full' },
+          { path: "list", loadComponent: () => import('./inventory/suppliers/supplier-list/supplier-list.component').then(m => m.SupplierListComponent) },
+          { path: "new", loadComponent: () => import('./inventory/suppliers/supplier/supplier.component').then(m => m.SupplierComponent) },
+          { path: ":supplierId", loadComponent: () => import('./inventory/suppliers/supplier/supplier.component').then(m => m.SupplierComponent) }
+        ]
+      },
+      {
+        path: "purchase-orders",
+        children: [
+          { path: '', redirectTo: 'list', pathMatch: 'full' },
+          { path: "list", loadComponent: () => import('./inventory/purchase-orders/purchase-order-list/purchase-order-list.component').then(m => m.PurchaseOrderListComponent) },
+          { path: "new", loadComponent: () => import('./inventory/purchase-orders/purchase-order/purchase-order.component').then(m => m.PurchaseOrderComponent) },
+          { path: ":purchaseOrderId", loadComponent: () => import('./inventory/purchase-orders/purchase-order/purchase-order.component').then(m => m.PurchaseOrderComponent) }
+        ]
       }
     ]
   },
@@ -447,7 +516,11 @@ export const routes: Routes = [
     path: "shop",
     canActivate: [async () => inject(AuthGuard).isLogin(), maintenanceGuard],
     children: [
-      { path: '', redirectTo: 'products', pathMatch: 'full' },
+      { path: '', redirectTo: 'home', pathMatch: 'full' },
+      {
+        path: "home",
+        loadComponent: () => import('./shop/home/shop-home.component').then(m => m.ShopHomeComponent)
+      },
       {
         path: "products",
         loadComponent: () => import('./shop/product-list/shop-product-list.component').then(m => m.ShopProductListComponent)
@@ -478,6 +551,33 @@ export const routes: Routes = [
     path: "reports",
     canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('reports:read')],
     loadComponent: () => import('./reports/reports.component').then(m => m.ReportsComponent)
+  },
+  {
+    path: "system/storefront",
+    canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('storefront:read')],
+    children: [
+      { path: '', loadComponent: () => import('./system/storefront/storefront-settings.component').then(m => m.StorefrontSettingsComponent) },
+      { path: 'preview', loadComponent: () => import('./system/storefront/storefront-preview.component').then(m => m.StorefrontPreviewComponent) },
+      { path: 'pages', loadComponent: () => import('./system/storefront/pages/storefront-page-list.component').then(m => m.StorefrontPageListComponent) },
+      { path: 'pages/:pageId', loadComponent: () => import('./system/storefront/pages/storefront-page.component').then(m => m.StorefrontPageComponent) },
+      { path: 'templates', loadComponent: () => import('./system/storefront/templates/storefront-template-list.component').then(m => m.StorefrontTemplateListComponent) },
+      { path: 'templates/:templateId', loadComponent: () => import('./system/storefront/templates/storefront-template.component').then(m => m.StorefrontTemplateComponent) }
+    ]
+  },
+  {
+    path: "system/store",
+    canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('settings:read')],
+    loadComponent: () => import('./system/store/store-settings.component').then(m => m.StoreSettingsComponent)
+  },
+  {
+    path: "system/audit",
+    canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('audit:read')],
+    loadComponent: () => import('./system/audit/audit-log.component').then(m => m.AuditLogComponent)
+  },
+  {
+    path: "system/mail",
+    canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('smtp:read')],
+    loadComponent: () => import('./system/mail/mail-settings.component').then(m => m.MailSettingsComponent)
   },
   {
     path: "system/maintenance",

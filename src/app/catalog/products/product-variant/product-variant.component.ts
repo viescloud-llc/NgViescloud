@@ -1,3 +1,4 @@
+import { HistoryPanelComponent } from '../../../shared/component/history-panel/history-panel.component';
 import { Component, computed, inject, OnInit, signal, viewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
@@ -24,6 +25,8 @@ import { QuickStockDialog, QuickStockDialogData } from '../../../shared/componen
 import { StockMovement } from '../../../shared/model/commerce.model';
 import { ProductVariantScanCode, SCAN_CODE_SYMBOLOGY_LABELS, ScanCodeSymbology } from '../../../shared/model/scan-code.model';
 import { ScanCodeService } from '../../../shared/service/scan-code/scan-code.service';
+import { SupplierService } from '../../../shared/service/supplier/supplier.service';
+import { Supplier } from '../../../shared/model/inventory.model';
 import { LabelFormat, ScanLabelUtil } from '../../../shared/util/scan-label.util';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ViesService } from '../../../../lib/service/rest.service';
@@ -53,8 +56,7 @@ import { FileUtils } from '../../../../lib/util/File.utils';
     MatInputModule,
     MatSelectModule,
     AttributeValueFieldComponent,
-    ProductMediaGalleryComponent
-  ]
+    ProductMediaGalleryComponent, HistoryPanelComponent]
 })
 export class ProductVariantComponent extends ViesRestApi<ProductVariant, ProductVariantService> implements OnInit {
 
@@ -100,6 +102,11 @@ export class ProductVariantComponent extends ViesRestApi<ProductVariant, Product
   scanCodes = signal<ProductVariantScanCode[]>([]);
   newAliasValue = signal<string>('');
   newAliasSymbology = signal<ScanCodeSymbology>(ScanCodeSymbology.OTHER);
+  // Aliases may name the supplier whose carton barcode they are (Inventory → Suppliers).
+  private supplierService = inject(SupplierService);
+  supplierList = signal<Supplier[]>([]);
+  newAliasSupplierId = signal<string>('');
+  supplierName(id?: string | null): string { return this.supplierList().find(s => s.id === id)?.name ?? ''; }
   newAliasLabel = signal<string>('');
   canAddAlias = computed<boolean>(() => !!this.id() && this.newAliasValue().trim().length > 0);
 
@@ -151,7 +158,7 @@ export class ProductVariantComponent extends ViesRestApi<ProductVariant, Product
   addAlias() {
     const id = this.id();
     if (!id || !this.canAddAlias()) return;
-    this.scanCodeService.add(id, { codeValue: this.newAliasValue().trim(), symbology: this.newAliasSymbology(), label: this.newAliasLabel().trim() || null, active: true })
+    this.scanCodeService.add(id, { codeValue: this.newAliasValue().trim(), symbology: this.newAliasSymbology(), label: this.newAliasLabel().trim() || null, supplierId: this.newAliasSupplierId() || null, active: true })
       .pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
         next: () => { this.newAliasValue.set(''); this.newAliasLabel.set(''); this.loadScanCodes(); },
         error: err => this.dialogUtils.openErrorMessageFromError(err)
@@ -331,6 +338,7 @@ export class ProductVariantComponent extends ViesRestApi<ProductVariant, Product
     super.ngOnInit();
     this.loadDigitalAssets();
     this.loadScanCodes();
+    this.supplierService.getAll().subscribe({ next: res => this.supplierList.set((res ?? []).filter(x => x.active)), error: () => {} });
     this.renderMainCode();
 
     // Capture the parent product id from the URL. Try the ActivatedRoute

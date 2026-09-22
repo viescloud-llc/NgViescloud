@@ -201,3 +201,14 @@
   tr.inactive td { opacity: 0.6; }
   .asset-row { display: flex; align-items: center; gap: 0.25rem; }
 }
+
+.banner-actions { display: flex; gap: 0.5rem; align-items: center; }
+
+// Payment tab money actions
+.money-panel { margin: 0.75rem 0 1rem; padding: 0.75rem 1rem; border: 1px solid var(--mat-sys-outline-variant, rgba(255,255,255,0.1)); border-radius: 6px; }
+.money-kpis { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
+.money-kpis .kpi { flex: 1 1 140px; display: flex; flex-direction: column; gap: 0.15rem; .label { font-size: 0.75rem; opacity: 0.75; text-transform: uppercase; } .value { font-size: 1.2rem; font-weight: 600; &.small { font-size: 0.95rem; } } }
+.money-action { margin-top: 0.75rem; padding-top: 0.5rem; border-top: 1px dashed var(--mat-sys-outline-variant, rgba(255,255,255,0.1)); h4 { margin: 0 0 0.25rem; } &.inline { display: flex; align-items: center; gap: 0.75rem; .hint { font-size: 0.85rem; opacity: 0.75; } } }
+.money-row { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
+.warn-text { color: var(--mat-sys-error, #f28b82); font-size: 0.85rem; }
+.tx-table { .num { text-align: right; white-space: nowrap; } .mono { font-family: monospace; font-size: 0.8rem; } }

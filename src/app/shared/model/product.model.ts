@@ -224,6 +224,11 @@ export class ProductVariant extends TrackedTimeStamp {
     @MatInputDisplayLabel('Stock (all warehouses, read-only)', 'sum of the per-warehouse balances below; adjust via a stock movement')
     stockQuantity: number = 0;
 
+    // Null = inherit the product default, then the store default (Inventory → Low stock).
+    @MatInputDisplayLabel('Low-stock line', 'on-hand at or below this lists the variant under Inventory → Low stock and in the daily digest; empty = product / store default')
+    @MatTableHide()
+    lowStockThreshold?: number | null = null;
+
     // ---- Packaged shipping spec. 0 = "use the product's default"; the editor
     // sends 0 as null so the server-side fallback applies. Server echoes the
     // resolved values as effective* (read-only).
@@ -322,6 +327,10 @@ export class Product extends TrackedTimeStamp {
     @MatInputEnum(ProductStatus)
     @MatInputDisplayLabel('Status')
     status: ProductStatus = ProductStatus.DRAFT;
+
+    @MatInputDisplayLabel('Low-stock line (default)', 'for every variant of this product that has none of its own; empty = store default')
+    @MatTableHide()
+    lowStockThreshold?: number | null = null;
 
     // ---- Shipping defaults (packaged), inherited by variants that leave theirs at 0 ----
     @MatInputDisplayLabel('Packaged weight (g)', 'default for every variant; the box, not the bare item')

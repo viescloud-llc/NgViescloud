@@ -16,6 +16,7 @@ import {
 import { ReturnRequestService } from '../../../shared/service/return-request/return-request.service';
 import { OrderFulfillmentService } from '../../../shared/service/order-fulfillment/order-fulfillment.service';
 import { CheckoutOrderService } from '../../../shared/service/checkout-order/checkout-order.service';
+import { OrderPaymentService } from '../../../shared/service/order-payment/order-payment.service';
 
 // Legal ReturnStatus transitions. The backend does NOT enforce these (contract
 // § ReturnRequest quirk), so the UI is the guard. Terminal states (REJECTED,
@@ -191,56 +192,38 @@ export class ReturnComponent extends ViesRestApi<ReturnRequest, ReturnRequestSer
 
   // ---- Refund flow -----------------------------------------------------------
 
-  // Money moves here. Sequence:
-  //   1. Confirm with the admin (shows amount + destination).
-  //   2. POST the PayPal refund via the library checkout module.
-  //   3. PATCH the parent OrderFulfillment.status → REFUNDED or
-  //      PARTIALLY_REFUNDED (refundAmount vs order totalAmount).
-  //   4. Stamp this return REFUNDED and PUT it.
-  // Failures stop the chain at the failed step and report — a refund that
-  // succeeded but a status PATCH that failed leaves the money moved (correct)
-  // and the admin re-runs the status update by hand.
+  // Money moves here — in ONE server-side step (POST /returns/{id}/refund,
+  // checkout:refund): the server takes the amount from this return (refundAmount
+  // + shipping when refundShipping; 0 = everything still refundable), refunds
+  // through the checkout module, lets the webhook listener move the order
+  // status, closes this return as REFUNDED and notes the transaction.
+  private readonly orderPaymentService = inject(OrderPaymentService);
+
   async issueRefund() {
     const v = this._value.value();
     const order = this.linkedOrder();
-    if (!v || !order?.checkoutOrderId) return;
-
-    const amount = v.refundAmount && Number(v.refundAmount) > 0 ? v.refundAmount : undefined;
+    if (!v?.id || !order?.checkoutOrderId) return;
+    if (this._value.isValueChange()) {
+      this.dialogUtils.openErrorMessage('Save first', 'Save the return before issuing the refund — the server refunds the saved amount.');
+      return;
+    }
+    const amount = v.refundAmount && Number(v.refundAmount) > 0 ? Number(v.refundAmount).toFixed(2) : undefined;
+    const shipping = v.refundShipping && Number(order.shippingCost) > 0 ? ` plus shipping ${Number(order.shippingCost).toFixed(2)}` : '';
     const confirmed = await this.dialogUtils.openConfirmDialog(
-      'Issue PayPal refund?',
+      'Issue refund?',
       amount
-        ? `Refund ${amount} ${order.currency} to the buyer via PayPal. This cannot be undone.`
-        : `Refund the FULL order amount (${order.totalAmount} ${order.currency}) to the buyer via PayPal. This cannot be undone.`,
-      'Refund',
-      'Cancel'
-    ).catch(() => false);
+        ? `Refund ${amount} ${order.currency}${shipping} to the buyer through the payment provider. This cannot be undone.`
+        : `Refund EVERYTHING still refundable on order ${order.orderNumber} to the buyer. This cannot be undone.`,
+      'Refund', 'Cancel').catch(() => false);
     if (!confirmed) return;
 
-    try {
-      // (2) the refund itself
-      await firstValueFrom(
-        this.checkoutOrderService
-          .refundPaypal(order.checkoutOrderId, amount, v.reason || undefined)
-          .pipe(this.rxjsUtils.waitLoadingDialog())
-      );
-
-      // (3) reflect on the fulfillment. Partial = refunded less than the
-      // order total; full otherwise (no amount param == full refund).
-      const partial = amount !== undefined && Number(amount) < Number(order.totalAmount);
-      const nextStatus = partial ? FulfillmentStatus.PARTIALLY_REFUNDED : FulfillmentStatus.REFUNDED;
-      await firstValueFrom(
-        this.orderService
-          .patch(order.id, { status: nextStatus } as OrderFulfillment)
-          .pipe(this.rxjsUtils.waitLoadingDialog())
-      );
-
-      // (4) close out the RMA
-      v.status = ReturnStatus.REFUNDED;
-      this.value.set({ ...v });
-      super.save();
-    } catch (err) {
-      this.dialogUtils.openErrorMessageFromError(err);
-    }
+    this.orderPaymentService.refundReturn(v.id).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+      next: res => {
+        this._value.set(res.returnRequest);
+        if (res.payment?.order) this.allOrders.set(this.allOrders().map(o => o.id === res.payment.order.id ? res.payment.order : o));
+      },
+      error: err => this.dialogUtils.openErrorMessageFromError(err)
+    });
   }
 
   // ---- Save / delete ---------------------------------------------------------

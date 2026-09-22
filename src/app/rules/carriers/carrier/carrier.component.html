@@ -50,6 +50,10 @@
     <button matButton="filled" (click)="addService()" type="button">Add service level</button>
   </li>
 
+  <li>
+    <app-history-panel entityType="Carrier" [entityId]="id()"></app-history-panel>
+  </li>
+
   <li class="flex-row-container-auto">
     <button #viesSaveBtn matButton="filled" (click)="save()" [disabled]="_value.isValueNotChange() || !validForm()">Save</button>
     <button matButton="filled" class="warn" (click)="revert()" [disabled]="!_value.isValueChange()">Revert</button>

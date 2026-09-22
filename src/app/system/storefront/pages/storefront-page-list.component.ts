@@ -1,0 +1,43 @@
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { Router } from '@angular/router';
+import { NgComponentModule } from '../../../../lib/module/ng-component.module';
+import { RxJSUtils } from '../../../../lib/util/RxJS.utils';
+import { DialogUtils } from '../../../../lib/util/Dialog.utils';
+import { APP_ROUTES } from '../../../app.routes';
+import { StorefrontPage } from '../../../shared/model/storefront.model';
+import { StorefrontPageService, StorefrontService } from '../../../shared/service/storefront/storefront.service';
+
+// Storefront pages (/system/storefront/pages): decorator-driven table, click a row to edit.
+@Component({
+  selector: 'app-storefront-page-list',
+  imports: [NgComponentModule],
+  template: `
+    <ul class="margin-center">
+      <li><p class="tab-hint">The home page and any extra pages (about, legal). Edit the draft, then <strong>Publish</strong>; customers only ever see the published copy.</p></li>
+      <li><app-mat-table [matRows]="pages()" [blankObject]="blank" [showMatTooltip]="true" (onEditRow)="open($event)"></app-mat-table></li>
+      <br>
+      <li class="flex-row-container-auto"><button matButton="filled" (click)="add()" type="button">New page</button><button matButton (click)="refresh()" type="button">Refresh</button></li>
+    </ul>`
+})
+export class StorefrontPageListComponent implements OnInit {
+  private readonly rxjsUtils = inject(RxJSUtils);
+  private readonly dialogUtils = inject(DialogUtils);
+  private readonly sf = inject(StorefrontService);
+  private readonly pageService = inject(StorefrontPageService);
+  private readonly router = inject(Router);
+  pages = signal<StorefrontPage[]>([]);
+  readonly blank = new StorefrontPage();
+  ngOnInit(): void { this.refresh(); }
+  refresh() {
+    // ensure the home page exists, then list
+    this.sf.homePage().subscribe({
+      next: () => this.pageService.getAll().pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+        next: p => this.pages.set([...(p ?? [])].sort((a, b) => (a.slug === 'home' ? -1 : b.slug === 'home' ? 1 : a.title.localeCompare(b.title)))),
+        error: err => this.dialogUtils.openErrorMessageFromError(err)
+      }),
+      error: err => this.dialogUtils.openErrorMessageFromError(err)
+    });
+  }
+  open(p: StorefrontPage) { if (p.id) this.router.navigate([APP_ROUTES.systemStorefrontPage(p.id)]); }
+  add() { this.router.navigate([APP_ROUTES.systemStorefrontPage('new')]); }
+}

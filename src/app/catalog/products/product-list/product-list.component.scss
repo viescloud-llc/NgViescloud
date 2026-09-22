@@ -11,3 +11,8 @@
     flex: 0 0 auto;
   }
 }
+
+.bulk-bar { margin: 0.5rem 0 1rem; padding: 0.5rem 0.75rem; border-left: 4px solid var(--mat-sys-primary, #7c4dff); background: var(--mat-sys-surface-container-low, rgba(255,255,255,0.03)); border-radius: 4px; }
+.bulk-row { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
+.sel { min-width: 200px; }
+.bulk-preview { margin-top: 0.5rem; font-size: 0.9rem; .bulk-item { margin: 0.15rem 0; } .bulk-note { opacity: 0.7; } }

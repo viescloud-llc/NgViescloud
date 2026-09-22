@@ -28,3 +28,6 @@
   .breakdown { font-size: 0.85rem; opacity: 0.85; }
   tr.inactive td { opacity: 0.55; }
 }
+
+.mode-radio { display: inline-flex; gap: 0.75rem; align-items: center; margin: 0 0.5rem; }
+.file-picker-btn { cursor: pointer; }

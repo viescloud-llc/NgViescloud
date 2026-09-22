@@ -1,0 +1,45 @@
+<ul class="margin-center" appMatFormFieldGroup [formSummitButton]="viesSaveBtn" (onAllInputCheck)="validForm.set($event)">
+  <li class="return-banner">
+    <span>@if (id()) { Template <strong>{{ value()?.name }}</strong> } @else { New template }</span>
+    <button matButton="filled" (click)="back()" type="button">Back to templates</button>
+  </li>
+  <li>
+    <app-mat-form-field-input-dynamic [value]="value()" (valueChange)="onMainFormChange($event)" [blankObject]="blankValue"
+      [inputMap]="inputField('tp-main').set(inputKeys.indent, false).set(inputKeys.styleWidth, '100%').set(inputKeys.disable, !canUpdate())"></app-mat-form-field-input-dynamic>
+    @if (value(); as t) {
+      <p class="status">
+        @if (t.publishedAt) { Published {{ t.publishedAt.slice(0, 16).replace('T', ' ') }} } @else { <strong>Draft only</strong> — publish before scheduling }
+        @if (unpublishedChanges() && !_value.isValueChange()) { · <strong>draft differs from the published copy</strong> }
+      </p>
+      <p class="tab-hint">Parts switched on above replace that part of the default look; switched off = the default shows through. Images uploaded here belong to the template.</p>
+    }
+  </li>
+  @if (value(); as t) {
+    <li>
+      <mat-tab-group [preserveContent]="true">
+        <mat-tab label="Theme"><div class="tab-body">@if (t.overrideTheme) { <app-appearance-editor [value]="t.draftAppearance" [parts]="['theme']" ownerType="TEMPLATE" [ownerId]="id()" [disabled]="!canUpdate()" (valueChange)="onAppearance($event)"></app-appearance-editor> } @else { <p class="inherit">Inherits the default theme (switch "Overrides theme" on above).</p> }</div></mat-tab>
+        <mat-tab label="Brand"><div class="tab-body">@if (t.overrideBrand) { <app-appearance-editor [value]="t.draftAppearance" [parts]="['brand']" ownerType="TEMPLATE" [ownerId]="id()" [disabled]="!canUpdate()" (valueChange)="onAppearance($event)"></app-appearance-editor> } @else { <p class="inherit">Inherits the default favicon and share image.</p> }</div></mat-tab>
+        <mat-tab label="Header"><div class="tab-body">@if (t.overrideHeader) { <app-appearance-editor [value]="t.draftAppearance" [parts]="['header']" ownerType="TEMPLATE" [ownerId]="id()" [disabled]="!canUpdate()" (valueChange)="onAppearance($event)"></app-appearance-editor> } @else { <p class="inherit">Inherits the default header.</p> }</div></mat-tab>
+        <mat-tab label="Footer"><div class="tab-body">@if (t.overrideFooter) { <app-appearance-editor [value]="t.draftAppearance" [parts]="['footer']" ownerType="TEMPLATE" [ownerId]="id()" [disabled]="!canUpdate()" (valueChange)="onAppearance($event)"></app-appearance-editor> } @else { <p class="inherit">Inherits the default footer.</p> }</div></mat-tab>
+        <mat-tab label="Announcement"><div class="tab-body">@if (t.overrideAnnouncement) { <app-appearance-editor [value]="t.draftAppearance" [parts]="['announcement']" ownerType="TEMPLATE" [ownerId]="id()" [disabled]="!canUpdate()" (valueChange)="onAppearance($event)"></app-appearance-editor> } @else { <p class="inherit">Inherits the default announcement bar.</p> }</div></mat-tab>
+        <mat-tab label="Home page"><div class="tab-body">@if (t.overrideHome) { <app-sections-editor [sections]="t.draftHomeSections" (sectionsChange)="onSections($event)" ownerType="TEMPLATE" [ownerId]="id()" [disabled]="!canUpdate()"></app-sections-editor> } @else { <p class="inherit">Inherits the default home page.</p> }</div></mat-tab>
+        <mat-tab label="Images"><div class="tab-body"><p class="tab-hint">Images uploaded for this template; pick them from any image field on the other tabs.</p><app-asset-picker label="Upload" ownerType="TEMPLATE" [ownerId]="id()" [value]="null" [disabled]="!canUpdate() || !id()"></app-asset-picker>@if (!id()) { <p class="inherit">Save the template once to attach images.</p> }</div></mat-tab>
+        @if (id()) { <mat-tab label="History"><div class="tab-body"><app-history-panel entityType="StorefrontTemplate" [entityId]="id()"></app-history-panel></div></mat-tab> }
+      </mat-tab-group>
+    </li>
+  }
+  <li class="flex-row-container-auto">
+    <button #viesSaveBtn matButton="filled" (click)="save()" [disabled]="!canUpdate() || _value.isValueNotChange() || !validForm()">Save draft</button>
+    <button matButton="filled" class="warn" (click)="revert()" [disabled]="!_value.isValueChange()">Revert</button>
+    @if (id()) {
+      <button matButton="filled" (click)="publish()" [disabled]="!canUpdate() || _value.isValueChange()">Publish</button>
+      <button matButton (click)="discard()" [disabled]="!canUpdate() || !value()?.publishedAt" type="button">Discard draft</button>
+      <button matButton (click)="preview(true)" type="button">Preview draft</button>
+      <button matButton (click)="preview(false)" [disabled]="!value()?.publishedAt" type="button">Preview published</button>
+      <button matButton (click)="duplicate()" type="button">Duplicate</button>
+      <button matButton="filled" (click)="activateNow()" [disabled]="!canUpdate() || _value.isValueChange()">Activate now</button>
+      <button matButton (click)="deactivate()" [disabled]="!canUpdate()" type="button">Back to default</button>
+      <button matButton="filled" class="warn" (click)="remove()" [disabled]="!canUpdate()">Delete</button>
+    }
+  </li>
+</ul>

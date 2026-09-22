@@ -1,3 +1,4 @@
+import { HistoryPanelComponent } from '../../../shared/component/history-panel/history-panel.component';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { NgComponentModule } from '../../../../lib/module/ng-component.module';
 import { ViesRestApi } from '../../../../lib/abtract/ViesRestApi';
@@ -25,7 +26,7 @@ import { AttributeDefinitionService } from '../../../shared/service/attribute-de
   selector: 'app-tax-rule',
   templateUrl: './tax-rule.component.html',
   styleUrls: ['./tax-rule.component.scss'],
-  imports: [NgComponentModule]
+  imports: [NgComponentModule, HistoryPanelComponent]
 })
 export class TaxRuleComponent extends ViesRestApi<TaxRule, TaxRuleService> implements OnInit {
 

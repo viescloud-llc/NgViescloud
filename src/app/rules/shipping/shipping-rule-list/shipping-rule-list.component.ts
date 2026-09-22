@@ -4,6 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatRadioModule } from '@angular/material/radio';
+import { firstValueFrom } from 'rxjs';
+import { ImportExportService } from '../../../shared/service/import-export/import-export.service';
+import { TaxRuleImportMode } from '../../../shared/service/tax-rule-import-export/tax-rule-import-export.service';
+import { AuthenticatorService } from '../../../../lib/service/authenticator.service';
 import { NgComponentModule } from '../../../../lib/module/ng-component.module';
 import { ViesMatFormFieldMap } from '../../../../lib/abtract/ViesMatFormFieldMap';
 import { RxJSUtils } from '../../../../lib/util/RxJS.utils';
@@ -26,7 +31,7 @@ import { ProductVariantService } from '../../../shared/service/product-variant/p
   selector: 'app-shipping-rule-list',
   templateUrl: './shipping-rule-list.component.html',
   styleUrls: ['./shipping-rule-list.component.scss'],
-  imports: [NgComponentModule, FormsModule, MatFormFieldModule, MatInputModule, MatSelectModule]
+  imports: [NgComponentModule, FormsModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatRadioModule]
 })
 export class ShippingRuleListComponent extends ViesMatFormFieldMap implements OnInit {
 
@@ -35,6 +40,44 @@ export class ShippingRuleListComponent extends ViesMatFormFieldMap implements On
   protected readonly shippingRuleService = inject(ShippingRuleService);
   protected readonly router = inject(Router);
   private readonly variantService = inject(ProductVariantService);
+
+  // ---- JSON export / import (same shape as tax rules: append | replace, ids regenerated) ----
+  private readonly io = inject(ImportExportService);
+  private readonly authenticatorService = inject(AuthenticatorService);
+  canUpdate = computed<boolean>(() => this.authenticatorService.hasAuthorityOrAdmin('rules:update'));
+  importMode = signal<TaxRuleImportMode>('append');
+
+  exportRules() {
+    this.io.exportShippingRules().pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+      next: rules => {
+        const blob = new Blob([JSON.stringify(rules, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = 'shipping-rules.json'; a.click(); URL.revokeObjectURL(url);
+      },
+      error: err => this.dialogUtils.openErrorMessageFromError(err)
+    });
+  }
+
+  async onImportFilePicked(evt: Event) {
+    const input = evt.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file) return;
+    let parsed: unknown;
+    try { parsed = JSON.parse(await file.text()); } catch { this.dialogUtils.openErrorMessage('Invalid file', 'The selected file is not valid JSON.'); return; }
+    if (!Array.isArray(parsed)) { this.dialogUtils.openErrorMessage('Invalid file', 'Expected a JSON array of shipping methods.'); return; }
+    const mode = this.importMode();
+    const message = mode === 'replace'
+      ? `Import ${parsed.length} method(s) in REPLACE mode. All ${this.rules().length} existing method(s) will be DELETED first. Continue?`
+      : `Import ${parsed.length} method(s) in append mode (existing methods untouched). Continue?`;
+    const confirmed = await this.dialogUtils.openConfirmDialog('Import shipping methods', message, 'Import', 'Cancel').catch(() => false);
+    if (!confirmed) return;
+    try {
+      const result = await firstValueFrom(this.io.importShippingRules(parsed as ShippingRule[], mode).pipe(this.rxjsUtils.waitLoadingDialog()));
+      this.dialogUtils.openErrorMessage('Import complete', `Imported ${result.imported} method(s)` + (result.replaced ? `, replaced ${result.replaced}.` : '.'));
+      this.refresh();
+    } catch (err) { this.dialogUtils.openErrorMessageFromError(err); }
+  }
 
   rules = signal<ShippingRule[]>([]);
   blankRule = new ShippingRule();

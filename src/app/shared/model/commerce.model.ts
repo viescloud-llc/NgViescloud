@@ -165,6 +165,11 @@ export class OrderFulfillment extends TrackedTimeStampUserAccess {
     @MatInputDisplayLabel('Order Number')
     orderNumber: string = '';
 
+    // ONLINE (checkout provider) or the offline method staff recorded on a manual order.
+    @MatInputDisable()
+    @MatInputDisplayLabel('Payment Method')
+    paymentMethod?: string | null;
+
     @MatInputDisable()
     @MatInputDisplayLabel('User ID')
     userId: string = '';

@@ -1,0 +1,32 @@
+<ul class="margin-center">
+  <li class="return-banner">
+    <span>Storefront — default look &amp; behaviour @if (dirty()) { <span class="unsaved">Unsaved changes</span> }</span>
+    <span class="links"><button matButton (click)="preview()" type="button">Preview live</button><button matButton (click)="pages()" type="button">Pages</button><button matButton (click)="templates()" type="button">Templates &amp; schedule</button></span>
+  </li>
+  <li><p class="tab-hint">This is the <strong>default</strong> look customers see when no template is scheduled. Saving applies immediately (the storefront caches on a version tag). Seasonal looks live under Templates.</p></li>
+
+  @if (appearance(); as a) {
+    <li>
+      <mat-tab-group [preserveContent]="true" class="sf-tabs">
+        <mat-tab label="Theme & brand"><div class="tab-body"><app-appearance-editor [value]="a" [parts]="['theme', 'brand']" ownerType="SETTINGS" [disabled]="!canUpdate()" (valueChange)="appearance.set($event)"></app-appearance-editor></div></mat-tab>
+        <mat-tab label="Header & navigation"><div class="tab-body"><app-appearance-editor [value]="a" [parts]="['header']" ownerType="SETTINGS" [disabled]="!canUpdate()" (valueChange)="appearance.set($event)"></app-appearance-editor></div></mat-tab>
+        <mat-tab label="Footer"><div class="tab-body"><app-appearance-editor [value]="a" [parts]="['footer']" ownerType="SETTINGS" [disabled]="!canUpdate()" (valueChange)="appearance.set($event)"></app-appearance-editor></div></mat-tab>
+        <mat-tab label="Announcement"><div class="tab-body"><app-appearance-editor [value]="a" [parts]="['announcement']" ownerType="SETTINGS" [disabled]="!canUpdate()" (valueChange)="appearance.set($event)"></app-appearance-editor></div></mat-tab>
+        <mat-tab label="Behaviour">
+          <div class="tab-body">
+            @if (behaviour(); as b) {
+              <app-mat-form-field-input-dynamic [value]="b" (valueChange)="behaviour.set($event)" [blankObject]="blankBehaviour"
+                [inputMap]="inputField('sf-behaviour').set(inputKeys.indent, false).set(inputKeys.styleWidth, '100%').set(inputKeys.disable, !canUpdate())"></app-mat-form-field-input-dynamic>
+            }
+          </div>
+        </mat-tab>
+        <mat-tab label="SEO"><div class="tab-body"><app-appearance-editor [value]="a" [parts]="['seo']" ownerType="SETTINGS" [disabled]="!canUpdate()" (valueChange)="appearance.set($event)"></app-appearance-editor></div></mat-tab>
+      </mat-tab-group>
+    </li>
+  }
+
+  <li class="flex-row-container-auto">
+    <button matButton="filled" (click)="save()" [disabled]="!canUpdate() || !dirty() || busy()">Save</button>
+    <button matButton="filled" class="warn" (click)="revert()" [disabled]="!dirty()">Revert</button>
+  </li>
+</ul>

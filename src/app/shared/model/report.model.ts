@@ -76,6 +76,8 @@ export interface SalesSummaryByCurrency {
     averageOrderValue: string;
     refundCount: number;
     refundAmount: string;
+    totalByPaymentMethod?: Record<string, string | number>;
+    ordersByPaymentMethod?: Record<string, number>;
 }
 
 export interface SalesSummaryReport {

@@ -10,29 +10,44 @@
   <li class="filter-row">
     <app-mat-form-field-input
       [value]="searchTerm()"
-      (valueChange)="searchTerm.set($event)"
+      (valueChange)="onSearchTerm($event)"
       [inputMap]="inputField('movement-search')
                     .set(inputKeys.label, 'Search movements')
-                    .set(inputKeys.placeholder, 'By reason or reference…')
+                    .set(inputKeys.placeholder, 'Reason, reference or SKU…')
                     .set(inputKeys.showClearIcon, true)
                     .set(inputKeys.styleWidth, '100%')"
     ></app-mat-form-field-input>
 
     <app-mat-form-field-input-option
       [value]="typeFilter()"
-      (valueChange)="typeFilter.set($event)"
+      (valueChange)="onType($event)"
       [options]="typeOptions"
       [noneLabel]="''"
       [inputMap]="inputField('movement-type-filter')
                     .set(inputKeys.label, 'Type')
                     .set(inputKeys.styleWidth, '200px')"
     ></app-mat-form-field-input-option>
+
+    <app-mat-form-field-input-option
+      [value]="warehouseFilter()"
+      (valueChange)="onWarehouse($event)"
+      [options]="warehouseOptions()"
+      [noneLabel]="''"
+      [inputMap]="inputField('movement-warehouse-filter')
+                    .set(inputKeys.label, 'Warehouse')
+                    .set(inputKeys.styleWidth, '200px')"
+    ></app-mat-form-field-input-option>
+
+    <label class="date-field">From <input type="date" [value]="from()" (change)="onFrom($any($event.target).value)" /></label>
+    <label class="date-field">To <input type="date" [value]="to()" (change)="onTo($any($event.target).value)" /></label>
   </li>
 
   <li>
     <app-mat-table
-      [matRows]="filteredMovements()"
+      [matRows]="movements()"
       [blankObject]="blankMovement"
     ></app-mat-table>
+    <app-server-pager [page]="page()" [size]="size()" [total]="result().totalElements" [loading]="loading()"
+                      (pageChange)="onPage($event)" (sizeChange)="onSize($event)"></app-server-pager>
   </li>
 </ul>

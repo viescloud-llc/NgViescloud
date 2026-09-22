@@ -1,0 +1,100 @@
+<ul class="margin-center">
+  <li class="return-banner">
+    <span>
+      @if (po(); as p) { <strong>{{ p.poNumber }}</strong> · <span class="status">{{ p.status }}</span> · {{ totalReceived() }}/{{ totalOrdered() }} received }
+      @else { New purchase order }
+    </span>
+    <button matButton="filled" (click)="backToList()" type="button">Back to purchase orders</button>
+  </li>
+
+  <!-- Header -->
+  <li class="panel">
+    <h3 class="section-title">Order</h3>
+    <div class="row">
+      <mat-form-field appearance="outline" class="sel"><mat-label>Supplier</mat-label>
+        <mat-select [value]="supplierId()" (selectionChange)="onSupplier($event.value)" [disabled]="!editable() || status() !== 'DRAFT'">
+          @for (s of supplierList(); track s.id) { <mat-option [value]="s.id">{{ s.name }}@if (s.code) { ({{ s.code }}) }</mat-option> }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="sel"><mat-label>Deliver to warehouse</mat-label>
+        <mat-select [value]="warehouseId()" (selectionChange)="warehouseId.set($event.value)" [disabled]="status() !== 'DRAFT'">
+          @for (w of warehouseList(); track w.id) { <mat-option [value]="w.id">{{ w.name }}</mat-option> }
+        </mat-select>
+      </mat-form-field>
+      <app-mat-form-field-input [value]="expectedDate()" (valueChange)="expectedDate.set($event)" [blankObject]="''" [inputMap]="inputField('po-expected').set(inputKeys.label, 'Expected (yyyy-MM-dd)').set(inputKeys.styleWidth, '180px').set(inputKeys.disable, !editable())"></app-mat-form-field-input>
+      <app-mat-form-field-input [value]="supplierReference()" (valueChange)="supplierReference.set($event)" [blankObject]="''" [inputMap]="inputField('po-ref').set(inputKeys.label, 'Supplier reference').set(inputKeys.styleWidth, '220px').set(inputKeys.disable, !editable())"></app-mat-form-field-input>
+    </div>
+    <app-mat-form-field-input-text-area [value]="notes()" (valueChange)="notes.set($event)" [blankObject]="''" [inputMap]="inputField('po-notes').set(inputKeys.label, 'Notes').set(inputKeys.styleWidth, '100%').set(inputKeys.disable, !editable())"></app-mat-form-field-input-text-area>
+  </li>
+
+  <!-- Lines -->
+  <li class="panel">
+    <h3 class="section-title">Lines</h3>
+    @if (editable()) {
+      <div class="row">
+        <input class="text-input scan" type="text" placeholder="Scan a code to add a line (variant id or alias) + Enter" [value]="scanValue()" (input)="scanValue.set($any($event.target).value)" (keydown)="onScanKey($event)" autocomplete="off" />
+        <button matButton (click)="scanAdd()" [disabled]="!scanValue().trim()" type="button">Add</button>
+        <input class="text-input" type="text" placeholder="…or search products by name / SKU" [value]="productQuery()" (input)="onProductQuery($any($event.target).value)" autocomplete="off" />
+      </div>
+      @if (productResults().length > 0) {
+        <div class="results">
+          @for (p of productResults(); track p.id) {
+            @for (v of p.variants; track v.id) { <button matButton (click)="addFromProduct(p, v)" type="button">{{ p.name }} — {{ v.variantName || v.sku }} <small>{{ v.sku }} · stock {{ v.stockQuantity }}</small></button> }
+          }
+        </div>
+      }
+    }
+    @if (lines().length === 0) { <p class="tab-hint">No lines yet.</p> } @else {
+      <table class="report-table lines">
+        <thead><tr><th>Item</th><th class="num">Ordered</th><th class="num">Unit cost</th><th class="num">Line</th><th class="num">Received</th>@if (receivable()) { <th class="num">Receive now</th> }<th></th></tr></thead>
+        <tbody>
+          @for (l of lines(); track l.productVariantId) {
+            <tr [class.done]="l.quantityOutstanding === 0 && (l.quantityReceived ?? 0) > 0">
+              <td>{{ l.name }}<br><small class="mono">{{ l.sku }}</small></td>
+              <td class="num">@if (editable()) { <input class="qty" type="number" min="1" [value]="l.quantityOrdered" (change)="setLine(l.productVariantId, 'quantityOrdered', $any($event.target).value)" /> } @else { {{ l.quantityOrdered }} }</td>
+              <td class="num">@if (editable()) { <input class="price" type="text" inputmode="decimal" [value]="l.unitCost" (change)="setLine(l.productVariantId, 'unitCost', $any($event.target).value)" /> } @else { {{ money(l.unitCost) }} }</td>
+              <td class="num">{{ money(lineTotal(l)) }}</td>
+              <td class="num">{{ l.quantityReceived ?? 0 }}@if ((l.quantityOutstanding ?? 0) > 0 && (l.quantityReceived ?? 0) > 0) { <small> ({{ l.quantityOutstanding }} open)</small> }</td>
+              @if (receivable()) {
+                <td class="num">@if (l.id && (l.quantityOutstanding ?? 0) > 0) { <input class="qty" type="number" min="0" [max]="l.quantityOutstanding" [value]="receiveQty()[l.id] || 0" (change)="onReceiveQty(l.id, $any($event.target).value)" /> } @else { — }</td>
+              }
+              <td>@if (editable() && !(l.quantityReceived ?? 0)) { <button mat-icon-button (click)="removeLine(l.productVariantId)" type="button"><mat-icon>close</mat-icon></button> }</td>
+            </tr>
+          }
+        </tbody>
+        <tfoot><tr><td>Total</td><td class="num">{{ totalOrdered() }}</td><td></td><td class="num"><strong>{{ money(totalCost()) }} {{ currency() }}</strong></td><td class="num">{{ totalReceived() }}</td>@if (receivable()) { <td class="num">{{ receiveTotal() }}</td> }<td></td></tr></tfoot>
+      </table>
+    }
+  </li>
+
+  <!-- Receiving -->
+  @if (receivable()) {
+    <li class="panel receive">
+      <h3 class="section-title">Receive into {{ warehouseName() }}</h3>
+      <p class="tab-hint">Each receipt writes <strong>PURCHASE</strong> stock movements referenced <span class="mono">{{ po()?.poNumber }}</span>. Scan cartons one by one, or type quantities above and book them together.</p>
+      <div class="row">
+        <input class="text-input scan" type="text" placeholder="Scanner: each scan receives +1 on the matching line" [value]="receiveScanValue()" (input)="receiveScanValue.set($any($event.target).value)" (keydown)="onReceiveScanKey($event)" autocomplete="off" [disabled]="busy()" />
+        <button matButton (click)="receiveScan()" [disabled]="!receiveScanValue().trim() || busy()" type="button">+1</button>
+        @if (lastScan()) { <span class="last-scan">{{ lastScan() }}</span> }
+      </div>
+      <div class="row">
+        <app-mat-form-field-input [value]="receiveNote()" (valueChange)="receiveNote.set($event)" [blankObject]="''" [inputMap]="inputField('po-rnote').set(inputKeys.label, 'Receipt note (optional)').set(inputKeys.placeholder, 'Delivery note 4471').set(inputKeys.styleWidth, '300px')"></app-mat-form-field-input>
+        <button matButton="filled" (click)="receiveEntered()" [disabled]="receiveTotal() === 0 || busy()" type="button">Receive entered ({{ receiveTotal() }})</button>
+        <button matButton (click)="receiveAll()" [disabled]="busy()" type="button">Receive everything outstanding</button>
+        <button matButton (click)="close()" [disabled]="busy()" type="button">Close short</button>
+      </div>
+    </li>
+  }
+
+  @if (id()) { <li><app-history-panel entityType="PurchaseOrder" [entityId]="id()"></app-history-panel></li> }
+
+  <li class="flex-row-container-auto">
+    @if (editable()) {
+      <button matButton="filled" (click)="save()" [disabled]="!canSave()">Save</button>
+      <button matButton="filled" class="warn" (click)="revert()" [disabled]="!dirty()">Revert</button>
+    }
+    @if (status() === 'DRAFT' && id()) { <button matButton="filled" (click)="place()" [disabled]="busy() || dirty()">Place order</button> }
+    @if ((status() === 'DRAFT' || status() === 'ORDERED') && id()) { <button matButton class="warn" (click)="cancel()" [disabled]="busy()">Cancel order</button> }
+    @if ((status() === 'DRAFT' || status() === 'CANCELLED') && id()) { <button matButton="filled" class="warn" (click)="remove()">Delete</button> }
+  </li>
+</ul>

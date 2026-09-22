@@ -1,3 +1,4 @@
+import { HistoryPanelComponent } from '../../../shared/component/history-panel/history-panel.component';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { NgComponentModule } from '../../../../lib/module/ng-component.module';
 import { ViesRestApi } from '../../../../lib/abtract/ViesRestApi';
@@ -30,7 +31,7 @@ import { AttributeDefinitionService } from '../../../shared/service/attribute-de
   selector: 'app-discount',
   templateUrl: './discount.component.html',
   styleUrls: ['./discount.component.scss'],
-  imports: [NgComponentModule]
+  imports: [NgComponentModule, HistoryPanelComponent]
 })
 export class DiscountComponent extends ViesRestApi<Discount, DiscountService> implements OnInit {
 

@@ -14,6 +14,9 @@ import { Product, ProductVariant } from '../../shared/model/product.model';
 import { StockMovement, StockMovementType } from '../../shared/model/commerce.model';
 import { ProductService } from '../../shared/service/product/product.service';
 import { StockMovementService } from '../../shared/service/stock-movement/stock-movement.service';
+import { CsvImportExportComponent, CsvModeOption } from '../../shared/component/csv-import-export/csv-import-export.component';
+import { ImportExportService, StockImportMode } from '../../shared/service/import-export/import-export.service';
+import { AuthenticatorService } from '../../../lib/service/authenticator.service';
 
 // Row shape for the stock table — variant joined with its parent product name
 // so admins can tell WHICH "Small / Red" they're looking at.
@@ -32,7 +35,7 @@ interface StockRow {
   selector: 'app-stock',
   templateUrl: './stock.component.html',
   styleUrls: ['./stock.component.scss'],
-  imports: [NgComponentModule, MatSlideToggleModule]
+  imports: [NgComponentModule, MatSlideToggleModule, CsvImportExportComponent]
 })
 export class StockComponent extends ViesMatFormFieldMap implements OnInit {
 
@@ -41,6 +44,18 @@ export class StockComponent extends ViesMatFormFieldMap implements OnInit {
   protected readonly productService = inject(ProductService);
   protected readonly stockMovementService = inject(StockMovementService);
   private readonly router = inject(Router);
+
+  // CSV: export every physical variant × active warehouse; import sets (or adds
+  // to) on-hand per SKU × warehouse code through ADJUSTMENT movements.
+  private readonly io = inject(ImportExportService);
+  private readonly authenticatorService = inject(AuthenticatorService);
+  canUpdate = computed<boolean>(() => this.authenticatorService.hasAuthorityOrAdmin('inventory:update'));
+  readonly stockModes: CsvModeOption[] = [
+    { value: 'set', label: 'Set', hint: 'quantity becomes the on-hand (a stock count)' },
+    { value: 'add', label: 'Add', hint: 'quantity is a signed delta (a delivery, a write-off)' }
+  ];
+  readonly exportStock = () => this.io.exportStockCsv();
+  readonly importStock = (csv: string, dryRun: boolean, mode: string) => this.io.importStockCsv(csv, dryRun, (mode || 'set') as StockImportMode);
 
   products = signal<Product[]>([]);
 
@@ -77,6 +92,8 @@ export class StockComponent extends ViesMatFormFieldMap implements OnInit {
       error: err => { this.scanning.set(false); this.dialogUtils.openErrorMessageFromError(err); }
     });
   }
+
+  openLowStock() { this.router.navigate([APP_ROUTES.inventoryLowStock]); }
 
   openScanMatch(productId?: string | null, variantId?: string) {
     if (!productId || !variantId) return;

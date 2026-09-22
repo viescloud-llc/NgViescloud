@@ -1,3 +1,4 @@
+import { HistoryPanelComponent } from '../../../shared/component/history-panel/history-panel.component';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { NgComponentModule } from '../../../../lib/module/ng-component.module';
 import { ViesRestApi } from '../../../../lib/abtract/ViesRestApi';
@@ -14,7 +15,7 @@ import { InventoryService } from '../../../shared/service/inventory/inventory.se
   selector: 'app-warehouse',
   templateUrl: './warehouse.component.html',
   styleUrls: ['./warehouse.component.scss'],
-  imports: [NgComponentModule]
+  imports: [NgComponentModule, HistoryPanelComponent]
 })
 export class WarehouseComponent extends ViesRestApi<Warehouse, WarehouseService> implements OnInit {
 

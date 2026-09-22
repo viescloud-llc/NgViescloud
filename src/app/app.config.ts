@@ -20,7 +20,7 @@ export const VENZORA_PERMISSIONS: KnownPermission[] = [
   { resource: 'returns',     actions: [...CRUD, 'manage'],                     description: 'Return requests; manage = back-office access to every return' },
   { resource: 'discounts',   actions: CRUD,                                    description: 'Discount codes' },
   { resource: 'rules',       actions: CRUD,                                    description: 'Shipping and tax rules (rules:update = tax import)' },
-  { resource: 'inventory',   actions: CRUD,                                    description: 'Stock movements / adjustments, warehouses, stock per warehouse' },
+  { resource: 'inventory',   actions: CRUD,                                    description: 'Stock movements / adjustments, warehouses, transfers, low stock, suppliers, purchase orders (receiving moves stock)' },
   { resource: 'shipping',    actions: CRUD,                                    description: 'Carrier records (accounts, credentials, service levels)' },
   { resource: 'reviews',     actions: CRUD,                                    description: 'Review moderation' },
   { resource: 'reports',     actions: ['read'],                                description: 'Reports dashboard' },
@@ -28,6 +28,9 @@ export const VENZORA_PERMISSIONS: KnownPermission[] = [
   { resource: 'checkout',    actions: ['read', 'capture', 'refund', 'cancel', 'sync'], description: 'MONEY — never implied by orders:*' },
   { resource: 'iam',         actions: CRUD,                                    description: 'Users, groups, roles — as sensitive as money' },
   { resource: 'maintenance', actions: [...CRUD, 'bypass'],                     description: 'Maintenance mode; bypass = keep working while customers are held' },
+  { resource: 'audit',       actions: ['read'],                                description: 'Change history (who changed what, when)' },
+  { resource: 'settings',    actions: ['read', 'update'],                      description: 'Store settings (name, currency, mail addresses, logo, units, low-stock default)' },
+  { resource: 'storefront',  actions: CRUD,                                    description: 'Storefront look, pages, templates and schedule (customers see changes on publish)' },
   { resource: 'smtp',        actions: [...CRUD, 'send'],                       description: 'Outbound mail accounts (credentials round-trip → read is a real grant); send = mail through them' },
 ];
 

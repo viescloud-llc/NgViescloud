@@ -1,0 +1,44 @@
+<ul class="margin-center">
+  <li class="search-row">
+    <input class="search-input" type="text" placeholder="Search by username, email or name — Enter to search"
+           [value]="search()" (input)="search.set($any($event.target).value)" (keydown)="onSearchKey($event)" autocomplete="off" />
+    <button matButton="filled" (click)="runSearch()" [disabled]="loading()" type="button">Search</button>
+    <span class="count">{{ total() }} customer(s)</span>
+  </li>
+
+  <li>
+    <table class="report-table customers-table">
+      <thead>
+        <tr><th>Customer</th><th>Email</th><th>Groups</th><th class="num">Orders</th><th>Lifetime value</th><th>Last order</th><th class="num">Open returns</th><th></th></tr>
+      </thead>
+      <tbody>
+        @for (c of rows(); track c.userId) {
+          <tr (click)="open(c)" class="clickable" [class.inactive]="c.inactive">
+            <td>
+              <strong>{{ c.displayName }}</strong>
+              @if (c.displayName !== c.username) { <br><small class="mono">{{ c.username }}</small> }
+              @if (c.verified) { <span class="badge">verified</span> }
+              @if (c.inactive) { <span class="badge warn">inactive</span> }
+            </td>
+            <td>{{ c.email || '—' }}</td>
+            <td><small>{{ c.groups.join(', ') }}</small></td>
+            <td class="num">{{ c.orderCount }}</td>
+            <td>{{ ltv(c) }}</td>
+            <td>{{ when(c.lastOrderAt) }}</td>
+            <td class="num" [class.warn-text]="c.openReturns > 0">{{ c.openReturns }}</td>
+            <td><button matButton (click)="open(c); $event.stopPropagation()" type="button">Open</button></td>
+          </tr>
+        }
+        @if (rows().length === 0 && !loading()) {
+          <tr><td colspan="8"><em>No customers match.</em></td></tr>
+        }
+      </tbody>
+    </table>
+  </li>
+
+  <li class="pager">
+    <button matButton (click)="prev()" [disabled]="page() === 0 || loading()" type="button">Previous</button>
+    <span>Page {{ page() + 1 }} / {{ pageCount() }}</span>
+    <button matButton (click)="next()" [disabled]="page() + 1 >= pageCount() || loading()" type="button">Next</button>
+  </li>
+</ul>

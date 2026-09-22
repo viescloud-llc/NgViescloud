@@ -7,13 +7,16 @@ import { DialogUtils } from '../../../../lib/util/Dialog.utils';
 import { APP_ROUTES } from '../../../app.routes';
 import { Discount } from '../../../shared/model/commerce.model';
 import { DiscountService } from '../../../shared/service/discount/discount.service';
+import { CsvImportExportComponent } from '../../../shared/component/csv-import-export/csv-import-export.component';
+import { ImportExportService } from '../../../shared/service/import-export/import-export.service';
+import { AuthenticatorService } from '../../../../lib/service/authenticator.service';
 
 // Discount registry at /commerce/discounts/list. Free-text search on code.
 @Component({
   selector: 'app-discount-list',
   templateUrl: './discount-list.component.html',
   styleUrls: ['./discount-list.component.scss'],
-  imports: [NgComponentModule]
+  imports: [NgComponentModule, CsvImportExportComponent]
 })
 export class DiscountListComponent extends ViesMatFormFieldMap implements OnInit {
 
@@ -21,6 +24,12 @@ export class DiscountListComponent extends ViesMatFormFieldMap implements OnInit
   protected readonly dialogUtils = inject(DialogUtils);
   protected readonly discountService = inject(DiscountService);
   protected readonly router = inject(Router);
+
+  private readonly io = inject(ImportExportService);
+  private readonly authenticatorService = inject(AuthenticatorService);
+  canUpdate = computed<boolean>(() => this.authenticatorService.hasAuthorityOrAdmin('discounts:update'));
+  readonly exportDiscounts = () => this.io.exportDiscountsCsv();
+  readonly importDiscounts = (csv: string, dryRun: boolean) => this.io.importDiscountsCsv(csv, dryRun);
 
   discounts = signal<Discount[]>([]);
   blankDiscount = new Discount();

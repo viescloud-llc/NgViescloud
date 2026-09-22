@@ -1,0 +1,16 @@
+<ul class="margin-center">
+  <li>
+    <p class="tab-hint">
+      Who you buy stock from. Purchase orders name a supplier; scan-code aliases can name one so a supplier's
+      carton barcode receives straight onto the right PO line.
+    </p>
+  </li>
+  <li>
+    <app-mat-table [matRows]="suppliers()" [blankObject]="blank" [showMatTooltip]="true" (onEditRow)="select($event)"></app-mat-table>
+  </li>
+  <br>
+  <li class="flex-row-container-auto">
+    <button matButton="filled" (click)="add()" type="button">Add supplier</button>
+    <button matButton (click)="refresh()" type="button">Refresh</button>
+  </li>
+</ul>

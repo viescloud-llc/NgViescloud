@@ -3,17 +3,17 @@
   <li class="filter-row">
     <app-mat-form-field-input
       [value]="searchTerm()"
-      (valueChange)="searchTerm.set($event)"
+      (valueChange)="onSearchTerm($event)"
       [inputMap]="inputField('return-search')
                     .set(inputKeys.label, 'Search returns')
-                    .set(inputKeys.placeholder, 'By return number…')
+                    .set(inputKeys.placeholder, 'Return number, order number, reason…')
                     .set(inputKeys.showClearIcon, true)
                     .set(inputKeys.styleWidth, '100%')"
     ></app-mat-form-field-input>
 
     <app-mat-form-field-input-option
       [value]="statusFilter()"
-      (valueChange)="statusFilter.set($event)"
+      (valueChange)="onStatus($event)"
       [options]="statusOptions"
       [noneLabel]="''"
       [inputMap]="inputField('return-status-filter')
@@ -24,10 +24,12 @@
 
   <li>
     <app-mat-table
-      [matRows]="filteredReturns()"
+      [matRows]="returns()"
       [blankObject]="blankReturn"
       (onEditRow)="selectReturn($event)"
     ></app-mat-table>
+    <app-server-pager [page]="page()" [size]="size()" [total]="result().totalElements" [loading]="loading()"
+                      (pageChange)="onPage($event)" (sizeChange)="onSize($event)"></app-server-pager>
   </li>
   <br>
   <li class="flex-row-container-auto">
