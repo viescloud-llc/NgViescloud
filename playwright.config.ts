@@ -1,7 +1,6 @@
 import { defineConfig } from '@playwright/test';
 
-// Manager e2e smoke (checklist-2 §11). Expects the dev UI on 4200 and the
-// backend on 8085 (see document/manager-checklist-2.md and .claude/memory.md §5).
+// Customer storefront e2e smoke. Expects the dev UI on 4200 and the backend on 8085.
 //   npm run e2e            headless
 //   npm run e2e -- --ui    interactive
 export default defineConfig({

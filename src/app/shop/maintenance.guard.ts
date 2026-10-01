@@ -5,7 +5,7 @@ import { MaintenanceService } from '../../lib/service/maintenance.service';
 import { AuthenticatorService } from '../../lib/service/authenticator.service';
 import { MaintenanceInterceptor } from '../../lib/guards/maintenance.interceptor';
 
-// Customer-facing routes (the test shop) are held during maintenance. Staff
+// Customer-facing routes are held during maintenance. Staff
 // (ADMIN group — the ones the backend lets through via maintenance:bypass)
 // may still use the shop to test. The backend enforces the same rule on every
 // API call; this guard just keeps the UX clean by routing to /maintenance

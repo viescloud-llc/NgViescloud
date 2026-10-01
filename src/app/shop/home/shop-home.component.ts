@@ -5,7 +5,7 @@ import { ResolvedStorefront } from '../../shared/model/storefront.model';
 import { StorefrontService } from '../../shared/service/storefront/storefront.service';
 import { StorefrontRendererComponent } from '../../shared/component/storefront/storefront-renderer.component';
 
-// Shop (test) home: renders the live resolved storefront exactly as a customer would see it.
+// Storefront home: renders the live resolved storefront exactly as a customer would see it.
 @Component({
   selector: 'app-shop-home',
   imports: [NgComponentModule, StorefrontRendererComponent],

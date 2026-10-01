@@ -2,521 +2,56 @@ import { inject } from '@angular/core';
 import { Routes } from '@angular/router';
 import { AuthGuard } from '../lib/guards/auth.guard';
 import { MaintenancePageComponent } from '../lib/share-component/maintenance-page/maintenance-page.component';
-import { SmtpProviderListComponent } from '../lib/share-component/smtp-provider-list/smtp-provider-list.component';
-import { RoleListComponent } from '../lib/share-component/role-list/role-list.component';
-import { maintenanceGuard } from './shop/maintenance.guard';
 import { ApplicationSettingComponent } from '../lib/share-component/application-setting/application-setting.component';
 import { LoginComponent } from '../lib/share-component/login/login.component';
-import { OpenIdProviderComponent } from '../lib/share-component/open-id-provider/open-id-provider.component';
-import { UserGroupListComponent } from '../lib/share-component/user-group-list/user-group-list.component';
-import { UserListComponent } from '../lib/share-component/user-list/user-list.component';
 import { UserSettingComponent } from '../lib/share-component/user-setting/user-setting.component';
-import { HomeComponent } from './home/home.component';
+import { maintenanceGuard } from './shop/maintenance.guard';
 
-// Centralized route helpers. Use these instead of stringly-typed paths everywhere.
+// Customer-facing storefront (venzora-customer). The back office lives in the
+// venzora-manager project; this app only talks to the public and user-scoped
+// endpoints (storefront, public products, the signed-in buyer's carts, orders,
+// returns and downloads).
 //
-// IA per `frontend-manager.md` § 4:
-//   /catalog/{products,categories,tags,media}
-//   /schema/{attribute-definitions,attribute-options}
-//   /commerce/{orders,returns,shipments,discounts}
-//   /inventory/{stock,movements}
-//   /rules/{shipping,tax}
-//   /reports, /reviews, /auth/login
-//
-// Detail-route convention: each entity gets THREE child routes —
-//   /list  — index
-//   /new   — create flow (the detail component in "no id yet" mode)
-//   /:id   — edit flow (UUIDv7)
-//
-// The `xxx(id)` helpers map an empty/falsy id to `/new` so callers can write
-// `routerLink: APP_ROUTES.catalogProduct(product.id)` without branching on whether
-// `product.id` is set. The detail components map a `'new'` path-variable back to
-// null in `getRouteId()` so `ViesRestApi.ngOnInit` skips the GET and shows a blank form.
+//   /                   storefront home (resolved storefront + active template)
+//   /pages/:slug        a published content page (about, policies, …)
+//   /products[/:id]     catalogue (public)
+//   /cart /checkout     the buyer's cart and checkout (login required)
+//   /orders[/:id]       the buyer's own orders, downloads, shipments (login required)
+//   /login /oauth2      sign in; /setting/account — profile
+//   /maintenance        where customers wait while the backend is in maintenance
 export const APP_ROUTES = {
   home: "home",
   login: "login",
   setting: "setting",
   applicationSetting: "setting/application-setting",
   accountSetting: "setting/account",
-  usersSetting: "setting/users",
-  userGroupsSetting: "setting/user/groups",
-  openidProviderSetting: "setting/openid-provider",
-  smtpProviderSetting: "setting/smtp-providers",
   oauth2: "oauth2",
-
-  // ---- Catalog ----------------------------------------------------------
-  catalogProductList: "catalog/products/list",
-  catalogProductNew: "catalog/products/new",
-  catalogProduct(id: string) {
-    return id ? `catalog/products/${id}` : 'catalog/products/new';
-  },
-
-  catalogProductVariantNew(productId: string) {
-    return `catalog/products/${productId}/variants/new`;
-  },
-  catalogProductVariant(productId: string, variantId: string) {
-    return variantId
-      ? `catalog/products/${productId}/variants/${variantId}`
-      : `catalog/products/${productId}/variants/new`;
-  },
-
-  catalogTagList: "catalog/tags/list",
-  catalogTagNew: "catalog/tags/new",
-  catalogTag(id: string) {
-    return id ? `catalog/tags/${id}` : 'catalog/tags/new';
-  },
-
-  catalogCategoryList: "catalog/categories/list",
-  catalogCategoryNew: "catalog/categories/new",
-  catalogCategory(id: string) {
-    return id ? `catalog/categories/${id}` : 'catalog/categories/new';
-  },
-
-  // ---- Schema -----------------------------------------------------------
-  schemaAttributeDefinitionList: "schema/attribute-definitions/list",
-  schemaAttributeDefinitionNew: "schema/attribute-definitions/new",
-  schemaAttributeDefinition(id: string) {
-    return id ? `schema/attribute-definitions/${id}` : 'schema/attribute-definitions/new';
-  },
-
-  schemaAttributeOptionList: "schema/attribute-options/list",
-  schemaAttributeOptionNew: "schema/attribute-options/new",
-  schemaAttributeOption(id: string) {
-    return id ? `schema/attribute-options/${id}` : 'schema/attribute-options/new';
-  },
-
-  // ---- Commerce ---------------------------------------------------------
-  // Orders are NOT manually created — they come from checkout. So no /new
-  // route; just list + detail. The detail is edit-only (status, notes,
-  // notes.* metadata; everything else is read-only).
-  commerceOrderList: "commerce/orders/list",
-  commerceOrderNew: "commerce/orders/new",
-  commerceOrder(id: string) {
-    return `commerce/orders/${id}`;
-  },
-
-  commerceShipmentList: "commerce/shipments/list",
-  commerceShipmentNew: "commerce/shipments/new",
-  commerceShipment(id: string) {
-    return id ? `commerce/shipments/${id}` : 'commerce/shipments/new';
-  },
-
-  commerceCustomerList: "commerce/customers/list",
-  commerceCustomer(userId: string) {
-    return `commerce/customers/${userId}`;
-  },
-  commerceReturnList: "commerce/returns/list",
-  commerceReturnNew: "commerce/returns/new",
-  commerceReturn(id: string) {
-    return id ? `commerce/returns/${id}` : 'commerce/returns/new';
-  },
-
-  commerceDiscountList: "commerce/discounts/list",
-  commerceDiscountNew: "commerce/discounts/new",
-  commerceDiscount(id: string) {
-    return id ? `commerce/discounts/${id}` : 'commerce/discounts/new';
-  },
-
-  // ---- Rules --------------------------------------------------------------
-  rulesShippingList: "rules/shipping/list",
-  rulesShippingNew: "rules/shipping/new",
-  rulesShipping(id: string) {
-    return id ? `rules/shipping/${id}` : 'rules/shipping/new';
-  },
-
-  // ---- System -------------------------------------------------------------
-  systemMaintenance: "system/maintenance",
-  systemStore: "system/store",
-  systemStorefront: "system/storefront",
-  systemStorefrontPreview: "system/storefront/preview",
-  systemStorefrontPages: "system/storefront/pages",
-  systemStorefrontPage(id: string) { return `system/storefront/pages/${id}`; },
-  systemStorefrontTemplates: "system/storefront/templates",
-  systemStorefrontTemplate(id: string) { return `system/storefront/templates/${id}`; },
-  shopHome: "shop/home",
-  systemMail: "system/mail",
-  systemAudit: "system/audit",
-  rolesSetting: "setting/roles",
   maintenancePage: "maintenance",
 
-  rulesTaxList: "rules/tax/list",
-  rulesTaxNew: "rules/tax/new",
-  rulesTax(id: string) {
-    return id ? `rules/tax/${id}` : 'rules/tax/new';
+  // ---- Shop -----------------------------------------------------------------
+  shopHome: "home",
+  shopPage(slug: string) {
+    return `pages/${slug}`;
   },
-
-  // ---- Inventory ------------------------------------------------------------
-  inventoryStock: "inventory/stock",
-  inventoryMovements: "inventory/movements",
-  inventoryWarehouseList: "inventory/warehouses/list",
-  inventoryWarehouseNew: "inventory/warehouses/new",
-  inventoryWarehouse(id: string) {
-    return `inventory/warehouses/${id}`;
-  },
-  inventoryTransfers: "inventory/transfers",
-  inventoryLowStock: "inventory/low-stock",
-  inventorySupplierList: "inventory/suppliers/list",
-  inventorySupplierNew: "inventory/suppliers/new",
-  inventorySupplier(id: string) {
-    return `inventory/suppliers/${id}`;
-  },
-  inventoryPurchaseOrderList: "inventory/purchase-orders/list",
-  inventoryPurchaseOrderNew: "inventory/purchase-orders/new",
-  inventoryPurchaseOrder(id: string) {
-    return `inventory/purchase-orders/${id}`;
-  },
-  rulesCarrierList: "rules/carriers/list",
-  rulesCarrierNew: "rules/carriers/new",
-  rulesCarrier(id: string) {
-    return `rules/carriers/${id}`;
-  },
-
-  // ---- Reviews / Reports ------------------------------------------------------
-  reviews: "reviews",
-  reports: "reports",
-
-  // ---- Shop (test-only buyer flow) ---------------------------------------------
-  shopProducts: "shop/products",
+  shopProducts: "products",
   shopProduct(id: string) {
-    return `shop/products/${id}`;
+    return `products/${id}`;
   },
-  shopCart: "shop/cart",
-  shopCheckout: "shop/checkout",
-  shopOrders: "shop/orders",
+  shopCart: "cart",
+  shopCheckout: "checkout",
+  shopOrders: "orders",
   shopOrder(id: string) {
-    return `shop/orders/${id}`;
+    return `orders/${id}`;
   }
 };
 
 export const routes: Routes = [
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
   {
-    path: "home",
-    component: HomeComponent
-  },
-  {
-    path: "login",
-    component: LoginComponent
-  },
-  {
-    path: "catalog",
-    canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('catalog:read')],
+    // Public browsing: storefront, content pages, catalogue.
+    path: '',
+    canActivate: [maintenanceGuard],
     children: [
-      { path: '', redirectTo: 'products/list', pathMatch: 'full' },
-      {
-        path: "products",
-        children: [
-          { path: '', redirectTo: 'list', pathMatch: 'full' },
-          {
-            path: "list",
-            loadComponent: () => import('./catalog/products/product-list/product-list.component').then(m => m.ProductListComponent)
-          },
-          {
-            path: "new",
-            loadComponent: () => import('./catalog/products/product.component').then(m => m.ProductComponent)
-          },
-          // Nested variant routes come BEFORE the bare `:productId` route so
-          // the router matches the deeper path first.
-          {
-            path: ":productId/variants/new",
-            loadComponent: () => import('./catalog/products/product-variant/product-variant.component').then(m => m.ProductVariantComponent)
-          },
-          {
-            path: ":productId/variants/:variantId",
-            loadComponent: () => import('./catalog/products/product-variant/product-variant.component').then(m => m.ProductVariantComponent)
-          },
-          {
-            path: ":productId",
-            loadComponent: () => import('./catalog/products/product.component').then(m => m.ProductComponent)
-          }
-        ]
-      },
-      {
-        path: "tags",
-        children: [
-          { path: '', redirectTo: 'list', pathMatch: 'full' },
-          {
-            path: "list",
-            loadComponent: () => import('./catalog/tags/tag-list/tag-list.component').then(m => m.TagListComponent)
-          },
-          {
-            path: "new",
-            loadComponent: () => import('./catalog/tags/tag/tag.component').then(m => m.TagComponent)
-          },
-          {
-            path: ":tagId",
-            loadComponent: () => import('./catalog/tags/tag/tag.component').then(m => m.TagComponent)
-          }
-        ]
-      },
-      {
-        path: "categories",
-        children: [
-          { path: '', redirectTo: 'list', pathMatch: 'full' },
-          {
-            path: "list",
-            loadComponent: () => import('./catalog/categories/category-list/category-list.component').then(m => m.CategoryListComponent)
-          },
-          {
-            path: "new",
-            loadComponent: () => import('./catalog/categories/category/category.component').then(m => m.CategoryComponent)
-          },
-          {
-            path: ":categoryId",
-            loadComponent: () => import('./catalog/categories/category/category.component').then(m => m.CategoryComponent)
-          }
-        ]
-      }
-    ]
-  },
-  {
-    path: "schema",
-    canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('schema:read')],
-    children: [
-      { path: '', redirectTo: 'attribute-definitions/list', pathMatch: 'full' },
-      {
-        path: "attribute-definitions",
-        children: [
-          { path: '', redirectTo: 'list', pathMatch: 'full' },
-          {
-            path: "list",
-            loadComponent: () => import('./schema/attribute-definitions/attribute-definition-list/attribute-definition-list.component').then(m => m.AttributeDefinitionListComponent)
-          },
-          {
-            path: "new",
-            loadComponent: () => import('./schema/attribute-definitions/attribute-definition/attribute-definition.component').then(m => m.AttributeDefinitionComponent)
-          },
-          {
-            path: ":attributeDefinitionId",
-            loadComponent: () => import('./schema/attribute-definitions/attribute-definition/attribute-definition.component').then(m => m.AttributeDefinitionComponent)
-          }
-        ]
-      },
-      {
-        path: "attribute-options",
-        children: [
-          { path: '', redirectTo: 'list', pathMatch: 'full' },
-          {
-            path: "list",
-            loadComponent: () => import('./schema/attribute-options/attribute-option-list/attribute-option-list.component').then(m => m.AttributeOptionListComponent)
-          },
-          {
-            path: "new",
-            loadComponent: () => import('./schema/attribute-options/attribute-option/attribute-option.component').then(m => m.AttributeOptionComponent)
-          },
-          {
-            path: ":attributeOptionId",
-            loadComponent: () => import('./schema/attribute-options/attribute-option/attribute-option.component').then(m => m.AttributeOptionComponent)
-          }
-        ]
-      }
-    ]
-  },
-  {
-    path: "commerce",
-    canActivate: [async () => inject(AuthGuard).isLoginWithAuthority(['orders:read', 'shipments:read', 'returns:read', 'discounts:read', 'customers:read'])],
-    children: [
-      { path: '', redirectTo: 'orders/list', pathMatch: 'full' },
-      {
-        path: "customers",
-        canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('customers:read')],
-        children: [
-          { path: '', redirectTo: 'list', pathMatch: 'full' },
-          { path: "list", loadComponent: () => import('./commerce/customers/customer-list/customer-list.component').then(m => m.CustomerListComponent) },
-          { path: ":userId", loadComponent: () => import('./commerce/customers/customer/customer.component').then(m => m.CustomerComponent) }
-        ]
-      },
-      {
-        path: "orders",
-        children: [
-          { path: '', redirectTo: 'list', pathMatch: 'full' },
-          {
-            path: "list",
-            loadComponent: () => import('./commerce/orders/order-list/order-list.component').then(m => m.OrderListComponent)
-          },
-          {
-            // Staff-created orders (phone / counter). Must precede :orderId.
-            path: "new",
-            canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('orders:create')],
-            loadComponent: () => import('./commerce/orders/new-order/new-order.component').then(m => m.NewOrderComponent)
-          },
-          {
-            path: ":orderId",
-            loadComponent: () => import('./commerce/orders/order/order.component').then(m => m.OrderComponent)
-          }
-        ]
-      },
-      {
-        path: "shipments",
-        children: [
-          { path: '', redirectTo: 'list', pathMatch: 'full' },
-          {
-            path: "list",
-            loadComponent: () => import('./commerce/shipments/shipment-list/shipment-list.component').then(m => m.ShipmentListComponent)
-          },
-          {
-            path: "new",
-            loadComponent: () => import('./commerce/shipments/shipment/shipment.component').then(m => m.ShipmentComponent)
-          },
-          {
-            path: ":shipmentId",
-            loadComponent: () => import('./commerce/shipments/shipment/shipment.component').then(m => m.ShipmentComponent)
-          }
-        ]
-      },
-      {
-        path: "returns",
-        children: [
-          { path: '', redirectTo: 'list', pathMatch: 'full' },
-          {
-            path: "list",
-            loadComponent: () => import('./commerce/returns/return-list/return-list.component').then(m => m.ReturnListComponent)
-          },
-          {
-            path: "new",
-            loadComponent: () => import('./commerce/returns/return/return.component').then(m => m.ReturnComponent)
-          },
-          {
-            path: ":returnId",
-            loadComponent: () => import('./commerce/returns/return/return.component').then(m => m.ReturnComponent)
-          }
-        ]
-      },
-      {
-        path: "discounts",
-        children: [
-          { path: '', redirectTo: 'list', pathMatch: 'full' },
-          {
-            path: "list",
-            loadComponent: () => import('./commerce/discounts/discount-list/discount-list.component').then(m => m.DiscountListComponent)
-          },
-          {
-            path: "new",
-            loadComponent: () => import('./commerce/discounts/discount/discount.component').then(m => m.DiscountComponent)
-          },
-          {
-            path: ":discountId",
-            loadComponent: () => import('./commerce/discounts/discount/discount.component').then(m => m.DiscountComponent)
-          }
-        ]
-      }
-    ]
-  },
-  {
-    path: "rules",
-    canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('rules:read')],
-    children: [
-      { path: '', redirectTo: 'shipping/list', pathMatch: 'full' },
-      {
-        path: "shipping",
-        children: [
-          { path: '', redirectTo: 'list', pathMatch: 'full' },
-          {
-            path: "list",
-            loadComponent: () => import('./rules/shipping/shipping-rule-list/shipping-rule-list.component').then(m => m.ShippingRuleListComponent)
-          },
-          {
-            path: "new",
-            loadComponent: () => import('./rules/shipping/shipping-rule/shipping-rule.component').then(m => m.ShippingRuleComponent)
-          },
-          {
-            path: ":shippingRuleId",
-            loadComponent: () => import('./rules/shipping/shipping-rule/shipping-rule.component').then(m => m.ShippingRuleComponent)
-          }
-        ]
-      },
-      {
-        path: "tax",
-        children: [
-          { path: '', redirectTo: 'list', pathMatch: 'full' },
-          {
-            path: "list",
-            loadComponent: () => import('./rules/tax/tax-rule-list/tax-rule-list.component').then(m => m.TaxRuleListComponent)
-          },
-          {
-            path: "new",
-            loadComponent: () => import('./rules/tax/tax-rule/tax-rule.component').then(m => m.TaxRuleComponent)
-          },
-          {
-            path: ":taxRuleId",
-            loadComponent: () => import('./rules/tax/tax-rule/tax-rule.component').then(m => m.TaxRuleComponent)
-          }
-        ]
-      }
-    ]
-  },
-  {
-    path: "inventory",
-    canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('inventory:read')],
-    children: [
-      { path: '', redirectTo: 'stock', pathMatch: 'full' },
-      {
-        path: "stock",
-        loadComponent: () => import('./inventory/stock/stock.component').then(m => m.StockComponent)
-      },
-      {
-        path: "movements",
-        loadComponent: () => import('./inventory/stock-movement-list/stock-movement-list.component').then(m => m.StockMovementListComponent)
-      },
-      {
-        path: "warehouses",
-        children: [
-          { path: '', redirectTo: 'list', pathMatch: 'full' },
-          { path: "list", loadComponent: () => import('./inventory/warehouses/warehouse-list/warehouse-list.component').then(m => m.WarehouseListComponent) },
-          { path: "new", loadComponent: () => import('./inventory/warehouses/warehouse/warehouse.component').then(m => m.WarehouseComponent) },
-          { path: ":warehouseId", loadComponent: () => import('./inventory/warehouses/warehouse/warehouse.component').then(m => m.WarehouseComponent) }
-        ]
-      },
-      {
-        path: "transfers",
-        canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('inventory:update')],
-        loadComponent: () => import('./inventory/transfers/transfer.component').then(m => m.TransferComponent)
-      },
-      {
-        path: "low-stock",
-        loadComponent: () => import('./inventory/low-stock/low-stock.component').then(m => m.LowStockComponent)
-      },
-      {
-        path: "suppliers",
-        children: [
-          { path: '', redirectTo: 'list', pathMatch: 'full' },
-          { path: "list", loadComponent: () => import('./inventory/suppliers/supplier-list/supplier-list.component').then(m => m.SupplierListComponent) },
-          { path: "new", loadComponent: () => import('./inventory/suppliers/supplier/supplier.component').then(m => m.SupplierComponent) },
-          { path: ":supplierId", loadComponent: () => import('./inventory/suppliers/supplier/supplier.component').then(m => m.SupplierComponent) }
-        ]
-      },
-      {
-        path: "purchase-orders",
-        children: [
-          { path: '', redirectTo: 'list', pathMatch: 'full' },
-          { path: "list", loadComponent: () => import('./inventory/purchase-orders/purchase-order-list/purchase-order-list.component').then(m => m.PurchaseOrderListComponent) },
-          { path: "new", loadComponent: () => import('./inventory/purchase-orders/purchase-order/purchase-order.component').then(m => m.PurchaseOrderComponent) },
-          { path: ":purchaseOrderId", loadComponent: () => import('./inventory/purchase-orders/purchase-order/purchase-order.component').then(m => m.PurchaseOrderComponent) }
-        ]
-      }
-    ]
-  },
-  {
-    path: "rules/carriers",
-    canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('shipping:read')],
-    children: [
-      { path: '', redirectTo: 'list', pathMatch: 'full' },
-      { path: "list", loadComponent: () => import('./rules/carriers/carrier-list/carrier-list.component').then(m => m.CarrierListComponent) },
-      { path: "new", loadComponent: () => import('./rules/carriers/carrier/carrier.component').then(m => m.CarrierComponent) },
-      { path: ":carrierId", loadComponent: () => import('./rules/carriers/carrier/carrier.component').then(m => m.CarrierComponent) }
-    ]
-  },
-  {
-    path: "reviews",
-    canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('reviews:read')],
-    loadComponent: () => import('./reviews/review-list/review-list.component').then(m => m.ReviewListComponent)
-  },
-  {
-    // Test-only buyer-flow simulation. Login required (carts/orders are
-    // user-scoped) but NOT admin-gated — any authenticated test user works.
-    path: "shop",
-    canActivate: [async () => inject(AuthGuard).isLogin(), maintenanceGuard],
-    children: [
-      { path: '', redirectTo: 'home', pathMatch: 'full' },
       {
         path: "home",
         loadComponent: () => import('./shop/home/shop-home.component').then(m => m.ShopHomeComponent)
@@ -532,7 +67,14 @@ export const routes: Routes = [
       {
         path: "products/:productId",
         loadComponent: () => import('./shop/product/shop-product.component').then(m => m.ShopProductComponent)
-      },
+      }
+    ]
+  },
+  {
+    // Buyer-only: carts and orders are user-scoped server-side.
+    path: '',
+    canActivate: [async () => inject(AuthGuard).isLogin(), maintenanceGuard],
+    children: [
       {
         path: "cart",
         loadComponent: () => import('./shop/cart/shop-cart.component').then(m => m.ShopCartComponent)
@@ -552,41 +94,12 @@ export const routes: Routes = [
     ]
   },
   {
-    path: "reports",
-    canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('reports:read')],
-    loadComponent: () => import('./reports/reports.component').then(m => m.ReportsComponent)
+    path: "login",
+    component: LoginComponent
   },
   {
-    path: "system/storefront",
-    canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('storefront:read')],
-    children: [
-      { path: '', loadComponent: () => import('./system/storefront/storefront-settings.component').then(m => m.StorefrontSettingsComponent) },
-      { path: 'preview', loadComponent: () => import('./system/storefront/storefront-preview.component').then(m => m.StorefrontPreviewComponent) },
-      { path: 'pages', loadComponent: () => import('./system/storefront/pages/storefront-page-list.component').then(m => m.StorefrontPageListComponent) },
-      { path: 'pages/:pageId', loadComponent: () => import('./system/storefront/pages/storefront-page.component').then(m => m.StorefrontPageComponent) },
-      { path: 'templates', loadComponent: () => import('./system/storefront/templates/storefront-template-list.component').then(m => m.StorefrontTemplateListComponent) },
-      { path: 'templates/:templateId', loadComponent: () => import('./system/storefront/templates/storefront-template.component').then(m => m.StorefrontTemplateComponent) }
-    ]
-  },
-  {
-    path: "system/store",
-    canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('settings:read')],
-    loadComponent: () => import('./system/store/store-settings.component').then(m => m.StoreSettingsComponent)
-  },
-  {
-    path: "system/audit",
-    canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('audit:read')],
-    loadComponent: () => import('./system/audit/audit-log.component').then(m => m.AuditLogComponent)
-  },
-  {
-    path: "system/mail",
-    canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('smtp:read')],
-    loadComponent: () => import('./system/mail/mail-settings.component').then(m => m.MailSettingsComponent)
-  },
-  {
-    path: "system/maintenance",
-    canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('maintenance:read')],
-    loadComponent: () => import('./system/maintenance/maintenance-admin.component').then(m => m.MaintenanceAdminComponent)
+    path: 'oauth2',
+    component: LoginComponent
   },
   {
     // Where customers land while the backend is in maintenance (lib page; public).
@@ -604,39 +117,8 @@ export const routes: Routes = [
         path: 'account',
         component: UserSettingComponent,
         canActivate: [async () => inject(AuthGuard).isLogin()]
-      },
-      {
-        path: 'users',
-        component: UserListComponent,
-        canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('iam:read')]
-      },
-      {
-        path: 'user/groups',
-        component: UserGroupListComponent,
-        canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('iam:read')]
-      },
-      {
-        // Roles + permission grants (lib component; resource `iam`).
-        path: 'roles',
-        component: RoleListComponent,
-        canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('iam:read')]
-      },
-      {
-        path: 'openid-provider',
-        component: OpenIdProviderComponent,
-        canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('iam:read')]
-      },
-      {
-        // Outbound-mail accounts (lib component; resource `smtp`).
-        path: 'smtp-providers',
-        component: SmtpProviderListComponent,
-        canActivate: [async () => inject(AuthGuard).isLoginWithAuthority('smtp:read')]
       }
     ]
-  },
-  {
-    path: 'oauth2',
-    component: LoginComponent
   },
   {
     path: "**",

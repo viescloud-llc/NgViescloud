@@ -16,7 +16,7 @@ export async function login(page: Page) {
   await box.locator('input').first().fill(ADMIN.username);
   await box.locator('input[type="password"]').first().fill(ADMIN.password);
   await box.getByRole('button', { name: /login/i }).first().click();
-  await expect(page.locator('body')).toContainText(/Hello:/, { timeout: 20_000 });
+  await expect(page.locator('viescloud-login')).toHaveCount(0, { timeout: 20_000 });
 }
 
 export async function apiToken(): Promise<string> {

@@ -7,4 +7,3 @@ export * from './user-info.model';
 export * from './checkout.model';
 export * from './discount-validation.model';
 export * from './public-product.model';
-export * from './report.model';

@@ -6,7 +6,7 @@ import { PageView, ResolvedStorefront } from '../../shared/model/storefront.mode
 import { StorefrontService } from '../../shared/service/storefront/storefront.service';
 import { StorefrontRendererComponent } from '../../shared/component/storefront/storefront-renderer.component';
 
-// Shop (test) content page: /shop/pages/:slug — the storefront chrome plus the
+// Storefront content page: /shop/pages/:slug — the storefront chrome plus the
 // page's published sections (through the active template when it affects the role).
 @Component({
   selector: 'app-shop-page',

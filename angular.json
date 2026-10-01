@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "venzora-manager": {
+    "venzora-customer": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -67,10 +67,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "venzora-manager:build:production"
+              "buildTarget": "venzora-customer:build:production"
             },
             "development": {
-              "buildTarget": "venzora-manager:build:development"
+              "buildTarget": "venzora-customer:build:development"
             }
           },
           "defaultConfiguration": "development"

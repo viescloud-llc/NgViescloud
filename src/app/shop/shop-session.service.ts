@@ -5,11 +5,11 @@ import { Cart, CartItem } from '../shared/model/commerce.model';
 import { ProductVariant } from '../shared/model/product.model';
 import { CartService } from '../shared/service/cart/cart.service';
 
-// Cart mechanics shared by the test-shop pages. Carts are user-scoped
+// Cart mechanics shared by the shop pages. Carts are user-scoped
 // server-side, so "my cart" is just the active one in getAll(). Items are
 // owned with orphanRemoval — always PUT the full items array.
 //
-// Test-harness quality on purpose: no caching, no optimistic UI, no
+// Deliberately simple: no caching, no optimistic UI, no
 // concurrency handling. Every call round-trips.
 @Injectable({
   providedIn: 'root'
