@@ -1,0 +1,4 @@
+
+.list-option-row { display: flex; align-items: center; gap: 0.25rem; }
+.list-option-row.with-remove app-mat-form-field-input-option { flex: 1 1 auto; min-width: 0; }
+.list-option-row .remove-row { flex: 0 0 auto; }

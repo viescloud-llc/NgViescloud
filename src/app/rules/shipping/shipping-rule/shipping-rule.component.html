@@ -161,7 +161,7 @@
       <mat-select [value]="value()?.originWarehouseId || ''" (selectionChange)="onOriginWarehouseChange($event.value)">
         <mat-option value="">(any warehouse)</mat-option>
         @for (w of warehouses(); track w.id) {
-          <mat-option [value]="w.id">{{ w.name }}{{ w.address.country ? ' — ' + w.address.country : '' }}</mat-option>
+          <mat-option [value]="w.id">{{ w.name }}{{ warehouseCountry(w) ? ' — ' + warehouseCountry(w) : '' }}</mat-option>
         }
       </mat-select>
     </mat-form-field>

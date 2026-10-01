@@ -83,12 +83,39 @@
     </div>
   </li>
 
+  <!-- Carrier label (EasyPost). Server-filled, read-only; buying spends money on the carrier account. -->
+  @if (id()) {
+    <li class="label-block">
+      <h3 class="section-title">Carrier label</h3>
+      @if (hasLabel()) {
+        <p>
+          <a [href]="value()!.labelUrl" target="_blank" rel="noopener"><mat-icon inline>print</mat-icon> Open label</a>
+          · {{ value()?.carrier }} {{ value()?.carrierServiceCode }}
+          @if (labelCostText()) { · cost {{ labelCostText() }} }
+          @if (value()?.providerTrackingStatus) { · carrier status <strong>{{ value()?.providerTrackingStatus }}</strong> }
+        </p>
+        <p class="tab-hint">Provider shipment {{ value()?.providerShipmentId }} · tracker {{ value()?.trackerId || '(none)' }}. Tracking updates arrive through the carrier webhook.</p>
+      } @else if (carrierIsEasyPost()) {
+        <p class="tab-hint">
+          Buys the label for the service level above (or the cheapest) from the origin warehouse to the order's shipping address,
+          and replaces the tracking number / URL with the carrier's. Save first — the server reads the stored shipment.
+        </p>
+        <button matButton="filled" (click)="buyLabel()" [disabled]="!buyLabelEnabled()" type="button">
+          <mat-icon>local_shipping</mat-icon> {{ labelBusy() ? 'Buying…' : 'Buy label' }}
+        </button>
+        @if (!canBuyLabel()) { <p class="tab-hint">Needs the shipments:update authority.</p> }
+      } @else {
+        <p class="tab-hint">Pick a carrier record with the <em>easypost</em> integration to buy labels here; other carriers are tracked by hand.</p>
+      }
+    </li>
+  }
+
   <!-- Delivery dates — both REQUIRED by the backend (non-nullable columns). -->
   <li class="dates-block">
     <h3 class="section-title">Delivery dates</h3>
     <p class="tab-hint">
-      Both dates are required. For not-yet-delivered shipments, set
-      <em>actual delivery</em> to your best estimate and correct it on arrival.
+      The estimate is required. <em>Actual delivery</em> is stamped when the shipment reaches
+      DELIVERED (by you or the carrier webhook) and can be corrected here afterwards.
     </p>
     <div class="dates-row">
       @if (value()?.estimatedDeliveryDate) {
@@ -102,7 +129,7 @@
       }
       @if (value()?.actualDeliveryDate) {
         <app-mat-form-field-input-time
-          [value]="value()!.actualDeliveryDate"
+          [value]="value()!.actualDeliveryDate!"
           (valueChange)="onActualDateChange($event)"
           type="DATE"
           [inputMap]="inputField('shipment-act-date')

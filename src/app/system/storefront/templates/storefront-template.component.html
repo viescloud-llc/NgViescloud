@@ -22,7 +22,17 @@
         <mat-tab label="Header"><div class="tab-body">@if (t.overrideHeader) { <app-appearance-editor [value]="t.draftAppearance" [parts]="['header']" ownerType="TEMPLATE" [ownerId]="id()" [disabled]="!canUpdate()" (valueChange)="onAppearance($event)"></app-appearance-editor> } @else { <p class="inherit">Inherits the default header.</p> }</div></mat-tab>
         <mat-tab label="Footer"><div class="tab-body">@if (t.overrideFooter) { <app-appearance-editor [value]="t.draftAppearance" [parts]="['footer']" ownerType="TEMPLATE" [ownerId]="id()" [disabled]="!canUpdate()" (valueChange)="onAppearance($event)"></app-appearance-editor> } @else { <p class="inherit">Inherits the default footer.</p> }</div></mat-tab>
         <mat-tab label="Announcement"><div class="tab-body">@if (t.overrideAnnouncement) { <app-appearance-editor [value]="t.draftAppearance" [parts]="['announcement']" ownerType="TEMPLATE" [ownerId]="id()" [disabled]="!canUpdate()" (valueChange)="onAppearance($event)"></app-appearance-editor> } @else { <p class="inherit">Inherits the default announcement bar.</p> }</div></mat-tab>
-        <mat-tab label="Home page"><div class="tab-body">@if (t.overrideHome) { <app-sections-editor [sections]="t.draftHomeSections" (sectionsChange)="onSections($event)" ownerType="TEMPLATE" [ownerId]="id()" [disabled]="!canUpdate()"></app-sections-editor> } @else { <p class="inherit">Inherits the default home page.</p> }</div></mat-tab>
+        <mat-tab label="Pages">
+          <div class="tab-body">
+            <app-mat-form-field-input-list-option [value]="t.affectedRoles" (valueChange)="onRoles($event)" [options]="roleOptions"
+              [inputMap]="inputField('tp-roles').set(inputKeys.label, 'Page roles this template may restyle').set(inputKeys.styleWidth, '100%').set(inputKeys.showSizeInput, false).set(inputKeys.uniqueValue, true).set(inputKeys.disable, !canUpdate())"></app-mat-form-field-input-list-option>
+            <p class="tab-hint">Default: Home and Custom pages — legal pages are usually left out. For each affected page pick which <strong>body</strong> shows while this template is live; bodies are edited under Storefront pages. Publishing the template publishes the chosen bodies' drafts.</p>
+            @for (p of affectedPages(); track p.id) {
+              <app-mat-form-field-input-option [value]="bodyFor(p)" (valueChange)="onBody(p, $event)" [options]="bodyOptionsByPage()[p.id]" [noneLabel]="''"
+                [inputMap]="inputField('tp-body-' + p.id).set(inputKeys.label, roleLabel(p.role) + ' — ' + p.title).set(inputKeys.styleWidth, '100%').set(inputKeys.disable, !canUpdate())"></app-mat-form-field-input-option>
+            } @empty { <p class="inherit">No pages for the selected roles.</p> }
+          </div>
+        </mat-tab>
         <mat-tab label="Images"><div class="tab-body"><p class="tab-hint">Images uploaded for this template; pick them from any image field on the other tabs.</p><app-asset-picker label="Upload" ownerType="TEMPLATE" [ownerId]="id()" [value]="null" [disabled]="!canUpdate() || !id()"></app-asset-picker>@if (!id()) { <p class="inherit">Save the template once to attach images.</p> }</div></mat-tab>
         @if (id()) { <mat-tab label="History"><div class="tab-body"><app-history-panel entityType="StorefrontTemplate" [entityId]="id()"></app-history-panel></div></mat-tab> }
       </mat-tab-group>

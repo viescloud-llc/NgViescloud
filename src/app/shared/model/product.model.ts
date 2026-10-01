@@ -229,6 +229,11 @@ export class ProductVariant extends TrackedTimeStamp {
     @MatTableHide()
     lowStockThreshold?: number | null = null;
 
+    // BigDecimal-as-string. Never shown to buyers; feeds Reports → Stock valuation. Empty = product cost.
+    @MatInputDisplayLabel('Unit cost', 'what you pay per unit; empty = the product\'s cost')
+    @MatTableHide()
+    costPrice?: string | null = null;
+
     // ---- Packaged shipping spec. 0 = "use the product's default"; the editor
     // sends 0 as null so the server-side fallback applies. Server echoes the
     // resolved values as effective* (read-only).
@@ -331,6 +336,10 @@ export class Product extends TrackedTimeStamp {
     @MatInputDisplayLabel('Low-stock line (default)', 'for every variant of this product that has none of its own; empty = store default')
     @MatTableHide()
     lowStockThreshold?: number | null = null;
+
+    @MatInputDisplayLabel('Unit cost (default)', 'what you pay per unit; variants may override; feeds Reports → Stock valuation')
+    @MatTableHide()
+    costPrice?: string | null = null;
 
     // ---- Shipping defaults (packaged), inherited by variants that leave theirs at 0 ----
     @MatInputDisplayLabel('Packaged weight (g)', 'default for every variant; the box, not the bare item')

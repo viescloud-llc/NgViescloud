@@ -66,6 +66,9 @@ export class PermissionStrings {
       if (/[._ ]/.test(seg)) return `"${seg}": dots, underscores and spaces are not allowed — use resource:action (e.g. product:read)`;
       if (!PermissionStrings.SEGMENT.test(seg)) return `"${seg}": only a-z, 0-9 and - are allowed`;
     }
+    // A single segment is right-aligned by the grammar ("catalog" ≡ "*:catalog": the ACTION catalog
+    // on any resource) and matches no resource:action check — what the admin meant was catalog:*.
+    if (segments.length === 1 && raw !== '*') return `"${raw}" has no action and would grant nothing — did you mean "${raw}:*" (every action on ${raw})?`;
     return null;
   }
 

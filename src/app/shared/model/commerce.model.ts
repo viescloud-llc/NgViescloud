@@ -336,7 +336,7 @@ export class Shipment extends TrackedTimeStamp {
 
     @MatInputHide()
     @MatTableHide()
-    actualDeliveryDate: ViesDateTime = new ViesDateTime();
+    actualDeliveryDate: ViesDateTime | null = null; // null until DELIVERED (BE-26)
 
     @MatInputDisplayLabel('Notes')
     @MatInputItemSetting(MatItemSettingType.TEXT_AREA, true)
@@ -357,6 +357,31 @@ export class Shipment extends TrackedTimeStamp {
     @MatInputHide()
     @MatTableHide()
     carrierServiceCode?: string | null;
+
+    // ---- Purchased label (server-set by the carrier integration; read-only) ----
+    @MatInputHide()
+    @MatTableHide()
+    providerShipmentId?: string | null;
+
+    @MatInputHide()
+    @MatTableHide()
+    trackerId?: string | null;
+
+    @MatInputHide()
+    @MatTableHide()
+    labelUrl?: string | null;
+
+    @MatInputHide()
+    @MatTableHide()
+    labelCost?: string | null;
+
+    @MatInputHide()
+    @MatTableHide()
+    labelPurchasedAt?: ViesDateTime | null;
+
+    @MatInputHide()
+    @MatTableHide()
+    providerTrackingStatus?: string | null;
 }
 
 // ---- ReturnRequest ------------------------------------------------------

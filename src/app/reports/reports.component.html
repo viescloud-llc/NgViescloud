@@ -305,4 +305,92 @@
       </div>
     </li>
   }
+
+  @if (loadState() === 'loaded') {
+    <!-- ========================================================================
+         STOCK VALUATION — Σ on-hand × unit cost per warehouse (as of now, not the period).
+         ===================================================================== -->
+    <li class="report-block">
+      <h3 class="section-title">Stock valuation <small>(as of now — unit cost = variant cost, else product cost)</small></h3>
+      <div class="kpi-row">
+        <div class="kpi"><span class="kpi-label">Units on hand</span><span class="kpi-value">{{ stockValuation()?.totalUnits }}</span></div>
+        <div class="kpi"><span class="kpi-label">Stock value</span><span class="kpi-value">{{ valuationTotal() }}</span></div>
+        <div class="kpi"><span class="kpi-label">Variants without a cost</span><span class="kpi-value">{{ stockValuation()?.variantsWithoutCost }}</span></div>
+      </div>
+      <div class="two-col">
+        <div class="panel">
+          @if (valuationChart().labels.length > 0) { <app-chart type="bar" [labels]="valuationChart().labels" [datasets]="valuationChart().datasets" [height]="220"></app-chart> }
+          <table class="report-table">
+            <thead><tr><th>Warehouse</th><th class="num">Units</th><th class="num">Value</th><th class="num">No cost</th></tr></thead>
+            <tbody>@for (w of stockValuation()?.byWarehouse ?? []; track w.warehouseId) { <tr><td>{{ w.name }} <small class="mono">{{ w.code }}</small></td><td class="num">{{ w.units }}</td><td class="num">{{ whValue(w) }}</td><td class="num">{{ w.variantsWithoutCost || '' }}</td></tr> }</tbody>
+          </table>
+        </div>
+        <div class="panel">
+          <table class="report-table">
+            <thead><tr><th>Variant</th><th>Warehouse</th><th class="num">Qty</th><th class="num">Unit cost</th><th class="num">Value</th></tr></thead>
+            <tbody>@for (l of (stockValuation()?.lines ?? []).slice(0, 25); track l.variantId + l.warehouseCode) { <tr><td>{{ l.productName }} — {{ l.variantName || l.sku }}<br><small class="mono">{{ l.sku }}</small></td><td>{{ l.warehouseCode }}</td><td class="num">{{ l.quantity }}</td><td class="num">{{ l.unitCost ?? '—' }}</td><td class="num">{{ l.value ?? '—' }} {{ l.value != null ? l.currency : '' }}</td></tr> } @empty { <tr><td colspan="5" class="empty-hint">No stock on hand.</td></tr> }</tbody>
+          </table>
+        </div>
+      </div>
+    </li>
+
+    <!-- DISCOUNT PERFORMANCE -->
+    <li class="report-block">
+      <h3 class="section-title">Discount performance</h3>
+      @for (cur of discounts()?.byCurrency ?? []; track cur.currency) {
+        <h4 class="currency-heading">{{ cur.currency }} — {{ cur.ordersWithDiscount }} of {{ cur.ordersTotal }} orders used a code · {{ cur.discountGiven }} given</h4>
+        @if (cur.codes.length > 0) {
+          <div class="two-col">
+            <div class="panel"><app-chart type="bar" [labels]="discountChart().labels" [datasets]="discountChart().datasets" [height]="220"></app-chart></div>
+            <div class="panel">
+              <table class="report-table">
+                <thead><tr><th>Code</th><th>Type</th><th class="num">Orders</th><th class="num">Revenue</th><th class="num">Discount given</th><th class="num">Avg order</th><th class="num">Rate %</th><th class="num">Uses (cap)</th></tr></thead>
+                <tbody>@for (c of cur.codes; track c.code) { <tr [class.inactive]="!c.active"><td class="mono">{{ c.code }}</td><td>{{ c.type }}</td><td class="num">{{ c.orders }}</td><td class="num">{{ c.revenue }}</td><td class="num">{{ c.discountGiven }}</td><td class="num">{{ c.averageOrderValue }}</td><td class="num">{{ c.discountRatePercent }}</td><td class="num">{{ c.currentUses }}{{ c.maxUses ? ' / ' + c.maxUses : '' }}</td></tr> }</tbody>
+              </table>
+            </div>
+          </div>
+        } @else { <p class="empty-hint">No discount codes were used in this period.</p> }
+      } @empty { <p class="empty-hint">No orders in this period.</p> }
+    </li>
+
+    <!-- SHIPPING CHARGED VS COST -->
+    <li class="report-block">
+      <h3 class="section-title">Shipping charged @if (!shipping()?.carrierCostAvailable) { <small>(carrier cost appears once a carrier integration reports it)</small> }</h3>
+      @for (cur of shipping()?.byCurrency ?? []; track cur.currency) {
+        <h4 class="currency-heading">{{ cur.currency }} — {{ cur.orders }} orders · {{ cur.freeShippingOrders }} shipped free · {{ cur.charged }} charged</h4>
+        <table class="report-table">
+          <thead><tr><th>Method</th><th class="num">Orders</th><th class="num">Charged</th><th class="num">Avg</th><th class="num">Carrier cost</th><th class="num">Margin</th></tr></thead>
+          <tbody>@for (m of cur.methods; track m.method) { <tr><td>{{ m.method }}</td><td class="num">{{ m.orders }}</td><td class="num">{{ m.charged }}</td><td class="num">{{ m.averageCharged }}</td><td class="num">{{ m.carrierCost ?? '—' }}</td><td class="num">{{ m.margin ?? '—' }}</td></tr> }</tbody>
+        </table>
+      } @empty { <p class="empty-hint">No orders in this period.</p> }
+    </li>
+
+    <!-- RETURNS -->
+    <li class="report-block">
+      <h3 class="section-title">Returns</h3>
+      <div class="kpi-row">
+        <div class="kpi"><span class="kpi-label">Return requests</span><span class="kpi-value">{{ returns()?.returnRequests }}</span></div>
+        <div class="kpi"><span class="kpi-label">Units returned / sold</span><span class="kpi-value">{{ returns()?.unitsReturned }} / {{ returns()?.unitsSold }}</span></div>
+        <div class="kpi"><span class="kpi-label">Return rate</span><span class="kpi-value">{{ returns()?.returnRatePercent }}%</span></div>
+      </div>
+      <div class="two-col">
+        <div class="panel">
+          <h4 class="currency-heading">By product</h4>
+          <table class="report-table">
+            <thead><tr><th>Product</th><th class="num">Sold</th><th class="num">Returned</th><th class="num">Requests</th><th class="num">Rate %</th><th class="num">Refunded</th></tr></thead>
+            <tbody>@for (p of returns()?.byProduct ?? []; track p.productId) { <tr><td>{{ p.productName }} <small class="mono">{{ p.sku }}</small></td><td class="num">{{ p.unitsSold }}</td><td class="num">{{ p.unitsReturned }}</td><td class="num">{{ p.returnRequests }}</td><td class="num">{{ p.returnRatePercent }}</td><td class="num">{{ p.refunded }}</td></tr> } @empty { <tr><td colspan="6" class="empty-hint">No returns in this period.</td></tr> }</tbody>
+          </table>
+        </div>
+        <div class="panel">
+          <h4 class="currency-heading">By reason</h4>
+          @if (returnsReasonChart().labels.length > 0) { <app-chart type="bar" [horizontal]="true" [labels]="returnsReasonChart().labels" [datasets]="returnsReasonChart().datasets" [height]="200"></app-chart> }
+          <table class="report-table">
+            <thead><tr><th>Reason</th><th class="num">Requests</th><th class="num">Units</th></tr></thead>
+            <tbody>@for (r of returns()?.byReason ?? []; track r.reason) { <tr><td>{{ r.reason }}</td><td class="num">{{ r.requests }}</td><td class="num">{{ r.units }}</td></tr> } @empty { <tr><td colspan="3" class="empty-hint">—</td></tr> }</tbody>
+          </table>
+          @if ((returns()?.byStatus ?? []).length > 0) { <p class="tab-hint">Status: @for (st of returns()?.byStatus ?? []; track st.status; let last = $last) {{{ st.status }} {{ st.requests }}{{ last ? '' : ' · ' }}}</p> }
+        </div>
+      </div>
+    </li>
+  }
 </ul>

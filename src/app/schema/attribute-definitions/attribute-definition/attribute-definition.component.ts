@@ -144,6 +144,14 @@ export class AttributeDefinitionComponent extends ViesRestApi<AttributeDefinitio
     super.save();
   }
 
+  // After a create, leave /new for the entity's real edit URL so
+  // refresh/bookmark/back work (FE-20, same as FE-6/10/12).
+  protected override afterSave(res: AttributeDefinition, wasCreate: boolean): void {
+    if (wasCreate && res.id) {
+      this.router.navigate([APP_ROUTES.schemaAttributeDefinition(res.id)]);
+    }
+  }
+
   // Cascade-delete with the count of owned options surfaced in the prompt
   // (intent § 7.6). Then navigate back to the definitions list rather than the
   // default `/home`.

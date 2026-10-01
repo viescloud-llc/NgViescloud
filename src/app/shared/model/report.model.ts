@@ -245,3 +245,21 @@ export interface OrderExportReport {
     totalElements: number;
     rows: OrderExportRow[];
 }
+
+// ---- checklist-2 §10 ----------------------------------------------------------
+export interface StockValuationWarehouse { warehouseId: string; code: string; name: string; units: number; valueByCurrency: Record<string, string | number>; variantsWithoutCost: number; }
+export interface StockValuationLine { variantId: string; sku: string; productName?: string | null; variantName?: string | null; warehouseCode: string; quantity: number; unitCost?: string | number | null; value?: string | number | null; currency: string; }
+export interface StockValuationReport { asOf: string; byWarehouse: StockValuationWarehouse[]; lines: StockValuationLine[]; totalUnits: number; totalValueByCurrency: Record<string, string | number>; variantsWithoutCost: number; }
+
+export interface DiscountCodeLine { code: string; type?: string | null; orders: number; revenue: string | number; discountGiven: string | number; averageOrderValue: string | number; discountRatePercent: string | number; currentUses: number; maxUses?: number | null; active: boolean; }
+export interface DiscountPerformanceByCurrency { currency: string; ordersWithDiscount: number; ordersTotal: number; discountGiven: string | number; codes: DiscountCodeLine[]; }
+export interface DiscountPerformanceReport { period: ReportPeriod; byCurrency: DiscountPerformanceByCurrency[]; }
+
+export interface ShippingMethodLine { method: string; orders: number; charged: string | number; averageCharged: string | number; carrierCost?: string | number | null; margin?: string | number | null; }
+export interface ShippingByCurrency { currency: string; orders: number; freeShippingOrders: number; charged: string | number; carrierCost?: string | number | null; margin?: string | number | null; methods: ShippingMethodLine[]; }
+export interface ShippingReport { period: ReportPeriod; byCurrency: ShippingByCurrency[]; carrierCostAvailable: boolean; }
+
+export interface ReturnsProductLine { productId: string; productName?: string | null; sku?: string | null; unitsSold: number; unitsReturned: number; returnRequests: number; returnRatePercent: string | number; refunded: string | number; }
+export interface ReturnsReport { period: ReportPeriod; returnRequests: number; unitsSold: number; unitsReturned: number; returnRatePercent: string | number; byProduct: ReturnsProductLine[]; byReason: { reason: string; requests: number; units: number }[]; byStatus: { status: string; requests: number }[]; }
+
+export interface DashboardReport { asOf: string; ordersToday: number; revenueTodayByCurrency: Record<string, string | number>; awaitingShipment: number; shippedInTransit: number; pendingReturns: number; lowStockVariants: number; outOfStockVariants: number; unpaidPendingOlderThanHour: number; openPurchaseOrders: number; draftProducts: number; }

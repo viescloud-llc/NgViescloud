@@ -1,31 +1,73 @@
 <ul class="margin-center" appMatFormFieldGroup [formSummitButton]="viesSaveBtn" (onAllInputCheck)="validForm.set($event)">
   <li class="return-banner">
-    <span>@if (id()) { Page <strong>{{ value()?.title }}</strong> } @else { New page }</span>
+    <span>@if (id()) { Page <strong>{{ value()?.title }}</strong> @if (value()?.liveBodyId) { <span class="live">● live</span> } @else { <small>· offline</small> } } @else { New custom page }
+      @if (_value.isValueChange() || bodyDirty()) { <small class="unsaved"> · unsaved changes</small> }</span>
     <button matButton="filled" (click)="back()" type="button">Back to pages</button>
   </li>
+
   <li>
-    <app-mat-form-field-input-dynamic [value]="value()" (valueChange)="onMainFormChange($event)" [blankObject]="blankValue"
-      [inputMap]="inputField('pg-main').set(inputKeys.indent, false).set(inputKeys.styleWidth, '100%').set(inputKeys.disable, !canUpdate())"></app-mat-form-field-input-dynamic>
-    @if (value(); as p) {
-      <p class="status">
-        @if (p.publishedAt) { Published {{ p.publishedAt.slice(0, 16).replace('T', ' ') }} } @else { <strong>Never published</strong> — customers cannot see it yet }
-        @if (unpublishedChanges() && !_value.isValueChange()) { · <strong>draft differs from the published copy</strong> }
-      </p>
-    }
+    <mat-tab-group [preserveContent]="true" [selectedIndex]="tabIndex()" (selectedIndexChange)="tabIndex.set($event)" class="page-tabs">
+
+      <mat-tab label="Page">
+        <div class="tab-body">
+          <app-mat-form-field-input-option [value]="value()?.role" (valueChange)="onRole($event)" [options]="roleOptions" [noneLabel]="''"
+            [inputMap]="inputField('pg-role').set(inputKeys.label, 'Role').set(inputKeys.styleWidth, '260px').set(inputKeys.disable, !canUpdate() || isSystem())"></app-mat-form-field-input-option>
+          @if (isSystem()) { <p class="tab-hint">System page — its role is fixed; the customer frontend places it by role. Take it offline (Bodies tab) to hide it.</p> }
+          <app-mat-form-field-input-dynamic [value]="value()" (valueChange)="onMainFormChange($event)" [blankObject]="blankValue"
+            [inputMap]="inputField('pg-main').set(inputKeys.indent, false).set(inputKeys.styleWidth, '100%').set(inputKeys.disable, !canUpdate())"></app-mat-form-field-input-dynamic>
+        </div>
+      </mat-tab>
+
+      @if (id()) {
+        <mat-tab [label]="'Bodies (' + bodies().length + ')'">
+          <div class="tab-body">
+            <p class="tab-hint">Named versions of this page's content, each with its own draft and published copy. Exactly one is <strong>live</strong> for customers; templates can point at any body so a scheduled look swaps it automatically. Click a body to edit its content.</p>
+            <app-mat-table [matRows]="bodyRows()" [blankObject]="blankBodyRow" [showMatTooltip]="true" (onEditRow)="openBodyRow($event)"></app-mat-table>
+            <div class="row">
+              @if (canUpdate()) {
+                <button matButton="filled" (click)="newBody(false)" type="button">New body</button>
+                <button matButton (click)="newBody(true)" [disabled]="!editing()" type="button">Copy selected body</button>
+                @if (value()?.liveBodyId) { <button matButton class="warn" (click)="takeOffline()" type="button">Take page offline</button> }
+              }
+            </div>
+          </div>
+        </mat-tab>
+
+        <mat-tab [label]="'Content' + (editing() ? ' — ' + editing()!.name : '')">
+          <div class="tab-body">
+            <div class="row">
+              <app-mat-form-field-input-option [value]="selectedId()" (valueChange)="selectBody($event)" [options]="bodyOptions()" [noneLabel]="''" [inputMap]="inputField('pg-body').set(inputKeys.label, 'Body').set(inputKeys.styleWidth, '320px')"></app-mat-form-field-input-option>
+              @if (editing(); as b) {
+                <app-mat-form-field-input [value]="b.name" (valueChange)="onBodyName($event)" [blankObject]="''" [inputMap]="inputField('pg-body-name').set(inputKeys.label, 'Body name').set(inputKeys.styleWidth, '280px').set(inputKeys.disable, !canUpdate())"></app-mat-form-field-input>
+              }
+            </div>
+            @if (editing(); as b) {
+              <p class="status">
+                @if (isLive()) { <span class="live">● Live</span> · } @if (b.publishedAt) { published {{ b.publishedAt.slice(0, 16).replace('T', ' ') }} } @else { <strong>never published</strong> }
+                @if (bodyUnpublished() && !bodyDirty()) { · <strong>draft differs from the published copy</strong> }
+              </p>
+              <app-sections-editor [sections]="b.draftSections" (sectionsChange)="onSections($event)" ownerType="PAGE" [ownerId]="id()" [disabled]="!canUpdate()"></app-sections-editor>
+              <div class="row">
+                <button matButton="filled" (click)="saveBody()" [disabled]="!canUpdate() || !bodyDirty()" type="button">Save draft</button>
+                <button matButton="filled" class="warn" (click)="revertBody()" [disabled]="!bodyDirty()" type="button">Revert</button>
+                <button matButton="filled" (click)="publishBody()" [disabled]="!canUpdate() || bodyDirty()" type="button">Publish</button>
+                <button matButton (click)="discardBody()" [disabled]="!canUpdate() || !b.publishedAt" type="button">Discard draft</button>
+                <button matButton (click)="previewBody()" type="button">Preview draft</button>
+                @if (!isLive()) { <button matButton="filled" (click)="makeLive()" [disabled]="!canUpdate() || bodyDirty()" type="button">Make live</button> }
+                <button matButton class="warn" (click)="deleteBody()" [disabled]="!canUpdate() || isLive() || bodies().length <= 1" type="button">Delete body</button>
+              </div>
+            } @else { <p class="tab-hint">Pick a body above, or create one on the Bodies tab.</p> }
+          </div>
+        </mat-tab>
+
+        <mat-tab label="History"><div class="tab-body"><app-history-panel entityType="StorefrontPage" [entityId]="id()"></app-history-panel></div></mat-tab>
+      }
+    </mat-tab-group>
   </li>
-  <li>
-    <h3 class="section-title">Sections (draft)</h3>
-    <app-sections-editor [sections]="value()?.draftSections ?? []" (sectionsChange)="onSections($event)" ownerType="PAGE" [ownerId]="id()" [disabled]="!canUpdate()"></app-sections-editor>
-  </li>
-  @if (id()) { <li><app-history-panel entityType="StorefrontPage" [entityId]="id()"></app-history-panel></li> }
+
   <li class="flex-row-container-auto">
-    <button #viesSaveBtn matButton="filled" (click)="save()" [disabled]="!canUpdate() || _value.isValueNotChange() || !validForm()">Save draft</button>
+    <button #viesSaveBtn matButton="filled" (click)="save()" [disabled]="!canUpdate() || _value.isValueNotChange() || !validForm()">Save page</button>
     <button matButton="filled" class="warn" (click)="revert()" [disabled]="!_value.isValueChange()">Revert</button>
-    @if (id()) {
-      <button matButton="filled" (click)="publish()" [disabled]="!canUpdate() || _value.isValueChange()">Publish</button>
-      <button matButton (click)="discard()" [disabled]="!canUpdate() || !value()?.publishedAt" type="button">Discard draft</button>
-      @if (isHome()) { <button matButton (click)="preview()" type="button">Preview draft</button> }
-      @if (!isHome()) { <button matButton="filled" class="warn" (click)="remove()" [disabled]="!canUpdate()">Delete</button> }
-    }
+    @if (id() && !isSystem()) { <button matButton="filled" class="warn" (click)="remove()" [disabled]="!canUpdate()">Delete page</button> }
   </li>
 </ul>

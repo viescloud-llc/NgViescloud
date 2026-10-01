@@ -522,6 +522,10 @@ export const routes: Routes = [
         loadComponent: () => import('./shop/home/shop-home.component').then(m => m.ShopHomeComponent)
       },
       {
+        path: "pages/:slug",
+        loadComponent: () => import('./shop/page/shop-page.component').then(m => m.ShopPageComponent)
+      },
+      {
         path: "products",
         loadComponent: () => import('./shop/product-list/shop-product-list.component').then(m => m.ShopProductListComponent)
       },

@@ -2,7 +2,7 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { emptyPage, ListPage } from '../../../shared/model/list-page.model';
 import { SearchService } from '../../../shared/service/search/search.service';
 import { ServerPagerComponent } from '../../../shared/component/server-pager/server-pager.component';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NgComponentModule } from '../../../../lib/module/ng-component.module';
 import { ViesMatFormFieldMap } from '../../../../lib/abtract/ViesMatFormFieldMap';
 import { RxJSUtils } from '../../../../lib/util/RxJS.utils';
@@ -26,6 +26,7 @@ export class ReturnListComponent extends ViesMatFormFieldMap implements OnInit {
   protected readonly dialogUtils = inject(DialogUtils);
   protected readonly returnService = inject(ReturnRequestService);
   protected readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   // Server-side (GET /returns/search): status, free text (return / order number,
   // reason), paged, newest first.
@@ -47,6 +48,7 @@ export class ReturnListComponent extends ViesMatFormFieldMap implements OnInit {
   ];
 
   ngOnInit(): void {
+    const qs = this.route.snapshot.queryParamMap.get('status'); if (qs && (Object.values(ReturnStatus) as string[]).includes(qs)) this.statusFilter.set(qs as ReturnStatus);
     this.refresh();
   }
 
@@ -60,6 +62,7 @@ export class ReturnListComponent extends ViesMatFormFieldMap implements OnInit {
   }
 
   onSearchTerm(v: string) {
+    if (v === this.searchTerm()) return; // lib inputs re-emit on focusout — same query = no reload (FE-21)
     this.searchTerm.set(v);
     clearTimeout(this.debounce);
     this.debounce = setTimeout(() => { this.page.set(0); this.refresh(); }, 350);

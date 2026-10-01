@@ -108,10 +108,14 @@ export class ProductVariantComponent extends ViesRestApi<ProductVariant, Product
   newAliasSupplierId = signal<string>('');
   supplierName(id?: string | null): string { return this.supplierList().find(s => s.id === id)?.name ?? ''; }
   newAliasLabel = signal<string>('');
-  canAddAlias = computed<boolean>(() => !!this.id() && this.newAliasValue().trim().length > 0);
+  canAddAlias = computed<boolean>(() => !!this.variantId() && this.newAliasValue().trim().length > 0);
+
+  // `id()` is undefined until the variant GET resolves (memory §9.3); the early
+  // loads in ngOnInit must use the route id or they silently show nothing (FE-22).
+  variantId(): string | null { return this.id() || this.getRouteId() || null; }
 
   private renderMainCode() {
-    const id = this.id();
+    const id = this.variantId();
     if (!id || ViesService.isNotCSR()) { this.mainQrDataUrl.set(''); this.mainCode128Svg.set(null); return; }
     ScanLabelUtil.qrDataUrl(id, 180).then(url => this.mainQrDataUrl.set(url)).catch(() => this.mainQrDataUrl.set(''));
     try {
@@ -120,13 +124,13 @@ export class ProductVariantComponent extends ViesRestApi<ProductVariant, Product
   }
 
   loadScanCodes() {
-    const id = this.id();
+    const id = this.variantId();
     if (!id) { this.scanCodes.set([]); return; }
     this.scanCodeService.list(id).subscribe({ next: res => this.scanCodes.set(res ?? []), error: () => this.scanCodes.set([]) });
   }
 
   copyMainCode() {
-    const id = this.id();
+    const id = this.variantId();
     if (!id) return;
     navigator.clipboard?.writeText(id).then(() => SnackBarUtils.openSnackBar(this.rxjsUtils.snackBar, 'Variant id copied', 'Dismiss', 3000)).catch(() => {});
   }
@@ -196,7 +200,7 @@ export class ProductVariantComponent extends ViesRestApi<ProductVariant, Product
   activeDigitalAssetCount = computed<number>(() => this.digitalAssets().filter(a => a.active).length);
 
   loadDigitalAssets() {
-    const id = this.id();
+    const id = this.variantId();
     if (!id) { this.digitalAssets.set([]); this.digitalAssetsLoaded.set(true); return; }
     this.digitalAssetService.list(id).subscribe({
       next: res => { this.digitalAssets.set(res ?? []); this.digitalAssetsLoaded.set(true); },

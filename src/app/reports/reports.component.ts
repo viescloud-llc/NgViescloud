@@ -19,7 +19,8 @@ import {
   TaxReport,
   TaxReportJurisdiction,
   TopCategoriesReport,
-  TopProductsReport
+  TopProductsReport,
+  StockValuationReport, DiscountPerformanceReport, ShippingReport, ReturnsReport
 } from '../shared/model/report.model';
 
 // Reports & analytics at /reports (intent § 5.10). One period drives every
@@ -91,6 +92,27 @@ export class ReportsComponent extends ViesMatFormFieldMap implements OnInit {
   orderStatus = signal<OrderStatusReport | null>(null);
   refunds = signal<RefundsReport | null>(null);
   customers = signal<CustomersReport | null>(null);
+  // checklist-2 §10
+  stockValuation = signal<StockValuationReport | null>(null);
+  discounts = signal<DiscountPerformanceReport | null>(null);
+  shipping = signal<ShippingReport | null>(null);
+  returns = signal<ReturnsReport | null>(null);
+
+  // Discount given per code (first currency block), returns by reason, valuation by warehouse — memoised for <app-chart>.
+  discountChart = computed(() => {
+    const b = this.discounts()?.byCurrency?.[0]; const codes = (b?.codes ?? []).slice(0, 12);
+    return { currency: b?.currency ?? '', labels: codes.map(c => c.code), datasets: [{ label: `Discount given (${b?.currency ?? ''})`, data: codes.map(c => Number(c.discountGiven) || 0) }, { label: `Revenue (${b?.currency ?? ''})`, data: codes.map(c => Number(c.revenue) || 0) }] };
+  });
+  returnsReasonChart = computed(() => {
+    const rows = (this.returns()?.byReason ?? []).slice(0, 8);
+    return { labels: rows.map(r => r.reason), datasets: [{ label: 'Return requests', data: rows.map(r => r.requests) }] };
+  });
+  valuationChart = computed(() => {
+    const ws = this.stockValuation()?.byWarehouse ?? []; const cur = Object.keys(this.stockValuation()?.totalValueByCurrency ?? {})[0] ?? '';
+    return { currency: cur, labels: ws.map(w => w.name), datasets: [{ label: `Stock value (${cur})`, data: ws.map(w => Number(w.valueByCurrency?.[cur] ?? 0)) }] };
+  });
+  valuationTotal(): string { const t = this.stockValuation()?.totalValueByCurrency ?? {}; return Object.entries(t).map(([c, v]) => `${Number(v).toFixed(2)} ${c}`).join(' · ') || '—'; }
+  whValue(w: { valueByCurrency: Record<string, string | number> }): string { return Object.entries(w.valueByCurrency ?? {}).map(([c, v]) => `${Number(v).toFixed(2)} ${c}`).join(' · ') || '—'; }
 
   timeseriesBucket = signal<SalesTimeseriesBucket>('day');
 
@@ -166,10 +188,10 @@ export class ReportsComponent extends ViesMatFormFieldMap implements OnInit {
     const period = this.periodParams();
     this.loadState.set('loading');
     try {
-      // Fan out all nine in parallel — each section renders from its own
+      // Fan out all thirteen in parallel — each section renders from its own
       // signal, and a single failing endpoint fails the batch loudly instead
       // of silently showing stale numbers.
-      const [tax, summary, timeseries, products, categories, geo, status, refunds, customers] = await Promise.all([
+      const [tax, summary, timeseries, products, categories, geo, status, refunds, customers, valuation, discounts, shipping, returns] = await Promise.all([
         firstValueFrom(this.reportsService.tax(period)),
         firstValueFrom(this.reportsService.salesSummary(period)),
         firstValueFrom(this.reportsService.salesTimeseries(period, this.timeseriesBucket())),
@@ -178,7 +200,11 @@ export class ReportsComponent extends ViesMatFormFieldMap implements OnInit {
         firstValueFrom(this.reportsService.geography(period)),
         firstValueFrom(this.reportsService.orderStatus(period)),
         firstValueFrom(this.reportsService.refunds(period)),
-        firstValueFrom(this.reportsService.customers(period))
+        firstValueFrom(this.reportsService.customers(period)),
+        firstValueFrom(this.reportsService.stockValuation()),
+        firstValueFrom(this.reportsService.discounts(period)),
+        firstValueFrom(this.reportsService.shipping(period)),
+        firstValueFrom(this.reportsService.returns(period))
       ]);
       this.taxReport.set(tax);
       this.salesSummary.set(summary);
@@ -189,6 +215,10 @@ export class ReportsComponent extends ViesMatFormFieldMap implements OnInit {
       this.orderStatus.set(status);
       this.refunds.set(refunds);
       this.customers.set(customers);
+      this.stockValuation.set(valuation);
+      this.discounts.set(discounts);
+      this.shipping.set(shipping);
+      this.returns.set(returns);
       this.loadState.set('loaded');
     } catch (err) {
       this.loadState.set('failed');

@@ -22,6 +22,7 @@ import { OrderFulfillment } from '../../../shared/model/commerce.model';
 import { CustomerService } from '../../../shared/service/customer/customer.service';
 import { ManualOrderService } from '../../../shared/service/manual-order/manual-order.service';
 import { ScanCodeService } from '../../../shared/service/scan-code/scan-code.service';
+import { ScanLookupMatch } from '../../../shared/model/scan-code.model';
 import { SearchService } from '../../../shared/service/search/search.service';
 import { WarehouseService } from '../../../shared/service/warehouse/warehouse.service';
 import { ReceiptPrintUtil } from '../../../shared/util/receipt-print.util';
@@ -98,8 +99,15 @@ export class NewOrderComponent extends ViesMatFormFieldMap implements OnInit {
     if (!p || this.paymentMethod() !== 'CASH' || !t) return '';
     return Math.max(0, t - Number(p.total)).toFixed(2);
   });
+  // Cash tendered below the total: show the shortfall and block Create (FE-24; the server refuses too, BE-19).
+  shortBy = computed<string>(() => {
+    const p = this.preview(); const raw = this.amountTendered().trim();
+    if (!p || this.paymentMethod() !== 'CASH' || !raw) return '';
+    const t = Number(raw); if (Number.isNaN(t)) return '';
+    return t < Number(p.total) ? (Number(p.total) - t).toFixed(2) : '';
+  });
   canCreate = computed<boolean>(() =>
-    this.hasCustomer() && this.lines().length > 0 && !!this.preview() && (this.preview()!.warnings.length === 0)
+    this.hasCustomer() && this.lines().length > 0 && !!this.preview() && (this.preview()!.warnings.length === 0) && !this.shortBy()
     && (this.collected() || (!!this.address().country.trim() && !!this.shippingRuleId()))
     && !this.creating()
   );
@@ -122,6 +130,12 @@ export class NewOrderComponent extends ViesMatFormFieldMap implements OnInit {
   clearCustomer() { this.customer.set(null); this.schedulePreview(); }
 
   // ---- Line handlers ----
+  ambiguousScan = signal<{ code: string; matches: ScanLookupMatch[] } | null>(null);
+  pickScanMatch(m: ScanLookupMatch) {
+    this.addVariant(m.variant, m.productName ?? '', String(m.effectivePrice ?? m.variant.effectivePrice ?? m.variant.price ?? '0'));
+    this.ambiguousScan.set(null);
+  }
+
   onScanKey(evt: KeyboardEvent) { if (evt.key === 'Enter') { evt.preventDefault(); this.scan(); } }
 
   scan() {
@@ -130,9 +144,14 @@ export class NewOrderComponent extends ViesMatFormFieldMap implements OnInit {
     this.scanCodes.lookup(code).subscribe({
       next: r => {
         if (r.matches.length === 0) { SnackBarUtils.openSnackBar(this.rxjsUtils.snackBar, `No variant carries "${code}"`, 'Dismiss', 4000); return; }
+        if (r.matches.length > 1) {
+          // Shared supplier alias: let the cashier pick, like the stock page does (FE-23).
+          this.ambiguousScan.set({ code, matches: r.matches });
+          this.scanValue.set('');
+          return;
+        }
         const m = r.matches[0];
         this.addVariant(m.variant, m.productName ?? '', String(m.effectivePrice ?? m.variant.effectivePrice ?? m.variant.price ?? '0'));
-        if (r.matches.length > 1) SnackBarUtils.openSnackBar(this.rxjsUtils.snackBar, `${r.matches.length} variants share that alias — added the first`, 'Dismiss', 5000);
         this.scanValue.set('');
       },
       error: err => this.dialogUtils.openErrorMessageFromError(err)

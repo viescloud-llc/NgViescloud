@@ -35,7 +35,7 @@ export class Carrier extends TrackedTimeStamp {
     @MatInputDisplayLabel('Active')
     active: boolean = true;
 
-    @MatInputDisplayLabel('Integration', '"none" = manual; a registered integration key (e.g easypost, ups) once built')
+    @MatInputDisplayLabel('Integration', '"none" = manual; "easypost" = live rates, label purchase and tracking webhook (API key below; webhook secret in API secret)')
     integrationType: string = 'none';
 
     @MatInputDisplayLabel('Account number')

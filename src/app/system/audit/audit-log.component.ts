@@ -59,7 +59,7 @@ export class AuditLogComponent extends ViesMatFormFieldMap implements OnInit {
     });
   }
 
-  onQ(v: string) { this.q.set(v); clearTimeout(this.debounce); this.debounce = setTimeout(() => { this.page.set(0); this.load(); }, 350); }
+  onQ(v: string) { if (v === this.q()) return; this.q.set(v); clearTimeout(this.debounce); this.debounce = setTimeout(() => { this.page.set(0); this.load(); }, 350); }
   onType(v: string | null) { this.entityType.set(v); this.page.set(0); this.load(); }
   onAction(v: string | null) { this.action.set(v); this.page.set(0); this.load(); }
   onFrom(v: string) { this.from.set(v); this.page.set(0); this.load(); }

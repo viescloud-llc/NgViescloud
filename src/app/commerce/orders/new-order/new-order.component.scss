@@ -14,3 +14,5 @@
 .ship-options { display: flex; flex-direction: column; gap: 0.35rem; margin: 0.5rem 0; }
 .totals { border-collapse: collapse; margin-bottom: 0.75rem; td { padding: 0.2rem 0.75rem 0.2rem 0; } .num { text-align: right; } .grand td { font-weight: 700; font-size: 1.1rem; border-top: 1px solid var(--mat-sys-outline-variant, rgba(255,255,255,0.2)); } }
 .change { font-size: 1.05rem; }
+
+.change.short { color: #c62828; }

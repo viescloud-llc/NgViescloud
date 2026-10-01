@@ -98,15 +98,20 @@
     <h3 class="section-title">Refund</h3>
     @if (canRefund()) {
       <p class="tab-hint">
-        Refunds <strong>{{ value()?.refundAmount && +value()!.refundAmount > 0 ? value()?.refundAmount : 'everything still refundable' }}</strong>
+        Refunds <strong>{{ returnValueText() }}</strong>
         @if (value()?.refundShipping) { plus the order's shipping }
-        through the payment provider in one server step, lets the order move to
+        through the payment provider in one server step (capped at what is still refundable), lets the order move to
         <em>refunded / partially refunded</em>, and closes this return as <em>Refunded</em>.
-        Needs <code>checkout:refund</code>.
+        Edit <em>Refund Amount</em> above to refund a different figure. Needs <code>checkout:refund</code>.
       </p>
-      <button matButton="filled" class="warn" (click)="issueRefund()" [disabled]="_value.isValueChange()" type="button">
-        Issue refund
-      </button>
+      <div class="flex-row-container-auto">
+        <button matButton="filled" class="warn" (click)="issueRefund()" [disabled]="_value.isValueChange()" type="button">
+          Refund {{ value()?.refundAmount && +value()!.refundAmount > 0 ? value()?.refundAmount : 'return value' }}
+        </button>
+        <button matButton (click)="issueRefund(true)" [disabled]="_value.isValueChange()" type="button">
+          Refund the whole remaining order balance instead…
+        </button>
+      </div>
       @if (_value.isValueChange()) { <p class="empty-hint">Save your changes first — the server refunds the saved amount.</p> }
     } @else {
       <p class="empty-hint">

@@ -60,3 +60,5 @@
 }
 
 .picker-row { display: flex; gap: 1rem; flex-wrap: wrap; .picker { min-width: 240px; } }
+
+.label-block a { display: inline-flex; align-items: center; gap: 0.25rem; }

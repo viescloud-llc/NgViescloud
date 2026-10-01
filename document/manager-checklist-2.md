@@ -221,29 +221,53 @@ document new endpoints in `Venzora/document/api.md`.
   history. App shell loads the public info (and the row for staff with `settings:read`); counter receipts
   print name / legal name / tax id / footer; a new product preselects the default currency.
 
-## 10. New reports and an operational dashboard
+## 10. New reports and an operational dashboard ✅ *(2026-09-24)*
 
-- [ ] Stock valuation by warehouse (Σ qty × cost — needs a `cost` on variant/product; add it).
-- [ ] Discount performance (uses, revenue, discount given, per code and per period).
-- [ ] Shipping charged vs shipping cost (once a carrier provider reports cost).
-- [ ] Returns rate by product / reason.
-- [ ] **Manager** Home dashboard: today's orders, awaiting shipment, pending returns, low stock, unpaid
-  PENDING orders older than 1 h — each tile links to the filtered list.
+- [x] Stock valuation by warehouse — `costPrice` added to Product (default) and ProductVariant (override);
+  `GET /reports/stock/valuation?warehouseId=` = Σ on-hand × effective cost per warehouse and per line, valued in the
+  product's currency, with a "variants without a cost" count.
+- [x] Discount performance — `GET /reports/discounts?from&to`: per code (from order metadata `discount.code` /
+  `discount.appliedAmount`): orders, revenue, discount given, avg order, discount rate %, current uses / cap.
+- [x] Shipping charged vs cost — `GET /reports/shipping?from&to`: per method charged / avg / free-shipping count;
+  `carrierCost` and `margin` are null and `carrierCostAvailable=false` until a carrier provider reports cost.
+- [x] Returns rate by product / reason — `GET /reports/returns?from&to`: units returned vs sold per product
+  (rate %, refunded), requests by reason and by status (cancelled/rejected excluded).
+- [x] **Manager** Home dashboard (`/home`, `GET /reports/dashboard`): today's orders + revenue, awaiting shipment
+  (+ in transit), pending returns, low stock (+ out of stock), unpaid PENDING older than 1 h, open purchase orders,
+  draft products — each tile opens the filtered list (order / return / product lists now honour `?status=` and
+  orders `?from=`). Reports page gained the four sections with charts (valuation by warehouse, discount given vs
+  revenue per code, returns by reason).
 
-## 11. Technical items
+## 11. Technical items ✅ *(2026-09-24)*
 
-- [ ] `@Version` on `InventoryLevel` (optimistic lock) so simultaneous captures on the last unit fail
-  cleanly instead of racing; retry once in `complete()`.
-- [ ] Encryption at rest for SMTP passwords and carrier `apiKey/apiSecret` in the lib
-  (`@Convert(EncryptedStringConverter)` keyed by an env secret) — lib bump + deploy.
-- [ ] Integration tests for checkout: start → capture (complete + webhook) → refund → restock, against
-  H2 with a fake `CheckoutProviderRegistry`; and allocation across two warehouses.
-- [ ] Manager e2e smoke (Playwright) for login, product create, order workflow, so browser rounds stop
-  being manual.
-- [ ] First `CarrierRateProvider` (EasyPost or a direct UPS/FedEx client) reading the carrier's
+- [x] `@Version` on `InventoryLevel` (optimistic lock) so simultaneous captures on the last unit fail
+  cleanly instead of racing; retry once in `complete()`. — `InventoryLevel.version`,
+  `service/inventory/OptimisticRetry`, `complete()/completeByStaff()` and the webhook→fulfillment
+  listener run in a `TransactionTemplate` and retry once; capture goes through the order's own provider.
+- [x] Encryption at rest for SMTP passwords and carrier `apiKey/apiSecret` in the lib
+  (`@Convert(EncryptedStringConverter)` keyed by an env secret) — lib bump + deploy. — lib **6.5.6**:
+  AES key from `VIES_AES_SECRET`/`VIES_AES_SALT` (static dev fallback), `StringAesEncodeConverter`
+  tolerant of pre-encryption plaintext, `SmtpProvider.password` converted; Venzora `Carrier.apiKey/apiSecret`
+  converted (`AesAtRestTest`).
+- [x] Integration tests for checkout: start → capture (complete + webhook) → refund → restock, against
+  H2 with a fake `CheckoutProviderRegistry`; and allocation across two warehouses. — `it/CheckoutFlowIT`
+  (`@SpringBootTest`, profile `test` = in-memory H2, `FakeCheckoutOrderService` provider "fake"):
+  exactly one SALE per line, idempotent second complete, full refund, restock; two-warehouse allocation;
+  last-unit contention (one wins, one fails cleanly).
+- [x] Manager e2e smoke (Playwright) for login, product create, order workflow, so browser rounds stop
+  being manual. — `@playwright/test`, `playwright.config.ts`, `e2e/manager.spec.ts` (+ `helpers.ts`),
+  `npm run e2e` against the dev servers (4200/8085, admin/admin; `E2E_BASE_URL`/`E2E_API_URL`/`E2E_USER`/`E2E_PASS`).
+- [x] First `CarrierRateProvider` (EasyPost or a direct UPS/FedEx client) reading the carrier's
   credentials and the origin warehouse address; label purchase on shipments; tracking webhook →
-  shipment status listener (mirror of the PayPal webhook pattern).
-- [ ] Media: bulk image upload and drag-reorder across a product's variants.
+  shipment status listener (mirror of the PayPal webhook pattern). — `service/shipping/easypost/*`
+  (`EasyPostRateProvider` "easypost", `EasyPostLabelService`, `EasyPostClient` on Spring `RestClient`,
+  pure `EasyPostMapper` + `EasyPostMapperTest`), `POST /shipments/{id}/buy-label` (`shipments:update`),
+  public `POST /api/v1/public/webhooks/easypost` (HMAC per carrier `apiSecret`), label block on `Shipment`
+  + "Buy label" in the shipment editor. **Not verified against the live EasyPost API** — the webhook and
+  gates were verified over HTTP, the wire mapping by unit tests; api.md §7.25.
+- [x] Media: bulk image upload and drag-reorder across a product's variants. — media gallery "Add files…"
+  (multi-select, pending uploads until the parent saves) and CDK drag-to-reorder of thumbnails (sortOrder
+  follows the visual order); the same gallery is used by product and variant media.
 
 ---
 
@@ -294,6 +318,17 @@ business identity (those stay in §9 so applying a template never has side effec
 - [x] Manager: Settings → Storefront (tabs: Appearance, Home page, Announcement, Navigation & footer,
   Behaviour, SEO, Legal pages), Templates list + editor + schedule calendar. Section editor for the home
   page with drag-to-reorder and the product selector widget.
+- **Page roles (2026-09-22):** `PageRole` (HOME, TERMS, PRIVACY, RETURNS_POLICY, SHIPPING_POLICY, CONTACT, ABOUT,
+  FAQ, CUSTOM) replaces `kind`; system-role pages are unique, seeded, undeletable and placed by role in the customer
+  frontend (`pagesByRole` in the resolved storefront). Templates carry `affectedRoles` (default HOME + CUSTOM) and
+  per-page section overrides; `/public/storefront/pages/{slug}` applies the active template when it affects the role.
+  Test shop: `/shop/pages/:slug`.
+- **Page bodies (2026-09-22):** a page owns named `PageBody`s (each with draft + published sections); `liveBodyId`
+  is what customers see (`make-live` publishes if needed; `take-offline` hides the page). Templates reference a
+  body per affected page (`pageBodies {pageId → bodyId}`) instead of copying sections, and publishing a template
+  publishes those bodies — so parallel drafts ("Spring launch", "Black Friday") can be prepared and swapped by
+  schedule. Manager: body switcher on the page editor (new / copy / save / publish / discard / make live /
+  delete / preview), body picker per affected page on the template's Pages tab.
 - Implementation notes: appearance / behaviour are JSON columns on `StoreSettings` (`JsonColumn`
   converters, lenient on unknown fields); `StorefrontPage` (draft/published sections, `home` seeded on
   first read), `StorefrontTemplate` (partial overlay flags, draft/published), `StorefrontSchedule`
@@ -311,4 +346,4 @@ business identity (those stay in §9 so applying a template never has side effec
 
 1. §1 Customers → 2. §2 Money actions → 3. §3 Transactional email → 4. §4 Server-side lists →
 5. §5 Audit → 6. §8 Manual orders (unlocks the POS) → 7. §6 Stock ops → 8. §7 Bulk/import →
-9. §9 Store settings → 10. §10 Reports/dashboard → 11. §12 Storefront customisation ✅ → §11 as items become blocking.
+9. §9 Store settings → 10. §10 Reports/dashboard ✅ → 11. §12 Storefront customisation ✅ → §11 as items become blocking.

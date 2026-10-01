@@ -51,9 +51,11 @@
                                         .set(inputKeys.showSizeInput, false)
                                         .set(inputKeys.showSearchOption, true)
                                         .set(inputKeys.expanded, true)
-                                        .set(inputKeys.uniqueValue, true)"
+                                        .set(inputKeys.uniqueValue, true)
+                                        .set(inputKeys.showAddNewButton, false)
+                                        .set(inputKeys.showRemoveButton, true)"
       ></app-mat-form-field-input-list-option>
-      <p class="hint">Roles from the user's groups are inherited automatically; the effective set is the union.</p>
+      <p class="hint">Pick a role in the search box above to grant it (nothing is added until you choose); the × removes a grant. Roles from the user's groups are inherited automatically; the effective set is the union.</p>
     </li>
     <li>
       <app-mat-form-field-input-dynamic

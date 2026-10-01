@@ -56,7 +56,7 @@ export class OrderPaymentService {
   }
 
   /** Refund a return in one step: amount from the request, status → REFUNDED. */
-  refundReturn(returnId: string): Observable<ReturnRefundResult> {
-    return this.http.post<ReturnRefundResult>(`${this.returns}/${returnId}/refund`, null);
+  refundReturn(returnId: string, wholeOrder = false): Observable<ReturnRefundResult> {
+    return this.http.post<ReturnRefundResult>(`${this.returns}/${returnId}/refund${wholeOrder ? '?wholeOrder=true' : ''}`, null);
   }
 }

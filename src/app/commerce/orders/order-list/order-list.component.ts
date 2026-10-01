@@ -55,6 +55,8 @@ export class OrderListComponent extends ViesMatFormFieldMap implements OnInit {
 
   ngOnInit(): void {
     this.customerId.set(this.route.snapshot.queryParamMap.get('customerId') ?? '');
+    const qs = this.route.snapshot.queryParamMap.get('status'); if (qs && (Object.values(FulfillmentStatus) as string[]).includes(qs)) this.statusFilter.set(qs as FulfillmentStatus);
+    const qf = this.route.snapshot.queryParamMap.get('from'); if (qf) this.from.set(qf);
     this.load();
   }
 
@@ -71,6 +73,7 @@ export class OrderListComponent extends ViesMatFormFieldMap implements OnInit {
   }
 
   onSearchTerm(v: string) {
+    if (v === this.searchTerm()) return; // lib inputs re-emit on focusout — same query = no reload (FE-21)
     this.searchTerm.set(v);
     clearTimeout(this.debounce);
     this.debounce = setTimeout(() => this.resetAndLoad(), 350);

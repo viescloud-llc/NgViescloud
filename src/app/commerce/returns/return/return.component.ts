@@ -199,7 +199,18 @@ export class ReturnComponent extends ViesRestApi<ReturnRequest, ReturnRequestSer
   // status, closes this return as REFUNDED and notes the transaction.
   private readonly orderPaymentService = inject(OrderPaymentService);
 
-  async issueRefund() {
+  // What the returned units are worth (the server computes the same default on
+  // create and refunds it when the amount is empty, BE-24): shown so the admin
+  // sees a number, never "everything" (FE-25).
+  returnValueText = computed<string>(() => {
+    const v = this.value(); const item = this.selectedItem();
+    const amount = v?.refundAmount && Number(v.refundAmount) > 0 ? Number(v.refundAmount).toFixed(2) : '';
+    const sku = item?.lineItemSku || item?.productVariant?.sku || '';
+    const qty = v?.returnQuantity || item?.quantity || 1;
+    return amount ? `${amount} for ${qty}× ${sku}` : `the value of ${qty}× ${sku}`;
+  });
+
+  async issueRefund(wholeOrder = false) {
     const v = this._value.value();
     const order = this.linkedOrder();
     if (!v?.id || !order?.checkoutOrderId) return;
@@ -207,17 +218,16 @@ export class ReturnComponent extends ViesRestApi<ReturnRequest, ReturnRequestSer
       this.dialogUtils.openErrorMessage('Save first', 'Save the return before issuing the refund — the server refunds the saved amount.');
       return;
     }
-    const amount = v.refundAmount && Number(v.refundAmount) > 0 ? Number(v.refundAmount).toFixed(2) : undefined;
-    const shipping = v.refundShipping && Number(order.shippingCost) > 0 ? ` plus shipping ${Number(order.shippingCost).toFixed(2)}` : '';
+    const shipping = !wholeOrder && v.refundShipping && Number(order.shippingCost) > 0 ? ` plus shipping ${Number(order.shippingCost).toFixed(2)}` : '';
     const confirmed = await this.dialogUtils.openConfirmDialog(
-      'Issue refund?',
-      amount
-        ? `Refund ${amount} ${order.currency}${shipping} to the buyer through the payment provider. This cannot be undone.`
-        : `Refund EVERYTHING still refundable on order ${order.orderNumber} to the buyer. This cannot be undone.`,
-      'Refund', 'Cancel').catch(() => false);
+      wholeOrder ? 'Refund the whole remaining balance?' : 'Issue refund?',
+      wholeOrder
+        ? `Refund EVERYTHING still refundable on order ${order.orderNumber} — not just this return's items — to the buyer. This cannot be undone.`
+        : `Refund ${this.returnValueText()} ${order.currency}${shipping} to the buyer through the payment provider. This cannot be undone.`,
+      wholeOrder ? 'Refund whole balance' : 'Refund', 'Cancel').catch(() => false);
     if (!confirmed) return;
 
-    this.orderPaymentService.refundReturn(v.id).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+    this.orderPaymentService.refundReturn(v.id, wholeOrder).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
       next: res => {
         this._value.set(res.returnRequest);
         if (res.payment?.order) this.allOrders.set(this.allOrders().map(o => o.id === res.payment.order.id ? res.payment.order : o));

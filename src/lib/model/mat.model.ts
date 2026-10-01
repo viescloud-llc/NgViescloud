@@ -604,6 +604,11 @@ export const MatFormFieldInput = {
   // MatFormFieldInputListOption
   uniqueValue:            { key: 'uniqueValue',          value: field<boolean>(false) },
   showSearchOption:       { key: 'showSearchOption',     value: field<boolean>(false) },
+  // "Add new" inserts the first unused option immediately; for grants (roles, groups) hide it and
+  // require an explicit pick through the search option instead (FE-28).
+  showAddNewButton:       { key: 'showAddNewButton',     value: field<boolean>(true) },
+  // A visible remove button per row (the "Remove" entry inside the dropdown stays as well).
+  showRemoveButton:       { key: 'showRemoveButton',     value: field<boolean>(false) },
 
   // MatFormFieldInputDynamic
   isPassword:              { key: 'isPassword',              value: field<boolean>(false) },

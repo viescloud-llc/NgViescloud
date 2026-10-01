@@ -220,16 +220,35 @@ export function blankSettingsFor(type: SectionType): object {
 export interface PageSection { id?: string; type: SectionType; enabled: boolean; settings: Record<string, any>; }
 
 // ---- Pages, templates, schedules (ViesRestService resources) ----------------------------
-export enum PageKind { PAGE = 'PAGE', LEGAL = 'LEGAL' }
+// Where the storefront puts a page: "/" renders HOME, checkout links TERMS/PRIVACY,
+// the return flow shows RETURNS_POLICY, the contact route renders CONTACT. Every
+// role but CUSTOM is unique and its page cannot be deleted (only left unpublished).
+export enum PageRole { HOME = 'HOME', TERMS = 'TERMS', PRIVACY = 'PRIVACY', RETURNS_POLICY = 'RETURNS_POLICY', SHIPPING_POLICY = 'SHIPPING_POLICY', CONTACT = 'CONTACT', ABOUT = 'ABOUT', FAQ = 'FAQ', CUSTOM = 'CUSTOM' }
+export const PAGE_ROLE_LABELS: Record<PageRole, string> = { HOME: 'Home', TERMS: 'Terms of service', PRIVACY: 'Privacy policy', RETURNS_POLICY: 'Returns policy', SHIPPING_POLICY: 'Shipping policy', CONTACT: 'Contact', ABOUT: 'About', FAQ: 'FAQ', CUSTOM: 'Custom page' };
+export const isSystemRole = (r?: PageRole | null) => !!r && r !== PageRole.CUSTOM;
+// A named version of a page's content: its own draft and published sections.
+export interface PageBody { id: string; pageId: string; name: string; draftSections: PageSection[]; publishedSections?: PageSection[] | null; publishedAt?: string | null; }
+
+// Row shape for the page editor's Bodies table (decorator-driven columns).
+export class PageBodyRow {
+    @MatTableHide() id: string = '';
+    @MatTableDisplayLabel('Body') name: string = '';
+    @MatTableDisplayLabel('Live', (r: PageBodyRow) => r.live ? '● live' : '') live: boolean = false;
+    @MatTableDisplayLabel('Published', (r: PageBodyRow) => r.publishedAt ? r.publishedAt.slice(0, 16).replace('T', ' ') : 'never') publishedAt: string = '';
+    @MatTableDisplayLabel('Draft', (r: PageBodyRow) => r.draftDiffers ? 'differs from published' : (r.publishedAt ? 'same as published' : 'unpublished')) draftDiffers: boolean = false;
+    @MatTableDisplayLabel('Sections') sections: number = 0;
+}
+
 export class StorefrontPage extends TrackedTimeStamp {
     @MatInputDisable() @MatInputDisplayLabel('ID') @MatTableHide() id: string = '';
+    // Role is rendered by the editor with its own option widget (locked on system pages).
+    @MatInputHide() @MatTableDisplayLabel('Role', (p: StorefrontPage) => PAGE_ROLE_LABELS[p.role] ?? p.role) role: PageRole = PageRole.CUSTOM;
     @MatInputDisplayLabel('Title') title: string = '';
     @MatInputDisplayLabel('Slug (URL)', 'lower-case handle: about, terms, returns-policy') slug: string = '';
-    @MatInputEnum(PageKind) @MatInputDisplayLabel('Kind', 'LEGAL pages are linked from checkout and returns') kind: PageKind = PageKind.PAGE;
     @MatInputItemSetting(MatItemSettingType.SLIDE_TOGGLE, true) @MatInputDisplayLabel('Active') @MatTableHide() active: boolean = true;
-    @MatInputHide() @MatTableDisplayLabel('Draft sections', (p: StorefrontPage) => String((p.draftSections ?? []).length)) draftSections: PageSection[] = [];
-    @MatInputHide() @MatTableHide() publishedSections?: PageSection[] = [];
-    @MatInputHide() @MatTableDisplayLabel('Published', (p: StorefrontPage) => p.publishedAt ? p.publishedAt.slice(0, 16).replace('T', ' ') : 'never') publishedAt?: string | null = null;
+    // Which body customers see; owned by "make live".
+    @MatInputHide() @MatTableDisplayLabel('Live body', (p: StorefrontPage) => p.liveBodyId ? ((p.bodies ?? []).find(b => b.id === p.liveBodyId)?.name ?? 'yes') : 'offline') liveBodyId?: string | null = null;
+    @MatInputHide() @MatTableDisplayLabel('Bodies', (p: StorefrontPage) => String((p.bodies ?? []).length)) bodies: PageBody[] = [];
 }
 
 export class StorefrontTemplate extends TrackedTimeStamp {
@@ -241,11 +260,12 @@ export class StorefrontTemplate extends TrackedTimeStamp {
     @MatInputItemSetting(MatItemSettingType.SLIDE_TOGGLE, true) @MatInputDisplayLabel('Overrides header & navigation') @MatTableHide() overrideHeader: boolean = false;
     @MatInputItemSetting(MatItemSettingType.SLIDE_TOGGLE, true) @MatInputDisplayLabel('Overrides footer') @MatTableHide() overrideFooter: boolean = false;
     @MatInputItemSetting(MatItemSettingType.SLIDE_TOGGLE, true) @MatInputDisplayLabel('Overrides announcement bar') @MatTableHide() overrideAnnouncement: boolean = true;
-    @MatInputItemSetting(MatItemSettingType.SLIDE_TOGGLE, true) @MatInputDisplayLabel('Overrides home page') @MatTableHide() overrideHome: boolean = true;
-    @MatInputHide() @MatTableDisplayLabel('Overrides', (t: StorefrontTemplate) => [t.overrideTheme && 'theme', t.overrideBrand && 'brand', t.overrideHeader && 'header', t.overrideFooter && 'footer', t.overrideAnnouncement && 'announcement', t.overrideHome && 'home'].filter(Boolean).join(', ')) draftAppearance: StorefrontAppearance = new StorefrontAppearance();
+    // Which page roles this template may restyle (default HOME + CUSTOM). Rendered with the lib multi-select.
+    @MatInputHide() @MatTableDisplayLabel('Pages', (t: StorefrontTemplate) => (t.affectedRoles ?? []).map(r => PAGE_ROLE_LABELS[r] ?? r).join(', ')) affectedRoles: PageRole[] = [PageRole.HOME, PageRole.CUSTOM];
+    @MatInputHide() @MatTableDisplayLabel('Overrides', (t: StorefrontTemplate) => [t.overrideTheme && 'theme', t.overrideBrand && 'brand', t.overrideHeader && 'header', t.overrideFooter && 'footer', t.overrideAnnouncement && 'announcement'].filter(Boolean).join(', ')) draftAppearance: StorefrontAppearance = new StorefrontAppearance();
     @MatInputHide() @MatTableHide() publishedAppearance?: StorefrontAppearance | null = null;
-    @MatInputHide() @MatTableHide() draftHomeSections: PageSection[] = [];
-    @MatInputHide() @MatTableHide() publishedHomeSections?: PageSection[] | null = null;
+    // Which body each affected page shows while the template is live (pageId → bodyId). Rendered per page in the editor.
+    @MatInputHide() @MatTableHide() pageBodies: Record<string, string> = {};
     @MatInputHide() @MatTableDisplayLabel('Published', (t: StorefrontTemplate) => t.publishedAt ? t.publishedAt.slice(0, 16).replace('T', ' ') : 'draft only') publishedAt?: string | null = null;
 }
 
@@ -272,9 +292,14 @@ export interface ResolvedStorefront {
     version: string; store: PublicStoreInfo; appearance: WireAppearance; behaviour: WireBehaviour;
     navigation: { label: string; url: string; categoryId?: string | null }[];
     announcement?: WireAnnouncement | null; home: ResolvedSection[];
-    pages: { slug: string; title: string; kind: string }[];
+    pages: PageLink[];
+    /** System pages by role — checkout / returns / contact resolve slugs here. */
+    pagesByRole: Record<string, PageLink>;
     activeTemplate?: { id: string; name: string; preview: boolean } | null;
 }
+export interface PageLink { slug: string; title: string; role: string; published: boolean; }
+/** GET /public/storefront/pages/{slug} — a page as customers see it now (template applied when it affects the role). */
+export interface PageView { slug: string; title: string; role: string; sections: ResolvedSection[]; publishedAt?: string | null; templateName?: string | null; }
 
 // ---- Wire ↔ client --------------------------------------------------------------------
 function fixList<T extends object>(items: unknown, make: () => T, fix?: (x: T) => T): T[] {
@@ -310,4 +335,7 @@ export function behaviourToWire(b: StorefrontBehaviour): WireBehaviour {
 }
 export function sectionsFromWire(list?: PageSection[] | null): PageSection[] {
     return (list ?? []).map(s => ({ ...s, settings: Object.assign(blankSettingsFor(s.type), s.settings ?? {}) }));
+}
+export function bodyFromWire(b: PageBody): PageBody {
+    return { ...b, draftSections: sectionsFromWire(b.draftSections), publishedSections: b.publishedSections ? sectionsFromWire(b.publishedSections) : null };
 }

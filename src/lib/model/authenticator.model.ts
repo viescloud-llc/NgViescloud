@@ -1,5 +1,5 @@
 import { ReflectionUtils } from "../util/Reflection.utils";
-import { MatColumn, MatInputDisable, MatInputHide, MatTableHide, MatTableDisplayLabel, MatInputItemSetting, MatInputRequire, MatItemSettingType } from "./mat.model";
+import { MatColumn, MatInputDisable, MatInputDisplayLabel, MatInputHide, MatTableHide, MatTableDisplayLabel, MatInputItemSetting, MatInputRequire, MatItemSettingType } from "./mat.model";
 import { ViesDateTime } from "./vies.model";
 
 export enum AccessPermission {
@@ -62,9 +62,11 @@ export class Role {
     id: string = '';
 
     @MatInputRequire()
+    @MatInputDisplayLabel('Name', 'e.g CATALOG_ADMIN — what the role is for')
     name: string = '';
 
     @MatInputItemSetting(MatItemSettingType.TEXT_AREA)
+    @MatInputDisplayLabel('Description', 'who should hold this role and what it unlocks')
     description: string = '';
 
     // Edited by the dedicated permission editor, not the dynamic form.

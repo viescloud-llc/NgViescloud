@@ -1,25 +1,39 @@
 <ul class="margin-center">
-  <li><p class="tab-hint">A <strong>template</strong> is a saved look that overlays the default (only the parts it overrides). The <strong>schedule</strong> decides which one is live: the highest-priority enabled window containing now, else the default. Reverting is automatic when a window ends.</p></li>
-  <li>
-    <h3 class="section-title">Templates @if (activeId()) { <small class="live">· live now: {{ activeName() }}</small> } @else { <small>· default look is live</small> }</h3>
-    <app-mat-table [matRows]="templates()" [blankObject]="blankTemplate" [showMatTooltip]="true" (onEditRow)="open($event)"></app-mat-table>
-    <div class="row">
-      @if (canCreate()) { <button matButton="filled" (click)="add()" type="button">New template</button><button matButton (click)="fromLive()" type="button">Save live look as template</button> }
-      <button matButton (click)="preview()" type="button">Preview live</button><button matButton (click)="refresh()" type="button">Refresh</button>
-    </div>
+  <li class="return-banner">
+    <span>Templates &amp; schedule @if (activeId()) { <small class="live">· live now: {{ activeName() }}</small> } @else { <small>· default look is live</small> }</span>
+    <span class="links"><button matButton (click)="preview()" type="button">Preview live</button><button matButton (click)="refresh()" type="button">Refresh</button></span>
   </li>
   <li>
-    <h3 class="section-title">Schedule <small>(● = live now; click a row to edit, end or delete)</small></h3>
-    <app-mat-table [matRows]="scheduleRows()" [blankObject]="blankSchedule" [showMatTooltip]="true" (onEditRow)="editWindow($event)"></app-mat-table>
-    @if (canUpdate()) {
-      <div class="row">
-        <app-mat-form-field-input-option [value]="newTemplateId()" (valueChange)="newTemplateId.set($event)" [options]="templateOptions()" [noneLabel]="''" [inputMap]="inputField('sch-template').set(inputKeys.label, 'Template').set(inputKeys.styleWidth, '240px')"></app-mat-form-field-input-option>
-        <app-mat-form-field-input-time [value]="newStart()!" (valueChange)="newStart.set($event)" type="DATE_TIME" [inputMap]="inputField('sch-start').set(inputKeys.label, 'From')"></app-mat-form-field-input-time>
-        <app-mat-form-field-input-time [value]="newEnd()!" (valueChange)="newEnd.set($event)" type="DATE_TIME" [inputMap]="inputField('sch-end').set(inputKeys.label, 'Until (empty = open-ended)')"></app-mat-form-field-input-time>
-        <app-mat-form-field-input [value]="newPriority()" (valueChange)="newPriority.set(+$event || 0)" [blankObject]="0" [inputMap]="inputField('sch-prio').set(inputKeys.label, 'Priority').set(inputKeys.styleWidth, '110px')"></app-mat-form-field-input>
-        <app-mat-form-field-input [value]="newName()" (valueChange)="newName.set($event)" [blankObject]="''" [inputMap]="inputField('sch-name').set(inputKeys.label, 'Window name (optional)').set(inputKeys.styleWidth, '220px')"></app-mat-form-field-input>
-        <button matButton="filled" (click)="addWindow()" [disabled]="!newTemplateId() || !newStart()" type="button">Schedule</button>
-      </div>
-    }
+    <mat-tab-group [preserveContent]="true" class="tpl-tabs">
+
+      <mat-tab [label]="'Templates (' + templates().length + ')'">
+        <div class="tab-body">
+          <p class="tab-hint">A <strong>template</strong> is a saved look that overlays the default: only the parts it overrides (theme, header, footer, announcement) and the page bodies it points at replace the default. Click a template to edit it.</p>
+          <app-mat-table [matRows]="templates()" [blankObject]="blankTemplate" [showMatTooltip]="true" (onEditRow)="open($event)"></app-mat-table>
+          <div class="row">
+            @if (canCreate()) { <button matButton="filled" (click)="add()" type="button">New template</button><button matButton (click)="fromLive()" type="button">Save live look as template</button> }
+          </div>
+        </div>
+      </mat-tab>
+
+      <mat-tab [label]="'Schedule (' + schedules().length + ')'">
+        <div class="tab-body">
+          <p class="tab-hint">The schedule decides which template is live: the highest-priority enabled window containing now, else the default. Reverting is automatic when a window ends. ● = live now; click a row to edit, end or delete it.</p>
+          <app-mat-table [matRows]="scheduleRows()" [blankObject]="blankSchedule" [showMatTooltip]="true" (onEditRow)="editWindow($event)"></app-mat-table>
+          @if (canUpdate()) {
+            <h3 class="section-title">Schedule a window</h3>
+            <div class="row">
+              <app-mat-form-field-input-option [value]="newTemplateId()" (valueChange)="newTemplateId.set($event)" [options]="templateOptions()" [noneLabel]="''" [inputMap]="inputField('sch-template').set(inputKeys.label, 'Template').set(inputKeys.styleWidth, '240px')"></app-mat-form-field-input-option>
+              <app-mat-form-field-input-time [value]="newStart()!" (valueChange)="newStart.set($event)" type="DATE_TIME" [inputMap]="inputField('sch-start').set(inputKeys.label, 'From')"></app-mat-form-field-input-time>
+              <app-mat-form-field-input-time [value]="newEnd()!" (valueChange)="newEnd.set($event)" type="DATE_TIME" [inputMap]="inputField('sch-end').set(inputKeys.label, 'Until (empty = open-ended)')"></app-mat-form-field-input-time>
+              <app-mat-form-field-input [value]="newPriority()" (valueChange)="newPriority.set(+$event || 0)" [blankObject]="0" [inputMap]="inputField('sch-prio').set(inputKeys.label, 'Priority').set(inputKeys.styleWidth, '110px')"></app-mat-form-field-input>
+              <app-mat-form-field-input [value]="newName()" (valueChange)="newName.set($event)" [blankObject]="''" [inputMap]="inputField('sch-name').set(inputKeys.label, 'Window name (optional)').set(inputKeys.styleWidth, '220px')"></app-mat-form-field-input>
+              <button matButton="filled" (click)="addWindow()" [disabled]="!newTemplateId() || !newStart()" type="button">Schedule</button>
+            </div>
+          }
+        </div>
+      </mat-tab>
+
+    </mat-tab-group>
   </li>
 </ul>

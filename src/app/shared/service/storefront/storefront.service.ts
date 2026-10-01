@@ -3,7 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { ViesRestService, ViesService } from '../../../../lib/service/rest.service';
 import { Product } from '../../model/product.model';
-import { appearanceFromWire, appearanceToWire, AssetOwnerType, behaviourFromWire, behaviourToWire, ProductSelector, ResolvedStorefront, sectionsFromWire, StorefrontAppearance, StorefrontAsset, StorefrontBehaviour, StorefrontPage, StorefrontSchedule, StorefrontTemplate } from '../../model/storefront.model';
+import { appearanceFromWire, appearanceToWire, AssetOwnerType, behaviourFromWire, behaviourToWire, bodyFromWire, PageBody, PageRole, PageSection, PageView, ProductSelector, ResolvedStorefront, StorefrontAppearance, StorefrontAsset, StorefrontBehaviour, StorefrontPage, StorefrontSchedule, StorefrontTemplate } from '../../model/storefront.model';
 
 // ---- Default look + behaviour, assets, previews (/api/v1/storefront/**, authority `storefront`) ----
 export interface StorefrontSettingsDoc { appearance: StorefrontAppearance; behaviour: StorefrontBehaviour; }
@@ -28,6 +28,11 @@ export class StorefrontService {
     return this.http.get<ResolvedStorefront>(`${this.base}/storefront/preview`, { params: p });
   }
   resolveSelector(sel: ProductSelector): Observable<Product[]> { return this.http.post<Product[]>(`${this.base}/storefront/selector/resolve`, sel); }
+  publicPage(slug: string): Observable<PageView> { return this.http.get<PageView>(`${this.base}/public/storefront/pages/${slug}`); }
+  previewPage(slug: string, templateId?: string | null, draft = true, bodyId?: string | null): Observable<PageView> {
+    let p = new HttpParams().set('draft', draft); if (templateId) p = p.set('templateId', templateId); if (bodyId) p = p.set('bodyId', bodyId);
+    return this.http.get<PageView>(`${this.base}/storefront/preview/pages/${slug}`, { params: p });
+  }
 
   assets(ownerType: AssetOwnerType, ownerId?: string | null): Observable<StorefrontAsset[]> {
     let p = new HttpParams().set('ownerType', ownerType); if (ownerId) p = p.set('ownerId', ownerId);
@@ -48,14 +53,25 @@ export class StorefrontService {
   templateFromLive(name?: string): Observable<StorefrontTemplate> { return this.http.post<StorefrontTemplate>(`${this.base}/storefront/templates/from-live`, { name }).pipe(map(StorefrontTemplateService.fromWire)); }
   activateNow(id: string): Observable<StorefrontSchedule> { return this.http.post<StorefrontSchedule>(`${this.base}/storefront/templates/${id}/activate-now`, null); }
   deactivate(id: string): Observable<{ ended: number }> { return this.http.post<{ ended: number }>(`${this.base}/storefront/templates/${id}/deactivate`, null); }
-  // page actions
+  // pages: bodies (named versions of the content) + the live pointer
   homePage(): Observable<StorefrontPage> { return this.http.get<StorefrontPage>(`${this.base}/storefront/pages/home`).pipe(map(StorefrontPageService.fix)); }
-  publishPage(id: string): Observable<StorefrontPage> { return this.http.post<StorefrontPage>(`${this.base}/storefront/pages/${id}/publish`, null).pipe(map(StorefrontPageService.fix)); }
-  discardPageDraft(id: string): Observable<StorefrontPage> { return this.http.post<StorefrontPage>(`${this.base}/storefront/pages/${id}/discard-draft`, null).pipe(map(StorefrontPageService.fix)); }
+  allPages(): Observable<StorefrontPage[]> { return this.http.get<StorefrontPage[]>(`${this.base}/storefront/pages/all`).pipe(map(l => l.map(StorefrontPageService.fix))); }
+  pageFull(id: string): Observable<StorefrontPage> { return this.http.get<StorefrontPage>(`${this.base}/storefront/pages/${id}/full`).pipe(map(StorefrontPageService.fix)); }
+  pageByRole(role: PageRole): Observable<StorefrontPage> { return this.http.get<StorefrontPage>(`${this.base}/storefront/pages/by-role/${role}`).pipe(map(StorefrontPageService.fix)); }
+  bodies(pageId: string): Observable<PageBody[]> { return this.http.get<PageBody[]>(`${this.base}/storefront/pages/${pageId}/bodies`).pipe(map(l => l.map(bodyFromWire))); }
+  createBody(pageId: string, name: string, copyOf?: string | null, sections?: PageSection[]): Observable<PageBody> {
+    return this.http.post<PageBody>(`${this.base}/storefront/pages/${pageId}/bodies`, { name, copyOf: copyOf || undefined, sections }).pipe(map(bodyFromWire));
+  }
+  updateBody(pageId: string, body: PageBody): Observable<PageBody> { return this.http.put<PageBody>(`${this.base}/storefront/pages/${pageId}/bodies/${body.id}`, { name: body.name, draftSections: body.draftSections }).pipe(map(bodyFromWire)); }
+  publishBody(pageId: string, bodyId: string): Observable<PageBody> { return this.http.post<PageBody>(`${this.base}/storefront/pages/${pageId}/bodies/${bodyId}/publish`, null).pipe(map(bodyFromWire)); }
+  discardBodyDraft(pageId: string, bodyId: string): Observable<PageBody> { return this.http.post<PageBody>(`${this.base}/storefront/pages/${pageId}/bodies/${bodyId}/discard-draft`, null).pipe(map(bodyFromWire)); }
+  makeLive(pageId: string, bodyId: string): Observable<StorefrontPage> { return this.http.post<StorefrontPage>(`${this.base}/storefront/pages/${pageId}/bodies/${bodyId}/make-live`, null).pipe(map(StorefrontPageService.fix)); }
+  takeOffline(pageId: string): Observable<StorefrontPage> { return this.http.post<StorefrontPage>(`${this.base}/storefront/pages/${pageId}/take-offline`, null).pipe(map(StorefrontPageService.fix)); }
+  deleteBody(pageId: string, bodyId: string): Observable<void> { return this.http.delete<void>(`${this.base}/storefront/pages/${pageId}/bodies/${bodyId}`); }
 }
 
 // ---- 7-verb CRUD resources on the lib REST base ------------------------------------------
-// Pages: draft sections are decorated per type on the way in so the dynamic form can render them.
+// Pages: bodies' sections are decorated per type on the way in so the dynamic form can render them.
 @Injectable({ providedIn: 'root' })
 export class StorefrontPageService extends ViesRestService<StorefrontPage> {
   protected override getPrefixes(): string[] { return ['api', 'v1', 'storefront', 'pages']; }
@@ -64,7 +80,7 @@ export class StorefrontPageService extends ViesRestService<StorefrontPage> {
   override setIdFieldValue(o: StorefrontPage, id: any): void { o.id = id; }
   static fix(p: StorefrontPage): StorefrontPage {
     const out = Object.assign(new StorefrontPage(), p);
-    out.draftSections = sectionsFromWire(p.draftSections); out.publishedSections = sectionsFromWire(p.publishedSections);
+    out.bodies = (p.bodies ?? []).map(bodyFromWire);
     return out;
   }
   override get(id: any): Observable<StorefrontPage> { return super.get(id).pipe(map(StorefrontPageService.fix)); }
@@ -85,11 +101,12 @@ export class StorefrontTemplateService extends ViesRestService<StorefrontTemplat
     out.description = t.description ?? '';
     out.draftAppearance = appearanceFromWire(t.draftAppearance as never);
     out.publishedAppearance = t.publishedAppearance ? appearanceFromWire(t.publishedAppearance as never) : null;
-    out.draftHomeSections = sectionsFromWire(t.draftHomeSections); out.publishedHomeSections = t.publishedHomeSections ? sectionsFromWire(t.publishedHomeSections) : null;
+    out.affectedRoles = t.affectedRoles ?? [PageRole.HOME, PageRole.CUSTOM];
+    out.pageBodies = t.pageBodies ?? {};
     return out;
   }
   static toWire(t: StorefrontTemplate): StorefrontTemplate {
-    return { ...t, draftAppearance: appearanceToWire(t.draftAppearance), publishedAppearance: undefined, publishedHomeSections: undefined } as unknown as StorefrontTemplate;
+    return { ...t, draftAppearance: appearanceToWire(t.draftAppearance), publishedAppearance: undefined } as unknown as StorefrontTemplate;
   }
   override get(id: any): Observable<StorefrontTemplate> { return super.get(id).pipe(map(StorefrontTemplateService.fromWire)); }
   override getAll(): Observable<StorefrontTemplate[]> { return super.getAll().pipe(map(l => l.map(StorefrontTemplateService.fromWire))); }

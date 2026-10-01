@@ -13,7 +13,7 @@ import { AuthenticatorService } from '../../../../lib/service/authenticator.serv
 import { ProductService } from '../../../shared/service/product/product.service';
 import { Category, Product, ProductStatus, Tag } from '../../../shared/model/product.model';
 import { NgComponentModule } from "../../../../lib/module/ng-component.module";
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { APP_ROUTES } from '../../../app.routes';
 import { ViesMatFormFieldMap } from '../../../../lib/abtract/ViesMatFormFieldMap';
 import { MatOption } from '../../../../lib/model/mat.model';
@@ -34,6 +34,7 @@ export class ProductListComponent extends ViesMatFormFieldMap implements OnInit 
   protected readonly dialogUtils = inject(DialogUtils);
   protected readonly productService = inject(ProductService);
   protected readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly authenticatorService = inject(AuthenticatorService);
   readonly io = inject(ImportExportService);
   private readonly tagService = inject(TagService);
@@ -91,6 +92,7 @@ export class ProductListComponent extends ViesMatFormFieldMap implements OnInit 
   });
 
   ngOnInit(): void {
+    const qs = this.route.snapshot.queryParamMap.get('status'); if (qs && (Object.values(ProductStatus) as string[]).includes(qs)) this.statusFilter.set(qs as ProductStatus);
     this.refresh();
     if (this.canUpdate()) {
       this.tagService.getAll().subscribe({ next: t => this.tags.set(t ?? []), error: () => {} });
@@ -108,6 +110,7 @@ export class ProductListComponent extends ViesMatFormFieldMap implements OnInit 
   }
 
   onSearchTerm(v: string) {
+    if (v === this.searchTerm()) return; // lib inputs re-emit on focusout — same query = no reload (FE-21)
     this.searchTerm.set(v);
     clearTimeout(this.debounce);
     this.debounce = setTimeout(() => { this.page.set(0); this.refresh(); }, 350);

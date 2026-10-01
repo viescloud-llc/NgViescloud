@@ -22,6 +22,9 @@ export class MaintenancePageComponent implements OnInit {
 
   checking = signal(false);
   stillDown = signal(false);
+  /** Where staff sign in; the lib's auth guard sends unauthenticated users here too. */
+  static loginRoute = '/login';
+  readonly loginRoute = MaintenancePageComponent.loginRoute;
 
   ngOnInit(): void {
     if (ViesService.isNotCSR()) return;

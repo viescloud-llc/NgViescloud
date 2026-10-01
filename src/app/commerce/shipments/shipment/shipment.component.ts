@@ -11,6 +11,7 @@ import { APP_ROUTES } from '../../../app.routes';
 import { OrderFulfillment, Shipment } from '../../../shared/model/commerce.model';
 import { Warehouse } from '../../../shared/model/inventory.model';
 import { Carrier } from '../../../shared/model/shipping.model';
+import { AuthenticatorService } from '../../../../lib/service/authenticator.service';
 import { WarehouseService } from '../../../shared/service/warehouse/warehouse.service';
 import { CarrierService } from '../../../shared/service/carrier/carrier.service';
 import { ShipmentService } from '../../../shared/service/shipment/shipment.service';
@@ -42,6 +43,34 @@ export class ShipmentComponent extends ViesRestApi<Shipment, ShipmentService> im
   warehouses = signal<Warehouse[]>([]);
   carriers = signal<Carrier[]>([]);
   selectedCarrier = computed<Carrier | null>(() => this.carriers().find(c => c.id === this.value()?.carrierId) ?? null);
+
+  // ---- Label purchase (MONEY on the carrier account — shipments:update, EasyPost carriers only) ----
+  private authenticatorService = inject(AuthenticatorService);
+  canBuyLabel = computed<boolean>(() => this.authenticatorService.hasAuthorityOrAdmin('shipments:update'));
+  carrierIsEasyPost = computed<boolean>(() => (this.selectedCarrier()?.integrationType ?? '').trim().toLowerCase() === 'easypost');
+  hasLabel = computed<boolean>(() => !!this.value()?.labelUrl);
+  labelBusy = signal<boolean>(false);
+  // Only once saved (the server reads carrier/warehouse from the stored row) and with no unsaved edits.
+  buyLabelEnabled = computed<boolean>(() => !!this.id() && this.canBuyLabel() && this.carrierIsEasyPost() && !this.hasLabel() && !this.labelBusy() && this._value.isValueNotChange());
+
+  async buyLabel() {
+    const sid = this.id();
+    if (!sid || !this.buyLabelEnabled()) return;
+    const ok = await this.dialogUtils.openConfirmDialog('Buy a shipping label?',
+      `This purchases a ${this.selectedCarrier()?.name} label (${this.value()?.carrierServiceCode || 'cheapest service'}) on your carrier account. The tracking number and URL on this shipment will be replaced by the carrier's.`,
+      'Buy label', 'Cancel').catch(() => false);
+    if (!ok) return;
+    this.labelBusy.set(true);
+    this.service.buyLabel(sid).pipe(this.rxjsUtils.waitLoadingDialog()).subscribe({
+      next: s => { this.labelBusy.set(false); this._value.set(s); },
+      error: err => { this.labelBusy.set(false); this.dialogUtils.openErrorMessageFromError(err); }
+    });
+  }
+
+  labelCostText(): string {
+    const v = this.value();
+    return v?.labelCost != null && v.labelCost !== '' ? Number(v.labelCost).toFixed(2) : '';
+  }
 
   onWarehouseChange(id: string) { const v = this.value(); if (v) this.value.set({ ...v, warehouseId: id || null }); }
   // Picking a carrier record also fills the display name and (when a tracking number is set) the tracking link.
@@ -110,8 +139,9 @@ export class ShipmentComponent extends ViesRestApi<Shipment, ShipmentService> im
           inFiveDays.setDate(inFiveDays.getDate() + 5);
           v.estimatedDeliveryDate = ViesDateTime.fromJsDate(inFiveDays);
         }
+        // actualDeliveryDate stays empty until the shipment is DELIVERED (server stamps it, BE-26).
         if (!v.actualDeliveryDate?.year) {
-          v.actualDeliveryDate = ViesDateTime.now();
+          v.actualDeliveryDate = null as unknown as ViesDateTime;
         }
         this._value.set({ ...v });
       }
@@ -143,7 +173,7 @@ export class ShipmentComponent extends ViesRestApi<Shipment, ShipmentService> im
     v.carrierServiceCode = current?.carrierServiceCode;
     v.orderFulfillment = current?.orderFulfillment ?? new OrderFulfillment();
     v.estimatedDeliveryDate = current?.estimatedDeliveryDate ?? ViesDateTime.now();
-    v.actualDeliveryDate = current?.actualDeliveryDate ?? ViesDateTime.now();
+    v.actualDeliveryDate = current?.actualDeliveryDate ?? (null as unknown as ViesDateTime);
     this.value.set({ ...v });
   }
 

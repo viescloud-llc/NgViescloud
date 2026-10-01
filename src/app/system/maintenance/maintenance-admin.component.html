@@ -39,12 +39,15 @@
                     .set(inputKeys.styleWidth, '100%')"
     ></app-mat-form-field-input-text-area>
     <div class="add-row">
-      <button matButton="filled" class="warn" (click)="setActive(true)" [disabled]="manualWindow()?.active === true" type="button">
-        Turn maintenance ON now
-      </button>
-      <button matButton="filled" (click)="setActive(false)" [disabled]="!manualWindow()?.active" type="button">
-        Turn OFF
-      </button>
+      @if (manualWindow()?.active) {
+        <button matButton="filled" (click)="setActive(false)" type="button">
+          Turn maintenance OFF
+        </button>
+      } @else {
+        <button matButton="filled" class="warn" (click)="setActive(true)" type="button">
+          Turn maintenance ON now
+        </button>
+      }
     </div>
   </li>
 

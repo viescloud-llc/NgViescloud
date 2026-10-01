@@ -12,7 +12,8 @@
     "serve:ssr:venzora-manager": "node dist/venzora-manager/server/server.mjs",
     "build_serve": "ng build && node dist/venzora-manager/server/server.mjs",
     "watch:build_serve": "nodemon --watch src --ext ts,html,scss --exec \"npm run build_serve\"",
-    "watch:dev": "nodemon --watch src/lib --ext ts,html,scss --exec \"ng serve\""
+    "watch:dev": "nodemon --watch src/lib --ext ts,html,scss --exec \"ng serve\"",
+    "e2e": "playwright test"
   },
   "private": true,
   "dependencies": {
@@ -41,6 +42,7 @@
     "@angular/build": "^21.1.4",
     "@angular/cli": "^21.1.4",
     "@angular/compiler-cli": "^21.1.5",
+    "@playwright/test": "^1.62.1",
     "@types/express": "^5.0.1",
     "@types/jasmine": "~5.1.0",
     "@types/node": "^20.17.19",

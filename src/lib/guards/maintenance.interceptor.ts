@@ -17,6 +17,13 @@ import { MaintenanceService } from '../service/maintenance.service';
 export class MaintenanceInterceptor implements HttpInterceptor {
 
   static maintenanceRoute = '/maintenance';
+  /** Routes that must stay reachable during maintenance so staff can sign in and switch it off (FE-26). */
+  static passThroughRoutes: string[] = ['/login', '/oauth2', '/home', '/system/maintenance', '/setting'];
+
+  static isPassThrough(url: string): boolean {
+    const path = (url || '').split('?')[0];
+    return path === '/' || MaintenanceInterceptor.passThroughRoutes.some(r => path === r || path.startsWith(r + '/') || path.startsWith(r));
+  }
 
   constructor(private injector: Injector) {}
 
@@ -27,7 +34,10 @@ export class MaintenanceInterceptor implements HttpInterceptor {
           const maintenance = this.injector.get(MaintenanceService);
           const router = this.injector.get(Router);
           maintenance.applyRejectedStatus(err.error);
-          if (!router.url.startsWith(MaintenanceInterceptor.maintenanceRoute)) {
+          // Only customer-facing pages bounce to the maintenance page. The login page's own
+          // background calls (store info, providers, dashboard) 503 too — redirecting from there
+          // would lock every signed-out admin out until the API is poked by hand (FE-26).
+          if (!router.url.startsWith(MaintenanceInterceptor.maintenanceRoute) && !MaintenanceInterceptor.isPassThrough(router.url)) {
             router.navigate([MaintenanceInterceptor.maintenanceRoute]);
           }
         }

@@ -1,3 +1,4 @@
+import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, computed, effect, inject, input, OnDestroy, output, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -31,7 +32,7 @@ import {
   selector: 'app-product-media-gallery',
   templateUrl: './media-gallery.component.html',
   styleUrls: ['./media-gallery.component.scss'],
-  imports: [NgComponentModule, MatButtonModule, MatIconModule, MatTooltipModule]
+  imports: [NgComponentModule, MatButtonModule, MatIconModule, MatTooltipModule, DragDropModule]
 })
 export class ProductMediaGalleryComponent extends ViesMatFormFieldMap implements OnDestroy {
 
@@ -246,6 +247,46 @@ export class ProductMediaGalleryComponent extends ViesMatFormFieldMap implements
       // set alt text / caption on it next.
       this.selectedIndex.set(next.length - 1);
     });
+  }
+
+  /**
+   * Bulk add: every picked file becomes a pending upload (same deferred-commit
+   * rules as the dialog flow — nothing hits object storage until the parent
+   * saves). Videos by MIME type, everything else an image.
+   */
+  addFiles(evt: Event) {
+    const input = evt.target as HTMLInputElement;
+    const files = Array.from(input.files ?? []);
+    input.value = '';
+    if (files.length === 0) return;
+    const next = [...this.medias()];
+    for (const file of files) {
+      const media = DataUtils.purgeValue(new ProductMedia());
+      const ext = (file.name.split('.').pop() ?? '').toLowerCase();
+      const vfile: VFile = { name: file.name, type: file.type || '', extension: ext, rawFile: file, objectUrl: '' };
+      const blobUrl = URL.createObjectURL(file);
+      vfile.objectUrl = blobUrl;
+      this.pendingUploads.set(blobUrl, vfile);
+      media.url = blobUrl;
+      media.objectStorageDataId = '';
+      media.mediaType = file.type.startsWith('video/') ? ProductMediaType.VIDEO : ProductMediaType.IMAGE;
+      media.altText = file.name.replace(/\.[^.]+$/, '');
+      if (next.length === 0) media.isPrimary = true;
+      next.push(media);
+    }
+    next.forEach((m, idx) => { m.sortOrder = idx; });
+    this.mediasChange.emit(next);
+    this.selectedIndex.set(next.length - 1);
+  }
+
+  /** Drag a thumbnail to a new position; sortOrder follows the visual order. */
+  onThumbDrop(evt: CdkDragDrop<ProductMedia[]>) {
+    if (evt.previousIndex === evt.currentIndex) return;
+    const next = [...this.medias()];
+    moveItemInArray(next, evt.previousIndex, evt.currentIndex);
+    next.forEach((m, idx) => { m.sortOrder = idx; });
+    this.mediasChange.emit(next);
+    this.selectedIndex.set(evt.currentIndex);
   }
 
   openReplace() {

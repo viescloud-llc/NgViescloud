@@ -75,6 +75,7 @@ export class StockMovementListComponent extends ViesMatFormFieldMap implements O
   }
 
   onSearchTerm(v: string) {
+    if (v === this.searchTerm()) return; // lib inputs re-emit on focusout — same query = no reload (FE-21)
     this.searchTerm.set(v);
     clearTimeout(this.debounce);
     this.debounce = setTimeout(() => { this.page.set(0); this.refresh(); }, 350);

@@ -3,7 +3,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { NgComponentModule } from '../../../../lib/module/ng-component.module';
 import { Product } from '../../model/product.model';
-import { ResolvedSection, ResolvedStorefront } from '../../model/storefront.model';
+import { PageView, ResolvedSection, ResolvedStorefront } from '../../model/storefront.model';
 import { StorefrontService } from '../../service/storefront/storefront.service';
 
 // Renders a resolved storefront: announcement, header nav, sections, footer.
@@ -21,6 +21,9 @@ export class StorefrontRendererComponent {
   data = input.required<ResolvedStorefront>();
   /** In the Manager preview links do not navigate. */
   inert = input<boolean>(false);
+  /** When set, this page's sections render instead of the home sections (the chrome stays). */
+  page = input<PageView | null>(null);
+  sections = computed<ResolvedSection[]>(() => this.page()?.sections ?? this.data().home);
 
   themeStyle = computed<Record<string, string>>(() => {
     const t = this.data().appearance.theme;

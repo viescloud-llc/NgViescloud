@@ -47,3 +47,7 @@ temp
 .claude/.env
 document/backend-fix-checklist.md
 document/frontend-fix-checklist.md
+
+# Playwright
+/test-results/
+/playwright-report/

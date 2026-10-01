@@ -211,3 +211,9 @@
   padding: 0;
   margin: 0;
 }
+
+.header-actions { display: flex; gap: 0.5rem; align-items: center; }
+.file-picker-btn { cursor: pointer; }
+.thumb.cdk-drag-preview { opacity: 0.85; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+.thumb.cdk-drag-placeholder { opacity: 0.3; }
+.thumb-rail.cdk-drop-list-dragging .thumb:not(.cdk-drag-placeholder) { transition: transform 150ms ease; }

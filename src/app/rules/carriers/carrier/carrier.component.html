@@ -18,7 +18,7 @@
 
   <li>
     <h3 class="section-title">API credentials</h3>
-    <p class="tab-hint">Only used once an integration for this carrier exists. Stored as entered.</p>
+    <p class="tab-hint">Encrypted at rest and never shown again: a saved key reads back as <code>••••</code> plus its last characters. Leave the mask as is to keep the stored value; type a new value to replace it; clear the field to remove it.</p>
     <app-mat-form-field-input
       [value]="value()?.apiKey || ''" (valueChange)="onApiKeyChange($event)" [blankObject]="''"
       [inputMap]="inputField('carrier-api-key').set(inputKeys.label, 'API key').set(inputKeys.showVisibleSwitch, true).set(inputKeys.styleWidth, '100%')"

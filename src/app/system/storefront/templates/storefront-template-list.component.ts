@@ -19,7 +19,7 @@ import { StorefrontScheduleService, StorefrontService, StorefrontTemplateService
   selector: 'app-storefront-template-list',
   imports: [NgComponentModule],
   templateUrl: './storefront-template-list.component.html',
-  styles: [`.row { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; margin: 0.25rem 0; } .live { color: #4caf50; font-weight: 600; } .section-title { margin: 1rem 0 0.5rem; }`]
+  styles: [`.return-banner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding: 0.75rem 1rem; margin-bottom: 1rem; border-left: 4px solid var(--mat-sys-primary, #7c4dff); background: var(--mat-sys-surface-container-low, rgba(255,255,255,0.03)); border-radius: 4px; .links { display: flex; gap: 0.25rem; } } .tab-body { padding: 1rem 0.25rem; } .row { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; margin: 0.5rem 0; } .live { color: #4caf50; font-weight: 600; } .section-title { margin: 1rem 0 0.25rem; }`]
 })
 export class StorefrontTemplateListComponent extends ViesMatFormFieldMap implements OnInit {
   private readonly rxjsUtils = inject(RxJSUtils);

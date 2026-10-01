@@ -102,6 +102,9 @@ export class ShippingRuleComponent extends ViesRestApi<ShippingRule, ShippingRul
     this.carrierService.getAll().subscribe({ next: res => this.carriers.set(res ?? []), error: () => {} });
   }
 
+  // The seeded MAIN warehouse has address: null on the wire (FE-16).
+  warehouseCountry(w: Warehouse): string { return (w as { address?: { country?: string } | null }).address?.country ?? ''; }
+
   onOriginWarehouseChange(id: string) { this.patch({ originWarehouseId: id || null }); }
   onCarrierChange(id: string) { this.patch({ carrierId: id || null, carrierServiceCode: '' }); }
 

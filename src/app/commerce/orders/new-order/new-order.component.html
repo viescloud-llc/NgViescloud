@@ -46,6 +46,15 @@
         <button matButton (click)="scan()" [disabled]="!scanValue().trim()" type="button">Add</button>
         <input class="text-input" type="text" placeholder="…or search products by name / SKU" [value]="productQuery()" (input)="onProductQuery($any($event.target).value)" autocomplete="off" />
       </div>
+      @if (ambiguousScan(); as a) {
+        <div class="results ambiguous">
+          <p class="hint">"{{ a.code }}" is an alias on {{ a.matches.length }} variants — which one?</p>
+          @for (m of a.matches; track m.variant.id) {
+            <button matButton (click)="pickScanMatch(m)" type="button">{{ m.productName }} — {{ m.variant.variantName || m.variant.sku }} <small>{{ m.variant.sku }} · {{ money(m.effectivePrice || m.variant.effectivePrice || m.variant.price) }} · stock {{ m.variant.stockQuantity }}</small></button>
+          }
+          <button matButton (click)="ambiguousScan.set(null)" type="button">Cancel</button>
+        </div>
+      }
       @if (productResults().length > 0) {
         <div class="results">
           @for (p of productResults(); track p.id) {
@@ -119,7 +128,8 @@
         }
         @if (paymentMethod() === 'CASH') {
           <app-mat-form-field-input [value]="amountTendered()" (valueChange)="amountTendered.set($event)" [blankObject]="''" [inputMap]="inputField('mo-tendered').set(inputKeys.label, 'Cash tendered').set(inputKeys.styleWidth, '200px')"></app-mat-form-field-input>
-          @if (change()) { <p class="change">Change due: <strong>{{ change() }}</strong></p> }
+          @if (shortBy()) { <p class="change short">Short by <strong>{{ shortBy() }}</strong> — a cash sale must be paid in full</p> }
+          @else if (change()) { <p class="change">Change due: <strong>{{ change() }}</strong></p> }
         }
         @if (paymentMethod() === 'UNPAID') { <p class="hint">The order stays PENDING and stock is not moved until a payment is recorded on its Payment tab.</p> }
       </div>

@@ -47,21 +47,26 @@
 
       <ng-container>
         @for (item of value; track trackByIndex(i, item); let i = $index) {
-          <app-mat-form-field-input-option
-            [value]="value[i]" (valueChange)="value[i] = $event; emitValue()"
-            (onValueChange)="onValueChange.emit()"
-            [options]="getOptons()"
-            [noneLabel]="''"
-            (onCustomOptionSelected)="remove(i)"
-            [inputMap]="inputMap.clone()
-                                .set(inputKeys.customOptionLabel, 'Remove')
-                                .set(inputKeys.customOptionLabelColor, 'red')
-                                .set(inputKeys.styleWidth, '100%')"
-          ></app-mat-form-field-input-option>
+          <div class="list-option-row" [class.with-remove]="getInputValue(inputKeys.showRemoveButton)">
+            <app-mat-form-field-input-option
+              [value]="value[i]" (valueChange)="value[i] = $event; emitValue()"
+              (onValueChange)="onValueChange.emit()"
+              [options]="getOptons()"
+              [noneLabel]="''"
+              (onCustomOptionSelected)="remove(i)"
+              [inputMap]="inputMap.clone()
+                                  .set(inputKeys.customOptionLabel, 'Remove')
+                                  .set(inputKeys.customOptionLabelColor, 'red')
+                                  .set(inputKeys.styleWidth, '100%')"
+            ></app-mat-form-field-input-option>
+            @if (getInputValue(inputKeys.showRemoveButton) && !getInputValue(inputKeys.readonly)) {
+              <button matIconButton class="remove-row" (click)="remove(i)" type="button" [attr.aria-label]="'Remove ' + getInputValue(inputKeys.label)" title="Remove"><mat-icon>close</mat-icon></button>
+            }
+          </div>
         }
       </ng-container>
 
-      @if (!getInputValue(inputKeys.readonly)) {
+      @if (!getInputValue(inputKeys.readonly) && getInputValue(inputKeys.showAddNewButton)) {
         <li class="flex-row-container-auto">
           <button matButton="filled" (click)="addNewItem()" [disabled]="reachMaxSize()">Add new {{getInputValue(inputKeys.label)}}</button>
         </li>

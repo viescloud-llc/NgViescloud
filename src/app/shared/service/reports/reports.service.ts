@@ -16,7 +16,8 @@ import {
   TaxReport,
   TopCategoriesReport,
   TopOrderedBy,
-  TopProductsReport
+  TopProductsReport,
+  StockValuationReport, DiscountPerformanceReport, ShippingReport, ReturnsReport, DashboardReport
 } from '../../model/report.model';
 
 // Read-only analytics over `OrderFulfillment` for dashboards and tax filing. All
@@ -90,6 +91,15 @@ export class ReportsService {
       params: this.period(period).set('page', String(page)).set('size', String(size))
     });
   }
+
+  // ---- checklist-2 §10 ----
+  stockValuation(warehouseId?: string | null): Observable<StockValuationReport> {
+    return this.http.get<StockValuationReport>(`${this.baseUrl}/stock/valuation`, { params: warehouseId ? new HttpParams().set('warehouseId', warehouseId) : new HttpParams() });
+  }
+  discounts(period: ReportPeriodParams): Observable<DiscountPerformanceReport> { return this.http.get<DiscountPerformanceReport>(`${this.baseUrl}/discounts`, { params: this.period(period) }); }
+  shipping(period: ReportPeriodParams): Observable<ShippingReport> { return this.http.get<ShippingReport>(`${this.baseUrl}/shipping`, { params: this.period(period) }); }
+  returns(period: ReportPeriodParams): Observable<ReturnsReport> { return this.http.get<ReturnsReport>(`${this.baseUrl}/returns`, { params: this.period(period) }); }
+  dashboard(): Observable<DashboardReport> { return this.http.get<DashboardReport>(`${this.baseUrl}/dashboard`); }
 
   private period(p: ReportPeriodParams): HttpParams {
     return new HttpParams().set('from', p.from).set('to', p.to);

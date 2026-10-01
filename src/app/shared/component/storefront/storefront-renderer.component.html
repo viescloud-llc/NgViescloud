@@ -15,7 +15,8 @@
     </div>
   </header>
 
-  @for (s of data().home; track s.id) {
+  @if (page(); as pg) { <h1 class="page-title">{{ pg.title }}</h1> }
+  @for (s of sections(); track s.id) {
     @switch (s.type) {
       @case ('HERO') {
         <section class="hero" [style.background-image]="s.settings['imageAssetId'] ? 'url(' + asset(s.settings['imageAssetId']) + ')' : ''">
@@ -54,6 +55,7 @@
     <div class="cols">
       @for (c of data().appearance.footer.columns; track $index) { <div class="col"><strong>{{ c.title }}</strong>@for (l of c.links; track $index) { <a (click)="go(l.url)">{{ l.label }}</a> }</div> }
       @if (data().pages.length > 0) { <div class="col"><strong>Info</strong>@for (p of data().pages; track p.slug) { <a (click)="go('/shop/pages/' + p.slug)">{{ p.title }}</a> }</div> }
+      @if (data().pagesByRole['TERMS']?.published || data().pagesByRole['PRIVACY']?.published) { <div class="col"><strong>Legal</strong>@if (data().pagesByRole['TERMS']?.published) { <a (click)="go('/shop/pages/' + data().pagesByRole['TERMS'].slug)">Terms</a> }@if (data().pagesByRole['PRIVACY']?.published) { <a (click)="go('/shop/pages/' + data().pagesByRole['PRIVACY'].slug)">Privacy</a> }</div> }
       @if (data().appearance.footer.showSupportContact && (data().store.supportEmail || data().store.supportPhone)) { <div class="col"><strong>Contact</strong><span>{{ data().store.supportEmail }}</span><span>{{ data().store.supportPhone }}</span></div> }
     </div>
     <div class="social">@for (s of data().appearance.footer.socialLinks; track $index) { <a (click)="go(s.url)">{{ s.network }}</a> }</div>

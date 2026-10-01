@@ -1,1 +1,6 @@
-/* Add your component styles here */
+.return-banner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding: 0.75rem 1rem; margin-bottom: 1rem; border-left: 4px solid var(--mat-sys-primary, #7c4dff); background: var(--mat-sys-surface-container-low, rgba(255,255,255,0.03)); border-radius: 4px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.75rem; }
+.tile { display: flex; flex-direction: column; align-items: flex-start; gap: 0.15rem; padding: 0.9rem 1rem; border: 1px solid var(--mat-sys-outline-variant, rgba(255,255,255,0.15)); border-radius: 8px; background: var(--mat-sys-surface-container-low, rgba(255,255,255,0.03)); color: inherit; cursor: pointer; text-align: left; font: inherit;
+  &:hover { border-color: var(--mat-sys-primary, #7c4dff); } &.warn { border-left: 4px solid var(--mat-sys-tertiary, #ffd54f); }
+  .value { font-size: 1.8rem; font-weight: 700; line-height: 1.1; } .label { font-weight: 600; } .hint { font-size: 0.8rem; opacity: 0.7; } }
+.warn-text { color: var(--mat-sys-error, #f28b82); }
