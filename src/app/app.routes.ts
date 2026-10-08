@@ -34,6 +34,7 @@ import { HomeComponent } from './home/home.component';
 // null in `getRouteId()` so `ViesRestApi.ngOnInit` skips the GET and shows a blank form.
 export const APP_ROUTES = {
   home: "home",
+  help: "help",
   login: "login",
   setting: "setting",
   applicationSetting: "setting/application-setting",
@@ -196,6 +197,12 @@ export const routes: Routes = [
   {
     path: "login",
     component: LoginComponent
+  },
+  {
+    // The owner's manual — any signed-in user.
+    path: "help",
+    canActivate: [async () => inject(AuthGuard).isLogin()],
+    loadComponent: () => import('./help/help.component').then(m => m.HelpComponent)
   },
   {
     path: "catalog",

@@ -52,6 +52,11 @@ export class App extends ViescloudApplication {
           routerLink: environment.endpoint_home
         },
         {
+          title: 'Help / manual',
+          routerLink: APP_ROUTES.help,
+          hideConditional: () => !this.authenticatorService.isAuthenticatedSync()
+        },
+        {
           title: 'Login',
           routerLink: environment.endpoint_login,
           hideConditional: () => this.authenticatorService.isAuthenticatedSync(),

@@ -1,0 +1,68 @@
+<div class="help">
+  <aside class="toc" aria-label="Help contents">
+    <div class="search">
+      <mat-icon>search</mat-icon>
+      <input type="search" placeholder="Search the manual…" [value]="query()" (input)="query.set($any($event.target).value)" aria-label="Search help" />
+      @if (query()) { <button matIconButton type="button" (click)="clear()" aria-label="Clear search"><mat-icon>close</mat-icon></button> }
+    </div>
+    @if (query()) { <p class="hits">{{ hits() }} {{ hits() === 1 ? 'topic' : 'topics' }}</p> }
+    <nav>
+      <a (click)="jump('tasks')" [class.active]="active() === 'tasks'" tabindex="0"><mat-icon>checklist</mat-icon> Common tasks</a>
+      @for (s of sections(); track s.id) {
+        <a (click)="jump(s.id)" [class.active]="active() === s.id" tabindex="0"><mat-icon>{{ s.icon }}</mat-icon> {{ s.title }}</a>
+        @if (!query()) {
+          @for (t of s.topics; track t.id) { <a class="sub" (click)="jump(t.id)" [class.active]="active() === t.id" tabindex="0">{{ t.title }}</a> }
+        }
+      }
+    </nav>
+  </aside>
+
+  <main class="content">
+    <header class="intro">
+      <h1>How Venzora Manager works</h1>
+      <p>This is the owner's manual: what each area does, how to use it, and — most of all — <strong>what changes in your shop</strong> when you do. Start with a common task, or pick an area on the left.</p>
+    </header>
+
+    @if (!query()) {
+      <section id="tasks" class="tasks">
+        <h2><mat-icon>checklist</mat-icon> Common tasks</h2>
+        <div class="task-grid">
+          @for (t of tasks; track t.title) {
+            <article class="task">
+              <h3><mat-icon>{{ t.icon }}</mat-icon> {{ t.title }}</h3>
+              <ol>@for (s of t.steps; track $index) { <li [innerHTML]="html(s)"></li> }</ol>
+              <div class="links">@for (l of t.links; track l.route) { <a matButton (click)="go(l.route)" tabindex="0">{{ l.label }} <mat-icon>arrow_forward</mat-icon></a> }</div>
+            </article>
+          }
+        </div>
+      </section>
+    }
+
+    @for (s of sections(); track s.id) {
+      <section [id]="s.id" class="area">
+        <h2><mat-icon>{{ s.icon }}</mat-icon> {{ s.title }}</h2>
+        <p class="lead" [innerHTML]="html(s.intro)"></p>
+        @for (t of s.topics; track t.id) {
+          <article [id]="t.id" class="topic">
+            <h3>{{ t.title }} <a class="anchor" (click)="jump(t.id)" tabindex="0" aria-label="Link to this topic"><mat-icon>link</mat-icon></a></h3>
+            <div class="what" [innerHTML]="html(t.what)"></div>
+            @if (t.how?.length) {
+              <div class="block how"><strong><mat-icon>play_circle</mat-icon> How</strong><ol>@for (h of t.how; track $index) { <li [innerHTML]="html(h)"></li> }</ol></div>
+            }
+            @if (t.impact?.length) {
+              <div class="block impact"><strong><mat-icon>bolt</mat-icon> What it changes</strong><ul>@for (i of t.impact; track $index) { <li [innerHTML]="html(i)"></li> }</ul></div>
+            }
+            @if (t.tips?.length) {
+              <div class="block tips"><strong><mat-icon>lightbulb</mat-icon> Good to know</strong><ul>@for (i of t.tips; track $index) { <li [innerHTML]="html(i)"></li> }</ul></div>
+            }
+            @if (t.links?.length) {
+              <div class="links">@for (l of t.links; track l.route) { <a matButton (click)="go(l.route)" tabindex="0">{{ l.label }} <mat-icon>arrow_forward</mat-icon></a> }</div>
+            }
+          </article>
+        }
+      </section>
+    } @empty {
+      <p class="empty">Nothing matches “{{ query() }}”. Try another word — or <a (click)="clear()" tabindex="0">clear the search</a>.</p>
+    }
+  </main>
+</div>

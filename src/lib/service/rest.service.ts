@@ -59,9 +59,18 @@ export abstract class ViesService {
         }
     }
 
+    /**
+     * Server-side rendering has no window and no /assets/env.json to fetch:
+     * the server entry sets the gateway here (from GATEWAY_API or the built
+     * env.json) before bootstrapping, so public reads can run on the server.
+     */
+    static setEnv(env: { gateway_api: string } | null): void {
+        this.env = env;
+    }
+
     static getUri(): string {
         if(ViesRestService.isNotCSR()) {
-            return 'http://localhost';
+            return this.env?.gateway_api || 'http://localhost';
         }
 
         const env_gateway_api = this.loadEnvSync()?.gateway_api;

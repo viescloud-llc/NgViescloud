@@ -347,3 +347,12 @@ business identity (those stay in §9 so applying a template never has side effec
 1. §1 Customers → 2. §2 Money actions → 3. §3 Transactional email → 4. §4 Server-side lists →
 5. §5 Audit → 6. §8 Manual orders (unlocks the POS) → 7. §6 Stock ops → 8. §7 Bulk/import →
 9. §9 Store settings → 10. §10 Reports/dashboard ✅ → 11. §12 Storefront customisation ✅ → §11 as items become blocking.
+
+## 13. Follow-ups from the customer client (2026-10-08)
+
+- [ ] **Contact inbox** — the storefront's contact form stores `ContactMessage` rows (`/api/v1/contact-messages`,
+  resource `contact`, api.md §7.27). Add a System → Contact inbox page: list (NEW first), read, mark READ / REPLIED,
+  reply-by-mail link, delete; badge with the NEW count in the nav.
+- [ ] **Email → Contact form message** — the `CONTACT_MESSAGE` staff event appears in Settings → Email; make sure the
+  recipients row is editable there (falls back to the store support e-mail when empty).
+- [x] **Help page** — `/help` owner's manual (common tasks + every area, searchable, anchored). *(2026-10-08)* Keep it current when workflows change; a Contact inbox section goes in once the inbox page exists.
